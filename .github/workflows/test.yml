@@ -71,7 +71,7 @@ jobs:
           driver-opts: network=host
 
       - name: Build service image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: false
@@ -80,7 +80,7 @@ jobs:
           file: docker/service/Dockerfile
 
       - name: Build app image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: false
