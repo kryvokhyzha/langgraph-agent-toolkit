@@ -9,7 +9,7 @@ from langgraph.types import Interrupt
 
 from langgraph_agent_toolkit.agents.agents import Agent
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import OpenAIModelName
+from langgraph_agent_toolkit.schema.models import OpenAICompatibleName
 
 
 def test_invoke(test_client, mock_agent) -> None:
@@ -49,7 +49,7 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
             return mock_agent
         return default_mock
 
-    with patch("service.service.get_agent", side_effect=agent_lookup):
+    with patch("langgraph_agent_toolkit.service.service.get_agent", side_effect=agent_lookup):
         response = test_client.post(f"/{CUSTOM_AGENT}/invoke", json={"message": QUESTION})
         assert response.status_code == 200
 
@@ -69,7 +69,7 @@ def test_invoke_model_param(test_client, mock_agent) -> None:
     """Test that the model parameter is correctly passed to the agent."""
     QUESTION = "What is the weather in Tokyo?"
     ANSWER = "The weather in Tokyo is sunny."
-    CUSTOM_MODEL = "claude-3.5-sonnet"
+    CUSTOM_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
 
     response = test_client.post("/invoke", json={"message": QUESTION, "model": CUSTOM_MODEL})
@@ -140,7 +140,7 @@ def test_invoke_interrupt(test_client, mock_agent) -> None:
     assert output.content == INTERRUPT
 
 
-@patch("service.service.LangsmithClient")
+@patch("langgraph_agent_toolkit.service.service.LangsmithClient")
 def test_feedback(mock_client: langsmith.Client, test_client) -> None:
     ls_instance = mock_client.return_value
     ls_instance.create_feedback.return_value = None
@@ -326,17 +326,17 @@ def test_info(test_client, mock_settings) -> None:
 
     base_agent = Agent(description="A base agent.", graph=None)
     mock_settings.AUTH_SECRET = None
-    mock_settings.DEFAULT_MODEL = OpenAIModelName.GPT_4O_MINI
-    mock_settings.AVAILABLE_MODELS = {OpenAIModelName.GPT_4O_MINI, OpenAIModelName.GPT_4O}
-    with patch.dict("agents.agents.agents", {"base-agent": base_agent}, clear=True):
+    mock_settings.DEFAULT_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
+    mock_settings.AVAILABLE_MODELS = {OpenAICompatibleName.OPENAI_COMPATIBLE}
+    with patch.dict("langgraph_agent_toolkit.agents.agents.agents", {"base-agent": base_agent}, clear=True):
         response = test_client.get("/info")
         assert response.status_code == 200
         output = ServiceMetadata.model_validate(response.json())
 
-    assert output.default_agent == "research-assistant"
+    assert output.default_agent == "langgraph-supervisor-agent"
     assert len(output.agents) == 1
     assert output.agents[0].key == "base-agent"
     assert output.agents[0].description == "A base agent."
 
-    assert output.default_model == OpenAIModelName.GPT_4O_MINI
-    assert output.models == [OpenAIModelName.GPT_4O, OpenAIModelName.GPT_4O_MINI]
+    assert output.default_model == OpenAICompatibleName.OPENAI_COMPATIBLE
+    assert output.models == [OpenAICompatibleName.OPENAI_COMPATIBLE]

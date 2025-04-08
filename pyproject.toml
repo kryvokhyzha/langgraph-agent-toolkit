@@ -128,7 +128,7 @@ black = 1
 ruff = 1
 
 [tool.pytest.ini_options]
-pythonpath = ["langgraph_agent_toolkit"]
+pythonpath = ["langgraph_agent_toolkit", "."]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.pytest_env]

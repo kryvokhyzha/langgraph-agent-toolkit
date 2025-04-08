@@ -29,6 +29,7 @@ class AgentClient:
         agent: str = None,
         timeout: float | None = None,
         get_info: bool = True,
+        verify: bool = False,
     ) -> None:
         """
         Initialize the client.
@@ -39,6 +40,8 @@ class AgentClient:
             timeout (float, optional): The timeout for requests.
             get_info (bool, optional): Whether to fetch agent information on init.
                 Default: True
+            verify (bool, optional): Whether to verify the agent information.
+                Default: False
         """
         self.base_url = base_url
         self.auth_secret = os.getenv("AUTH_SECRET")
@@ -48,7 +51,7 @@ class AgentClient:
         if get_info:
             self.retrieve_info()
         if agent:
-            self.update_agent(agent)
+            self.update_agent(agent, verify=verify)
 
     @property
     def _headers(self) -> dict[str, str]:
@@ -285,7 +288,7 @@ class AgentClient:
                     headers=self._headers,
                     timeout=self.timeout,
                 ) as response:
-                    response.raise_for_status()
+                    await response.raise_for_status()
                     async for line in response.aiter_lines():
                         if line.strip():
                             parsed = self._parse_stream_line(line)

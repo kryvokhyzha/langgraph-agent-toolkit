@@ -2,62 +2,46 @@ import os
 from unittest.mock import patch
 
 import pytest
-from langchain_anthropic import ChatAnthropic
 from langchain_community.chat_models import FakeListChatModel
-from langchain_groq import ChatGroq
-from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
 from langgraph_agent_toolkit.core.llm import get_model
 from langgraph_agent_toolkit.schema.models import (
-    AnthropicModelName,
     FakeModelName,
-    GroqModelName,
-    OllamaModelName,
-    OpenAIModelName,
+    OpenAICompatibleName,
 )
 
 
-def test_get_model_openai():
-    with patch.dict(os.environ, {"OPENAI_API_KEY": "test_key"}):
-        model = get_model(OpenAIModelName.GPT_4O_MINI)
+def test_get_model_openai_compatible():
+    # Clear the cache to ensure a fresh test
+    get_model.cache_clear()
+
+    with patch("langgraph_agent_toolkit.core.llm.settings") as mock_settings:
+        # Mock the settings attributes directly
+        mock_settings.COMPATIBLE_MODEL = "gpt-4"
+        mock_settings.COMPATIBLE_BASE_URL = "http://api.example.com"
+        mock_settings.COMPATIBLE_API_KEY = "test_key"
+
+        model = get_model(OpenAICompatibleName.OPENAI_COMPATIBLE)
         assert isinstance(model, ChatOpenAI)
-        assert model.model_name == "gpt-4o-mini"
+        assert model.model_name == "gpt-4"
         assert model.temperature == 0.5
         assert model.streaming is True
+        assert model.openai_api_base == "http://api.example.com"
+        assert model.openai_api_key.get_secret_value() == "test_key"
 
 
-def test_get_model_anthropic():
-    with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test_key"}):
-        model = get_model(AnthropicModelName.HAIKU_3)
-        assert isinstance(model, ChatAnthropic)
-        assert model.model == "claude-3-haiku-20240307"
-        assert model.temperature == 0.5
-        assert model.streaming is True
+def test_get_model_openai_compatible_missing_config():
+    # Clear the cache to ensure a fresh test
+    get_model.cache_clear()
 
+    with patch("langgraph_agent_toolkit.core.llm.settings") as mock_settings:
+        # Set the required attributes to None to simulate missing configuration
+        mock_settings.COMPATIBLE_BASE_URL = None
+        mock_settings.COMPATIBLE_MODEL = None
 
-def test_get_model_groq():
-    with patch.dict(os.environ, {"GROQ_API_KEY": "test_key"}):
-        model = get_model(GroqModelName.LLAMA_31_8B)
-        assert isinstance(model, ChatGroq)
-        assert model.model_name == "llama-3.1-8b-instant"
-        assert model.temperature == 0.5
-
-
-def test_get_model_groq_guard():
-    with patch.dict(os.environ, {"GROQ_API_KEY": "test_key"}):
-        model = get_model(GroqModelName.LLAMA_GUARD_3_8B)
-        assert isinstance(model, ChatGroq)
-        assert model.model_name == "llama-guard-3-8b"
-        assert model.temperature < 0.01
-
-
-def test_get_model_ollama():
-    with patch("core.settings.settings.OLLAMA_MODEL", "llama3.3"):
-        model = get_model(OllamaModelName.OLLAMA_GENERIC)
-        assert isinstance(model, ChatOllama)
-        assert model.model == "llama3.3"
-        assert model.temperature == 0.5
+        with pytest.raises(ValueError, match="OpenAICompatible base url and endpoint must be configured"):
+            get_model(OpenAICompatibleName.OPENAI_COMPATIBLE)
 
 
 def test_get_model_fake():

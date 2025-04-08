@@ -1,5 +1,7 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
+import pytest
+from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage, ToolCall, ToolMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
@@ -8,8 +10,10 @@ from langgraph.types import StreamWriter
 from langgraph_agent_toolkit.agents.agents import Agent
 from langgraph_agent_toolkit.agents.utils import CustomData
 from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.core.settings import settings, DatabaseType
 from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
+from langgraph_agent_toolkit.service.service import app
 
 START_MESSAGE = CustomData(type="start", data={"key1": "value1", "key2": 123})
 
@@ -31,6 +35,32 @@ STATIC_MESSAGES = [
 
 
 EXPECTED_OUTPUT_MESSAGES = [langchain_to_chat_message(m) for m in [START_MESSAGE.to_langchain()] + STATIC_MESSAGES]
+
+
+@pytest.fixture
+def mock_httpx():
+    """Mock httpx to avoid making real HTTP requests."""
+    with patch("httpx.stream") as mock_stream:
+        # Create a mock response
+        mock_response = MagicMock()
+        mock_response.raise_for_status.return_value = None
+        mock_response.iter_lines.return_value = []
+
+        # Configure the mock to return our mock response
+        mock_stream.return_value.__enter__.return_value = mock_response
+
+        yield mock_stream
+
+
+@pytest.fixture
+def sqlite_db_settings():
+    """Temporarily configure settings to use SQLite in-memory database for testing."""
+    # Patch the settings instance, not the Settings class
+    with patch.object(settings, "DATABASE_TYPE", DatabaseType.SQLITE):
+        with patch.object(settings, "SQLITE_DB_PATH", ":memory:"):
+            # Patch the database initialization function
+            with patch("langgraph_agent_toolkit.service.service.initialize_database"):
+                yield
 
 
 def test_messages_conversion() -> None:
@@ -77,11 +107,14 @@ agent.add_edge("static_messages", END)
 static_agent = agent.compile(checkpointer=MemorySaver())
 
 
-def test_agent_stream(mock_httpx):
+def test_agent_stream(mock_httpx, sqlite_db_settings):
     """Test that streaming from our static agent works correctly with token streaming."""
+    # Apply database settings and patch
     agent_meta = Agent(description="A static agent.", graph=static_agent)
-    with patch.dict("agents.agents.agents", {"static-agent": agent_meta}, clear=True):
-        client = AgentClient(agent="static-agent")
+
+    with patch.dict("langgraph_agent_toolkit.agents.agents.agents", {"static-agent": agent_meta}, clear=True):
+        # Initialize client with get_info=False and verify=False to avoid HTTP request
+        client = AgentClient(agent="static-agent", base_url="http://0.0.0.0:8080", get_info=False, verify=False)
 
     # Use stream to get intermediate responses
     messages = []
@@ -91,7 +124,7 @@ def test_agent_stream(mock_httpx):
             return static_agent
         return None
 
-    with patch("service.service.get_agent", side_effect=agent_lookup):
+    with patch("langgraph_agent_toolkit.service.service.get_agent", side_effect=agent_lookup):
         for response in client.stream("Test message", stream_tokens=False):
             if isinstance(response, ChatMessage):
                 messages.append(response)

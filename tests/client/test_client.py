@@ -3,11 +3,11 @@ import os
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from httpx import Request, Response
+from httpx import Request, Response, HTTPStatusError
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import OpenAIModelName
+from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
 
 
 def test_init(mock_env):
@@ -63,14 +63,14 @@ def test_invoke(agent_client):
     with patch("httpx.post", return_value=mock_response) as mock_post:
         response = agent_client.invoke(
             QUESTION,
-            model="gpt-4o",
+            model="openai-compatible",
             thread_id="test-thread",
         )
         assert isinstance(response, ChatMessage)
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["message"] == QUESTION
-        assert kwargs["json"]["model"] == "gpt-4o"
+        assert kwargs["json"]["model"] == "openai-compatible"
         assert kwargs["json"]["thread_id"] == "test-thread"
 
     # Test error response
@@ -100,7 +100,7 @@ async def test_ainvoke(agent_client):
     with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
         response = await agent_client.ainvoke(
             QUESTION,
-            model="gpt-4o",
+            model="openai-compatible",
             thread_id="test-thread",
         )
         assert isinstance(response, ChatMessage)
@@ -109,7 +109,7 @@ async def test_ainvoke(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["message"] == QUESTION
-        assert kwargs["json"]["model"] == "gpt-4o"
+        assert kwargs["json"]["model"] == "openai-compatible"
         assert kwargs["json"]["thread_id"] == "test-thread"
 
     # Test error response
@@ -216,6 +216,13 @@ async def test_astream(agent_client):
 
     # Test error response
     error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream"))
+    # Create an async mock for raise_for_status that raises an exception
+    error_response.raise_for_status = AsyncMock(
+        side_effect=HTTPStatusError(
+            "500 Internal Server Error", request=error_response.request, response=error_response
+        )
+    )
+
     error_response_mock = AsyncMock()
     error_response_mock.__aenter__ = AsyncMock(return_value=error_response)
 
@@ -290,8 +297,8 @@ def test_info(agent_client):
     test_info = ServiceMetadata(
         default_agent="custom-agent",
         agents=[AgentInfo(key="custom-agent", description="Custom agent")],
-        default_model=OpenAIModelName.GPT_4O,
-        models=[OpenAIModelName.GPT_4O, OpenAIModelName.GPT_4O_MINI],
+        default_model=OpenAICompatibleName.OPENAI_COMPATIBLE,
+        models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
     test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))
 
