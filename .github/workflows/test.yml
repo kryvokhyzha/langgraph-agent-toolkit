@@ -40,6 +40,11 @@ jobs:
       - name: Test with pytest
         run: |
           uv run pytest --cov=langgraph_agent_toolkit/ --cov-report=xml
+        env:
+          USE_FAKE_MODEL: true
+          COMPATIBLE_MODEL: ${{ secrets.COMPATIBLE_MODEL }}
+          COMPATIBLE_API_KEY: ${{ secrets.COMPATIBLE_API_KEY }}
+          COMPATIBLE_BASE_URL: ${{ secrets.COMPATIBLE_BASE_URL }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
