@@ -7,9 +7,9 @@ from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.pregel.types import StateSnapshot
 from langgraph.types import Interrupt
 
-from agents.agents import Agent
-from schema import ChatHistory, ChatMessage, ServiceMetadata
-from schema.models import OpenAIModelName
+from langgraph_agent_toolkit.agents.agents import Agent
+from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
+from langgraph_agent_toolkit.schema.models import OpenAIModelName
 
 
 def test_invoke(test_client, mock_agent) -> None:
@@ -38,9 +38,7 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
 
     # Create a separate mock for the default agent
     default_mock = AsyncMock()
-    default_mock.ainvoke.return_value = [
-        ("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})
-    ]
+    default_mock.ainvoke.return_value = [("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})]
 
     # Configure our custom mock agent
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=CUSTOM_ANSWER)]})]
@@ -101,9 +99,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent) -> None:
 
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
 
-    response = test_client.post(
-        "/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG}
-    )
+    response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG})
     assert response.status_code == 200
 
     # Verify the agent_config was passed correctly in the config
@@ -119,9 +115,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent) -> None:
 
     # Verify a reserved key in agent_config throws a validation error
     INVALID_CONFIG = {"model": "gpt-4o"}
-    response = test_client.post(
-        "/invoke", json={"message": QUESTION, "agent_config": INVALID_CONFIG}
-    )
+    response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": INVALID_CONFIG})
     assert response.status_code == 422
 
 
@@ -180,9 +174,7 @@ def test_history(test_client, mock_agent) -> None:
         tasks=(),
     )
 
-    response = test_client.post(
-        "/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"}
-    )
+    response = test_client.post("/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"})
     assert response.status_code == 200
 
     output = ChatHistory.model_validate(response.json())
@@ -223,9 +215,7 @@ async def test_stream(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": True}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": True}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages
@@ -278,9 +268,7 @@ async def test_stream_no_tokens(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming disabled
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": False}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages
@@ -318,9 +306,7 @@ def test_stream_interrupt(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming disabled
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": False}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages

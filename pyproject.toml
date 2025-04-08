@@ -1,50 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "agent-service-toolkit"
+name = "langgraph-agent-toolkit"
 version = "0.1.0"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
-authors = [{ name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
+authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }]
+keywords = ["langgraph", "agent", "fastapi", "streamlit"]
+license = "mit"
 classifiers = [
     "Development Status :: 4 - Beta",
+#    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Framework :: FastAPI",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 
 dependencies = [
-    "duckduckgo-search>=7.3.0",
+    "rootutils >= 1.0.7",
+    "duckduckgo-search >=7.3.0",
     "fastapi ~=0.115.5",
     "grpcio >=1.68.0",
     "httpx ~=0.27.2",
     "jiter ~=0.8.2",
     "langchain-core ~=0.3.33",
     "langchain-community ~=0.3.16",
+    "langchain-litellm ~=0.1.4",
     "langchain-openai ~=0.2.9",
-    "langchain-anthropic ~= 0.3.0",
-    "langchain-google-genai ~=2.0.11",
-    "langchain-groq ~=0.2.1",
-    "langchain-aws ~=0.2.14",
-    "langchain-ollama ~=0.2.3",
     "langgraph ~=0.3.5",
     "langgraph-checkpoint-sqlite ~=2.0.1",
     "langgraph-checkpoint-postgres ~=2.0.13",
     "langgraph-supervisor ~=0.0.8",
     "langsmith ~=0.1.145",
+    "litellm ~=1.65.4",
     "numexpr ~=2.10.1",
     "numpy ~=1.26.4; python_version <= '3.12'",
     "numpy ~=2.2.3; python_version >= '3.13'",
     "pandas ~=2.2.3",
     "psycopg[binary,pool] ~=3.2.4",
-    "pyarrow >=18.1.0",
+    "pyarrow ~=18.1.0",
     "pydantic ~=2.10.1",
     "pydantic-settings ~=2.6.1",
     "pyowm ~=3.3.0",
     "python-dotenv ~=1.0.1",
-    "setuptools ~=75.6.0",
+    "setuptools >=75.6.0",
     "streamlit ~=1.40.1",
     "tiktoken >=0.8.0",
     "uvicorn ~=0.32.1",
@@ -64,22 +74,62 @@ dev = [
 # These are also installed in the default dependencies.
 # To install run: `uv sync --frozen --only-group client`
 client = [
-    "httpx~=0.27.2",
+    "httpx ~=0.27.2",
     "pydantic ~=2.10.1",
     "python-dotenv ~=1.0.1",
     "streamlit~=1.40.1",
 ]
 
-[tool.ruff]
-line-length = 100
-target-version = "py311"
+[project.urls]
+documentation = "https://langgraph-agent-toolkit.readthedocs.org"
+repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
 
-[tool.ruff.lint]
-extend-select = ["I", "U"]
+[tool.hatch.build.targets.wheel]
+packages = ["langgraph_agent_toolkit"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+select = ["E", "F", "W", "I", "D"]  # all rules can be found here: https://beta.ruff.rs/docs/rules/
+ignore=[
+    "E203",         # space before : (needed for how black formats slicing)
+    "E731",         # do not assign a lambda expression, use a def
+    "E741",         # do not use variables named 'l', 'O', or 'I'
+    "F403",         # unable to detect undefined names
+    "F401",         # imported but unused
+    "D100",         # missing docstring in public module
+    "D101",         # missing docstring in public class
+    "D102",         # missing docstring in public method
+    "D103",         # missing docstring in public function
+    "D104",         # missing docstring in public package
+    "D105",         # missing docstring in magic method
+    "D107",         # missing docstring in `__init__`
+]
+exclude=[
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    "build",
+    "dist",
+]
+
+[tool.ruff.isort]
+lines-after-imports = 2     # Use a single line after each import block.
+
+[tool.nbqa.config]
+black = "pyproject.toml"
+ruff = "pyproject.toml"
+
+[tool.nbqa.addopts]
+ruff = ["--extend-ignore=E402"]
+
+[tool.nbqa.mutate]
+black = 1
+ruff = 1
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["langgraph_agent_toolkit"]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.pytest_env]
-OPENAI_API_KEY = "sk-fake-openai-key"
+OPENAI_API_KEY = "sk-xxxxx-fake-openai-key"

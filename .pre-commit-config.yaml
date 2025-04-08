@@ -1,13 +1,55 @@
+default_language_version:
+  python: python3.11
+
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.3.0
-  hooks:
-    - id: check-yaml
-    - id: end-of-file-fixer
-    - id: trailing-whitespace
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.6.3
-  hooks:
-    - id: ruff
-      args: [ --fix ]
-    - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-executables-have-shebangs
+      - id: check-docstring-first
+      - id: detect-private-key
+      - id: debug-statements
+      - id: check-case-conflict
+      - id: mixed-line-ending
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.4
+    hooks:
+      - id: ruff-format
+      - id: ruff
+        args: ["--fix", "--show-files"]
+
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.9.1
+    hooks:
+      - id: nbqa-ruff-format
+        additional_dependencies: [ruff==0.11.4]
+      - id: nbqa-ruff
+        additional_dependencies: [ruff==0.11.4]
+        args: ["--fix", "--show-source"]
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        files: ".ipynb"
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        types_or: [python, markdown]
+        additional_dependencies: [tomli]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.3
+    hooks:
+      - id: prettier
+        types_or: [markdown, yaml, toml, json, dockerfile, shell]
+        additional_dependencies: ["prettier@3.0.3", "prettier-plugin-sh@0.13.1"]
+        args: [--print-width=80, --prose-wrap=always]

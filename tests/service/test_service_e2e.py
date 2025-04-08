@@ -5,11 +5,11 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import StreamWriter
 
-from agents.agents import Agent
-from agents.utils import CustomData
-from client import AgentClient
-from schema.schema import ChatMessage
-from service.utils import langchain_to_chat_message
+from langgraph_agent_toolkit.agents.agents import Agent
+from langgraph_agent_toolkit.agents.utils import CustomData
+from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.schema.schema import ChatMessage
+from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
 
 START_MESSAGE = CustomData(type="start", data={"key1": "value1", "key2": 123})
 
@@ -30,9 +30,7 @@ STATIC_MESSAGES = [
 ]
 
 
-EXPECTED_OUTPUT_MESSAGES = [
-    langchain_to_chat_message(m) for m in [START_MESSAGE.to_langchain()] + STATIC_MESSAGES
-]
+EXPECTED_OUTPUT_MESSAGES = [langchain_to_chat_message(m) for m in [START_MESSAGE.to_langchain()] + STATIC_MESSAGES]
 
 
 def test_messages_conversion() -> None:

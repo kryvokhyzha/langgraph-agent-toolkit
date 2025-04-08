@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from httpx import Request, Response
 
-from client import AgentClient, AgentClientError
-from schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
-from schema.models import OpenAIModelName
+from langgraph_agent_toolkit.client import AgentClient, AgentClientError
+from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
+from langgraph_agent_toolkit.schema.models import OpenAIModelName
 
 
 def test_init(mock_env):
@@ -129,9 +129,7 @@ def test_stream(agent_client):
     # Create mock response with streaming events
     events = (
         [f"data: {json.dumps({'type': 'token', 'content': token})}" for token in TOKENS]
-        + [
-            f"data: {json.dumps({'type': 'message', 'content': {'type': 'ai', 'content': FINAL_ANSWER}})}"
-        ]
+        + [f"data: {json.dumps({'type': 'message', 'content': {'type': 'ai', 'content': FINAL_ANSWER}})}"]
         + ["data: [DONE]"]
     )
 
@@ -159,9 +157,7 @@ def test_stream(agent_client):
         assert final_message.content == FINAL_ANSWER
 
     # Test error response
-    error_response = Response(
-        500, text="Internal Server Error", request=Request("POST", "http://test/stream")
-    )
+    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream"))
     error_response_mock = Mock()
     error_response_mock.__enter__ = Mock(return_value=error_response)
     error_response_mock.__exit__ = Mock(return_value=None)
@@ -181,9 +177,7 @@ async def test_astream(agent_client):
     # Create mock response with streaming events
     events = (
         [f"data: {json.dumps({'type': 'token', 'content': token})}" for token in TOKENS]
-        + [
-            f"data: {json.dumps({'type': 'message', 'content': {'type': 'ai', 'content': FINAL_ANSWER}})}"
-        ]
+        + [f"data: {json.dumps({'type': 'message', 'content': {'type': 'ai', 'content': FINAL_ANSWER}})}"]
         + ["data: [DONE]"]
     )
 
@@ -221,9 +215,7 @@ async def test_astream(agent_client):
         assert final_message.content == FINAL_ANSWER
 
     # Test error response
-    error_response = Response(
-        500, text="Internal Server Error", request=Request("POST", "http://test/stream")
-    )
+    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream"))
     error_response_mock = AsyncMock()
     error_response_mock.__aenter__ = AsyncMock(return_value=error_response)
 
@@ -256,9 +248,7 @@ async def test_acreate_feedback(agent_client):
         assert kwargs["json"]["kwargs"] == KWARGS
 
     # Test error response
-    error_response = Response(
-        500, text="Internal Server Error", request=Request("POST", "http://test/feedback")
-    )
+    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/feedback"))
     with patch("httpx.AsyncClient.post", return_value=error_response):
         with pytest.raises(AgentClientError) as exc:
             await agent_client.acreate_feedback(RUN_ID, KEY, SCORE)
@@ -285,9 +275,7 @@ def test_get_history(agent_client):
         assert history.messages[1].type == "ai"
 
     # Test error response
-    error_response = Response(
-        500, text="Internal Server Error", request=Request("POST", "http://test/history")
-    )
+    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/history"))
     with patch("httpx.post", return_value=error_response):
         with pytest.raises(AgentClientError) as exc:
             agent_client.get_history(THREAD_ID)
@@ -305,9 +293,7 @@ def test_info(agent_client):
         default_model=OpenAIModelName.GPT_4O,
         models=[OpenAIModelName.GPT_4O, OpenAIModelName.GPT_4O_MINI],
     )
-    test_response = Response(
-        200, json=test_info.model_dump(), request=Request("GET", "http://test/info")
-    )
+    test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))
 
     # Update an existing client with info
     with patch("httpx.get", return_value=test_response):

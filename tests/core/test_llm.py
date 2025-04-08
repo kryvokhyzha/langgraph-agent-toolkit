@@ -8,8 +8,8 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
-from core.llm import get_model
-from schema.models import (
+from langgraph_agent_toolkit.core.llm import get_model
+from langgraph_agent_toolkit.schema.models import (
     AnthropicModelName,
     FakeModelName,
     GroqModelName,

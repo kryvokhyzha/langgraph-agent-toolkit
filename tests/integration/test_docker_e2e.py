@@ -1,7 +1,7 @@
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from client import AgentClient
+from langgraph_agent_toolkit.client import AgentClient
 
 
 @pytest.mark.docker
@@ -22,7 +22,7 @@ def test_service_with_app():
 
     This test requires the service container to be running with USE_FAKE_MODEL=true
     """
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
     assert at.chat_message[0].avatar == "assistant"
     welcome = at.chat_message[0].markdown[0].value
     assert welcome.startswith("Hello! I'm an AI-powered research assistant")

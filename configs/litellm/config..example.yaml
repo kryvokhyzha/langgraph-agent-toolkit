@@ -1,0 +1,43 @@
+# https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: azure/gpt-4o-mini
+      litellm_credential_name: default_azure_credential
+      rpm: 6
+    model_info:
+      supported_environments: ["development", "production", "staging"]
+  - model_name: gpt-4o
+    litellm_params:
+      model: azure/gpt-4o
+      litellm_credential_name: default_azure_credential
+      tmp: 6
+    model_info:
+      supported_environments: ["development", "production", "staging"]
+
+litellm_settings:
+  num_retries: 2 # retry call 3 times on each model_name (e.g. zephyr-beta)
+  request_timeout: 40 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
+  allowed_fails: 3 # cooldown model if it fails > 1 call in a minute.
+
+credential_list:
+  - credential_name: default_azure_credential
+    credential_values:
+      api_key: os.environ/AZURE_API_KEY
+      api_base: os.environ/AZURE_API_BASE
+      api_version: "2023-05-15"
+    credential_info:
+      description: "Production credentials for EU region"
+
+router_settings: # router_settings are optional
+  routing_strategy: latency-based-routing # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
+  model_group_alias: { "gpt-4": "gpt-3.5-turbo" } # all requests with `gpt-4` will be routed to models with `gpt-3.5-turbo`
+  num_retries: 2
+  timeout: 30 # 30 seconds
+  redis_host: <your redis host> # set this when using multiple litellm proxy deployments, load balancing state stored in redis
+  redis_password: os.environ/REDIS_AUTH
+  redis_port: 1992
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

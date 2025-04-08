@@ -1,6 +1,6 @@
 import pytest
 
-from client import AgentClient
+from langgraph_agent_toolkit.client import AgentClient
 
 
 @pytest.fixture

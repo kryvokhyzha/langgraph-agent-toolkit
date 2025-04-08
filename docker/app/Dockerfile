@@ -1,0 +1,16 @@
+FROM python:3.12.3-slim
+
+WORKDIR /app
+
+ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
+ENV UV_COMPILE_BYTECODE=1
+ENV PYTHONPATH="/app"
+
+COPY pyproject.toml .
+COPY uv.lock .
+RUN pip install --no-cache-dir uv
+RUN uv sync --frozen --only-group client
+
+COPY langgraph_agent_toolkit/ ./langgraph_agent_toolkit/
+
+CMD ["streamlit", "run", "langgraph_agent_toolkit/streamlit_app.py"]

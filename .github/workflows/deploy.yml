@@ -34,8 +34,10 @@ jobs:
         with:
           context: .
           push: true
-          tags: index.docker.io/${{ secrets.DOCKER_USERNAME }}/agent-service-toolkit.service:${{ github.sha }}
-          file: docker/Dockerfile.service
+          tags:
+            index.docker.io/${{ secrets.DOCKER_USERNAME
+            }}/agent-service-toolkit.service:${{ github.sha }}
+          file: docker/service/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +48,9 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'agent-service'
-          slot-name: 'production'
+          app-name: "agent-service"
+          slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'index.docker.io/${{ secrets.DOCKER_USERNAME }}/agent-service-toolkit.service:${{ github.sha }}'
+          images:
+            "index.docker.io/${{ secrets.DOCKER_USERNAME
+            }}/agent-service-toolkit.service:${{ github.sha }}"
