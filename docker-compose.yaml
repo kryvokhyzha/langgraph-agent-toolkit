@@ -6,13 +6,13 @@ x-healthcheck-defaults: &healthcheck-defaults
 
 x-postgres-credentials: &postgres-credentials
   POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   POSTGRES_DB: ${POSTGRES_DB:-postgres}
 
 x-redis-credentials: &redis-credentials
   REDIS_HOST: ${REDIS_HOST:-redis}
   REDIS_PORT: ${REDIS_PORT:-6379}
-  REDIS_AUTH: ${REDIS_AUTH:-myredissecret}
+  REDIS_AUTH: ${REDIS_AUTH}
 
 x-langfuse-env: &langfuse-env
   DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
@@ -160,9 +160,11 @@ services:
     image: redis:7
     container_name: redis
     command: >
-      --requirepass ${REDIS_AUTH:-myredissecret}
+      --requirepass ${REDIS_AUTH}
     ports:
       - 127.0.0.1:6379:6379
+    env_file:
+      - .env
     healthcheck:
       <<: *healthcheck-defaults
       test: ["CMD", "redis-cli", "ping"]
