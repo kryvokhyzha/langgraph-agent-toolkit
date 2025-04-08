@@ -25,7 +25,7 @@ def test_service_with_app():
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
     assert at.chat_message[0].avatar == "assistant"
     welcome = at.chat_message[0].markdown[0].value
-    assert welcome.startswith("Hello! I'm an AI-powered research assistant")
+    assert welcome.startswith("Hello! I'm an AI agent. Ask me anything!")
     assert not at.exception
 
     at.sidebar.selectbox[1].set_value("chatbot")
