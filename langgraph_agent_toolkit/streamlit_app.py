@@ -2,6 +2,7 @@ import asyncio
 import os
 import urllib.parse
 from collections.abc import AsyncGenerator
+from typing import List
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -9,7 +10,7 @@ from pydantic import ValidationError
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
-from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage
+from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.schema.task_data import TaskData, TaskDataStatus
 
 # A Streamlit app for interacting with the langgraph agent via a simple chat interface.
@@ -74,7 +75,7 @@ async def main() -> None:
             messages = []
         else:
             try:
-                messages: ChatHistory = agent_client.get_history(thread_id=thread_id).messages
+                messages: List[ChatMessage] = agent_client.get_history(thread_id=thread_id).messages
             except AgentClientError:
                 st.error("No message history found for this Thread ID.")
                 messages = []
@@ -122,6 +123,9 @@ async def main() -> None:
             st_base_url = urllib.parse.urlunparse(
                 [session.client.request.protocol, session.client.request.host, "", "", "", ""]
             )
+
+            st_base_url = st_base_url.decode()
+
             # if it's not localhost, switch to https by default
             if not st_base_url.startswith("https") and "localhost" not in st_base_url:
                 st_base_url = st_base_url.replace("http", "https")
@@ -148,7 +152,7 @@ async def main() -> None:
                 WELCOME = "Hello! I'm an interrupt agent. Tell me your birthday and I will predict your personality!"
             case _:
                 WELCOME = "Hello! I'm an AI agent. Ask me anything!"
-        with st.chat_message("ai"):
+        with st.chat_message("assistant"):
             st.write(WELCOME)
 
     # draw_messages() expects an async iterator over messages
@@ -161,7 +165,7 @@ async def main() -> None:
     # Generate new message if the user provided new input
     if user_input := st.chat_input():
         messages.append(ChatMessage(type="human", content=user_input))
-        st.chat_message("human").write(user_input)
+        st.chat_message("user").write(user_input)
         try:
             if use_streaming:
                 stream = agent_client.astream(
@@ -177,7 +181,7 @@ async def main() -> None:
                     thread_id=st.session_state.thread_id,
                 )
                 messages.append(response)
-                st.chat_message("ai").write(response.content)
+                st.chat_message("assistant").write(response.content)
             st.rerun()  # Clear stale containers
         except AgentClientError as e:
             st.error(f"Error generating response: {e}")
@@ -207,7 +211,7 @@ async def draw_messages(
     drawing the feedback widget in the latest chat message.
 
     Args:
-        messages_aiter: An async iterator over messages to draw.
+        messages_agen: An async iterator over messages to draw.
         is_new: Whether the messages are new or not.
     """
 
@@ -228,7 +232,7 @@ async def draw_messages(
             if not streaming_placeholder:
                 if last_message_type != "ai":
                     last_message_type = "ai"
-                    st.session_state.last_message = st.chat_message("ai")
+                    st.session_state.last_message = st.chat_message("assistant")
                 with st.session_state.last_message:
                     streaming_placeholder = st.empty()
 
@@ -244,7 +248,7 @@ async def draw_messages(
             # A message from the user, the easiest case
             case "human":
                 last_message_type = "human"
-                st.chat_message("human").write(msg.content)
+                st.chat_message("user").write(msg.content)
 
             # A message from the agent is the most complex case, since we need to
             # handle streaming tokens and tool calls.
@@ -256,7 +260,7 @@ async def draw_messages(
                 # If the last message type was not AI, create a new chat message
                 if last_message_type != "ai":
                     last_message_type = "ai"
-                    st.session_state.last_message = st.chat_message("ai")
+                    st.session_state.last_message = st.chat_message("assistant")
 
                 with st.session_state.last_message:
                     # If the message has content, write it out.
