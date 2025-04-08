@@ -192,9 +192,12 @@ async def test_astream(agent_client):
     mock_response.request = Request("POST", "http://test/stream")
     mock_response.aiter_lines = Mock(return_value=async_events())
     mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+    mock_response.__aexit__ = AsyncMock(return_value=None)
 
+    # Create a mock client that returns the mock_response directly (not as a coroutine)
     mock_client = AsyncMock()
     mock_client.__aenter__.return_value = mock_client
+    # Make stream a regular method that returns the response object directly
     mock_client.stream = Mock(return_value=mock_response)
 
     with patch("httpx.AsyncClient", return_value=mock_client):
@@ -215,20 +218,19 @@ async def test_astream(agent_client):
         assert final_message.content == FINAL_ANSWER
 
     # Test error response
-    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream"))
-    # Create an async mock for raise_for_status that raises an exception
-    error_response.raise_for_status = AsyncMock(
-        side_effect=HTTPStatusError(
-            "500 Internal Server Error", request=error_response.request, response=error_response
-        )
+    http_error = HTTPStatusError(
+        "500 Internal Server Error",
+        request=Request("POST", "http://test/stream"),
+        response=Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream")),
     )
 
-    error_response_mock = AsyncMock()
-    error_response_mock.__aenter__ = AsyncMock(return_value=error_response)
+    # Set up error mock client
+    error_mock_client = AsyncMock()
+    error_mock_client.__aenter__.return_value = error_mock_client
+    # Make stream raise the exception when called directly
+    error_mock_client.stream = Mock(side_effect=http_error)
 
-    mock_client.stream.return_value = error_response_mock
-
-    with patch("httpx.AsyncClient", return_value=mock_client):
+    with patch("httpx.AsyncClient", return_value=error_mock_client):
         with pytest.raises(AgentClientError) as exc:
             async for _ in agent_client.astream(QUESTION):
                 pass

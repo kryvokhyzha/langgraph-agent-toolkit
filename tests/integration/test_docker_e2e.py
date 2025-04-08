@@ -30,8 +30,8 @@ def test_service_with_app():
 
     at.sidebar.selectbox[1].set_value("chatbot")
     at.chat_input[0].set_value("What is the weather in Tokyo?").run()
-    assert at.chat_message[0].avatar == "user"
-    assert at.chat_message[0].markdown[0].value == "What is the weather in Tokyo?"
-    assert at.chat_message[1].avatar == "assistant"
-    assert at.chat_message[1].markdown[0].value == "This is a test response from the fake model."
+    assert at.chat_message[1].avatar == "user"
+    assert at.chat_message[1].markdown[0].value == "What is the weather in Tokyo?"
+    assert at.chat_message[2].avatar == "assistant"
+    assert at.chat_message[2].markdown[0].value == "This is a test response from the fake model."
     assert not at.exception
