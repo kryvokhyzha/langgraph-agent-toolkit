@@ -24,25 +24,28 @@ def test_service_with_app():
     """
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
+    # First check for the welcome message that appears when the app first loads
+    assert len(at.chat_message) >= 1
+    assert at.chat_message[0].avatar == "assistant"
+    assert "Hello! I'm a simple chatbot. Ask me anything!" in at.chat_message[0].markdown[0].value
+
+    # Now set the agent and input a message
     at.sidebar.selectbox[1].set_value("chatbot")
     at.chat_input[0].set_value("What is the weather in Tokyo?").run()
 
     # Check all messages to verify correct order
     assert len(at.chat_message) == 3
 
-    # First message should be the user input
-    assert at.chat_message[0].avatar == "user"
-    assert at.chat_message[0].markdown[0].value == "What is the weather in Tokyo?"
+    # First message should still be the welcome message
+    assert at.chat_message[0].avatar == "assistant"
+    assert "Hello! I'm a simple chatbot. Ask me anything!" in at.chat_message[0].markdown[0].value
 
-    # Second and third messages are from the assistant
-    assert at.chat_message[1].avatar == "assistant"
+    # Second message should be the user input
+    assert at.chat_message[1].avatar == "user"
+    assert at.chat_message[1].markdown[0].value == "What is the weather in Tokyo?"
+
+    # Third message should be the assistant response
     assert at.chat_message[2].avatar == "assistant"
-
-    # One of the assistant messages should be the welcome message
-    # and one should be the response
-    assistant_messages = [at.chat_message[1].markdown[0].value, at.chat_message[2].markdown[0].value]
-
-    assert "Hello! I'm a simple chatbot. Ask me anything!" in assistant_messages
-    assert "This is a test response from the fake model." in assistant_messages
+    assert "This is a test response from the fake model." in at.chat_message[2].markdown[0].value
 
     assert not at.exception
