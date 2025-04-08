@@ -137,6 +137,7 @@ jobs:
           uv run pytest tests/integration -v --run-docker
         env:
           AGENT_URL: http://0.0.0.0
+          USE_FAKE_MODEL: true
 
       - name: Clean up containers
         if: always()
