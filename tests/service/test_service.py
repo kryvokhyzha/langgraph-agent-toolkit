@@ -7,9 +7,9 @@ from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.pregel.types import StateSnapshot
 from langgraph.types import Interrupt
 
-from agents.agents import Agent
-from schema import ChatHistory, ChatMessage, ServiceMetadata
-from schema.models import OpenAIModelName
+from langgraph_agent_toolkit.agents.agents import Agent
+from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
+from langgraph_agent_toolkit.schema.models import OpenAICompatibleName
 
 
 def test_invoke(test_client, mock_agent) -> None:
@@ -38,9 +38,7 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
 
     # Create a separate mock for the default agent
     default_mock = AsyncMock()
-    default_mock.ainvoke.return_value = [
-        ("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})
-    ]
+    default_mock.ainvoke.return_value = [("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})]
 
     # Configure our custom mock agent
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=CUSTOM_ANSWER)]})]
@@ -51,7 +49,7 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
             return mock_agent
         return default_mock
 
-    with patch("service.service.get_agent", side_effect=agent_lookup):
+    with patch("langgraph_agent_toolkit.service.service.get_agent", side_effect=agent_lookup):
         response = test_client.post(f"/{CUSTOM_AGENT}/invoke", json={"message": QUESTION})
         assert response.status_code == 200
 
@@ -71,7 +69,7 @@ def test_invoke_model_param(test_client, mock_agent) -> None:
     """Test that the model parameter is correctly passed to the agent."""
     QUESTION = "What is the weather in Tokyo?"
     ANSWER = "The weather in Tokyo is sunny."
-    CUSTOM_MODEL = "claude-3.5-sonnet"
+    CUSTOM_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
 
     response = test_client.post("/invoke", json={"message": QUESTION, "model": CUSTOM_MODEL})
@@ -101,9 +99,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent) -> None:
 
     mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
 
-    response = test_client.post(
-        "/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG}
-    )
+    response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG})
     assert response.status_code == 200
 
     # Verify the agent_config was passed correctly in the config
@@ -119,9 +115,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent) -> None:
 
     # Verify a reserved key in agent_config throws a validation error
     INVALID_CONFIG = {"model": "gpt-4o"}
-    response = test_client.post(
-        "/invoke", json={"message": QUESTION, "agent_config": INVALID_CONFIG}
-    )
+    response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": INVALID_CONFIG})
     assert response.status_code == 422
 
 
@@ -146,7 +140,7 @@ def test_invoke_interrupt(test_client, mock_agent) -> None:
     assert output.content == INTERRUPT
 
 
-@patch("service.service.LangsmithClient")
+@patch("langgraph_agent_toolkit.service.service.LangsmithClient")
 def test_feedback(mock_client: langsmith.Client, test_client) -> None:
     ls_instance = mock_client.return_value
     ls_instance.create_feedback.return_value = None
@@ -180,9 +174,7 @@ def test_history(test_client, mock_agent) -> None:
         tasks=(),
     )
 
-    response = test_client.post(
-        "/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"}
-    )
+    response = test_client.post("/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"})
     assert response.status_code == 200
 
     output = ChatHistory.model_validate(response.json())
@@ -223,9 +215,7 @@ async def test_stream(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": True}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": True}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages
@@ -278,9 +268,7 @@ async def test_stream_no_tokens(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming disabled
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": False}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages
@@ -318,9 +306,7 @@ def test_stream_interrupt(test_client, mock_agent) -> None:
     mock_agent.astream = mock_astream
 
     # Make request with streaming disabled
-    with test_client.stream(
-        "POST", "/stream", json={"message": QUESTION, "stream_tokens": False}
-    ) as response:
+    with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
         assert response.status_code == 200
 
         # Collect all SSE messages
@@ -340,17 +326,17 @@ def test_info(test_client, mock_settings) -> None:
 
     base_agent = Agent(description="A base agent.", graph=None)
     mock_settings.AUTH_SECRET = None
-    mock_settings.DEFAULT_MODEL = OpenAIModelName.GPT_4O_MINI
-    mock_settings.AVAILABLE_MODELS = {OpenAIModelName.GPT_4O_MINI, OpenAIModelName.GPT_4O}
-    with patch.dict("agents.agents.agents", {"base-agent": base_agent}, clear=True):
+    mock_settings.DEFAULT_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
+    mock_settings.AVAILABLE_MODELS = {OpenAICompatibleName.OPENAI_COMPATIBLE}
+    with patch.dict("langgraph_agent_toolkit.agents.agents.agents", {"base-agent": base_agent}, clear=True):
         response = test_client.get("/info")
         assert response.status_code == 200
         output = ServiceMetadata.model_validate(response.json())
 
-    assert output.default_agent == "research-assistant"
+    assert output.default_agent == "langgraph-supervisor-agent"
     assert len(output.agents) == 1
     assert output.agents[0].key == "base-agent"
     assert output.agents[0].description == "A base agent."
 
-    assert output.default_model == OpenAIModelName.GPT_4O_MINI
-    assert output.models == [OpenAIModelName.GPT_4O, OpenAIModelName.GPT_4O_MINI]
+    assert output.default_model == OpenAICompatibleName.OPENAI_COMPATIBLE
+    assert output.models == [OpenAICompatibleName.OPENAI_COMPATIBLE]

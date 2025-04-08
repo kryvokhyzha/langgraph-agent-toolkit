@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from client import AgentClientError
-from schema import ChatHistory, ChatMessage
-from schema.models import OpenAIModelName
+from langgraph_agent_toolkit.client import AgentClientError
+from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage
+from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
 
 
 def test_app_simple_non_streaming(mock_agent_client):
     """Test the full app - happy path"""
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     WELCOME_START = "Hello! I'm an AI agent. Ask me anything!"
     PROMPT = "Know any jokes?"
@@ -36,7 +36,7 @@ def test_app_simple_non_streaming(mock_agent_client):
 
 def test_app_settings(mock_agent_client):
     """Test the full app - happy path"""
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     PROMPT = "Know any jokes?"
     RESPONSE = "Sure! Here's a joke:"
@@ -46,9 +46,9 @@ def test_app_settings(mock_agent_client):
     )
 
     at.sidebar.toggle[0].set_value(False)  # Use Streaming = False
-    assert at.sidebar.selectbox[0].value == "gpt-4o"
+    assert at.sidebar.selectbox[0].value == "openai-compatible"
     assert mock_agent_client.agent == "test-agent"
-    at.sidebar.selectbox[0].set_value("gpt-4o-mini")
+    at.sidebar.selectbox[0].set_value("fake")
     at.sidebar.selectbox[1].set_value("chatbot")
     at.chat_input[0].set_value(PROMPT).run()
     print(at)
@@ -63,7 +63,7 @@ def test_app_settings(mock_agent_client):
     assert mock_agent_client.agent == "chatbot"
     mock_agent_client.ainvoke.assert_called_with(
         message=PROMPT,
-        model=OpenAIModelName.GPT_4O_MINI,
+        model=FakeModelName.FAKE,
         thread_id="test session id",
     )
     assert not at.exception
@@ -72,11 +72,11 @@ def test_app_settings(mock_agent_client):
 def test_app_thread_id_history(mock_agent_client):
     """Test the thread_id is generated"""
 
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
     assert at.session_state.thread_id == "test session id"
 
     # Reset and set thread_id
-    at = AppTest.from_file("../../src/streamlit_app.py")
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py")
     at.query_params["thread_id"] = "1234"
     HISTORY = [
         ChatMessage(type="human", content="What is the weather?"),
@@ -103,7 +103,7 @@ def test_app_feedback(mock_agent_client):
 @pytest.mark.asyncio
 async def test_app_streaming(mock_agent_client):
     """Test the app with streaming enabled - including tool messages"""
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     # Setup mock streaming response
     PROMPT = "What is 6 * 7?"
@@ -145,7 +145,7 @@ async def test_app_streaming(mock_agent_client):
 @pytest.mark.asyncio
 async def test_app_init_error(mock_agent_client):
     """Test the app with an error in the agent initialization"""
-    at = AppTest.from_file("../../src/streamlit_app.py").run()
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     # Setup mock streaming response
     PROMPT = "What is 6 * 7?"

@@ -1,6 +1,6 @@
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolCall, ToolMessage
 
-from service.utils import langchain_to_chat_message
+from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
 
 
 def test_messages_from_langchain() -> None:
