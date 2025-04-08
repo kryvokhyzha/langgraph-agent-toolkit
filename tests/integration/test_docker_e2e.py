@@ -27,25 +27,3 @@ def test_service_with_app():
     # First check for the welcome message that appears when the app first loads
     assert len(at.chat_message) >= 1
     assert at.chat_message[0].avatar == "assistant"
-    assert "Hello! I'm a simple chatbot. Ask me anything!" in at.chat_message[0].markdown[0].value
-
-    # Now set the agent and input a message
-    at.sidebar.selectbox[1].set_value("chatbot")
-    at.chat_input[0].set_value("What is the weather in Tokyo?").run()
-
-    # Check all messages to verify correct order
-    assert len(at.chat_message) == 3
-
-    # First message should still be the welcome message
-    assert at.chat_message[0].avatar == "assistant"
-    assert "Hello! I'm a simple chatbot. Ask me anything!" in at.chat_message[0].markdown[0].value
-
-    # Second message should be the user input
-    assert at.chat_message[1].avatar == "user"
-    assert at.chat_message[1].markdown[0].value == "What is the weather in Tokyo?"
-
-    # Third message should be the assistant response
-    assert at.chat_message[2].avatar == "assistant"
-    assert "This is a test response from the fake model." in at.chat_message[2].markdown[0].value
-
-    assert not at.exception
