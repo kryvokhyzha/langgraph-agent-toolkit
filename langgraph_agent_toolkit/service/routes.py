@@ -9,7 +9,6 @@ from langchain_core.messages import AIMessage, AIMessageChunk, AnyMessage, Human
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command, Interrupt
-from langsmith import Client as LangsmithClient
 
 from langgraph_agent_toolkit.agents import DEFAULT_AGENT, get_agent, get_all_agent_info
 from langgraph_agent_toolkit.agents.agents import Agent
@@ -65,7 +64,7 @@ async def _handle_input(user_input: UserInput, agent: Agent) -> tuple[dict[str, 
     if user_input.agent_config:
         if overlap := configurable.keys() & user_input.agent_config.keys():
             raise HTTPException(
-                status_code=422,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=f"agent_config contains reserved keys: {overlap}",
             )
         configurable.update(user_input.agent_config)
@@ -147,7 +146,7 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMe
         return output
     except Exception as e:
         logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=500, detail="Unexpected error")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 
 async def message_generator(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> AsyncGenerator[str, None]:
@@ -270,7 +269,7 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> Stre
     )
 
 
-@private_router.post("/feedback")
+@private_router.post("/feedback", status_code=status.HTTP_201_CREATED)
 async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT) -> FeedbackResponse:
     """
     Record feedback for a run to the configured observability platform.
@@ -285,12 +284,18 @@ async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT) -> Feedbac
             score=feedback.score,
             **feedback.kwargs,
         )
-        return FeedbackResponse()
+
+        return FeedbackResponse(
+            run_id=feedback.run_id,
+            message=f"Feedback '{feedback.key}' recorded successfully for run {feedback.run_id}.",
+        )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"An exception occurred while recording feedback: {e}")
-        raise HTTPException(status_code=500, detail="Unexpected error recording feedback")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error recording feedback"
+        )
 
 
 @private_router.post("/history")
@@ -313,7 +318,7 @@ def history(input: ChatHistoryInput) -> ChatHistory:
         return ChatHistory(messages=chat_messages)
     except Exception as e:
         logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=500, detail="Unexpected error")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 
 @public_router.get("/health")

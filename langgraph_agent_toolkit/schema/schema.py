@@ -154,7 +154,17 @@ class Feedback(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
+    """Response after recording feedback."""
+
     status: Literal["success"] = "success"
+    run_id: str = Field(
+        description="Run ID for which feedback was recorded.",
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    message: str = Field(
+        description="Descriptive message about the feedback operation.",
+        default="Feedback recorded successfully.",
+    )
 
 
 class ChatHistoryInput(BaseModel):

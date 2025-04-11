@@ -147,19 +147,109 @@ def test_invoke_interrupt(test_client, mock_agent) -> None:
     assert output.content == INTERRUPT
 
 
-@patch("langgraph_agent_toolkit.service.routes.LangsmithClient")
-def test_feedback(mock_client: langsmith.Client, test_client) -> None:
+def test_feedback(test_client, mock_agent) -> None:
+    """Test successful feedback submission to the default agent."""
+    mock_agent.observability.record_feedback = Mock(return_value=None)
+
+    body = {
+        "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
+        "key": "human-feedback-stars",
+        "score": 0.8,
+        "kwargs": {"comment": "Great response!"},
+    }
+
+    response = test_client.post("/feedback", json=body)
+
+    assert response.status_code == 201
+    assert response.json() == {
+        "status": "success",
+        "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
+        "message": f"Feedback 'human-feedback-stars' recorded successfully for run 847c6285-8fc9-4560-a83f-4e6285809254.",
+    }
+
+    mock_agent.observability.record_feedback.assert_called_once_with(
+        run_id="847c6285-8fc9-4560-a83f-4e6285809254", key="human-feedback-stars", score=0.8, comment="Great response!"
+    )
+
+
+def test_feedback_custom_agent(test_client) -> None:
+    """Test feedback submission to a specific agent."""
+    CUSTOM_AGENT = "custom_agent"
+
+    # Create a separate mock for the custom agent
+    custom_mock = Mock()
+    custom_mock.observability = Mock()
+    custom_mock.observability.record_feedback = Mock(return_value=None)
+
+    # Create a mock for default agent too
+    default_mock = Mock()
+    default_mock.observability = Mock()
+    default_mock.observability.record_feedback = Mock(return_value=None)
+
+    body = {"run_id": "847c6285-8fc9-4560-a83f-4e6285809254", "key": "human-feedback-stars", "score": 0.8}
+
+    # Patch get_agent to return the correct agent based on the provided agent_id
+    def agent_lookup(agent_id):
+        if agent_id == CUSTOM_AGENT:
+            return custom_mock
+        return default_mock
+
+    with patch("langgraph_agent_toolkit.service.routes.get_agent", side_effect=agent_lookup):
+        # Use the correct endpoint with agent_id as a query parameter
+        response = test_client.post("/feedback", json=body, params={"agent_id": CUSTOM_AGENT})
+        assert response.status_code == 201
+
+        # Verify custom agent's observability was used
+        custom_mock.observability.record_feedback.assert_called_once()
+        default_mock.observability.record_feedback.assert_not_called()
+
+
+def test_feedback_error_handling(test_client, mock_agent) -> None:
+    """Test error handling in feedback endpoint."""
+    # Test ValueError from observability platform
+    mock_agent.observability.record_feedback = Mock(side_effect=ValueError("Invalid feedback key"))
+
+    body = {"run_id": "847c6285-8fc9-4560-a83f-4e6285809254", "key": "invalid-key", "score": 0.8}
+
+    response = test_client.post("/feedback", json=body)
+    assert response.status_code == 400
+    assert "Invalid feedback key" in response.json()["detail"]
+
+    # Test unexpected exception
+    mock_agent.observability.record_feedback = Mock(side_effect=RuntimeError("Unexpected error"))
+
+    response = test_client.post("/feedback", json=body)
+    assert response.status_code == 500
+    assert "Unexpected error recording feedback" in response.json()["detail"]
+
+
+@patch("langgraph_agent_toolkit.observability.langsmith.LangsmithClient")
+def test_feedback_langsmith(mock_client: langsmith.Client, test_client, mock_agent) -> None:
+    """Test the Langsmith implementation for backward compatibility."""
+    # This test can be removed once the transition to the new implementation is complete
     ls_instance = mock_client.return_value
     ls_instance.create_feedback.return_value = None
+
+    # Mock the agent's observability platform's record_feedback method
+    mock_agent.observability.record_feedback = Mock(return_value=None)
+
     body = {
         "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
         "key": "human-feedback-stars",
         "score": 0.8,
     }
     response = test_client.post("/feedback", json=body)
-    assert response.status_code == 200
-    assert response.json() == {"status": "success"}
-    ls_instance.create_feedback.assert_called_once_with(
+    # Update expected status code to 201
+    assert response.status_code == 201
+    # Update expected response format
+    assert response.json() == {
+        "status": "success",
+        "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
+        "message": f"Feedback 'human-feedback-stars' recorded successfully for run 847c6285-8fc9-4560-a83f-4e6285809254.",
+    }
+
+    # Verify that the agent's observability platform's record_feedback method was called correctly
+    mock_agent.observability.record_feedback.assert_called_once_with(
         run_id="847c6285-8fc9-4560-a83f-4e6285809254",
         key="human-feedback-stars",
         score=0.8,
