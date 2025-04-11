@@ -5,6 +5,8 @@ from langchain_core.messages import AIMessage
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.types import Command
 
+from langgraph_agent_toolkit.agents.agent import Agent
+
 
 class AgentState(MessagesState, total=False):
     """`total=False` is PEP589 specs.
@@ -51,4 +53,8 @@ builder.add_node(node_b)
 builder.add_node(node_c)
 # NOTE: there are no edges between nodes A, B and C!
 
-command_agent = builder.compile()
+command_agent = Agent(
+    name="command-agent",
+    description="A command agent.",
+    graph=builder.compile(),
+)

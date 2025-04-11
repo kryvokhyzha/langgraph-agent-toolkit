@@ -4,7 +4,9 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.func import entrypoint
 from langgraph.graph import add_messages
 
-from langgraph_agent_toolkit.core import get_model, settings
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
 
 @entrypoint(checkpointer=MemorySaver())
@@ -18,6 +20,13 @@ async def chatbot(
     if previous:
         messages = add_messages(previous["messages"], messages)
 
-    model = get_model(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    model = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
     response = await model.ainvoke(messages)
     return entrypoint.final(value={"messages": [response]}, save={"messages": add_messages(messages, response)})
+
+
+chatbot_agent = Agent(
+    name="chatbot-agent",
+    description="A simple chatbot.",
+    graph=chatbot,
+)

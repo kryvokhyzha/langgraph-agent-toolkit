@@ -4,26 +4,20 @@ from dotenv import find_dotenv
 from pydantic import (
     BeforeValidator,
     Field,
-    HttpUrl,
     SecretStr,
-    TypeAdapter,
     computed_field,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from langgraph_agent_toolkit.memory.types import MemoryBackends
-from langgraph_agent_toolkit.observability.types import ObservabilityBackend
+from langgraph_agent_toolkit.helper.utils import check_str_is_http
+from langgraph_agent_toolkit.core.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.schema.models import (
     AllModelEnum,
     FakeModelName,
     OpenAICompatibleName,
     Provider,
 )
-
-
-def check_str_is_http(x: str) -> str:
-    http_url_adapter = TypeAdapter(HttpUrl)
-    return str(http_url_adapter.validate_python(x))
 
 
 class Settings(BaseSettings):
@@ -57,6 +51,13 @@ class Settings(BaseSettings):
 
     # Observability platform
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
+
+    # Agent configuration
+    AGENT_PATHS: list[str] = [
+        "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
+        "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
+        "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
+    ]
 
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"

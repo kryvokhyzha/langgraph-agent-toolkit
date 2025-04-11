@@ -1,4 +1,4 @@
-from langgraph_agent_toolkit.core.llm import get_model
+from langgraph_agent_toolkit.core.models.factory import ModelFactory
 from langgraph_agent_toolkit.core.settings import settings
 
-__all__ = ["settings", "get_model"]
+__all__ = ["settings", "ModelFactory"]

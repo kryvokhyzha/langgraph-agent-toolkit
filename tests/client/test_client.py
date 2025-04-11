@@ -193,6 +193,8 @@ async def test_astream(agent_client):
     mock_response.aiter_lines = Mock(return_value=async_events())
     mock_response.__aenter__ = AsyncMock(return_value=mock_response)
     mock_response.__aexit__ = AsyncMock(return_value=None)
+    # Explicitly set raise_for_status as an AsyncMock to make it awaitable
+    mock_response.raise_for_status = AsyncMock()
 
     # Create a mock client that returns the mock_response directly (not as a coroutine)
     mock_client = AsyncMock()

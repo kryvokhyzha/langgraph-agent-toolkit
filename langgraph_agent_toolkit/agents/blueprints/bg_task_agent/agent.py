@@ -7,8 +7,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import StreamWriter
 
-from langgraph_agent_toolkit.agents.bg_task_agent.task import Task
-from langgraph_agent_toolkit.core import get_model, settings
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.blueprints.bg_task_agent.task import Task
+from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.core import settings
 
 
 class AgentState(MessagesState, total=False):
@@ -27,7 +29,7 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
 
 
 async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
-    m = get_model(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
     model_runnable = wrap_model(m)
     response = await model_runnable.ainvoke(state, config)
 
@@ -60,6 +62,8 @@ agent.set_entry_point("bg_task")
 agent.add_edge("bg_task", "model")
 agent.add_edge("model", END)
 
-bg_task_agent = agent.compile(
-    checkpointer=MemorySaver(),
+bg_task_agent = Agent(
+    name="bg-task-agent",
+    description="A background task agent.",
+    graph=agent.compile(checkpointer=MemorySaver()),
 )

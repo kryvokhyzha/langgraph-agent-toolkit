@@ -5,12 +5,12 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 from langchain_core._api import LangChainBetaWarning
 
-from langgraph_agent_toolkit.agents import get_agent, get_all_agent_info
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
-from langgraph_agent_toolkit.observability.factory import ObservabilityFactory
-from langgraph_agent_toolkit.observability.empty import EmptyObservability
-from langgraph_agent_toolkit.memory.factory import MemoryFactory
+from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
+from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
 from langgraph_agent_toolkit.service.routes import private_router, public_router, verify_bearer
 
@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     observability = None
     initialized_agents = []
+    executor = None
 
     try:
         # Initialize observability platform
@@ -43,18 +44,29 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             yield
             return
 
+        # Initialize agent executor
+        try:
+            executor = AgentExecutor(*settings.AGENT_PATHS)
+            logger.info(f"Initialized AgentExecutor: {settings.AGENT_PATHS}")
+            # Store the executor in app.state for access in routes
+            app.state.agent_executor = executor
+        except Exception as e:
+            logger.error(f"Failed to initialize AgentExecutor: {e}")
+            yield
+            return
+
         checkpoint = memory_backend.get_checkpoint_saver()
         async with checkpoint as saver:
             try:
                 await saver.setup()
-                agents = get_all_agent_info()
+                agents = executor.get_all_agent_info()
 
                 if not agents:
-                    logger.warning("No agents found in the database.")
+                    logger.warning("No agents found in the executor.")
 
                 for a in agents:
                     try:
-                        agent = get_agent(a.key)
+                        agent = executor.get_agent(a.key)
                         agent.graph.checkpointer = saver
                         agent.observability = observability
                         initialized_agents.append(a.key)

@@ -95,8 +95,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 4G
+          cpus: "1"
+          memory: 2G
     develop:
       watch:
         - path: configs/litellm/config.yaml
@@ -245,6 +245,11 @@ services:
       LANGFUSE_INIT_USER_EMAIL: kriwohizha@gmail.com
       LANGFUSE_INIT_USER_NAME: kryvokhyzha
       LANGFUSE_INIT_USER_PASSWORD: 11111111111111111
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
 
   # === Application Services ===
   backend-agent-service:
@@ -269,11 +274,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 2G
+          cpus: "1"
+          memory: 1G
     develop:
       watch:
-        - path: langgraph_agent_toolkit/agents/
+        - path: langgraph_agent_toolkit/agents/blueprints/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/agents/
         - path: langgraph_agent_toolkit/core/
@@ -282,13 +287,13 @@ services:
         - path: langgraph_agent_toolkit/helper/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/helper/
-        - path: langgraph_agent_toolkit/memory/
+        - path: langgraph_agent_toolkit/core/memory/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/memory/
-        - path: langgraph_agent_toolkit/observability/
+        - path: langgraph_agent_toolkit/core/observability/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/observability/
-        - path: langgraph_agent_toolkit/prompt_manager/
+        - path: langgraph_agent_toolkit/core/prompt_manager/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/prompt_manager/
         - path: langgraph_agent_toolkit/schema/

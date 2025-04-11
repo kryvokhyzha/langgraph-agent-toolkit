@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 
 
 class AgentInfo(BaseModel):
@@ -30,7 +31,7 @@ class ServiceMetadata(BaseModel):
     )
     default_agent: str = Field(
         description="Default agent used when none is specified.",
-        examples=["langgraph-supervisor-agent"],
+        examples=[DEFAULT_AGENT],
     )
     default_model: AllModelEnum = Field(
         description="Default model used when none is specified.",
@@ -58,7 +59,14 @@ class UserInput(BaseModel):
     agent_config: dict[str, Any] = Field(
         description="Additional configuration to pass through to the agent",
         default={},
-        examples=[{"spicy_level": 0.8}],
+        examples=[
+            {
+                "memory_saver_params": {"k": 6},
+                "temperature": 0.0,
+                "max_tokens": 1024,
+                "top_p": 0.7,
+            },
+        ],
     )
 
 
@@ -154,7 +162,17 @@ class Feedback(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
+    """Response after recording feedback."""
+
     status: Literal["success"] = "success"
+    run_id: str = Field(
+        description="Run ID for which feedback was recorded.",
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    message: str = Field(
+        description="Descriptive message about the feedback operation.",
+        default="Feedback recorded successfully.",
+    )
 
 
 class ChatHistoryInput(BaseModel):
@@ -168,3 +186,9 @@ class ChatHistoryInput(BaseModel):
 
 class ChatHistory(BaseModel):
     messages: list[ChatMessage]
+
+
+class HealthCheck(BaseModel):
+    """Response model to validate and return when performing a health check."""
+
+    status: str = "OK"

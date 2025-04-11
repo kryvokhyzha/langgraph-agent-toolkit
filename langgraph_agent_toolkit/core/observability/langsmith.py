@@ -1,4 +1,5 @@
-from langgraph_agent_toolkit.observability.base import BaseObservabilityPlatform
+from langsmith import Client as LangsmithClient
+from core.observability.base import BaseObservabilityPlatform
 
 
 class LangsmithObservability(BaseObservabilityPlatform):
@@ -23,3 +24,14 @@ class LangsmithObservability(BaseObservabilityPlatform):
     def before_shutdown(self) -> None:
         """Perform any necessary cleanup before shutdown."""
         pass
+
+    def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
+        """Record feedback for a run to LangSmith."""
+        self.validate_environment()
+        client = LangsmithClient()
+        client.create_feedback(
+            run_id=run_id,
+            key=key,
+            score=score,
+            **kwargs,
+        )

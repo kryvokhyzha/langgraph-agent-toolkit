@@ -1,22 +1,29 @@
 from unittest.mock import patch, MagicMock, AsyncMock
 
 import pytest
-from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage, ToolCall, ToolMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import StreamWriter
 
-from langgraph_agent_toolkit.agents.agents import Agent
-from langgraph_agent_toolkit.agents.utils import CustomData
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.agents.blueprints.bg_task_agent.utils import CustomData
 from langgraph_agent_toolkit.client import AgentClient
 from langgraph_agent_toolkit.core.settings import settings
-from langgraph_agent_toolkit.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
-from langgraph_agent_toolkit.service.service import app
-from langgraph_agent_toolkit.memory.sqlite import SQLiteMemoryBackend
-from langgraph_agent_toolkit.observability.factory import ObservabilityFactory
+
+
+# Define MockStateSnapshot locally instead of importing from tests
+class MockStateSnapshot:
+    """Mock state snapshot that mimics the structure of langgraph.pregel.types.StateSnapshot."""
+
+    def __init__(self, values=None, tasks=None):
+        self.values = values or {}
+        self.tasks = tasks or []
+
 
 START_MESSAGE = CustomData(type="start", data={"key1": "value1", "key2": 123})
 
@@ -73,11 +80,13 @@ def sqlite_db_settings():
             mock_memory_backend.get_checkpoint_saver.return_value = mock_context
 
             # Patch the MemoryFactory.create method
-            with patch("langgraph_agent_toolkit.memory.factory.MemoryFactory.create", return_value=mock_memory_backend):
+            with patch(
+                "langgraph_agent_toolkit.core.memory.factory.MemoryFactory.create", return_value=mock_memory_backend
+            ):
                 # Patch the ObservabilityFactory.create method
                 mock_observability = MagicMock()
                 with patch(
-                    "langgraph_agent_toolkit.observability.factory.ObservabilityFactory.create",
+                    "langgraph_agent_toolkit.core.observability.factory.ObservabilityFactory.create",
                     return_value=mock_observability,
                 ):
                     yield
@@ -129,27 +138,33 @@ static_agent = agent.compile(checkpointer=MemorySaver())
 
 def test_agent_stream(mock_httpx, sqlite_db_settings):
     """Test that streaming from our static agent works correctly with token streaming."""
-    # Create agent meta with observability
-    agent_meta = Agent(description="A static agent.", graph=static_agent)
+    # Create agent meta with observability and name
+    agent_meta = Agent(name="static-agent", description="A static agent.", graph=static_agent)
     agent_meta.observability = MagicMock()
     agent_meta.observability.get_callback_handler = MagicMock(return_value=None)
 
-    with patch.dict("langgraph_agent_toolkit.agents.agents.agents", {"static-agent": agent_meta}, clear=True):
-        # Initialize client with get_info=False and verify=False to avoid HTTP request
-        client = AgentClient(agent="static-agent", base_url="http://0.0.0.0:8080", get_info=False, verify=False)
+    # Ensure aget_state returns a proper StateSnapshot
+    mock_state = MockStateSnapshot(values={"messages": []}, tasks=[])
+    agent_meta.graph.aget_state = AsyncMock(return_value=mock_state)
 
-    # Use stream to get intermediate responses
-    messages = []
+    # Create a mock agent executor that will return our test agent
+    mock_executor = MagicMock(spec=AgentExecutor)
+    mock_executor.get_agent = MagicMock(return_value=agent_meta)
+    mock_executor.agents = {"static-agent": agent_meta, "react-agent": MagicMock()}
 
-    def agent_lookup(agent_id):
-        if agent_id == "static-agent":
-            return agent_meta
-        return None
+    # Properly patch the request dependency
+    with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_executor):
+        # Also patch the get_agent function to properly use our agent
+        with patch("langgraph_agent_toolkit.service.routes.get_agent", return_value=agent_meta):
+            # Initialize client with get_info=False and verify=False to avoid HTTP request
+            client = AgentClient(agent="static-agent", base_url="http://0.0.0.0:8080", get_info=False, verify=False)
 
-    with patch("langgraph_agent_toolkit.service.routes.get_agent", side_effect=agent_lookup):
-        for response in client.stream("Test message", stream_tokens=False):
-            if isinstance(response, ChatMessage):
-                messages.append(response)
+            # Use stream to get intermediate responses
+            messages = []
+
+            for response in client.stream("Test message", stream_tokens=False):
+                if isinstance(response, ChatMessage):
+                    messages.append(response)
 
     for expected, actual in zip(EXPECTED_OUTPUT_MESSAGES, messages):
         actual.run_id = None

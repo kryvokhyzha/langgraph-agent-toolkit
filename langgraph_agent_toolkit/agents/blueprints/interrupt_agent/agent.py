@@ -1,16 +1,18 @@
 from datetime import datetime
-from typing import cast
+from typing import cast, Any
 
 from langchain.prompts import SystemMessagePromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnableSerializable
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import interrupt
 from pydantic import BaseModel, Field
 
-from langgraph_agent_toolkit.core import get_model, settings
+from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
 
 class AgentState(MessagesState, total=False):
@@ -22,7 +24,7 @@ class AgentState(MessagesState, total=False):
     birthdate: datetime | None
 
 
-def wrap_model(model: BaseChatModel, system_prompt: SystemMessage) -> RunnableSerializable[AgentState, AIMessage]:
+def wrap_model(model: BaseChatModel, system_prompt: BaseMessage) -> RunnableSerializable[Any, BaseMessage]:
     preprocessor = RunnableLambda(
         lambda state: [system_prompt] + state["messages"],
         name="StateModifier",
@@ -40,7 +42,7 @@ Don't tell the user what their sign is, you are just demonstrating your knowledg
 async def background(state: AgentState, config: RunnableConfig) -> AgentState:
     """This node is to demonstrate doing work before the interrupt"""
 
-    m = get_model(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
     model_runnable = wrap_model(m, background_prompt.format())
     response = await model_runnable.ainvoke(state, config)
 
@@ -67,7 +69,7 @@ class BirthdateExtraction(BaseModel):
 
 async def determine_birthdate(state: AgentState, config: RunnableConfig) -> AgentState:
     """This node examines the conversation history to determine user's birthdate.  If no birthdate is found, it will perform an interrupt before proceeding."""
-    m = get_model(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
     model_runnable = wrap_model(m.with_structured_output(BirthdateExtraction), birthdate_extraction_prompt.format())
     response = await model_runnable.ainvoke(state, config)
     response = cast(BirthdateExtraction, response)
@@ -96,7 +98,7 @@ async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentStat
     if not state.get("birthdate"):
         raise ValueError("No birthdate found in state")
 
-    m = get_model(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
     model_runnable = wrap_model(m, sign_prompt.format(birthdate=state["birthdate"].strftime("%Y-%m-%d")))
     response = await model_runnable.ainvoke(state, config)
 
@@ -114,7 +116,9 @@ agent.add_edge("background", "determine_birthdate")
 agent.add_edge("determine_birthdate", "determine_sign")
 agent.add_edge("determine_sign", END)
 
-interrupt_agent = agent.compile(
-    checkpointer=MemorySaver(),
+interrupt_agent = Agent(
+    name="interrupt-agent",
+    description="An agent the uses interrupts.",
+    graph=agent.compile(checkpointer=MemorySaver()),
 )
-interrupt_agent.name = "interrupt-agent"
+interrupt_agent.graph.name = "interrupt-agent"

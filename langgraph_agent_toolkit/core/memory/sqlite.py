@@ -2,7 +2,7 @@ from contextlib import AbstractAsyncContextManager
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from langgraph_agent_toolkit.core.settings import settings
-from langgraph_agent_toolkit.memory.base import BaseMemoryBackend
+from core.memory.base import BaseMemoryBackend
 
 
 class SQLiteMemoryBackend(BaseMemoryBackend):
