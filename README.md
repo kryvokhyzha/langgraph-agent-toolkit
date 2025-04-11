@@ -28,7 +28,7 @@ LangGraph-based projects by providing a full, robust toolkit.
 
 ### [Try the app!](https://agent-service-toolkit.streamlit.app/)
 
-<a href="https://agent-service-toolkit.streamlit.app/"><img src="media/app_screenshot.png" width="600"></a>
+<a href="https://agent-service-toolkit.streamlit.app/"><img src="docs/media/app_screenshot.png" width="600"></a>
 
 ### Quickstart
 
@@ -59,7 +59,7 @@ docker compose watch
 
 ### Architecture Diagram
 
-<img src="media/agent_architecture.png" width="600">
+<img src="docs/media/agent_architecture.png" width="600">
 
 ### Key Features
 
