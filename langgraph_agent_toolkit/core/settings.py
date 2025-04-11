@@ -1,4 +1,3 @@
-from enum import StrEnum
 from typing import Annotated, Any
 
 from dotenv import find_dotenv
@@ -12,17 +11,14 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from langgraph_agent_toolkit.memory.types import MemoryBackends
+from langgraph_agent_toolkit.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.schema.models import (
     AllModelEnum,
     FakeModelName,
     OpenAICompatibleName,
     Provider,
 )
-
-
-class DatabaseType(StrEnum):
-    SQLITE = "sqlite"
-    POSTGRES = "postgres"
 
 
 def check_str_is_http(x: str) -> str:
@@ -38,7 +34,7 @@ class Settings(BaseSettings):
         extra="ignore",
         validate_default=False,
     )
-    MODE: str | None = None
+    ENV_MODE: str | None = None
 
     HOST: str = "0.0.0.0"
     PORT: int = 8080
@@ -49,8 +45,9 @@ class Settings(BaseSettings):
     # If DEFAULT_MODEL is None, it will be set in model_post_init
     DEFAULT_MODEL: AllModelEnum | None = None
     AVAILABLE_MODELS: set[AllModelEnum] = Field(
-        default_factory=set,
+        ...,
         description="Set of available models. If not set, all models will be available.",
+        default_factory=set,
     )
 
     # Set openai compatible api, mainly used for proof of concept
@@ -58,13 +55,20 @@ class Settings(BaseSettings):
     COMPATIBLE_API_KEY: SecretStr | None = None
     COMPATIBLE_BASE_URL: str | None = None
 
+    # Observability platform
+    OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
+
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"
     LANGCHAIN_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "https://api.smith.langchain.com"
     LANGCHAIN_API_KEY: SecretStr | None = None
 
+    LANGFUSE_SECRET_KEY: SecretStr | None = None
+    LANGFUSE_PUBLIC_KEY: SecretStr | None = None
+    LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "http://localhost:3000"
+
     # Database Configuration
-    DATABASE_TYPE: DatabaseType = DatabaseType.SQLITE
+    MEMORY_BACKEND: MemoryBackends = MemoryBackends.SQLITE
     SQLITE_DB_PATH: str = "checkpoints.db"
 
     # postgresql Configuration
@@ -105,7 +109,7 @@ class Settings(BaseSettings):
         return f"http://{self.HOST}:{self.PORT}"
 
     def is_dev(self) -> bool:
-        return self.MODE == "dev"
+        return self.ENV_MODE == "development"
 
 
 settings = Settings()

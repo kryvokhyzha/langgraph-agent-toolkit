@@ -19,4 +19,11 @@ if __name__ == "__main__":
     # https://www.psycopg.org/psycopg3/docs/advanced/async.html#asynchronous-operations
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    uvicorn.run("service:app", host=settings.HOST, port=settings.PORT, reload=settings.is_dev())
+
+    # Use the app from the refactored service module
+    uvicorn.run(
+        "langgraph_agent_toolkit.service.service:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.is_dev(),
+    )

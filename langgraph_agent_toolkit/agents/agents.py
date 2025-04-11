@@ -1,7 +1,11 @@
 from dataclasses import dataclass
+from typing import Callable, List
 
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.func import Pregel
 
+from langgraph_agent_toolkit.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.agents.bg_task_agent.bg_task_agent import bg_task_agent
 from langgraph_agent_toolkit.agents.chatbot import chatbot
 from langgraph_agent_toolkit.agents.command_agent import command_agent
@@ -15,7 +19,8 @@ DEFAULT_AGENT = "langgraph-supervisor-agent"
 @dataclass
 class Agent:
     description: str
-    graph: CompiledStateGraph
+    graph: CompiledStateGraph | Pregel
+    observability: BaseObservabilityPlatform = EmptyObservability()
 
 
 agents: dict[str, Agent] = {
@@ -27,8 +32,8 @@ agents: dict[str, Agent] = {
 }
 
 
-def get_agent(agent_id: str) -> CompiledStateGraph:
-    return agents[agent_id].graph
+def get_agent(agent_id: str) -> Agent:
+    return agents[agent_id]
 
 
 def get_all_agent_info() -> list[AgentInfo]:

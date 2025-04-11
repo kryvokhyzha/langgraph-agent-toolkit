@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,10 +10,13 @@ from langgraph.types import StreamWriter
 from langgraph_agent_toolkit.agents.agents import Agent
 from langgraph_agent_toolkit.agents.utils import CustomData
 from langgraph_agent_toolkit.client import AgentClient
-from langgraph_agent_toolkit.core.settings import settings, DatabaseType
+from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.memory.types import MemoryBackends
 from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.service.service import app
+from langgraph_agent_toolkit.memory.sqlite import SQLiteMemoryBackend
+from langgraph_agent_toolkit.observability.factory import ObservabilityFactory
 
 START_MESSAGE = CustomData(type="start", data={"key1": "value1", "key2": 123})
 
@@ -56,11 +59,28 @@ def mock_httpx():
 def sqlite_db_settings():
     """Temporarily configure settings to use SQLite in-memory database for testing."""
     # Patch the settings instance, not the Settings class
-    with patch.object(settings, "DATABASE_TYPE", DatabaseType.SQLITE):
+    with patch.object(settings, "MEMORY_BACKEND", MemoryBackends.SQLITE):
         with patch.object(settings, "SQLITE_DB_PATH", ":memory:"):
-            # Patch the database initialization function
-            with patch("langgraph_agent_toolkit.service.service.initialize_database"):
-                yield
+            # Create mock async context manager
+            mock_saver = AsyncMock()
+            mock_saver.setup = AsyncMock()
+            mock_context = AsyncMock()
+            mock_context.__aenter__ = AsyncMock(return_value=mock_saver)
+            mock_context.__aexit__ = AsyncMock(return_value=None)
+
+            # Create mock memory backend
+            mock_memory_backend = MagicMock()
+            mock_memory_backend.get_checkpoint_saver.return_value = mock_context
+
+            # Patch the MemoryFactory.create method
+            with patch("langgraph_agent_toolkit.memory.factory.MemoryFactory.create", return_value=mock_memory_backend):
+                # Patch the ObservabilityFactory.create method
+                mock_observability = MagicMock()
+                with patch(
+                    "langgraph_agent_toolkit.observability.factory.ObservabilityFactory.create",
+                    return_value=mock_observability,
+                ):
+                    yield
 
 
 def test_messages_conversion() -> None:
@@ -109,8 +129,10 @@ static_agent = agent.compile(checkpointer=MemorySaver())
 
 def test_agent_stream(mock_httpx, sqlite_db_settings):
     """Test that streaming from our static agent works correctly with token streaming."""
-    # Apply database settings and patch
+    # Create agent meta with observability
     agent_meta = Agent(description="A static agent.", graph=static_agent)
+    agent_meta.observability = MagicMock()
+    agent_meta.observability.get_callback_handler = MagicMock(return_value=None)
 
     with patch.dict("langgraph_agent_toolkit.agents.agents.agents", {"static-agent": agent_meta}, clear=True):
         # Initialize client with get_info=False and verify=False to avoid HTTP request
@@ -121,10 +143,10 @@ def test_agent_stream(mock_httpx, sqlite_db_settings):
 
     def agent_lookup(agent_id):
         if agent_id == "static-agent":
-            return static_agent
+            return agent_meta
         return None
 
-    with patch("langgraph_agent_toolkit.service.service.get_agent", side_effect=agent_lookup):
+    with patch("langgraph_agent_toolkit.service.routes.get_agent", side_effect=agent_lookup):
         for response in client.stream("Test message", stream_tokens=False):
             if isinstance(response, ChatMessage):
                 messages.append(response)
