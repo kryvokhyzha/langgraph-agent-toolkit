@@ -4,7 +4,10 @@ import pytest
 from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.service.service import app
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 
 
 class MockStateSnapshot:
@@ -16,18 +19,55 @@ class MockStateSnapshot:
 
 
 @pytest.fixture
-def test_client():
+def mock_agent_executor():
+    """Fixture to create a mock agent executor with the default agent."""
+    # Create mock agent
+    agent_mock = Mock()
+    agent_mock.name = DEFAULT_AGENT
+    agent_mock.description = "A mock agent for testing"
+    agent_mock.graph = Mock()
+
+    # Configure async methods with AsyncMock
+    agent_mock.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content="Test response")]})])
+
+    # Create a proper StateSnapshot for aget_state
+    mock_state = MockStateSnapshot(values={"messages": []}, tasks=[])
+    agent_mock.graph.aget_state = AsyncMock(return_value=mock_state)
+
+    # Configure the astream method to work as an async generator
+    async def mock_astream(*args, **kwargs):
+        for item in [("values", {"messages": [AIMessage(content="Test response")]})]:
+            yield item
+
+    agent_mock.graph.astream = mock_astream
+    agent_mock.graph.get_state = Mock(return_value=mock_state)
+
+    agent_mock.observability = Mock()
+    agent_mock.observability.get_callback_handler = Mock(return_value=None)
+
+    # Create the executor with our agent
+    executor = Mock(spec=AgentExecutor)
+    executor.agents = {DEFAULT_AGENT: agent_mock}
+    executor.get_agent = Mock(return_value=agent_mock)
+    executor.get_all_agent_info = Mock(return_value=[{"key": DEFAULT_AGENT, "description": "A mock agent for testing"}])
+
+    return executor
+
+
+@pytest.fixture
+def mock_agent(mock_agent_executor):
+    """Fixture to get the mock agent from the executor."""
+    return mock_agent_executor.get_agent(DEFAULT_AGENT)
+
+
+@pytest.fixture
+def test_client(mock_agent_executor):
     """Fixture to create a FastAPI test client."""
     # Setup mocks for the app lifecycle
     mock_observability = Mock()
     mock_memory_backend = Mock()
     mock_saver = AsyncMock()
     mock_saver.setup = AsyncMock()
-
-    # Mock agents setup
-    mock_agent = Mock()
-    mock_agent.graph = Mock()
-    mock_agent.observability = mock_observability
 
     # Create context managers
     mock_context = AsyncMock()
@@ -36,39 +76,27 @@ def test_client():
     mock_memory_backend.get_checkpoint_saver.return_value = mock_context
 
     # Apply patches for app initialization
-    with patch("langgraph_agent_toolkit.memory.factory.MemoryFactory.create", return_value=mock_memory_backend):
+    with patch("langgraph_agent_toolkit.core.memory.factory.MemoryFactory.create", return_value=mock_memory_backend):
         with patch(
-            "langgraph_agent_toolkit.observability.factory.ObservabilityFactory.create", return_value=mock_observability
+            "langgraph_agent_toolkit.core.observability.factory.ObservabilityFactory.create",
+            return_value=mock_observability,
         ):
-            with patch("langgraph_agent_toolkit.service.handler.get_all_agent_info", return_value=[]):
-                with patch("langgraph_agent_toolkit.service.handler.get_agent", return_value=mock_agent):
-                    client = TestClient(app)
-                    yield client
+            with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
+                with patch(
+                    "langgraph_agent_toolkit.service.routes.get_agent",
+                    side_effect=lambda req, agent_id: mock_agent_executor.get_agent(agent_id),
+                ):
+                    with patch(
+                        "langgraph_agent_toolkit.service.routes.get_all_agent_info",
+                        return_value=mock_agent_executor.get_all_agent_info(),
+                    ):
+                        # Create a test client
+                        client = TestClient(app)
 
+                        # Set up app state with our mock executor
+                        app.state.agent_executor = mock_agent_executor
 
-@pytest.fixture
-def mock_agent():
-    """Fixture to create a mock agent that can be configured for different test scenarios."""
-    agent_mock = Mock()
-    agent_mock.graph = Mock()
-
-    # Configure async methods with AsyncMock
-    agent_mock.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content="Test response")]})])
-    agent_mock.graph.aget_state = AsyncMock(return_value=MockStateSnapshot(values={"messages": []}, tasks=[]))
-
-    # Configure the astream method to work as an async generator
-    async def mock_astream(*args, **kwargs):
-        for item in [("values", {"messages": [AIMessage(content="Test response")]})]:
-            yield item
-
-    agent_mock.graph.astream = mock_astream
-    agent_mock.graph.get_state = Mock()
-
-    agent_mock.observability = Mock()
-    agent_mock.observability.get_callback_handler = Mock(return_value=None)
-
-    with patch("langgraph_agent_toolkit.service.routes.get_agent", return_value=agent_mock):
-        yield agent_mock
+                        yield client
 
 
 @pytest.fixture

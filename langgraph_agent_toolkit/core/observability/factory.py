@@ -1,10 +1,10 @@
 from typing import Optional
 
-from langgraph_agent_toolkit.observability.base import BaseObservabilityPlatform
-from langgraph_agent_toolkit.observability.langfuse import LangfuseObservability
-from langgraph_agent_toolkit.observability.langsmith import LangsmithObservability
-from langgraph_agent_toolkit.observability.empty import EmptyObservability
-from langgraph_agent_toolkit.observability.types import ObservabilityBackend
+from core.observability.base import BaseObservabilityPlatform
+from core.observability.langfuse import LangfuseObservability
+from core.observability.langsmith import LangsmithObservability
+from core.observability.empty import EmptyObservability
+from core.observability.types import ObservabilityBackend
 
 
 class ObservabilityFactory:

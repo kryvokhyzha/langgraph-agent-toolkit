@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 
 
 class AgentInfo(BaseModel):
@@ -30,7 +31,7 @@ class ServiceMetadata(BaseModel):
     )
     default_agent: str = Field(
         description="Default agent used when none is specified.",
-        examples=["langgraph-supervisor-agent"],
+        examples=[DEFAULT_AGENT],
     )
     default_model: AllModelEnum = Field(
         description="Default model used when none is specified.",
@@ -58,7 +59,14 @@ class UserInput(BaseModel):
     agent_config: dict[str, Any] = Field(
         description="Additional configuration to pass through to the agent",
         default={},
-        examples=[{"spicy_level": 0.8}],
+        examples=[
+            {
+                "memory_saver_params": {"k": 6},
+                "temperature": 0.0,
+                "max_tokens": 1024,
+                "top_p": 0.7,
+            },
+        ],
     )
 
 

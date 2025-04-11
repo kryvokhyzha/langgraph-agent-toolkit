@@ -1,5 +1,5 @@
 from langsmith import Client as LangsmithClient
-from langgraph_agent_toolkit.observability.base import BaseObservabilityPlatform
+from core.observability.base import BaseObservabilityPlatform
 
 
 class LangsmithObservability(BaseObservabilityPlatform):

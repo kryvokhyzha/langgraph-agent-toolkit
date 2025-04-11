@@ -278,7 +278,7 @@ services:
           memory: 1G
     develop:
       watch:
-        - path: langgraph_agent_toolkit/agents/
+        - path: langgraph_agent_toolkit/agents/blueprints/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/agents/
         - path: langgraph_agent_toolkit/core/
@@ -287,13 +287,13 @@ services:
         - path: langgraph_agent_toolkit/helper/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/helper/
-        - path: langgraph_agent_toolkit/memory/
+        - path: langgraph_agent_toolkit/core/memory/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/memory/
-        - path: langgraph_agent_toolkit/observability/
+        - path: langgraph_agent_toolkit/core/observability/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/observability/
-        - path: langgraph_agent_toolkit/prompt_manager/
+        - path: langgraph_agent_toolkit/core/prompt_manager/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/prompt_manager/
         - path: langgraph_agent_toolkit/schema/

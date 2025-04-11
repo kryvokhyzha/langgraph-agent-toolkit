@@ -2,7 +2,7 @@ import json
 from typing import Annotated, Any, AsyncGenerator
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from langchain_core.messages import AIMessage, AIMessageChunk, AnyMessage, HumanMessage, ToolMessage
@@ -10,8 +10,9 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command, Interrupt
 
-from langgraph_agent_toolkit.agents import DEFAULT_AGENT, get_agent, get_all_agent_info
-from langgraph_agent_toolkit.agents.agents import Agent
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.schema import (
@@ -47,6 +48,35 @@ def verify_bearer(
     auth_secret = settings.AUTH_SECRET.get_secret_value()
     if not http_auth or http_auth.credentials != auth_secret:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+def get_agent_executor(request: Request) -> AgentExecutor:
+    """Get the AgentExecutor instance that was initialized in lifespan."""
+    app = request.app
+    if not hasattr(app.state, "agent_executor"):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agent executor not initialized. Service might be starting up.",
+        )
+    return app.state.agent_executor
+
+
+def get_agent(request: Request, agent_id: str) -> Agent:
+    """Get an agent by its ID from the initialized AgentExecutor."""
+    executor = get_agent_executor(request)
+    try:
+        return executor.get_agent(agent_id)
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent '{agent_id}' not found",
+        )
+
+
+def get_all_agent_info(request: Request):
+    """Get information about all available agents from the initialized AgentExecutor."""
+    executor = get_agent_executor(request)
+    return executor.get_all_agent_info()
 
 
 async def _handle_input(user_input: UserInput, agent: Agent) -> tuple[dict[str, Any], UUID]:
@@ -99,11 +129,11 @@ async def _handle_input(user_input: UserInput, agent: Agent) -> tuple[dict[str, 
 
 
 @private_router.get("/info")
-async def info() -> ServiceMetadata:
+async def info(request: Request) -> ServiceMetadata:
     models = list(settings.AVAILABLE_MODELS)
     models.sort()
     return ServiceMetadata(
-        agents=get_all_agent_info(),
+        agents=get_all_agent_info(request),
         models=models,
         default_agent=DEFAULT_AGENT,
         default_model=settings.DEFAULT_MODEL,
@@ -112,7 +142,7 @@ async def info() -> ServiceMetadata:
 
 @private_router.post("/{agent_id}/invoke")
 @private_router.post("/invoke")
-async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMessage:
+async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> ChatMessage:
     """
     Invoke an agent with user input to retrieve a final response.
 
@@ -125,7 +155,7 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMe
     # in interrupt-agent, or a tool step in research-assistant), it's omitted. Arguably,
     # you'd want to include it. You could update the API to return a list of ChatMessages
     # in that case.
-    agent: Agent = get_agent(agent_id)
+    agent: Agent = get_agent(request, agent_id)
 
     kwargs, run_id = await _handle_input(user_input, agent)
 
@@ -150,13 +180,15 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMe
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 
-async def message_generator(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> AsyncGenerator[str, None]:
+async def message_generator(
+    user_input: StreamInput, request: Request, agent_id: str = DEFAULT_AGENT
+) -> AsyncGenerator[str, None]:
     """
     Generate a stream of messages from the agent.
 
     This is the workhorse method for the /stream endpoint.
     """
-    agent = get_agent(agent_id)
+    agent = get_agent(request, agent_id)
     agent_graph: CompiledStateGraph = agent.graph
     kwargs, run_id = await _handle_input(user_input, agent)
 
@@ -254,7 +286,7 @@ def _sse_response_example() -> dict[int, Any]:
     responses=_sse_response_example(),
 )
 @private_router.post("/stream", response_class=StreamingResponse, responses=_sse_response_example())
-async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> StreamingResponse:
+async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> StreamingResponse:
     """
     Stream an agent's response to a user input, including intermediate messages and tokens.
 
@@ -265,20 +297,20 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> Stre
     Set `stream_tokens=false` to return intermediate messages but not token-by-token.
     """
     return StreamingResponse(
-        message_generator(user_input, agent_id),
+        message_generator(user_input, request, agent_id),
         media_type="text/event-stream",
     )
 
 
 @private_router.post("/feedback", status_code=status.HTTP_201_CREATED)
-async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT) -> FeedbackResponse:
+async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT, request: Request = None) -> FeedbackResponse:
     """
     Record feedback for a run to the configured observability platform.
 
     This routes the feedback to the appropriate platform based on the agent's configuration.
     """
     try:
-        agent = get_agent(agent_id)
+        agent = get_agent(request, agent_id)
         agent.observability.record_feedback(
             run_id=feedback.run_id,
             key=feedback.key,
@@ -300,14 +332,14 @@ async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT) -> Feedbac
 
 
 @private_router.post("/history")
-def history(input: ChatHistoryInput) -> ChatHistory:
+def history(input: ChatHistoryInput, request: Request = None) -> ChatHistory:
     """
     Get chat history.
     """
-    # TODO: Hard-coding DEFAULT_AGENT here is wonky
-    agent: CompiledStateGraph = get_agent(DEFAULT_AGENT).graph
+    agent: Agent = get_agent(request, DEFAULT_AGENT)
     try:
-        state_snapshot = agent.get_state(
+        agent_graph: CompiledStateGraph = agent.graph
+        state_snapshot = agent_graph.get_state(
             config=RunnableConfig(
                 configurable={
                     "thread_id": input.thread_id,
