@@ -55,6 +55,8 @@ class Settings(BaseSettings):
     # Agent configuration
     AGENT_PATHS: list[str] = [
         "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
+        "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
+        "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
     ]
 
     LANGCHAIN_TRACING_V2: bool = False
