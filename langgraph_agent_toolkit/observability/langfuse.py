@@ -26,3 +26,14 @@ class LangfuseObservability(BaseObservabilityPlatform):
     def before_shutdown(self) -> None:
         """Perform any necessary cleanup before shutdown."""
         Langfuse().flush()
+
+    def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
+        """Record feedback for a run to Langfuse."""
+        self.validate_environment()
+        client = Langfuse()
+        client.score(
+            trace_id=run_id,
+            name=key,
+            value=score,
+            **kwargs,
+        )

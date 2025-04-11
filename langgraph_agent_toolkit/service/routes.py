@@ -271,23 +271,26 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> Stre
 
 
 @private_router.post("/feedback")
-async def feedback(feedback: Feedback) -> FeedbackResponse:
+async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT) -> FeedbackResponse:
     """
-    Record feedback for a run to LangSmith.
+    Record feedback for a run to the configured observability platform.
 
-    This is a simple wrapper for the LangSmith create_feedback API, so the
-    credentials can be stored and managed in the service rather than the client.
-    See: https://api.smith.langchain.com/redoc#tag/feedback/operation/create_feedback_api_v1_feedback_post
+    This routes the feedback to the appropriate platform based on the agent's configuration.
     """
-    client = LangsmithClient()
-    kwargs = feedback.kwargs or {}
-    client.create_feedback(
-        run_id=feedback.run_id,
-        key=feedback.key,
-        score=feedback.score,
-        **kwargs,
-    )
-    return FeedbackResponse()
+    try:
+        agent = get_agent(agent_id)
+        agent.observability.record_feedback(
+            run_id=feedback.run_id,
+            key=feedback.key,
+            score=feedback.score,
+            **feedback.kwargs,
+        )
+        return FeedbackResponse()
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"An exception occurred while recording feedback: {e}")
+        raise HTTPException(status_code=500, detail="Unexpected error recording feedback")
 
 
 @private_router.post("/history")

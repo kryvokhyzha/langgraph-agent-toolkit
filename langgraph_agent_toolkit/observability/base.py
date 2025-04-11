@@ -40,3 +40,8 @@ class BaseObservabilityPlatform(ABC):
     def before_shutdown(self) -> None:
         """Perform any necessary cleanup before shutdown."""
         pass
+
+    @abstractmethod
+    def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
+        """Record feedback for a run."""
+        pass
