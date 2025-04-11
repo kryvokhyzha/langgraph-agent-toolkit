@@ -23,6 +23,7 @@ from langgraph_agent_toolkit.schema import (
     ServiceMetadata,
     StreamInput,
     UserInput,
+    HealthCheck,
 )
 from langgraph_agent_toolkit.service.utils import (
     convert_message_content_to_string,
@@ -321,7 +322,14 @@ def history(input: ChatHistoryInput) -> ChatHistory:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 
-@public_router.get("/health")
-async def health_check():
+@public_router.get(
+    "/health",
+    tags=["healthcheck"],
+    summary="Perform a Health Check",
+    response_description="Return HTTP Status Code 200 (OK)",
+    status_code=status.HTTP_200_OK,
+    response_model=HealthCheck,
+)
+async def health_check() -> HealthCheck:
     """Health check endpoint."""
-    return {"status": "ok"}
+    return HealthCheck(status="OK")
