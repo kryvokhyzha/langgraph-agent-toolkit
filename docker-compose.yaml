@@ -95,8 +95,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 4G
+          cpus: "1"
+          memory: 2G
     develop:
       watch:
         - path: configs/litellm/config.yaml
@@ -245,6 +245,11 @@ services:
       LANGFUSE_INIT_USER_EMAIL: kriwohizha@gmail.com
       LANGFUSE_INIT_USER_NAME: kryvokhyzha
       LANGFUSE_INIT_USER_PASSWORD: 11111111111111111
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
 
   # === Application Services ===
   backend-agent-service:
@@ -269,8 +274,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2"
-          memory: 2G
+          cpus: "1"
+          memory: 1G
     develop:
       watch:
         - path: langgraph_agent_toolkit/agents/
