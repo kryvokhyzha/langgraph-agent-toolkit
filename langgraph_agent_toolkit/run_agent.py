@@ -3,19 +3,21 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
+from langfuse.callback import CallbackHandler
 
 load_dotenv()
 
 from langgraph_agent_toolkit.agents import DEFAULT_AGENT, get_agent
 
-agent = get_agent(DEFAULT_AGENT)
+agent = get_agent(DEFAULT_AGENT).graph
+handler = CallbackHandler()
 
 
 async def main() -> None:
     inputs = {"messages": [("user", "Find me a recipe for chocolate chip cookies")]}
     result = await agent.ainvoke(
         inputs,
-        config=RunnableConfig(configurable={"thread_id": uuid4()}),
+        config=RunnableConfig(configurable={"thread_id": uuid4()}, callbacks=[handler]),
     )
     result["messages"][-1].pretty_print()
 

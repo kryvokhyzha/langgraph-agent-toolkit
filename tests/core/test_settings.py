@@ -123,8 +123,8 @@ def test_settings_is_dev():
             "COMPATIBLE_MODEL": "gpt-4",
         },
     ):
-        settings = Settings(MODE="dev", _env_file=None)
+        settings = Settings(ENV_MODE="development", _env_file=None)
         assert settings.is_dev() is True
 
-        settings = Settings(MODE="prod", _env_file=None)
+        settings = Settings(ENV_MODE="production", _env_file=None)
         assert settings.is_dev() is False

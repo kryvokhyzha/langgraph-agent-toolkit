@@ -288,7 +288,7 @@ class AgentClient:
                     headers=self._headers,
                     timeout=self.timeout,
                 ) as response:
-                    response.raise_for_status()  # Remove the await keyword here
+                    response.raise_for_status()
                     async for line in response.aiter_lines():
                         if line.strip():
                             parsed = self._parse_stream_line(line)

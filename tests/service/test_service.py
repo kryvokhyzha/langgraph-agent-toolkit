@@ -1,5 +1,5 @@
 import json
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import langsmith
 import pytest
@@ -10,18 +10,19 @@ from langgraph.types import Interrupt
 from langgraph_agent_toolkit.agents.agents import Agent
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import OpenAICompatibleName
+from langgraph_agent_toolkit.observability.factory import ObservabilityFactory
 
 
 def test_invoke(test_client, mock_agent) -> None:
     QUESTION = "What is the weather in Tokyo?"
     ANSWER = "The weather in Tokyo is 70 degrees."
-    mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
+    mock_agent.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content=ANSWER)]})])
 
     response = test_client.post("/invoke", json={"message": QUESTION})
     assert response.status_code == 200
 
-    mock_agent.ainvoke.assert_awaited_once()
-    input_message = mock_agent.ainvoke.await_args.kwargs["input"]["messages"][0]
+    mock_agent.graph.ainvoke.assert_awaited_once()
+    input_message = mock_agent.graph.ainvoke.await_args.kwargs["input"]["messages"][0]
     assert input_message.content == QUESTION
 
     output = ChatMessage.model_validate(response.json())
@@ -37,11 +38,15 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
     DEFAULT_ANSWER = "This is from the default agent."
 
     # Create a separate mock for the default agent
-    default_mock = AsyncMock()
-    default_mock.ainvoke.return_value = [("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})]
+    default_mock = Mock()
+    default_mock.graph = Mock()
+    default_mock.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content=DEFAULT_ANSWER)]})])
+    default_mock.graph.aget_state = AsyncMock(return_value={"tasks": []})
+    default_mock.observability = Mock()
+    default_mock.observability.get_callback_handler = Mock(return_value=None)
 
     # Configure our custom mock agent
-    mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=CUSTOM_ANSWER)]})]
+    mock_agent.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content=CUSTOM_ANSWER)]})])
 
     # Patch get_agent to return the correct agent based on the provided agent_id
     def agent_lookup(agent_id):
@@ -49,15 +54,15 @@ def test_invoke_custom_agent(test_client, mock_agent) -> None:
             return mock_agent
         return default_mock
 
-    with patch("langgraph_agent_toolkit.service.service.get_agent", side_effect=agent_lookup):
+    with patch("langgraph_agent_toolkit.service.routes.get_agent", side_effect=agent_lookup):
         response = test_client.post(f"/{CUSTOM_AGENT}/invoke", json={"message": QUESTION})
         assert response.status_code == 200
 
         # Verify custom agent was called and default wasn't
-        mock_agent.ainvoke.assert_awaited_once()
-        default_mock.ainvoke.assert_not_awaited()
+        mock_agent.graph.ainvoke.assert_awaited_once()
+        default_mock.graph.ainvoke.assert_not_awaited()
 
-        input_message = mock_agent.ainvoke.await_args.kwargs["input"]["messages"][0]
+        input_message = mock_agent.graph.ainvoke.await_args.kwargs["input"]["messages"][0]
         assert input_message.content == QUESTION
 
         output = ChatMessage.model_validate(response.json())
@@ -70,14 +75,14 @@ def test_invoke_model_param(test_client, mock_agent) -> None:
     QUESTION = "What is the weather in Tokyo?"
     ANSWER = "The weather in Tokyo is sunny."
     CUSTOM_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
-    mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
+    mock_agent.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content=ANSWER)]})])
 
     response = test_client.post("/invoke", json={"message": QUESTION, "model": CUSTOM_MODEL})
     assert response.status_code == 200
 
     # Verify the model was passed correctly in the config
-    mock_agent.ainvoke.assert_awaited_once()
-    config = mock_agent.ainvoke.await_args.kwargs["config"]
+    mock_agent.graph.ainvoke.assert_awaited_once()
+    config = mock_agent.graph.ainvoke.await_args.kwargs["config"]
     assert config["configurable"]["model"] == CUSTOM_MODEL
 
     # Verify the response is still correct
@@ -97,14 +102,14 @@ def test_invoke_custom_agent_config(test_client, mock_agent) -> None:
     ANSWER = "The weather in Tokyo is sunny."
     CUSTOM_CONFIG = {"spicy_level": 0.1, "additional_param": "value_foo"}
 
-    mock_agent.ainvoke.return_value = [("values", {"messages": [AIMessage(content=ANSWER)]})]
+    mock_agent.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content=ANSWER)]})])
 
     response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG})
     assert response.status_code == 200
 
     # Verify the agent_config was passed correctly in the config
-    mock_agent.ainvoke.assert_awaited_once()
-    config = mock_agent.ainvoke.await_args.kwargs["config"]
+    mock_agent.graph.ainvoke.assert_awaited_once()
+    config = mock_agent.graph.ainvoke.await_args.kwargs["config"]
     assert config["configurable"]["spicy_level"] == 0.1
     assert config["configurable"]["additional_param"] == "value_foo"
 
@@ -123,16 +128,18 @@ def test_invoke_interrupt(test_client, mock_agent) -> None:
     QUESTION = "What is the weather in Tokyo?"
     ANSWER = "The weather in Tokyo is 70 degrees."
     INTERRUPT = "Confirm weather check"
-    mock_agent.ainvoke.return_value = [
-        ("values", {"messages": [AIMessage(content=ANSWER)]}),
-        ("updates", {"__interrupt__": [Interrupt(value=INTERRUPT)]}),
-    ]
+    mock_agent.graph.ainvoke = AsyncMock(
+        return_value=[
+            ("values", {"messages": [AIMessage(content=ANSWER)]}),
+            ("updates", {"__interrupt__": [Interrupt(value=INTERRUPT)]}),
+        ]
+    )
 
     response = test_client.post("/invoke", json={"message": QUESTION})
     assert response.status_code == 200
 
-    mock_agent.ainvoke.assert_awaited_once()
-    input_message = mock_agent.ainvoke.await_args.kwargs["input"]["messages"][0]
+    mock_agent.graph.ainvoke.assert_awaited_once()
+    input_message = mock_agent.graph.ainvoke.await_args.kwargs["input"]["messages"][0]
     assert input_message.content == QUESTION
 
     output = ChatMessage.model_validate(response.json())
@@ -140,7 +147,7 @@ def test_invoke_interrupt(test_client, mock_agent) -> None:
     assert output.content == INTERRUPT
 
 
-@patch("langgraph_agent_toolkit.service.service.LangsmithClient")
+@patch("langgraph_agent_toolkit.service.routes.LangsmithClient")
 def test_feedback(mock_client: langsmith.Client, test_client) -> None:
     ls_instance = mock_client.return_value
     ls_instance.create_feedback.return_value = None
@@ -164,7 +171,9 @@ def test_history(test_client, mock_agent) -> None:
     ANSWER = "The weather in Tokyo is 70 degrees."
     user_question = HumanMessage(content=QUESTION)
     agent_response = AIMessage(content=ANSWER)
-    mock_agent.get_state.return_value = StateSnapshot(
+
+    # Create a proper StateSnapshot
+    state_snapshot = StateSnapshot(
         values={"messages": [user_question, agent_response]},
         next=(),
         config={},
@@ -173,6 +182,8 @@ def test_history(test_client, mock_agent) -> None:
         parent_config=None,
         tasks=(),
     )
+
+    mock_agent.graph.get_state.return_value = state_snapshot
 
     response = test_client.post("/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"})
     assert response.status_code == 200
@@ -212,7 +223,10 @@ async def test_stream(test_client, mock_agent) -> None:
         for event in events:
             yield event
 
-    mock_agent.astream = mock_astream
+    mock_agent.graph.astream = mock_astream
+
+    # Add observability mock for callback_handler
+    mock_agent.observability.get_callback_handler = Mock(return_value=None)
 
     # Make request with streaming
     with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": True}) as response:
@@ -265,7 +279,10 @@ async def test_stream_no_tokens(test_client, mock_agent) -> None:
         for event in events:
             yield event
 
-    mock_agent.astream = mock_astream
+    mock_agent.graph.astream = mock_astream
+
+    # Add observability mock for callback_handler
+    mock_agent.observability.get_callback_handler = Mock(return_value=None)
 
     # Make request with streaming disabled
     with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
@@ -303,7 +320,10 @@ def test_stream_interrupt(test_client, mock_agent) -> None:
         for event in events:
             yield event
 
-    mock_agent.astream = mock_astream
+    mock_agent.graph.astream = mock_astream
+
+    # Add observability mock for callback_handler
+    mock_agent.observability.get_callback_handler = Mock(return_value=None)
 
     # Make request with streaming disabled
     with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:

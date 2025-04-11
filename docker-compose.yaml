@@ -12,10 +12,10 @@ x-postgres-credentials: &postgres-credentials
 x-redis-credentials: &redis-credentials
   REDIS_HOST: ${REDIS_HOST:-redis}
   REDIS_PORT: ${REDIS_PORT:-6379}
-  REDIS_AUTH: ${REDIS_AUTH}
+  REDIS_AUTH: ${REDIS_AUTH:-myredissecret}
 
 x-langfuse-env: &langfuse-env
-  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/langfuse
   SALT: ${LANGFUSE_SALT:-mysalt}
   ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
   TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
@@ -77,11 +77,9 @@ services:
     image: ghcr.io/berriai/litellm:main-stable
     platform: linux/amd64
     container_name: litellm
-    environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/litellm"
-      STORE_MODEL_IN_DB: "True"
     env_file:
-      - .env
+      - ./configs/litellm/.litellm.env
+      - ./configs/redis/.redis.env
     ports:
       - 4000:4000
     volumes:
@@ -89,7 +87,10 @@ services:
     command:
       ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "1"]
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     init: true
     deploy:
       resources:
@@ -115,6 +116,8 @@ services:
       timeout: 3s
     environment:
       <<: *postgres-credentials
+    env_file:
+      - ./configs/postgres/.postgres.env
     ports:
       - 5432:5432
     volumes:
@@ -130,10 +133,8 @@ services:
     <<: *service-defaults
     image: clickhouse/clickhouse-server
     user: "101:101"
-    environment:
-      CLICKHOUSE_DB: default
-      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clickhouse}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse}
+    env_file:
+      - ./configs/clickhouse/.clickhouse.env
     volumes:
       - langfuse_clickhouse_data:/var/lib/clickhouse
       - langfuse_clickhouse_logs:/var/log/clickhouse-server
@@ -159,15 +160,15 @@ services:
     <<: *service-defaults
     image: redis:7
     container_name: redis
+    environment:
+      - REDIS_AUTH=${REDIS_AUTH:-myredissecret}
     command: >
-      --requirepass ${REDIS_AUTH}
+      --requirepass ${REDIS_AUTH:-myredissecret}
     ports:
       - 127.0.0.1:6379:6379
-    env_file:
-      - .env
     healthcheck:
       <<: *healthcheck-defaults
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_AUTH:-myredissecret}", "ping"]
       interval: 3s
       timeout: 10s
       retries: 10
@@ -185,9 +186,8 @@ services:
     command:
       -c 'mkdir -p /data/langfuse && minio server --address ":9000"
       --console-address ":9001" /data'
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-miniosecret}
+    env_file:
+      - ./configs/minio/.minio.env
     ports:
       - 9090:9000
       - 127.0.0.1:9091:9001
@@ -213,6 +213,9 @@ services:
     depends_on: *langfuse-depends-on
     ports:
       - 3030:3030
+    env_file:
+      - ./configs/minio/.minio.env
+      - ./configs/clickhouse/.clickhouse.env
     environment: *langfuse-env
     deploy:
       resources:
@@ -226,24 +229,22 @@ services:
     depends_on: *langfuse-depends-on
     ports:
       - 3000:3000
+    env_file:
+      - ./configs/minio/.minio.env
+      - ./configs/clickhouse/.clickhouse.env
     environment:
       <<: *langfuse-env
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-mysecret}
-      LANGFUSE_INIT_ORG_ID: ${LANGFUSE_INIT_ORG_ID:-}
-      LANGFUSE_INIT_ORG_NAME: ${LANGFUSE_INIT_ORG_NAME:-}
-      LANGFUSE_INIT_PROJECT_ID: ${LANGFUSE_INIT_PROJECT_ID:-}
-      LANGFUSE_INIT_PROJECT_NAME: ${LANGFUSE_INIT_PROJECT_NAME:-}
-      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:-}
-      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:-}
-      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:-}
-      LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-}
-      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-}
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 1G
+      LANGFUSE_INIT_ORG_ID: 1111111
+      LANGFUSE_INIT_ORG_NAME: "Test Organization"
+      LANGFUSE_INIT_PROJECT_ID: 1111111
+      LANGFUSE_INIT_PROJECT_NAME: "Test Projecct"
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: lf-pk-1234567890
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: lf-sk-1234567890
+      LANGFUSE_INIT_USER_EMAIL: kriwohizha@gmail.com
+      LANGFUSE_INIT_USER_NAME: kryvokhyzha
+      LANGFUSE_INIT_USER_PASSWORD: 11111111111111111
 
   # === Application Services ===
   backend-agent-service:
@@ -340,6 +341,4 @@ volumes:
   langfuse_clickhouse_logs:
     driver: local
   langfuse_minio_data:
-    driver: local
-  prometheus_data:
     driver: local

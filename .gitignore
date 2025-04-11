@@ -180,6 +180,9 @@ cython_debug/
 configs/**/*.yaml
 !configs/**/*.example.yaml
 
+configs/**/*.env
+!configs/**/*.env.example
+
 # data
 data
 !*/data
