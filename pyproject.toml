@@ -121,6 +121,11 @@ exclude=[
     "dist",
 ]
 
+[tool.ruff.per-file-ignores]
+# It's fine not to put the import at the top of the file in the examples
+# folder.
+"langgraph_agent_toolkit/run_agent.py"=["E402"]
+
 [tool.ruff.lint.isort]
 lines-after-imports = 2     # Use a single line after each import block.
 

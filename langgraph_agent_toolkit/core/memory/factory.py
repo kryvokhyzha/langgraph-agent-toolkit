@@ -9,8 +9,7 @@ class MemoryFactory:
 
     @staticmethod
     def create(backend: MemoryBackends) -> BaseMemoryBackend:
-        """
-        Create and return a memory backend instance.
+        """Create and return a memory backend instance.
 
         Args:
             backend: The memory backend to create
@@ -20,6 +19,7 @@ class MemoryFactory:
 
         Raises:
             ValueError: If the requested backend is not supported
+
         """
         match backend:
             case MemoryBackends.POSTGRES:

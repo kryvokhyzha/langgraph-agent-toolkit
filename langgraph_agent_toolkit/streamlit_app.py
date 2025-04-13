@@ -13,6 +13,7 @@ from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.schema.task_data import TaskData, TaskDataStatus
 
+
 # A Streamlit app for interacting with the langgraph agent via a simple chat interface.
 # The app has three main functions which are all run async:
 
@@ -114,7 +115,8 @@ async def main() -> None:
 
         with st.popover(":material/policy: Privacy", use_container_width=True):
             st.write(
-                "Prompts, responses and feedback in this app are anonymously recorded and saved to LangSmith for product evaluation and improvement purposes only."
+                "Prompts, responses and feedback in this app are anonymously recorded and saved to LangSmith "
+                "for product evaluation and improvement purposes only."
             )
 
         @st.dialog("Share/resume chat")
@@ -197,9 +199,7 @@ async def draw_messages(
     messages_agen: AsyncGenerator[ChatMessage | str, None],
     is_new: bool = False,
 ) -> None:
-    """
-    Draws a set of chat messages - either replaying existing messages
-    or streaming new ones.
+    """Draws a set of chat messages - either replaying existing messages or streaming new ones.
 
     This function has additional logic to handle streaming tokens and tool calls.
     - Use a placeholder container to render streaming tokens as they arrive.
@@ -213,8 +213,8 @@ async def draw_messages(
     Args:
         messages_agen: An async iterator over messages to draw.
         is_new: Whether the messages are new or not.
-    """
 
+    """
     # Keep track of the last message container
     last_message_type = None
     st.session_state.last_message = None
@@ -338,7 +338,6 @@ async def draw_messages(
 
 async def handle_feedback() -> None:
     """Draws a feedback widget and records feedback from the user."""
-
     # Keep track of last feedback sent to avoid sending duplicates
     if "last_feedback" not in st.session_state:
         st.session_state.last_feedback = (None, None)

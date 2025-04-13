@@ -1,17 +1,19 @@
 import asyncio
-from uuid import UUID
 import random
+from uuid import UUID
 
-from dotenv import load_dotenv, find_dotenv
+from dotenv import find_dotenv, load_dotenv
 from langchain_core.runnables import RunnableConfig
 from langfuse.callback import CallbackHandler
 
+
 load_dotenv(find_dotenv())
 
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.helper.logging import logger
+
 
 # agent = AgentExecutor(*settings.AGENT_PATHS).get_agent("react-agent").graph
 # agent = AgentExecutor(*settings.AGENT_PATHS).get_agent("react-agent-so").graph

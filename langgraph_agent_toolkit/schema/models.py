@@ -8,7 +8,10 @@ class Provider(StrEnum):
 
 
 class OpenAICompatibleName(StrEnum):
-    """https://platform.openai.com/docs/guides/text-generation"""
+    """OpenAI compatible model names.
+
+    https://platform.openai.com/docs/guides/text-generation
+    """
 
     OPENAI_COMPATIBLE = "openai-compatible"
 

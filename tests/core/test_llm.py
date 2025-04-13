@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import pytest
 from langchain_community.chat_models import FakeListChatModel
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnableSerializable
+from langchain_openai import ChatOpenAI
 
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 from langgraph_agent_toolkit.schema.models import (

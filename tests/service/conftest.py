@@ -5,9 +5,9 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.service.service import app
-from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.schema.schema import ChatMessage
+from langgraph_agent_toolkit.service.service import app
 
 
 class MockStateSnapshot:
@@ -130,7 +130,6 @@ def mock_settings(monkeypatch):
 @pytest.fixture
 def mock_httpx():
     """Patch httpx.stream and httpx.get to use our test client."""
-
     with TestClient(app) as client:
 
         def mock_stream(method: str, url: str, **kwargs):

@@ -1,7 +1,8 @@
 import os
-from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage
+
 from dotenv import find_dotenv, load_dotenv
+from langchain.schema import HumanMessage
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 

@@ -1,15 +1,15 @@
 from unittest.mock import AsyncMock, Mock, patch
-import pytest
 from uuid import UUID
 
+import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.types import Command
 
-from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.schema import ChatMessage
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.schema import ChatMessage
 
 
 class MockStateSnapshot:
@@ -190,11 +190,9 @@ async def test_stream_without_tokens(agent_executor, mock_agent):
         yield ChatMessage(type="ai", content="Message 2")
 
     # Create a patched version of agent_executor.stream that returns our test generator
-    real_stream = agent_executor.stream
-
     async def patched_stream(*args, **kwargs):
         # Check that stream_tokens is correctly set to False
-        assert kwargs.get("stream_tokens", True) == False
+        assert not kwargs.get("stream_tokens", True)
         # Return our test generator
         return stream_generator()
 

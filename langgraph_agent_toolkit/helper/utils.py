@@ -1,5 +1,3 @@
-from pydantic import HttpUrl, TypeAdapter
-
 from langchain_core.messages import (
     AIMessage,
     BaseMessage,
@@ -9,6 +7,7 @@ from langchain_core.messages import (
 from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
+from pydantic import HttpUrl, TypeAdapter
 
 from langgraph_agent_toolkit.schema import ChatMessage
 

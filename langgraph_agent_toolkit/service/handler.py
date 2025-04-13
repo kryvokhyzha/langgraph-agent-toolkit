@@ -6,23 +6,22 @@ from fastapi import Depends, FastAPI
 from langchain_core._api import LangChainBetaWarning
 
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
+from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
-from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
-from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
-from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
 from langgraph_agent_toolkit.service.routes import private_router, public_router
 from langgraph_agent_toolkit.service.utils import verify_bearer
+
 
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """
-    Configurable lifespan that initializes the appropriate database checkpointer based on settings.
-    """
+    """Create a lifespan context manager for the FastAPI app."""
     observability = None
     initialized_agents = []
     executor = None

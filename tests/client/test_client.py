@@ -3,11 +3,11 @@ import os
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from httpx import Request, Response, HTTPStatusError
+from httpx import HTTPStatusError, Request, Response
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
+from langgraph_agent_toolkit.schema.models import FakeModelName, OpenAICompatibleName
 
 
 def test_init(mock_env):

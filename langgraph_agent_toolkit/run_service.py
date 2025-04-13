@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from langgraph_agent_toolkit.core import settings
 
+
 load_dotenv()
 
 if __name__ == "__main__":

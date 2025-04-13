@@ -1,16 +1,17 @@
-from unittest.mock import patch, Mock
-from pydantic import SecretStr
-from fastapi import FastAPI, HTTPException, Depends
+from unittest.mock import Mock, patch
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 
 from langgraph_agent_toolkit.schema import ChatMessage
+from langgraph_agent_toolkit.service.routes import private_router
 from langgraph_agent_toolkit.service.service import app
 from langgraph_agent_toolkit.service.utils import verify_bearer
-from langgraph_agent_toolkit.service.routes import private_router
 
 
 def test_no_auth_secret(mock_settings, mock_agent_executor, test_client):
-    """Test that when AUTH_SECRET is not set, all requests are allowed"""
+    """Test that when AUTH_SECRET is not set, all requests are allowed."""
     mock_settings.AUTH_SECRET = None
 
     # Create a response
@@ -31,7 +32,7 @@ def test_no_auth_secret(mock_settings, mock_agent_executor, test_client):
 
 
 def test_auth_secret_correct(mock_settings, mock_agent_executor, test_client):
-    """Test that when AUTH_SECRET is set, requests with correct token are allowed"""
+    """Test that when AUTH_SECRET is set, requests with correct token are allowed."""
     mock_settings.AUTH_SECRET = SecretStr("test-secret")
 
     # Create a response
@@ -48,7 +49,7 @@ def test_auth_secret_correct(mock_settings, mock_agent_executor, test_client):
 
 
 def test_auth_secret_incorrect(mock_settings, mock_agent_executor):
-    """Test that when AUTH_SECRET is set, requests with wrong token are rejected"""
+    """Test that when AUTH_SECRET is set, requests with wrong token are rejected."""
     # Set the auth secret for testing
     mock_settings.AUTH_SECRET = SecretStr("test-secret")
 

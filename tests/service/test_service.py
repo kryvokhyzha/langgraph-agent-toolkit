@@ -4,12 +4,12 @@ from unittest.mock import AsyncMock, Mock, patch
 import langsmith
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.pregel.types import StateSnapshot
 from langgraph.errors import GraphRecursionError
+from langgraph.pregel.types import StateSnapshot
 
+from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import OpenAICompatibleName
-from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT
 
 
 # Define MockStateSnapshot locally instead of importing from tests
@@ -351,7 +351,10 @@ def test_feedback(test_client, mock_agent, mock_agent_executor) -> None:
             assert response.json() == {
                 "status": "success",
                 "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
-                "message": f"Feedback 'human-feedback-stars' recorded successfully for run 847c6285-8fc9-4560-a83f-4e6285809254.",
+                "message": (
+                    "Feedback 'human-feedback-stars' recorded successfully for run "
+                    "847c6285-8fc9-4560-a83f-4e6285809254."
+                ),
             }
 
             mock_agent.observability.record_feedback.assert_called_once_with(
@@ -451,7 +454,10 @@ def test_feedback_langsmith(mock_client: langsmith.Client, test_client, mock_age
             assert response.json() == {
                 "status": "success",
                 "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
-                "message": f"Feedback 'human-feedback-stars' recorded successfully for run 847c6285-8fc9-4560-a83f-4e6285809254.",
+                "message": (
+                    "Feedback 'human-feedback-stars' recorded successfully for run "
+                    "847c6285-8fc9-4560-a83f-4e6285809254."
+                ),
             }
 
             # Verify that the agent's observability platform's record_feedback method was called correctly
@@ -495,7 +501,6 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
 
 def test_info(test_client, mock_settings, mock_agent_executor) -> None:
     """Test that /info returns the correct service metadata."""
-
     mock_settings.AUTH_SECRET = None
     mock_settings.DEFAULT_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
     mock_settings.AVAILABLE_MODELS = {OpenAICompatibleName.OPENAI_COMPATIBLE}

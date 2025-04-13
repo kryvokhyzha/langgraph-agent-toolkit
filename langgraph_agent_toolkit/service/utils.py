@@ -1,17 +1,15 @@
 import json
 from typing import Annotated, Any, AsyncGenerator
 
-from fastapi import status, Request
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from langgraph_agent_toolkit.schema import StreamInput
 
-from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
 
 
 def verify_bearer(
@@ -59,8 +57,7 @@ def get_all_agent_info(request: Request):
 async def message_generator(
     user_input: StreamInput, request: Request, agent_id: str = DEFAULT_AGENT
 ) -> AsyncGenerator[str, None]:
-    """
-    Generate a stream of messages from the agent.
+    """Generate a stream of messages from the agent.
 
     This is the workhorse method for the /stream endpoint.
     """
@@ -96,7 +93,11 @@ def _sse_response_example() -> dict[int, Any]:
             "description": "Server Sent Event Response",
             "content": {
                 "text/event-stream": {
-                    "example": "data: {'type': 'token', 'content': 'Hello'}\n\ndata: {'type': 'token', 'content': ' World'}\n\ndata: [DONE]\n\n",
+                    "example": (
+                        "data: {'type': 'token', 'content': 'Hello'}\n\n"
+                        "data: {'type': 'token', 'content': ' World'}\n\n"
+                        "data: [DONE]\n\n"
+                    ),
                     "schema": {"type": "string"},
                 }
             },

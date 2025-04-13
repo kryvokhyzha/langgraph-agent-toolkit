@@ -1,33 +1,33 @@
-from fastapi import APIRouter, HTTPException, status, Request
-from fastapi.responses import StreamingResponse
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, HTTPException, Request, status
+from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.schema import (
     ChatHistory,
     ChatHistoryInput,
     ChatMessage,
     Feedback,
     FeedbackResponse,
+    HealthCheck,
     ServiceMetadata,
     StreamInput,
     UserInput,
-    HealthCheck,
 )
-from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.service.utils import (
-    message_generator,
     _sse_response_example,
     get_agent,
     get_agent_executor,
     get_all_agent_info,
+    message_generator,
 )
+
 
 # Create separate routers for private and public endpoints
 private_router = APIRouter()
@@ -49,8 +49,7 @@ async def info(request: Request) -> ServiceMetadata:
 @private_router.post("/{agent_id}/invoke", tags=["agent"])
 @private_router.post("/invoke", tags=["agent"])
 async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> ChatMessage:
-    """
-    Invoke an agent with user input to retrieve a final response.
+    """Invoke an agent with user input to retrieve a final response.
 
     If agent_id is not provided, the default agent will be used.
     Use thread_id to persist and continue a multi-turn conversation. run_id kwarg
@@ -85,8 +84,7 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: 
     tags=["agent"],
 )
 async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> StreamingResponse:
-    """
-    Stream an agent's response to a user input, including intermediate messages and tokens.
+    """Stream an agent's response to a user input, including intermediate messages and tokens.
 
     If agent_id is not provided, the default agent will be used.
     Use thread_id to persist and continue a multi-turn conversation. run_id kwarg
@@ -102,8 +100,7 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request
 
 @private_router.post("/feedback", status_code=status.HTTP_201_CREATED, tags=["feedback"])
 async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT, request: Request = None) -> FeedbackResponse:
-    """
-    Record feedback for a run to the configured observability platform.
+    """Record feedback for a run to the configured observability platform.
 
     This routes the feedback to the appropriate platform based on the agent's configuration.
     """
@@ -131,9 +128,7 @@ async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT, request: R
 
 @private_router.post("/history", tags=["history"])
 def history(input: ChatHistoryInput, request: Request = None) -> ChatHistory:
-    """
-    Get chat history.
-    """
+    """Get chat history."""
     agent: Agent = get_agent(request, DEFAULT_AGENT)
     try:
         agent_graph: CompiledStateGraph = agent.graph

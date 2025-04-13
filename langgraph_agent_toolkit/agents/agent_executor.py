@@ -1,27 +1,27 @@
-import importlib
-from typing import List, Dict, Optional, Any, Callable, TypeVar, AsyncGenerator, Tuple
-import os
-import joblib
-import functools
 import asyncio
+import functools
+import importlib
+import os
+from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
 
+import joblib
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, ToolMessage
+from langchain_core.runnables import RunnableConfig
+from langgraph.errors import GraphRecursionError
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.pregel import Pregel
 from langgraph.types import Command, Interrupt
-from langgraph.errors import GraphRecursionError
-from langchain_core.runnables import RunnableConfig
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, AIMessageChunk
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT, DEFAULT_RECURSION_LIMIT
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import (
+    convert_message_content_to_string,
     langchain_to_chat_message,
     remove_tool_calls,
-    convert_message_content_to_string,
 )
+from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
 
 
 # Type variable for the decorator
@@ -29,13 +29,10 @@ T = TypeVar("T")
 
 
 class AgentExecutor:
-    """
-    Handles the loading, execution and saving logic for different LangGraph agents.
-    """
+    """Handles the loading, execution and saving logic for different LangGraph agents."""
 
     def __init__(self, *args):
-        """
-        Initializes the AgentExecutor by importing agents.
+        """Initialize the AgentExecutor by importing agents.
 
         Args:
             *args: Variable length strings specifying the agents to import,
@@ -43,6 +40,7 @@ class AgentExecutor:
 
         Raises:
             ValueError: If no agents are provided.
+
         """
         self.agents: Dict[str, Agent] = {}
 
@@ -55,9 +53,7 @@ class AgentExecutor:
         self._validate_default_agent_loaded()
 
     def load_agents_from_imports(self, args: tuple) -> None:
-        """
-        Dynamically imports agents based on the provided import strings.
-        """
+        """Dynamically imports agents based on the provided import strings."""
         for import_str in args:
             try:
                 module_path, object_name = import_str.split(":")
@@ -76,11 +72,11 @@ class AgentExecutor:
                 print(f"Error loading agent from '{import_str}': {e}")
 
     def _validate_default_agent_loaded(self) -> None:
-        """
-        Validates that the default agent is loaded.
+        """Validate that the default agent is loaded.
 
         Raises:
             ValueError: If the default agent is not loaded
+
         """
         if not self.agents or DEFAULT_AGENT not in self.agents:
             raise ValueError(
@@ -88,8 +84,7 @@ class AgentExecutor:
             )
 
     def get_agent(self, agent_id: str) -> Agent:
-        """
-        Gets an agent by its ID.
+        """Get an agent by its ID.
 
         Args:
             agent_id: The ID of the agent to retrieve
@@ -99,33 +94,34 @@ class AgentExecutor:
 
         Raises:
             KeyError: If the agent_id is not found
+
         """
         if agent_id not in self.agents:
             raise KeyError(f"Agent '{agent_id}' not found")
         return self.agents[agent_id]
 
     def get_all_agent_info(self) -> list[AgentInfo]:
-        """
-        Gets information about all available agents.
+        """Get information about all available agents.
 
         Returns:
             A list of AgentInfo objects containing agent IDs and descriptions
+
         """
         return [AgentInfo(key=agent_id, description=agent.description) for agent_id, agent in self.agents.items()]
 
     def add_agent(self, agent_id: str, agent: Agent) -> None:
-        """
-        Adds a new agent to the executor.
+        """Add a new agent to the executor.
 
         Args:
             agent_id: The ID to assign to the agent
             agent: The Agent instance to add
+
         """
         self.agents[agent_id] = agent
 
     def handle_agent_errors(func: Callable[..., T]) -> Callable[..., T]:
-        """
-        Decorator to handle errors occurring during agent execution.
+        """Handle errors occurring during agent execution.
+
         Specifically handles GraphRecursionError and other exceptions.
 
         Args:
@@ -133,10 +129,11 @@ class AgentExecutor:
 
         Returns:
             The decorated function
+
         """
 
         def _handle_error(e: Exception):
-            """Internal helper to handle and re-raise errors with logging."""
+            """Handle and re-raise errors with logging."""
             if isinstance(e, GraphRecursionError):
                 logger.error(f"GraphRecursionError occurred: {e}")
             else:
@@ -172,8 +169,7 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> Tuple[Agent, Any, Any, UUID]:
-        """
-        Common setup for agent execution that both invoke and stream methods share.
+        """Apply common setup for agent execution that both invoke and stream methods share.
 
         Args:
             agent_id: ID of the agent to invoke
@@ -189,6 +185,7 @@ class AgentExecutor:
                 - input_data: The properly formatted input for the agent
                 - config: The RunnableConfig for the agent
                 - run_id: The UUID for this run
+
         """
         agent = self.get_agent(agent_id)
         agent_graph = agent.graph
@@ -239,8 +236,7 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> ChatMessage:
-        """
-        Invoke an agent with a message and return the response.
+        """Invoke an agent with a message and return the response.
 
         Args:
             agent_id: ID of the agent to invoke
@@ -252,6 +248,7 @@ class AgentExecutor:
 
         Returns:
             ChatMessage: The agent's response
+
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
@@ -290,8 +287,7 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> AsyncGenerator[str | ChatMessage, None]:
-        """
-        Stream an agent's response to a message, yielding either tokens or messages.
+        """Stream an agent's response to a message, yielding either tokens or messages.
 
         Args:
             agent_id: ID of the agent to invoke
@@ -304,6 +300,7 @@ class AgentExecutor:
 
         Yields:
             Either ChatMessage objects for full messages or strings for token chunks
+
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
@@ -380,12 +377,12 @@ class AgentExecutor:
                     yield convert_message_content_to_string(content)
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
-        """
-        Saves agents to disk using joblib.
+        """Save agents to disk using joblib.
 
         Args:
             path: Directory path where to save agents
             agent_ids: List of agent IDs to save. If None, saves all agents.
+
         """
         os.makedirs(path, exist_ok=True)
 
@@ -397,11 +394,11 @@ class AgentExecutor:
             joblib.dump(agent, os.path.join(path, f"{agent_id}.joblib"))
 
     def load_saved_agents(self, path: str) -> None:
-        """
-        Loads saved agents from disk using joblib.
+        """Load saved agents from disk using joblib.
 
         Args:
             path: Directory path from which to load agents
+
         """
         for filename in os.listdir(path):
             if filename.endswith(".joblib"):

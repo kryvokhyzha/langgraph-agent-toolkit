@@ -31,8 +31,7 @@ class AgentClient:
         get_info: bool = True,
         verify: bool = False,
     ) -> None:
-        """
-        Initialize the client.
+        """Initialize the client.
 
         Args:
             base_url (str): The base URL of the agent service.
@@ -42,6 +41,7 @@ class AgentClient:
                 Default: True
             verify (bool, optional): Whether to verify the agent information.
                 Default: False
+
         """
         self.base_url = base_url
         self.auth_secret = os.getenv("AUTH_SECRET")
@@ -91,8 +91,7 @@ class AgentClient:
         thread_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
-        """
-        Invoke the agent asynchronously. Only the final message is returned.
+        """Invoke the agent asynchronously. Only the final message is returned.
 
         Args:
             message (str): The message to send to the agent
@@ -102,6 +101,7 @@ class AgentClient:
 
         Returns:
             AnyMessage: The response from the agent
+
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
@@ -133,8 +133,7 @@ class AgentClient:
         thread_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
-        """
-        Invoke the agent synchronously. Only the final message is returned.
+        """Invoke the agent synchronously. Only the final message is returned.
 
         Args:
             message (str): The message to send to the agent
@@ -144,6 +143,7 @@ class AgentClient:
 
         Returns:
             ChatMessage: The response from the agent
+
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
@@ -199,8 +199,7 @@ class AgentClient:
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> Generator[ChatMessage | str, None, None]:
-        """
-        Stream the agent's response synchronously.
+        """Stream the agent's response synchronously.
 
         Each intermediate message of the agent process is yielded as a ChatMessage.
         If stream_tokens is True (the default value), the response will also yield
@@ -216,6 +215,7 @@ class AgentClient:
 
         Returns:
             Generator[ChatMessage | str, None, None]: The response from the agent
+
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
@@ -252,8 +252,7 @@ class AgentClient:
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> AsyncGenerator[ChatMessage | str, None]:
-        """
-        Stream the agent's response asynchronously.
+        """Stream the agent's response asynchronously.
 
         Each intermediate message of the agent process is yielded as an AnyMessage.
         If stream_tokens is True (the default value), the response will also yield
@@ -269,6 +268,7 @@ class AgentClient:
 
         Returns:
             AsyncGenerator[ChatMessage | str, None]: The response from the agent
+
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
@@ -299,8 +299,7 @@ class AgentClient:
                 raise AgentClientError(f"Error: {e}")
 
     async def acreate_feedback(self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}) -> None:
-        """
-        Create a feedback record for a run.
+        """Create a feedback record for a run.
 
         This is a simple wrapper for the LangSmith create_feedback API, so the
         credentials can be stored and managed in the service rather than the client.
@@ -324,11 +323,11 @@ class AgentClient:
         self,
         thread_id: str,
     ) -> ChatHistory:
-        """
-        Get chat history.
+        """Get chat history.
 
         Args:
             thread_id (str, optional): Thread ID for identifying a conversation
+
         """
         request = ChatHistoryInput(thread_id=thread_id)
         try:
