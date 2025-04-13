@@ -12,7 +12,8 @@ from langgraph_agent_toolkit.core.observability.factory import ObservabilityFact
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
-from langgraph_agent_toolkit.service.routes import private_router, public_router, verify_bearer
+from langgraph_agent_toolkit.service.routes import private_router, public_router
+from langgraph_agent_toolkit.service.utils import verify_bearer
 
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 

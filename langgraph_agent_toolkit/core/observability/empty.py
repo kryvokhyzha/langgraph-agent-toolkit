@@ -1,4 +1,4 @@
-from core.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 
 
 class EmptyObservability(BaseObservabilityPlatform):

@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager, AbstractAsyncContextManager
 from collections.abc import AsyncGenerator
 
 from langgraph_agent_toolkit.core.settings import settings
-from core.memory.base import BaseMemoryBackend
+from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 
 from langgraph_agent_toolkit.helper.logging import logger
 

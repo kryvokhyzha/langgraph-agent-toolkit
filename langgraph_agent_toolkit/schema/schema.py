@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT, DEFAULT_RECURSION_LIMIT
 
 
 class AgentInfo(BaseModel):
@@ -67,6 +67,11 @@ class UserInput(BaseModel):
                 "top_p": 0.7,
             },
         ],
+    )
+    recursion_limit: int | None = Field(
+        description="Recursion limit for the agent.",
+        default=None,  # Changed from DEFAULT_RECURSION_LIMIT to None
+        examples=[DEFAULT_RECURSION_LIMIT],
     )
 
 

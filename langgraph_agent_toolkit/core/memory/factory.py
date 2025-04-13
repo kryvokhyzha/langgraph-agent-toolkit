@@ -1,7 +1,7 @@
-from core.memory.base import BaseMemoryBackend
-from core.memory.postgres import PostgresMemoryBackend
-from core.memory.sqlite import SQLiteMemoryBackend
-from core.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
+from langgraph_agent_toolkit.core.memory.postgres import PostgresMemoryBackend
+from langgraph_agent_toolkit.core.memory.sqlite import SQLiteMemoryBackend
+from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 
 
 class MemoryFactory:

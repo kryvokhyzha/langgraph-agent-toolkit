@@ -9,12 +9,13 @@ from langfuse.callback import CallbackHandler
 load_dotenv(find_dotenv())
 
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
-from langgraph_agent_toolkit.agents.agents import get_agent
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
-# agent = get_agent("react-agent").graph
-# agent = get_agent("react-agent-so").graph
-agent = get_agent(DEFAULT_AGENT).graph
+# agent = AgentExecutor(*settings.AGENT_PATHS).get_agent("react-agent").graph
+# agent = AgentExecutor(*settings.AGENT_PATHS).get_agent("react-agent-so").graph
+agent = AgentExecutor(*settings.AGENT_PATHS).get_agent(DEFAULT_AGENT).graph
 
 
 async def main() -> None:

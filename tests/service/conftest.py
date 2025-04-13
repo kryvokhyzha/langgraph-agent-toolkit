@@ -4,9 +4,9 @@ import pytest
 from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
-from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.service.service import app
+from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 
 
@@ -51,6 +51,18 @@ def mock_agent_executor():
     executor.get_agent = Mock(return_value=agent_mock)
     executor.get_all_agent_info = Mock(return_value=[{"key": DEFAULT_AGENT, "description": "A mock agent for testing"}])
 
+    # We'll capture all args that are passed to these methods
+    async def mock_invoke(**kwargs):
+        return ChatMessage(type="ai", content="Test response")
+
+    executor.invoke = AsyncMock(side_effect=mock_invoke)
+
+    async def mock_stream_gen(**kwargs):
+        yield ChatMessage(type="ai", content="Test response")
+
+    # Don't use side_effect here as it complicates working with async generators
+    executor.stream = mock_stream_gen
+
     return executor
 
 
@@ -75,6 +87,11 @@ def test_client(mock_agent_executor):
     mock_context.__aexit__ = AsyncMock(return_value=None)
     mock_memory_backend.get_checkpoint_saver.return_value = mock_context
 
+    # Store original verify_bearer to restore later
+    from langgraph_agent_toolkit.service import utils
+
+    original_verify_bearer = utils.verify_bearer
+
     # Apply patches for app initialization
     with patch("langgraph_agent_toolkit.core.memory.factory.MemoryFactory.create", return_value=mock_memory_backend):
         with patch(
@@ -97,6 +114,9 @@ def test_client(mock_agent_executor):
                         app.state.agent_executor = mock_agent_executor
 
                         yield client
+
+                        # Restore the original verify_bearer
+                        utils.verify_bearer = original_verify_bearer
 
 
 @pytest.fixture

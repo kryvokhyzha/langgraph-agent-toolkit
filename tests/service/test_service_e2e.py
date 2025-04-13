@@ -13,7 +13,7 @@ from langgraph_agent_toolkit.client import AgentClient
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.schema.schema import ChatMessage
-from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
+from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 
 
 # Define MockStateSnapshot locally instead of importing from tests

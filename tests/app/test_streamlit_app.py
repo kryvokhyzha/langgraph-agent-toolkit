@@ -6,7 +6,7 @@ from streamlit.testing.v1 import AppTest
 
 from langgraph_agent_toolkit.client import AgentClientError
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage
-from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
+from langgraph_agent_toolkit.schema.models import FakeModelName
 
 
 def test_app_simple_non_streaming(mock_agent_client):

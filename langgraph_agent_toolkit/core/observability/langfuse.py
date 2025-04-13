@@ -1,7 +1,7 @@
 from langfuse.callback import CallbackHandler
 from langfuse import Langfuse
 
-from core.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 
 
 class LangfuseObservability(BaseObservabilityPlatform):

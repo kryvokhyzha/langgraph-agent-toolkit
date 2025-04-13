@@ -1,14 +1,31 @@
 import importlib
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any, Callable, TypeVar, AsyncGenerator, Tuple
 import os
 import joblib
+import functools
+import asyncio
+from uuid import UUID, uuid4
 
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.pregel import Pregel
+from langgraph.types import Command, Interrupt
+from langgraph.errors import GraphRecursionError
+from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, AIMessageChunk
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.schema import AgentInfo
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT, DEFAULT_RECURSION_LIMIT
+from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.helper.utils import (
+    langchain_to_chat_message,
+    remove_tool_calls,
+    convert_message_content_to_string,
+)
+
+
+# Type variable for the decorator
+T = TypeVar("T")
 
 
 class AgentExecutor:
@@ -105,6 +122,262 @@ class AgentExecutor:
             agent: The Agent instance to add
         """
         self.agents[agent_id] = agent
+
+    def handle_agent_errors(func: Callable[..., T]) -> Callable[..., T]:
+        """
+        Decorator to handle errors occurring during agent execution.
+        Specifically handles GraphRecursionError and other exceptions.
+
+        Args:
+            func: The function to decorate
+
+        Returns:
+            The decorated function
+        """
+
+        def _handle_error(e: Exception):
+            """Internal helper to handle and re-raise errors with logging."""
+            if isinstance(e, GraphRecursionError):
+                logger.error(f"GraphRecursionError occurred: {e}")
+            else:
+                logger.error(f"Error during agent execution: {e}")
+            # Re-raise the exception to be handled by the service
+            raise e
+
+        @functools.wraps(func)
+        async def async_wrapper(self, *args, **kwargs):
+            try:
+                return await func(self, *args, **kwargs)
+            except Exception as e:
+                return _handle_error(e)
+
+        @functools.wraps(func)
+        def sync_wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                return _handle_error(e)
+
+        if asyncio.iscoroutinefunction(func):
+            return async_wrapper
+        else:
+            return sync_wrapper
+
+    async def _setup_agent_execution(
+        self,
+        agent_id: str,
+        message: str,
+        thread_id: Optional[str] = None,
+        model: Optional[str] = None,
+        agent_config: Optional[Dict[str, Any]] = None,
+        recursion_limit: Optional[int] = None,
+    ) -> Tuple[Agent, Any, Any, UUID]:
+        """
+        Common setup for agent execution that both invoke and stream methods share.
+
+        Args:
+            agent_id: ID of the agent to invoke
+            message: User message to send to the agent
+            thread_id: Optional thread ID for conversation history
+            model: Optional model name to override the default
+            agent_config: Optional additional configuration for the agent
+            recursion_limit: Optional recursion limit for the agent
+
+        Returns:
+            Tuple containing:
+                - agent: The Agent instance
+                - input_data: The properly formatted input for the agent
+                - config: The RunnableConfig for the agent
+                - run_id: The UUID for this run
+        """
+        agent = self.get_agent(agent_id)
+        agent_graph = agent.graph
+
+        run_id = uuid4()
+        thread_id = thread_id or str(uuid4())
+
+        recursion_limit = recursion_limit or DEFAULT_RECURSION_LIMIT
+
+        configurable = {
+            "thread_id": thread_id,
+        }
+
+        if model:
+            configurable["model"] = model
+
+        if agent_config:
+            configurable.update(agent_config)
+
+        callback = agent.observability.get_callback_handler(session_id=thread_id)
+
+        config = RunnableConfig(
+            configurable=configurable,
+            run_id=run_id,
+            callbacks=[callback] if callback else None,
+            recursion_limit=recursion_limit,
+        )
+
+        # Check if there are any interrupts that need to be resumed
+        state = await agent_graph.aget_state(config=config)
+        interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
+
+        if interrupted_tasks:
+            # User input is a response to resume agent execution from interrupt
+            input_data = Command(resume=message)
+        else:
+            input_data = {"messages": [HumanMessage(content=message)]}
+
+        return agent, input_data, config, run_id
+
+    @handle_agent_errors
+    async def invoke(
+        self,
+        agent_id: str,
+        message: str,
+        thread_id: Optional[str] = None,
+        model: Optional[str] = None,
+        agent_config: Optional[Dict[str, Any]] = None,
+        recursion_limit: Optional[int] = None,
+    ) -> ChatMessage:
+        """
+        Invoke an agent with a message and return the response.
+
+        Args:
+            agent_id: ID of the agent to invoke
+            message: User message to send to the agent
+            thread_id: Optional thread ID for conversation history
+            model: Optional model name to override the default
+            agent_config: Optional additional configuration for the agent
+            recursion_limit: Optional recursion limit for the agent
+
+        Returns:
+            ChatMessage: The agent's response
+        """
+        agent, input_data, config, run_id = await self._setup_agent_execution(
+            agent_id=agent_id,
+            message=message,
+            thread_id=thread_id,
+            model=model,
+            agent_config=agent_config,
+            recursion_limit=recursion_limit,
+        )
+
+        # Invoke the agent
+        response_events = await agent.graph.ainvoke(input=input_data, config=config, stream_mode=["updates", "values"])
+
+        response_type, response = response_events[-1]
+        if response_type == "values":
+            # Normal response, the agent completed successfully
+            output = langchain_to_chat_message(response["messages"][-1])
+        elif response_type == "updates" and "__interrupt__" in response:
+            # The last thing to occur was an interrupt
+            # Return the value of the first interrupt as an AIMessage
+            output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
+        else:
+            raise ValueError(f"Unexpected response type: {response_type}")
+
+        output.run_id = str(run_id)
+        return output
+
+    @handle_agent_errors
+    async def stream(
+        self,
+        agent_id: str,
+        message: str,
+        thread_id: Optional[str] = None,
+        model: Optional[str] = None,
+        stream_tokens: bool = True,
+        agent_config: Optional[Dict[str, Any]] = None,
+        recursion_limit: Optional[int] = None,
+    ) -> AsyncGenerator[str | ChatMessage, None]:
+        """
+        Stream an agent's response to a message, yielding either tokens or messages.
+
+        Args:
+            agent_id: ID of the agent to invoke
+            message: User message to send to the agent
+            thread_id: Optional thread ID for conversation history
+            model: Optional model name to override the default
+            stream_tokens: Whether to stream individual tokens
+            agent_config: Optional additional configuration for the agent
+            recursion_limit: Optional recursion limit for the agent
+
+        Yields:
+            Either ChatMessage objects for full messages or strings for token chunks
+        """
+        agent, input_data, config, run_id = await self._setup_agent_execution(
+            agent_id=agent_id,
+            message=message,
+            thread_id=thread_id,
+            model=model,
+            agent_config=agent_config,
+            recursion_limit=recursion_limit,
+        )
+
+        # Stream from the agent with appropriate modes
+        stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
+
+        async for stream_event in agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode):
+            if not isinstance(stream_event, tuple):
+                continue
+
+            stream_mode, event = stream_event
+
+            if stream_mode == "updates":
+                for node, updates in event.items():
+                    # Handle agent interrupts
+                    if node == "__interrupt__":
+                        interrupt: Interrupt
+                        for interrupt in updates:
+                            chat_message = langchain_to_chat_message(AIMessage(content=interrupt.value))
+                            chat_message.run_id = str(run_id)
+                            yield chat_message
+                        continue
+
+                    update_messages = updates.get("messages", [])
+
+                    # Special case for supervisor agent
+                    if node == "supervisor":
+                        # Get only the last AIMessage since supervisor includes all previous messages
+                        ai_messages = [msg for msg in update_messages if isinstance(msg, AIMessage)]
+                        if ai_messages:
+                            update_messages = [ai_messages[-1]]
+
+                    # Special case for expert agents
+                    if node in ("research_expert", "math_expert"):
+                        # Convert to ToolMessage so it displays in the UI as a tool response
+                        msg = ToolMessage(
+                            content=update_messages[0].content,
+                            name=node,
+                            tool_call_id="",
+                        )
+                        update_messages = [msg]
+
+                    for message in update_messages:
+                        chat_message = langchain_to_chat_message(message)
+                        chat_message.run_id = str(run_id)
+                        yield chat_message
+
+            elif stream_mode == "custom":
+                chat_message = langchain_to_chat_message(event)
+                chat_message.run_id = str(run_id)
+                yield chat_message
+
+            elif stream_mode == "messages" and stream_tokens:
+                msg, metadata = event
+
+                if "skip_stream" in metadata.get("tags", []):
+                    continue
+
+                # Skip non-LLM nodes that might send messages
+                if not isinstance(msg, AIMessageChunk):
+                    continue
+
+                content = remove_tool_calls(msg.content)
+
+                if content:
+                    # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
+                    yield convert_message_content_to_string(content)
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
         """
