@@ -3,6 +3,7 @@ import sys
 from typing import Any, Dict
 
 from loguru import logger as loguru_logger
+
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
 
 
@@ -44,7 +45,7 @@ class LoggerConfig(metaclass=SingletonMeta):
         # Remove default handlers
         try:
             loguru_logger.remove(0)
-        except:
+        except Exception:
             pass
 
         # Configure stderr handler with the correct settings for JSON or text mode

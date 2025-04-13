@@ -6,11 +6,11 @@ from streamlit.testing.v1 import AppTest
 
 from langgraph_agent_toolkit.client import AgentClientError
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage
-from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
+from langgraph_agent_toolkit.schema.models import FakeModelName
 
 
 def test_app_simple_non_streaming(mock_agent_client):
-    """Test the full app - happy path"""
+    """Test the full app - happy path."""
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     WELCOME_START = "Hello! I'm an AI agent. Ask me anything!"
@@ -35,7 +35,7 @@ def test_app_simple_non_streaming(mock_agent_client):
 
 
 def test_app_settings(mock_agent_client):
-    """Test the full app - happy path"""
+    """Test the full app - happy path."""
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     PROMPT = "Know any jokes?"
@@ -70,8 +70,7 @@ def test_app_settings(mock_agent_client):
 
 
 def test_app_thread_id_history(mock_agent_client):
-    """Test the thread_id is generated"""
-
+    """Test the thread_id is generated."""
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
     assert at.session_state.thread_id == "test session id"
 
@@ -95,14 +94,14 @@ def test_app_thread_id_history(mock_agent_client):
 
 
 def test_app_feedback(mock_agent_client):
-    """TODO: Can't figure out how to interact with st.feedback"""
-
+    """Test the feedback button."""
+    # TODO: Implement feedback test. Can't figure out how to interact with st.feedback.
     pass
 
 
 @pytest.mark.asyncio
 async def test_app_streaming(mock_agent_client):
-    """Test the app with streaming enabled - including tool messages"""
+    """Test the app with streaming enabled - including tool messages."""
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     # Setup mock streaming response
@@ -144,7 +143,7 @@ async def test_app_streaming(mock_agent_client):
 
 @pytest.mark.asyncio
 async def test_app_init_error(mock_agent_client):
-    """Test the app with an error in the agent initialization"""
+    """Test the app with an error in the agent initialization."""
     at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
 
     # Setup mock streaming response

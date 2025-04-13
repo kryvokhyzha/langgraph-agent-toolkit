@@ -1,18 +1,16 @@
 from contextlib import AbstractAsyncContextManager
+
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
+from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 from langgraph_agent_toolkit.core.settings import settings
-from core.memory.base import BaseMemoryBackend
 
 
 class SQLiteMemoryBackend(BaseMemoryBackend):
     """SQLite implementation of memory backend."""
 
     def validate_config(self) -> bool:
-        """
-        Validate that SQLite configuration is present.
-        Raises ValueError if configuration is missing.
-        """
+        """Validate that SQLite configuration is present."""
         if not getattr(settings, "SQLITE_DB_PATH", None):
             raise ValueError("Missing SQLITE_DB_PATH configuration. This must be set to use SQLite persistence.")
         return True

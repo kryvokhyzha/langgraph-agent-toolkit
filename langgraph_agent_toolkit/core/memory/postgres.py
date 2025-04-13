@@ -1,13 +1,12 @@
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from psycopg_pool import AsyncConnectionPool
-from psycopg.rows import dict_row
-
-from contextlib import asynccontextmanager, AbstractAsyncContextManager
 from collections.abc import AsyncGenerator
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
 
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from psycopg.rows import dict_row
+from psycopg_pool import AsyncConnectionPool
+
+from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 from langgraph_agent_toolkit.core.settings import settings
-from core.memory.base import BaseMemoryBackend
-
 from langgraph_agent_toolkit.helper.logging import logger
 
 
@@ -15,10 +14,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
     """PostgreSQL implementation of memory backend."""
 
     def validate_config(self) -> bool:
-        """
-        Validate that all required PostgreSQL configuration is present.
-        Raises ValueError if any required configuration is missing.
-        """
+        """Validate that all required PostgreSQL configuration is present."""
         required_vars = [
             "POSTGRES_USER",
             "POSTGRES_PASSWORD",
@@ -46,11 +42,11 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     @asynccontextmanager
     async def get_saver(self) -> AsyncGenerator[AsyncPostgresSaver, None]:
-        """
-        Asynchronous context manager for acquiring and releasing the PostgreSQL connection pool.
+        """Asynchronous context manager for acquiring and releasing the PostgreSQL connection pool.
 
         Yields:
             AsyncPostgresSaver: The database saver instance
+
         """
         conn_string = self.get_connection_string()
 

@@ -9,8 +9,8 @@ from langgraph.types import StreamWriter
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.blueprints.bg_task_agent.task import Task
-from langgraph_agent_toolkit.core.models.factory import ModelFactory
 from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
 
 class AgentState(MessagesState, total=False):

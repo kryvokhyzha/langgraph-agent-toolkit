@@ -1,9 +1,9 @@
 from typing import Optional
 
 from core.observability.base import BaseObservabilityPlatform
+from core.observability.empty import EmptyObservability
 from core.observability.langfuse import LangfuseObservability
 from core.observability.langsmith import LangsmithObservability
-from core.observability.empty import EmptyObservability
 from core.observability.types import ObservabilityBackend
 
 
@@ -12,8 +12,7 @@ class ObservabilityFactory:
 
     @staticmethod
     def create(platform: ObservabilityBackend) -> Optional[BaseObservabilityPlatform]:
-        """
-        Create and return an observability platform instance.
+        """Create and return an observability platform instance.
 
         Args:
             platform: The observability platform to create
@@ -23,6 +22,7 @@ class ObservabilityFactory:
 
         Raises:
             ValueError: If the requested platform is not supported
+
         """
         match platform:
             case ObservabilityBackend.LANGFUSE:

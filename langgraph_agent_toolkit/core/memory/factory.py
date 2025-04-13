@@ -1,7 +1,7 @@
-from core.memory.base import BaseMemoryBackend
-from core.memory.postgres import PostgresMemoryBackend
-from core.memory.sqlite import SQLiteMemoryBackend
-from core.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
+from langgraph_agent_toolkit.core.memory.postgres import PostgresMemoryBackend
+from langgraph_agent_toolkit.core.memory.sqlite import SQLiteMemoryBackend
+from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 
 
 class MemoryFactory:
@@ -9,8 +9,7 @@ class MemoryFactory:
 
     @staticmethod
     def create(backend: MemoryBackends) -> BaseMemoryBackend:
-        """
-        Create and return a memory backend instance.
+        """Create and return a memory backend instance.
 
         Args:
             backend: The memory backend to create
@@ -20,6 +19,7 @@ class MemoryFactory:
 
         Raises:
             ValueError: If the requested backend is not supported
+
         """
         match backend:
             case MemoryBackends.POSTGRES:

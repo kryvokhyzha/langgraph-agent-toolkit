@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from langchain_core.messages import AIMessage, ToolCall, ToolMessage
@@ -10,10 +10,10 @@ from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.agents.blueprints.bg_task_agent.utils import CustomData
 from langgraph_agent_toolkit.client import AgentClient
-from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.schema.schema import ChatMessage
-from langgraph_agent_toolkit.service.utils import langchain_to_chat_message
 
 
 # Define MockStateSnapshot locally instead of importing from tests
@@ -94,7 +94,6 @@ def sqlite_db_settings():
 
 def test_messages_conversion() -> None:
     """Verify that our list of messages is converted to the expected output."""
-
     messages = EXPECTED_OUTPUT_MESSAGES
 
     # Verify the sequence of messages

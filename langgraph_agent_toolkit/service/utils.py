@@ -1,74 +1,105 @@
-from langchain_core.messages import (
-    AIMessage,
-    BaseMessage,
-    HumanMessage,
-    ToolMessage,
-)
-from langchain_core.messages import (
-    ChatMessage as LangchainChatMessage,
-)
+import json
+from typing import Annotated, Any, AsyncGenerator
 
-from langgraph_agent_toolkit.schema import ChatMessage
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-
-def convert_message_content_to_string(content: str | list[str | dict]) -> str:
-    if isinstance(content, str):
-        return content
-    text: list[str] = []
-    for content_item in content:
-        if isinstance(content_item, str):
-            text.append(content_item)
-            continue
-        if content_item["type"] == "text":
-            text.append(content_item["text"])
-    return "".join(text)
+from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.core import settings
+from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
 
 
-def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
-    """Create a ChatMessage from a LangChain message."""
-    match message:
-        case HumanMessage():
-            human_message = ChatMessage(
-                type="human",
-                content=convert_message_content_to_string(message.content),
-            )
-            return human_message
-        case AIMessage():
-            ai_message = ChatMessage(
-                type="ai",
-                content=convert_message_content_to_string(message.content),
-            )
-            if message.tool_calls:
-                ai_message.tool_calls = message.tool_calls
-            if message.response_metadata:
-                ai_message.response_metadata = message.response_metadata
-            return ai_message
-        case ToolMessage():
-            tool_message = ChatMessage(
-                type="tool",
-                content=convert_message_content_to_string(message.content),
-                tool_call_id=message.tool_call_id,
-            )
-            return tool_message
-        case LangchainChatMessage():
-            if message.role == "custom":
-                custom_message = ChatMessage(
-                    type="custom",
-                    content="",
-                    custom_data=message.content[0],
-                )
-                return custom_message
-            else:
-                raise ValueError(f"Unsupported chat message role: {message.role}")
-        case _:
-            raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
+def verify_bearer(
+    http_auth: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(HTTPBearer(description="Please provide AUTH_SECRET api key.", auto_error=False)),
+    ],
+) -> None:
+    if not settings.AUTH_SECRET:
+        return
+    auth_secret = settings.AUTH_SECRET.get_secret_value()
+    if not http_auth or http_auth.credentials != auth_secret:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]:
-    """Remove tool calls from content."""
-    if isinstance(content, str):
-        return content
-    # Currently only Anthropic models stream tool calls, using content item type tool_use.
-    return [
-        content_item for content_item in content if isinstance(content_item, str) or content_item["type"] != "tool_use"
-    ]
+def get_agent_executor(request: Request) -> AgentExecutor:
+    """Get the AgentExecutor instance that was initialized in lifespan."""
+    app = request.app
+    if not hasattr(app.state, "agent_executor"):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agent executor not initialized. Service might be starting up.",
+        )
+    return app.state.agent_executor
+
+
+def get_agent(request: Request, agent_id: str) -> Agent:
+    """Get an agent by its ID from the initialized AgentExecutor."""
+    executor = get_agent_executor(request)
+    try:
+        return executor.get_agent(agent_id)
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Agent '{agent_id}' not found",
+        )
+
+
+def get_all_agent_info(request: Request):
+    """Get information about all available agents from the initialized AgentExecutor."""
+    executor = get_agent_executor(request)
+    return executor.get_all_agent_info()
+
+
+async def message_generator(
+    user_input: StreamInput, request: Request, agent_id: str = DEFAULT_AGENT
+) -> AsyncGenerator[str, None]:
+    """Generate a stream of messages from the agent.
+
+    This is the workhorse method for the /stream endpoint.
+    """
+    executor = get_agent_executor(request)
+
+    try:
+        async for item in executor.stream(
+            agent_id=agent_id,
+            message=user_input.message,
+            thread_id=user_input.thread_id,
+            model=user_input.model,
+            stream_tokens=user_input.stream_tokens,
+            agent_config=user_input.agent_config,
+            recursion_limit=user_input.recursion_limit,
+        ):
+            if isinstance(item, str):
+                # Token output
+                yield f"data: {json.dumps({'type': 'token', 'content': item})}\n\n"
+            elif isinstance(item, ChatMessage):
+                # Complete message
+                yield f"data: {json.dumps({'type': 'message', 'content': item.model_dump()})}\n\n"
+
+        yield "data: [DONE]\n\n"
+    except Exception as e:
+        logger.error(f"Error in message_generator: {e}")
+        yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+        yield "data: [DONE]\n\n"
+
+
+def _sse_response_example() -> dict[int, Any]:
+    return {
+        status.HTTP_200_OK: {
+            "description": "Server Sent Event Response",
+            "content": {
+                "text/event-stream": {
+                    "example": (
+                        "data: {'type': 'token', 'content': 'Hello'}\n\n"
+                        "data: {'type': 'token', 'content': ' World'}\n\n"
+                        "data: [DONE]\n\n"
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        }
+    }

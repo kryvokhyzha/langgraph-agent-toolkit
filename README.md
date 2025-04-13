@@ -282,6 +282,10 @@ from this repo.
 **Please create a pull request editing the README or open a discussion with any
 new ones to be added!** Would love to include more projects.
 
+## Useful resources
+
+- [About graphs, states, schemas, multiple schemas, reducers, configuration, recursion limit, breakpoint, sub-graphs](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. Currently

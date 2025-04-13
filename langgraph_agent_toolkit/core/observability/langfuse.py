@@ -1,7 +1,7 @@
-from langfuse.callback import CallbackHandler
 from langfuse import Langfuse
+from langfuse.callback import CallbackHandler
 
-from core.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 
 
 class LangfuseObservability(BaseObservabilityPlatform):
@@ -10,14 +10,14 @@ class LangfuseObservability(BaseObservabilityPlatform):
     __default_required_vars = ["LANGFUSE_SECRET_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_HOST"]
 
     def get_callback_handler(self, **kwargs) -> CallbackHandler:
-        """
-        Get Langfuse callback handler.
+        """Get Langfuse callback handler.
 
         Args:
             **kwargs: Any keyword arguments
 
         Returns:
             A configured Langfuse CallbackHandler
+
         """
         self.validate_environment()
 

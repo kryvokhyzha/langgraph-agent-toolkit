@@ -3,13 +3,12 @@ from unittest.mock import patch
 import pytest
 
 from langgraph_agent_toolkit.schema import AgentInfo, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import OpenAICompatibleName, FakeModelName
+from langgraph_agent_toolkit.schema.models import FakeModelName, OpenAICompatibleName
 
 
 @pytest.fixture
 def mock_agent_client(mock_env):
     """Fixture for creating a mock AgentClient with a clean environment."""
-
     mock_info = ServiceMetadata(
         default_agent="test-agent",
         agents=[

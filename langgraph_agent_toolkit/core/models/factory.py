@@ -1,5 +1,5 @@
-from typing import TypeAlias
 from functools import cache
+from typing import TypeAlias
 
 from langchain_core.runnables import ConfigurableField, RunnableSerializable
 
@@ -28,8 +28,7 @@ class ModelFactory:
     @staticmethod
     @cache
     def create(model_name: AllModelEnum) -> ModelT:
-        """
-        Create and return a model instance.
+        """Create and return a model instance.
 
         Args:
             model_name: The model to create from AllModelEnum
@@ -39,6 +38,7 @@ class ModelFactory:
 
         Raises:
             ValueError: If the requested model is not supported
+
         """
         api_model_name = ModelFactory._MODEL_TABLE.get(model_name)
         if not api_model_name:

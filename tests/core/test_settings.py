@@ -8,7 +8,6 @@ from langgraph_agent_toolkit.core.settings import Settings, check_str_is_http
 from langgraph_agent_toolkit.schema.models import (
     FakeModelName,
     OpenAICompatibleName,
-    Provider,
 )
 
 
