@@ -9,53 +9,177 @@
 <!-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_red.svg)](https://langgraph-agent-toolkit.streamlit.app/) -->
 
 A full toolkit for running an AI agent service built with LangGraph, FastAPI and
-Streamlit.
+Streamlit:
 
-It includes a [LangGraph](https://langchain-ai.github.io/langgraph/) agent, a
-[FastAPI](https://fastapi.tiangolo.com/) service to serve it, a client to
-interact with the service, and a [Streamlit](https://streamlit.io/) app that
-uses the client to provide a chat interface. Data structures and settings are
-built with [Pydantic](https://github.com/pydantic/pydantic).
+- It includes a [LangGraph](https://langchain-ai.github.io/langgraph/) agent, a
+  [FastAPI](https://fastapi.tiangolo.com/) service to serve it, a client to
+  interact with the service, and a [Streamlit](https://streamlit.io/) app that
+  uses the client to provide a chat interface.
+- Data structures and settings are built with
+  [Pydantic](https://github.com/pydantic/pydantic).
+- Instead of implementing dozens of classes to support various models, we use
+  the [LiteLLM](https://github.com/BerriAI/litellm) proxy server to work with
+  various LLM providers.
+- This project offers a template for you to easily build and run your own agents
+  using the `LangGraph` framework. It demonstrates a complete setup from agent
+  definition to user interface, making it easier to get started with
+  LangGraph-based projects by providing a full, robust toolkit.
 
-This project offers a template for you to easily build and run your own agents
-using the LangGraph framework. It demonstrates a complete setup from agent
-definition to user interface, making it easier to get started with
-LangGraph-based projects by providing a full, robust toolkit.
+## Environment Setup
 
-**[🎥 Watch a video walkthrough of the repo and app](https://www.youtube.com/watch?v=pdYVHw_YCNY)**
+Before running the toolkit, you need to set up your environment variables by
+creating a `.env` file in the project root directory.
+
+### Creating Your `.env` File
+
+1. Copy the `.env.example` file to create your own `.env` file:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Open the `.env` file in your favorite text editor and configure the following
+   essential sections:
+
+   - **LLM API Configuration**: At minimum, include one of these:
+
+     ```env
+     # LiteLLM configuration
+     COMPATIBLE_MODEL="gpt4o"                        # LiteLLM model name
+     COMPATIBLE_BASE_URL=http://litellm:4000/v1      # LiteLLM endpoint
+     COMPATIBLE_API_KEY=sk-any-string                # LiteLLM master key
+     ```
+
+   - **Database Configuration**: For Postgres storage:
+
+     ```env
+     POSTGRES_HOST=postgres
+     POSTGRES_PORT=5432
+     POSTGRES_USER=postgres
+     POSTGRES_PASSWORD=postgres
+     POSTGRES_DB=postgres
+     POSTGRES_SCHEMA=public
+     ```
+
+   - **Observability Configuration**:
+
+     ```env
+     LANGFUSE_HOST=http://langfuse-web:3000
+     LANGFUSE_PUBLIC_KEY=lf-pk-1234567890
+     LANGFUSE_SECRET_KEY=lf-sk-1234567890
+     ```
+
+     or
+
+     ```env
+     LANGSMITH_TRACING=true
+     LANGSMITH_API_KEY=api-key-xxxxxxxxcxxxxxx
+     LANGSMITH_PROJECT=default
+     LANGSMITH_ENDPOINT=https://api.smith.langchain.com
+     ```
+
+3. Customize other sections as needed for your specific use case, including
+   Redis configuration, memory options, and logging levels.
+
+4. Save your `.env` file.
+
+> [!WARNING]\
+> The `.env` file contains sensitive credentials and should never be committed to
+> version control. It's already included in `.gitignore`.
+
+### LiteLLM Configuration
+
+This project includes LiteLLM as a proxy to manage access to multiple LLM
+providers. To configure LiteLLM:
+
+1. Review the sample configuration in `configs/litellm/config.example.yaml` to
+   understand the structure.
+
+2. Create your own configuration by copying and modifying `config.example.yaml`:
+
+   ```sh
+   cp configs/litellm/config.example.yaml configs/litellm/config.yaml
+   ```
+
+3. Edit `configs/litellm/config.yaml` to include your preferred language models
+   and credentials. Key sections to configure:
+
+   - **model_list**: Defines the available models and their settings
+
+     ```yaml
+     model_list:
+       - model_name: gpt-4o-mini # This name is used when selecting the model in your app
+         litellm_params:
+           model: azure/gpt-4o-mini # Format for the underlying LiteLLM model
+           litellm_credential_name: your_azure_credential # References credentials defined below
+           rpm: 6 # Rate limit (requests per minute)
+     ```
+
+   - **credential_list**: Stores your API keys and endpoints
+
+     ```yaml
+     credential_list:
+       - credential_name: your_azure_credential
+         credential_values:
+           api_key: "your-api-key-here" # Best practice: use os.environ/AZURE_API_KEY
+           api_base: "https://your-azure-endpoint.openai.azure.com/"
+           api_version: "2025-01-01-preview"
+     ```
+
+   - **router_settings**: Configuration for routing between models
+
+     ```yaml
+     router_settings:
+       routing_strategy: simple-shuffle
+       redis_host: redis
+       redis_password: os.environ/REDIS_AUTH
+     ```
+
+4. Create and configure the `.litellm.env` file:
+
+   ```sh
+   cp configs/litellm/.litellm.env.example configs/litellm/.litellm.env
+   ```
+
+5. Edit `.litellm.env` to include:
+
+   ```env
+   LITELLM_MASTER_KEY=sk-your-master-key  # Create a strong key here
+   LITELLM_ENVIRONMENT=development
+   DATABASE_URL="postgresql://postgres:postgres@postgres:5432/litellm"
+   STORE_MODEL_IN_DB=True
+   ```
+
+> **Note**: LiteLLM relies on Redis for request caching and rate limiting. Make
+> sure Redis is properly configured in your environment.
 
 ## Overview
 
-### [Try the app!](https://agent-service-toolkit.streamlit.app/)
-
-<a href="https://agent-service-toolkit.streamlit.app/"><img src="docs/media/app_screenshot.png" width="600"></a>
-
 ### Quickstart
 
-Run directly in python
+1. Create a `.env` file in the root directory, based on the
+   [`.env.example` file](./.env.example).
 
-```sh
-# At least one LLM API key is required
-echo 'OPENAI_API_KEY=your_openai_api_key' >> .env
+2. Run directly in python
 
-# uv is recommended but "pip install ." also works
-pip install uv
-uv sync --frozen
-# "uv sync" creates .venv automatically
-source .venv/bin/activate
-python langgraph_agent_toolkit/run_service.py
+   ```sh
+   # uv is recommended but "pip install ." also works
+   pip install uv
+   uv sync --frozen
+   # "uv sync" creates .venv automatically
+   source .venv/bin/activate
+   python langgraph_agent_toolkit/run_service.py
 
-# In another shell
-source .venv/bin/activate
-streamlit run langgraph_agent_toolkit/streamlit_app.py
-```
+   # In another shell
+   source .venv/bin/activate
+   streamlit run langgraph_agent_toolkit/streamlit_app.py
+   ```
 
-Run with docker
+3. (optional) Run with docker
 
-```sh
-echo 'OPENAI_API_KEY=your_openai_api_key' >> .env
-docker compose watch
-```
+   ```sh
+   docker compose watch
+   ```
 
 ### Architecture Diagram
 
@@ -67,41 +191,54 @@ docker compose watch
    LangGraph framework. Implements the latest LangGraph v0.3 features including
    human in the loop with `interrupt()`, and flow control with `Command`, and
    `langgraph-supervisor`.
-1. **FastAPI Service**: Serves the agent with both streaming and non-streaming
+2. **FastAPI Service**: Serves the agent with both streaming and non-streaming
    endpoints.
-1. **Advanced Streaming**: A novel approach to support both token-based and
+3. **Advanced Streaming**: A novel approach to support both token-based and
    message-based streaming.
-1. **Streamlit Interface**: Provides a user-friendly chat interface for
+4. **Streamlit Interface**: Provides a user-friendly chat interface for
    interacting with the agent.
-1. **Multiple Agent Support**: Run multiple agents in the service and call by
+5. **Multiple Agent Support**: Run multiple agents in the service and call by
    URL path. Available agents and models are described in `/info`
-1. **Asynchronous Design**: Utilizes async/await for efficient handling of
+6. **Asynchronous Design**: Utilizes async/await for efficient handling of
    concurrent requests.
-1. **Content Moderation**: Implements LlamaGuard for content moderation
-   (requires Groq API key).
-1. **Feedback Mechanism**: Includes a star-based feedback system integrated with
-   LangSmith.
-1. **Docker Support**: Includes Dockerfiles and a docker compose file for easy
+7. **Docker Support**: Includes Dockerfiles and a docker compose file for easy
    development and deployment.
-1. **Testing**: Includes robust unit and integration tests for the full repo.
-1. **Configurable Connection Pools**: Custom PostgreSQL connection pool settings
-   for database performance tuning.
+8. **Testing**: Includes robust unit and integration tests for the full repo.
+9. **Configurable Connection Pools**: Custom `PostgreSQL` connection pool
+   settings for database performance tuning.
+10. **Different Memory Options**: Supports different memory options including
+    `PostgreSQL`, and `Sqlite`.
+11. **Observability**: Integrates with `Langfuse` and `Langsmith` for
+    observability and monitoring.
+12. **Feedback Mechanism**: Includes a star-based feedback system integrated
+    with observability platform.
+13. **Prompt Management**: Supports prompt management integrated with
+    observability platform and local file system.
+14. **LiteLLM Integration**: Includes a LiteLLM proxy server for managing
+    multiple LLM providers.
+15. **Object Storage with MinIO**: Provides MinIO for object storage
+    capabilities.
+16. **ClickHouse Support**: Includes ClickHouse for analytics and data storage.
+17. **Redis Integration**: Uses Redis for caching and message brokering.
 
 ### Key Files
 
 The repository is structured as follows:
 
-- `langgraph_agent_toolkit/agents/`: Defines several agents with different
-  capabilities
+- `langgraph_agent_toolkit/agents/blueprints/`: Defines several agents with
+  different capabilities
+- `langgraph_agent_toolkit/agents/agent_executor.py`: Defines the agent
+  executor. Controls the agent execution and error handling.
 - `langgraph_agent_toolkit/schema/`: Defines the protocol schema
-- `langgraph_agent_toolkit/core/`: Core modules including LLM definition and
-  settings
+- `langgraph_agent_toolkit/core/`: Core modules including LLM definition,
+  memory, observability and settings
 - `langgraph_agent_toolkit/service/service.py`: FastAPI service to serve the
   agents
 - `langgraph_agent_toolkit/client/client.py`: Client to interact with the agent
   service
 - `langgraph_agent_toolkit/streamlit_app.py`: Streamlit app providing a chat
   interface
+- `docker`: Dockerfiles for the agent service and Streamlit app
 - `tests/`: Unit and integration tests
 
 ## Setup and Usage
@@ -109,16 +246,14 @@ The repository is structured as follows:
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/JoshuaC215/agent-service-toolkit.git
-   cd agent-service-toolkit
+   git clone https://github.com/kryvokhyzha/langgraph-agent-toolkit
+   cd langgraph-agent-toolkit
    ```
 
 2. Set up environment variables: Create a `.env` file in the root directory. At
    least one LLM API key or configuration is required. See the
    [`.env.example` file](./.env.example) for a full list of available
-   environment variables, including a variety of model provider API keys,
-   header-based authentication, LangSmith tracing, testing and development
-   modes, and OpenWeatherMap API key.
+   environment variables, including a variety different parameters.
 
 3. You can now run the agent service and the Streamlit app locally, either with
    Docker or just using Python. The Docker setup is recommended for simpler
@@ -129,20 +264,33 @@ The repository is structured as follows:
 
 To customize the agent for your own use case:
 
-1. Add your new agent to the `langgraph_agent_toolkit/agents` directory. You can
-   copy `research_assistant.py` or `chatbot.py` and modify it to change the
-   agent's behavior and tools.
-1. Import and add your new agent to the `agents` dictionary in
-   `langgraph_agent_toolkit/agents/agents.py`. Your agent can be called by
-   `/<your_agent_name>/invoke` or `/<your_agent_name>/stream`.
-1. Adjust the Streamlit interface in `langgraph_agent_toolkit/streamlit_app.py`
-   to match your agent's capabilities.
+1. Add your new agent to the `langgraph_agent_toolkit/agents/blueprints`
+   directory. You can copy an existing agent like those in the `blueprints`
+   folder and modify it to change the agent's behavior and tools.
+2. Add your new agent to the `AGENT_PATHS` list in
+   `langgraph_agent_toolkit/core/settings.py`.
+3. (optional) Adjust the Streamlit interface in
+   `langgraph_agent_toolkit/streamlit_app.py` to match your agent's
+   capabilities.
 
 ### Docker Setup
 
 This project includes a Docker setup for easy development and deployment. The
-`compose.yaml` file defines two services: `agent_service` and `streamlit_app`.
-The `Dockerfile` for each is in their respective directories.
+`docker-compose.yaml` file defines the following services:
+
+- `backend-agent-service`: The FastAPI service that serves the agent.
+- `frontend-streamlit-app`: The Streamlit app that provides a chat interface for
+  the agent.
+- `postgres`: A PostgreSQL database for storing agent data and logs.
+- `redis`: A Redis server for caching and message brokering.
+- `minio`: A MinIO server for object storage.
+- `clickhouse`: A ClickHouse server for analytics and data storage.
+- `langfuse-web`: A Langfuse server for observability and monitoring.
+- `langfuse-worker`: A worker for Langfuse to process events and logs.
+- `litellm`: A LiteLLM proxy server for managing multiple LLM providers.
+
+Each service is configured with appropriate resource limits and health checks to
+ensure stability and performance.
 
 For local development, we recommend using
 [docker compose watch](https://docs.docker.com/compose/file-watch/). This
@@ -163,7 +311,7 @@ your containers when changes are detected in your source code.
    code:
 
    - Changes in the relevant python files and directories will trigger updates
-     for the relevantservices.
+     for the relevant services.
    - NOTE: If you make changes to the `pyproject.toml` or `uv.lock` files, you
      will need to rebuild the services by running `docker compose up --build`.
 
@@ -173,7 +321,14 @@ your containers when changes are detected in your source code.
 5. The agent service API will be available at `http://0.0.0.0:8080`. You can
    also use the OpenAPI docs at `http://0.0.0.0:8080/redoc`.
 
-6. Use `docker compose down` to stop the services.
+6. Other service endpoints:
+
+   - Langfuse dashboard: `http://localhost:3000`
+   - MinIO console: `http://localhost:9091`
+   - LiteLLM API: `http://localhost:4000`
+   - ClickHouse HTTP interface: `http://localhost:8123`
+
+7. Use `docker compose down` to stop the services.
 
 This setup allows you to develop and test your changes in real-time without
 manually restarting the services.
@@ -212,34 +367,6 @@ You can simply install LangGraph Studio, add your `.env` file to the root
 directory as described above, and then launch LangGraph studio pointed at the
 root directory. Customize `langgraph.json` as needed.
 
-### Using Ollama
-
-⚠️ _**Note:** Ollama support in agent-service-toolkit is experimental and may
-not work as expected. The instructions below have been tested using Docker
-Desktop on a MacBook Pro. Please file an issue for any challenges you
-encounter._
-
-You can also use [Ollama](https://ollama.com) to run the LLM powering the agent
-service.
-
-1. Install Ollama using instructions from https://github.com/ollama/ollama
-1. Install any model you want to use, e.g. `ollama pull llama3.2` and set the
-   `OLLAMA_MODEL` environment variable to the model you want to use, e.g.
-   `OLLAMA_MODEL=llama3.2`
-
-If you are running the service locally (e.g.
-`python langgraph_agent_toolkit/run_service.py`), you should be all set!
-
-If you are running the service in Docker, you will also need to:
-
-1. [Configure the Ollama server as described here](https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server),
-   e.g. by running `launchctl setenv OLLAMA_HOST "0.0.0.0"` on MacOS and restart
-   Ollama.
-1. Set the `OLLAMA_BASE_URL` environment variable to the base URL of the Ollama
-   server, e.g. `OLLAMA_BASE_URL=http://host.docker.internal:11434`
-1. Alternatively, you can run `ollama/ollama` image in Docker and use a similar
-   configuration (however it may be slower in some cases).
-
 ### Local development without Docker
 
 You can also run the agent service and the Streamlit app locally without Docker,
@@ -253,34 +380,25 @@ just using a Python virtual environment.
    source .venv/bin/activate
    ```
 
-2. Run the FastAPI server:
+2. Set up environment variables: Create a `.env` file in the root directory. At
+   least one LLM API key or configuration is required. See the
+   [`.env.example` file](./.env.example) for a full list of available
+   environment variables, including a variety different parameters.
+
+3. Run the FastAPI server:
 
    ```sh
    python langgraph_agent_toolkit/run_service.py
    ```
 
-3. In a separate terminal, run the Streamlit app:
+4. In a separate terminal, run the Streamlit app:
 
    ```sh
    streamlit run langgraph_agent_toolkit/streamlit_app.py
    ```
 
-4. Open your browser and navigate to the URL provided by Streamlit (usually
+5. Open your browser and navigate to the URL provided by Streamlit (usually
    `http://localhost:8501`).
-
-## Projects built with or inspired by agent-service-toolkit
-
-The following are a few of the public projects that drew code or inspiration
-from this repo.
-
-- **[alexrisch/agent-web-kit](https://github.com/alexrisch/agent-web-kit)** A
-  Next.JS frontend for agent-service-toolkit
-- **[raushan-in/dapa](https://github.com/raushan-in/dapa)** - Digital Arrest
-  Protection App (DAPA) enables users to report financial scams and frauds
-  efficiently via a user-friendly platform.
-
-**Please create a pull request editing the README or open a discussion with any
-new ones to be added!** Would love to include more projects.
 
 ## Useful resources
 
@@ -288,7 +406,7 @@ new ones to be added!** Would love to include more projects.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. Currently
+Contributions are welcome! Please feel free to submit a Pull Request. Currently,
 the tests need to be run using the local development without Docker setup. To
 run the tests for the agent service:
 
