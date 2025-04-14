@@ -4,6 +4,7 @@ from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 
+from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
@@ -162,4 +163,7 @@ async def redirect_to_docs() -> RedirectResponse:
 )
 async def health_check() -> HealthCheck:
     """Health check endpoint."""
-    return HealthCheck(status="OK")
+    return HealthCheck(
+        content="healthy",
+        version=__version__,
+    )

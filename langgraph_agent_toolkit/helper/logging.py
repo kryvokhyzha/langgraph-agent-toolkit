@@ -1,6 +1,7 @@
+import logging
 import os
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from loguru import logger as loguru_logger
 
@@ -89,6 +90,20 @@ class LoggerConfig(metaclass=SingletonMeta):
     def logger(self):
         """Get the configured logger instance."""
         return loguru_logger
+
+
+class InterceptHandler(logging.Handler):
+    """Redirect FastAPI's built-in logger to Loguru."""
+
+    def emit(self, record: Optional[logging.LogRecord]) -> None:
+        if record is None:
+            return
+
+        loguru_level = record.levelname.upper()
+        if record.exc_info is not None:
+            logger.opt(exception=record.exc_info).log(loguru_level, record.getMessage())
+        else:
+            logger.log(loguru_level, record.getMessage())
 
 
 # Initialize singleton and expose logger
