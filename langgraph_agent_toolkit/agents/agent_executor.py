@@ -119,6 +119,7 @@ class AgentExecutor:
         """
         self.agents[agent_id] = agent
 
+    @staticmethod
     def handle_agent_errors(func: Callable[..., T]) -> Callable[..., T]:
         """Handle errors occurring during agent execution.
 
@@ -138,7 +139,6 @@ class AgentExecutor:
                 logger.error(f"GraphRecursionError occurred: {e}")
             else:
                 logger.error(f"Error during agent execution: {e}")
-            # Re-raise the exception to be handled by the service
             raise e
 
         @functools.wraps(func)
@@ -319,16 +319,17 @@ class AgentExecutor:
                 continue
 
             stream_mode, event = stream_event
+            new_messages = []
 
             if stream_mode == "updates":
                 for node, updates in event.items():
-                    # Handle agent interrupts
+                    # A simple approach to handle agent interrupts.
+                    # In a more sophisticated implementation, we could add
+                    # some structured ChatMessage type to return the interrupt value.
                     if node == "__interrupt__":
                         interrupt: Interrupt
                         for interrupt in updates:
-                            chat_message = langchain_to_chat_message(AIMessage(content=interrupt.value))
-                            chat_message.run_id = str(run_id)
-                            yield chat_message
+                            new_messages.append(AIMessage(content=interrupt.value))
                         continue
 
                     update_messages = updates.get("messages", [])
@@ -343,38 +344,42 @@ class AgentExecutor:
                     # Special case for expert agents
                     if node in ("research_expert", "math_expert"):
                         # Convert to ToolMessage so it displays in the UI as a tool response
-                        msg = ToolMessage(
-                            content=update_messages[0].content,
-                            name=node,
-                            tool_call_id="",
-                        )
-                        update_messages = [msg]
-
-                    for message in update_messages:
-                        chat_message = langchain_to_chat_message(message)
-                        chat_message.run_id = str(run_id)
-                        yield chat_message
+                        if update_messages:
+                            msg = ToolMessage(
+                                content=update_messages[0].content,
+                                name=node,
+                                tool_call_id="",
+                            )
+                            update_messages = [msg]
+                    new_messages.extend(update_messages)
 
             elif stream_mode == "custom":
-                chat_message = langchain_to_chat_message(event)
-                chat_message.run_id = str(run_id)
-                yield chat_message
+                new_messages = [event]
 
             elif stream_mode == "messages" and stream_tokens:
                 msg, metadata = event
-
                 if "skip_stream" in metadata.get("tags", []):
                     continue
-
                 # Skip non-LLM nodes that might send messages
                 if not isinstance(msg, AIMessageChunk):
                     continue
-
                 content = remove_tool_calls(msg.content)
-
                 if content:
                     # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
                     yield convert_message_content_to_string(content)
+
+            # Process and yield all collected messages
+            for msg in new_messages:
+                try:
+                    chat_message = langchain_to_chat_message(msg)
+                    chat_message.run_id = str(run_id)
+                    # Skip the input message if it's repeated by LangGraph
+                    if chat_message.type == "human" and chat_message.content == message:
+                        continue
+                    yield chat_message
+                except Exception as e:
+                    logger.error(f"Error parsing message: {e}")
+                    continue
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
         """Save agents to disk using joblib.
