@@ -44,7 +44,7 @@ dependencies = [
     "langgraph-supervisor ~=0.0.16",
     "langsmith ~=0.3.30",
     "langfuse ~=2.60.2",
-    "litellm ~=1.65.4",
+    "litellm ~=1.66.0",
     "numpy ~=1.26.4; python_version <= '3.12'",
     "numpy ~=2.2.3; python_version >= '3.13'",
     "pandas ~=2.2.3",
