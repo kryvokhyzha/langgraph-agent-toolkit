@@ -158,7 +158,7 @@ providers. To configure LiteLLM:
 ### Quickstart
 
 1. Create a `.env` file in the root directory, based on the
-   [`.env.example` file](./.env.example).
+   [`.env.example`](./.env.example) file.
 
 2. Run directly in python
 
@@ -216,10 +216,6 @@ providers. To configure LiteLLM:
     observability platform and local file system.
 14. **LiteLLM Integration**: Includes a LiteLLM proxy server for managing
     multiple LLM providers.
-15. **Object Storage with MinIO**: Provides MinIO for object storage
-    capabilities.
-16. **ClickHouse Support**: Includes ClickHouse for analytics and data storage.
-17. **Redis Integration**: Uses Redis for caching and message brokering.
 
 ### Key Files
 
@@ -252,7 +248,7 @@ The repository is structured as follows:
 
 2. Set up environment variables: Create a `.env` file in the root directory. At
    least one LLM API key or configuration is required. See the
-   [`.env.example` file](./.env.example) for a full list of available
+   [`.env.example`](./.env.example) file for a full list of available
    environment variables, including a variety different parameters.
 
 3. You can now run the agent service and the Streamlit app locally, either with
@@ -382,7 +378,7 @@ just using a Python virtual environment.
 
 2. Set up environment variables: Create a `.env` file in the root directory. At
    least one LLM API key or configuration is required. See the
-   [`.env.example` file](./.env.example) for a full list of available
+   [`.env.example`](./.env.example) file for a full list of available
    environment variables, including a variety different parameters.
 
 3. Run the FastAPI server:
