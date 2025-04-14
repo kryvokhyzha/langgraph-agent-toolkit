@@ -1,16 +1,20 @@
 import json
+import logging
+import secrets
+import warnings
 from asyncio import CancelledError
 from builtins import GeneratorExit
 from typing import Annotated, Any, AsyncGenerator
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from langchain_core._api import LangChainBetaWarning
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
-from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.helper.logging import InterceptHandler, logger
 from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
 
 
@@ -22,8 +26,9 @@ def verify_bearer(
 ) -> None:
     if not settings.AUTH_SECRET:
         return
+
     auth_secret = settings.AUTH_SECRET.get_secret_value()
-    if not http_auth or http_auth.credentials != auth_secret:
+    if not http_auth or not secrets.compare_digest(http_auth.credentials, auth_secret):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -111,3 +116,21 @@ def _sse_response_example() -> dict[int, Any]:
             },
         }
     }
+
+
+def setup_logging():
+    """Configure application logging to use loguru."""
+    # Setup logging once - redirect standard library logging to loguru
+    logging.basicConfig(handlers=[InterceptHandler()], level=0)
+    # Reduce noise from uvicorn logs in production
+    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+    logging.getLogger("uvicorn").handlers = [InterceptHandler()]
+
+    # Additional loggers that should be quieter in production
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    logging.getLogger("fastapi").setLevel(logging.INFO)
+
+    # Suppress LangChain beta warnings
+    warnings.filterwarnings("ignore", category=LangChainBetaWarning)
+
+    return logger

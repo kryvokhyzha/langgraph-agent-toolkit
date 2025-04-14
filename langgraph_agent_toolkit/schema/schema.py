@@ -196,4 +196,13 @@ class ChatHistory(BaseModel):
 class HealthCheck(BaseModel):
     """Response model to validate and return when performing a health check."""
 
-    status: str = "OK"
+    content: str = Field(
+        ...,
+        description="Health status of the service.",
+        examples=["healthy"],
+    )
+    version: str = Field(
+        ...,
+        description="Version of the service.",
+        examples=["1.0.0"],
+    )

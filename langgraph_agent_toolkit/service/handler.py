@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI
 from langchain_core._api import LangChainBetaWarning
 
+from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
@@ -12,6 +13,7 @@ from langgraph_agent_toolkit.core.observability.factory import ObservabilityFact
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
+from langgraph_agent_toolkit.service.middleware import LoggingMiddleware
 from langgraph_agent_toolkit.service.routes import private_router, public_router
 from langgraph_agent_toolkit.service.utils import verify_bearer
 
@@ -24,7 +26,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Create a lifespan context manager for the FastAPI app."""
     observability = None
     initialized_agents = []
-    executor = None
 
     try:
         # Initialize observability platform
@@ -97,7 +98,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
+    logger.info(f"Initializing API service v{__version__}")
+
     app = FastAPI(lifespan=lifespan)
+
+    # add middleware
+    app.add_middleware(LoggingMiddleware)
 
     # Register exception handlers
     register_exception_handlers(app)
