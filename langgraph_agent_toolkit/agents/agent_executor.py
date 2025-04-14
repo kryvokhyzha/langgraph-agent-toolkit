@@ -2,6 +2,7 @@ import asyncio
 import functools
 import importlib
 import os
+from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
 
@@ -389,14 +390,15 @@ class AgentExecutor:
             agent_ids: List of agent IDs to save. If None, saves all agents.
 
         """
-        os.makedirs(path, exist_ok=True)
+        _path = Path(path)
+        _path.mkdir(exist_ok=True, parents=True)
 
         agents_to_save = self.agents
         if agent_ids:
             agents_to_save = {k: v for k, v in self.agents.items() if k in agent_ids}
 
         for agent_id, agent in agents_to_save.items():
-            joblib.dump(agent, os.path.join(path, f"{agent_id}.joblib"))
+            joblib.dump(agent, _path / f"{agent_id}.joblib")
 
     def load_saved_agents(self, path: str) -> None:
         """Load saved agents from disk using joblib.
