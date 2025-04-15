@@ -1,4 +1,5 @@
 from langchain_community.tools import DuckDuckGoSearchResults
+from langchain_core.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
 
 from langgraph_agent_toolkit.agents.agent import Agent
@@ -15,10 +16,16 @@ react_agent = Agent(
     graph=create_react_agent(
         model=ModelFactory.create(settings.DEFAULT_MODEL),
         tools=[add, multiply, DuckDuckGoSearchResults()],
-        prompt=(
-            "You are a team support agent that can perform calculations and search the web. "
-            "You can use the tools provided to help you with your tasks. "
-            "You can also ask clarifying questions to the user. "
+        prompt=ChatPromptTemplate.from_messages(
+            messages=[
+                SystemMessagePromptTemplate.from_template(
+                    template=(
+                        "You are a team support agent that can perform calculations and search the web. "
+                        "You can use the tools provided to help you with your tasks. "
+                        "You can also ask clarifying questions to the user. "
+                    )
+                ),
+            ],
         ),
         pre_model_hook=pre_model_hook_standard,
         state_schema=AgentStateWithRemainingSteps,
