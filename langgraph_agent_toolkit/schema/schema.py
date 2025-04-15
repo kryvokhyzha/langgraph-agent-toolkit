@@ -3,7 +3,11 @@ from typing import Any, Literal, NotRequired
 from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT, DEFAULT_RECURSION_LIMIT
+from langgraph_agent_toolkit.helper.constants import (
+    DEFAULT_AGENT,
+    DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
+    DEFAULT_RECURSION_LIMIT,
+)
 from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
 
 
@@ -62,9 +66,7 @@ class UserInput(BaseModel):
         examples=[
             {
                 "memory_saver_params": {"k": 6},
-                "temperature": 0.0,
-                "max_tokens": 1024,
-                "top_p": 0.7,
+                **DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
             },
         ],
     )

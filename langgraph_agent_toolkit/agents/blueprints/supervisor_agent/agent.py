@@ -4,7 +4,7 @@ from langgraph.prebuilt import create_react_agent
 from langgraph_supervisor import create_supervisor
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.agents.blueprints.tools import add, multiply
+from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 

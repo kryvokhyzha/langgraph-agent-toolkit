@@ -9,13 +9,7 @@ from langgraph_agent_toolkit.agents.agent import Agent
 
 
 class AgentState(MessagesState, total=False):
-    """`total=False` is PEP589 specs.
-
-    documentation: https://typing.readthedocs.io/en/latest/spec/typeddict.html#totality
-    """
-
-
-# Define the nodes
+    pass
 
 
 def node_a(state: AgentState) -> Command[Literal["node_b", "node_c"]]:

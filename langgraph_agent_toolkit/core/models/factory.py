@@ -1,7 +1,19 @@
+import warnings
 from functools import cache
-from typing import TypeAlias
+from typing import (
+    Any,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
-from langchain_core.runnables import ConfigurableField, RunnableSerializable
+from langchain.chat_models.base import _ConfigurableModel, _init_chat_model_helper
+from langchain_core.language_models import BaseChatModel
+from langchain_core.runnables import RunnableSerializable
+from typing_extensions import TypeAlias
 
 from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
 from langgraph_agent_toolkit.core.settings import settings
@@ -13,7 +25,7 @@ from langgraph_agent_toolkit.schema.models import (
 )
 
 
-ModelT: TypeAlias = ChatOpenAIPatched | FakeToolModel | RunnableSerializable
+ModelT: TypeAlias = ChatOpenAIPatched | FakeToolModel | RunnableSerializable | _ConfigurableModel
 
 
 class ModelFactory:
@@ -24,6 +36,46 @@ class ModelFactory:
         OpenAICompatibleName.OPENAI_COMPATIBLE: settings.COMPATIBLE_MODEL,
         FakeModelName.FAKE: "fake",
     }
+
+    @staticmethod
+    def __init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
+        if model_provider == "openai":
+            return ChatOpenAIPatched(model_name=model, **kwargs)
+        else:
+            return _init_chat_model_helper(model, model_provider=model_provider, **kwargs)
+
+    @staticmethod
+    def init_chat_model(
+        model: Optional[str] = None,
+        *,
+        model_provider: Optional[str] = None,
+        configurable_fields: Optional[Union[Literal["any"], List[str], Tuple[str, ...]]] = None,
+        config_prefix: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Union[BaseChatModel, _ConfigurableModel]:
+        if not model and not configurable_fields:
+            configurable_fields = ("model", "model_provider")
+        config_prefix = config_prefix or ""
+
+        if config_prefix and not configurable_fields:
+            warnings.warn(
+                f"{config_prefix=} has been set but no fields are configurable. Set "
+                f"`configurable_fields=(...)` to specify the model params that are "
+                f"configurable."
+            )
+
+        if not configurable_fields:
+            return ModelFactory.__init_chat_model_helper(cast(str, model), model_provider=model_provider, **kwargs)
+        else:
+            if model:
+                kwargs["model"] = model
+            if model_provider:
+                kwargs["model_provider"] = model_provider
+            return _ConfigurableModel(
+                default_config=kwargs,
+                config_prefix=config_prefix,
+                configurable_fields=configurable_fields,
+            )
 
     @staticmethod
     @cache
@@ -49,27 +101,14 @@ class ModelFactory:
                 if not settings.COMPATIBLE_BASE_URL or not settings.COMPATIBLE_MODEL:
                     raise ValueError("OpenAICompatible base url and endpoint must be configured")
 
-                model = ChatOpenAIPatched(
-                    model_name=settings.COMPATIBLE_MODEL,
+                model = ModelFactory.init_chat_model(
+                    model=settings.COMPATIBLE_MODEL,
+                    model_provider="openai",
+                    configurable_fields=("temperature", "max_tokens", "top_p", "streaming"),
+                    config_prefix="agent",
                     openai_api_base=settings.COMPATIBLE_BASE_URL,
                     openai_api_key=settings.COMPATIBLE_API_KEY,
                     **DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
-                ).configurable_fields(
-                    temperature=ConfigurableField(
-                        id="temperature",
-                        name="Agent Temperature",
-                        description="The temperature to use. Default value is `0.0`.",
-                    ),
-                    max_tokens=ConfigurableField(
-                        id="max_tokens",
-                        name="Agent Max Tokens",
-                        description="The maximum number of tokens to generate. Default value is `1500`.",
-                    ),
-                    top_p=ConfigurableField(
-                        id="top_p",
-                        name="Agent Top P",
-                        description="The nucleus sampling probability. Default value is `0.7`.",
-                    ),
                 )
 
                 return model

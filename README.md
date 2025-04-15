@@ -51,7 +51,7 @@ Features include:
 
 ## 🏗️ Architecture
 
-<img src="docs/media/agent_architecture.png" width="600">
+<img src="docs/media/agent_architecture.png" width="800">
 
 ## ✨ Key Features
 

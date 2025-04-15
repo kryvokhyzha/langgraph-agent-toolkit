@@ -99,9 +99,9 @@ services:
           memory: 2G
     develop:
       watch:
-        - path: configs/litellm/config.yaml
+        - path: configs/litellm/
           action: sync+restart
-          target: /app/config.yaml
+          target: /app/
 
   # === Database Services ===
   postgres:
@@ -278,7 +278,7 @@ services:
           memory: 1G
     develop:
       watch:
-        - path: langgraph_agent_toolkit/agents/blueprints/
+        - path: langgraph_agent_toolkit/agents/
           action: sync+restart
           target: /app/langgraph_agent_toolkit/agents/
         - path: langgraph_agent_toolkit/core/
