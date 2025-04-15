@@ -9,7 +9,9 @@ from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
 
-@entrypoint(checkpointer=MemorySaver())
+@entrypoint(
+    # checkpointer=MemorySaver(),  # Uncomment if you want to save the state of the agent
+)
 async def chatbot(
     inputs: dict[str, list[BaseMessage]],
     *,

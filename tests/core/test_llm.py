@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from langchain.chat_models.base import _ConfigurableModel
 from langchain_community.chat_models import FakeListChatModel
 from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI
@@ -23,7 +24,7 @@ def test_get_model_openai_compatible():
         mock_settings.COMPATIBLE_API_KEY = "test_key"
 
         model = ModelFactory.create(OpenAICompatibleName.OPENAI_COMPATIBLE)
-        assert isinstance(model, (ChatOpenAI, RunnableSerializable))
+        assert isinstance(model, (ChatOpenAI, RunnableSerializable, _ConfigurableModel))
         assert model.model_name == "gpt-4"
         assert model.streaming is True
         assert model.openai_api_base == "http://api.example.com"

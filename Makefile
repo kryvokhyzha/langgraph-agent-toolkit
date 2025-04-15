@@ -21,3 +21,6 @@ pre_commit_run: .pre-commit-config.yaml
 	pre-commit run --all-files
 pre_commit_rm_hooks:
 	pre-commit --uninstall-hooks
+
+run_langgraph:
+	uv run langgraph dev

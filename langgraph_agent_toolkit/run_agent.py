@@ -21,7 +21,9 @@ agent = AgentExecutor(*settings.AGENT_PATHS).get_agent(DEFAULT_AGENT).graph
 
 
 async def main() -> None:
-    inputs = {"messages": [("user", "Find me a recipe for chocolate chip cookies")]}
+    inputs = {
+        "messages": [("user", "Find me a recipe for chocolate chip cookies and how Dynamo Kyiv played last game")]
+    }
 
     rd = random.Random()
     rd.seed(0)
@@ -32,7 +34,17 @@ async def main() -> None:
 
     result = await agent.ainvoke(
         inputs,
-        config=RunnableConfig(configurable={"thread_id": thread_id}, callbacks=[handler]),
+        config=RunnableConfig(
+            configurable={
+                "thread_id": thread_id,
+                "agent_temperature": 0.9,
+                "agent_top_p": 0.75,
+                "agent_max_tokens": 512,
+                "memory_saver_params": {"k": 3},
+            },
+            callbacks=[handler],
+            recursion_limit=15,
+        ),
     )
     logger.info(result.keys())
     logger.info(result)

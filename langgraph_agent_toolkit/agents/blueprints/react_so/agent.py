@@ -1,11 +1,11 @@
 from langchain_community.tools import DuckDuckGoSearchResults
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.prebuilt import create_react_agent
 from pydantic import BaseModel, Field
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.agents.blueprints.tools import add, multiply
-from langgraph_agent_toolkit.agents.blueprints.utils import pre_model_hook_standard
+from langgraph_agent_toolkit.agents.components.creators.create_react_agent import create_react_agent
+from langgraph_agent_toolkit.agents.components.tools import add, multiply
+from langgraph_agent_toolkit.agents.components.utils import AgentStateWithRemainingSteps, pre_model_hook_standard
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
@@ -32,6 +32,8 @@ react_agent_so = Agent(
         ),
         pre_model_hook=pre_model_hook_standard,
         response_format=ResponseSchema,
+        state_schema=AgentStateWithRemainingSteps,
         checkpointer=MemorySaver(),
+        immediate_step_threshold=5,
     ),
 )

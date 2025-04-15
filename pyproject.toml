@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }]
-keywords = ["langgraph", "agent", "fastapi", "streamlit"]
+keywords = ["langgraph", "agents", "fastapi", "streamlit", "litellm", "blueprint"]
 license = "mit"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -39,12 +39,13 @@ dependencies = [
     "langchain-litellm ~=0.1.4",
     "langchain-openai ~=0.3.12",
     "langgraph ~=0.3.28",
+    "langgraph-cli[inmem] ~=0.1.89",
     "langgraph-checkpoint-sqlite ~=2.0.6",
     "langgraph-checkpoint-postgres ~=2.0.19",
     "langgraph-supervisor ~=0.0.16",
     "langsmith ~=0.3.30",
     "langfuse ~=2.60.2",
-    "litellm ~=1.65.4",
+    "litellm ~=1.66.0",
     "numpy ~=1.26.4; python_version <= '3.12'",
     "numpy ~=2.2.3; python_version >= '3.13'",
     "pandas ~=2.2.3",

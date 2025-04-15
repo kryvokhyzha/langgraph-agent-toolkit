@@ -1,8 +1,8 @@
 {
-  "python_version": "3.12",
+  "python_version": "3.13",
   "dependencies": ["."],
   "graphs": {
-    "research_assistant": "./langgraph_agent_toolkit/agents/research_assistant.py:research_assistant"
+    "chatbot": "./langgraph_agent_toolkit/agents/blueprints/chatbot/agent.py:chatbot"
   },
   "env": "./.env"
 }

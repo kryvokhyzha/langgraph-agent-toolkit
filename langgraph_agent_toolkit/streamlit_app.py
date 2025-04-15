@@ -115,8 +115,8 @@ async def main() -> None:
 
         with st.popover(":material/policy: Privacy", use_container_width=True):
             st.write(
-                "Prompts, responses and feedback in this app are anonymously recorded and saved to LangSmith "
-                "for product evaluation and improvement purposes only."
+                "Prompts, responses and feedback in this app are anonymously recorded and saved to selected "
+                "observability service for product evaluation and improvement purposes only."
             )
 
         @st.dialog("Share/resume chat")
@@ -126,7 +126,9 @@ async def main() -> None:
                 [session.client.request.protocol, session.client.request.host, "", "", "", ""]
             )
 
-            st_base_url = st_base_url.decode()
+            if isinstance(st_base_url, bytes):
+                # Decode the base URL if it's in bytes
+                st_base_url = st_base_url.decode()
 
             # if it's not localhost, switch to https by default
             if not st_base_url.startswith("https") and "localhost" not in st_base_url:
@@ -139,9 +141,6 @@ async def main() -> None:
             share_chat_dialog()
 
         "[View the source code](https://github.com/kryvokhyzha/langgraph-agent-toolkit)"
-        st.caption(
-            "Made with :material/favorite: by [Joshua](https://www.linkedin.com/in/joshua-k-carroll/) in Oakland"
-        )
 
     # Draw existing messages
     messages: list[ChatMessage] = st.session_state.messages
