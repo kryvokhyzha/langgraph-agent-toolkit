@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from langfuse import Langfuse
 from langfuse.callback import CallbackHandler
@@ -13,38 +13,19 @@ class LangfuseObservability(BaseObservabilityPlatform):
     """Langfuse implementation of observability platform."""
 
     def __init__(self, prompts_dir: Optional[str] = None):
-        """Initialize LangfuseObservability.
-
-        Args:
-            prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.
-
-        """
         super().__init__(prompts_dir)
-        # Set required environment variables explicitly
         self.required_vars = ["LANGFUSE_SECRET_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_HOST"]
 
     @BaseObservabilityPlatform.requires_env_vars
     def get_callback_handler(self, **kwargs) -> CallbackHandler:
-        """Get Langfuse callback handler.
-
-        Args:
-            **kwargs: Any keyword arguments
-
-        Returns:
-            A configured Langfuse CallbackHandler
-
-        """
         return CallbackHandler(**kwargs)
 
     def before_shutdown(self) -> None:
-        """Perform any necessary cleanup before shutdown."""
         Langfuse().flush()
 
     @BaseObservabilityPlatform.requires_env_vars
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        """Record feedback for a run to Langfuse."""
-        client = Langfuse()
-        client.score(
+        Langfuse().score(
             trace_id=run_id,
             name=key,
             value=score,
@@ -59,37 +40,35 @@ class LangfuseObservability(BaseObservabilityPlatform):
         metadata: Optional[Dict[str, Any]] = None,
         create_new_version: bool = True,
     ) -> None:
-        """Push a prompt to Langfuse."""
         langfuse = Langfuse()
+        labels = metadata.get("labels", ["production"]) if metadata else ["production"]
 
-        # Create labels from metadata if available
-        labels = metadata.get("labels", []) if metadata else ["production"]
-
-        # Check versioning (Langfuse handles this internally)
-        if create_new_version:
+        # Handle existing prompt versions - custom implementation for Langfuse
+        existing_prompt = None
+        if not create_new_version:
             try:
-                langfuse.get_prompt(name=name)
+                existing_prompt = langfuse.get_prompt(name=name)
+                logger.debug(f"Using existing prompt '{name}' as create_new_version is False")
             except Exception:
-                pass
+                logger.debug(f"Existing prompt '{name}' not found, will create a new one")
 
-        # Convert to proper format
         prompt_obj = self._convert_to_chat_prompt(prompt_template)
-
-        # Create prompt in Langfuse
         type_prompt = "text" if isinstance(prompt_template, str) else "chat"
-        langfuse_prompt = langfuse.create_prompt(
-            name=name,
-            prompt=prompt_template,
-            labels=labels,
-            type=type_prompt,
-        )
 
-        # Save metadata
+        if existing_prompt:
+            langfuse_prompt = existing_prompt
+        else:
+            langfuse_prompt = langfuse.create_prompt(
+                name=name,
+                prompt=prompt_template,
+                labels=labels,
+                type=type_prompt,
+            )
+
         full_metadata = metadata.copy() if metadata else {}
         full_metadata["langfuse_prompt"] = langfuse_prompt
         full_metadata["original_prompt"] = prompt_obj
 
-        # Save locally
         super().push_prompt(name, prompt_template, full_metadata)
 
     @BaseObservabilityPlatform.requires_env_vars
@@ -98,52 +77,42 @@ class LangfuseObservability(BaseObservabilityPlatform):
         name: str,
         return_with_prompt_object: bool = False,
         cache_ttl_seconds: Optional[int] = DEFAULT_CACHE_TTL_SECOND,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
+        label: Optional[str] = None,
+        version: Optional[int] = None,
+        **kwargs,
     ) -> Union[PromptReturnType, Tuple[PromptReturnType, Any]]:
-        """Pull a prompt from Langfuse.
-
-        Args:
-            name: Name of the prompt to retrieve
-            return_with_prompt_object: If True, returns a tuple of (prompt, langfuse_prompt_object)
-            cache_ttl_seconds: Cache TTL in seconds for the prompt retrieval
-
-        Returns:
-            The prompt template or a tuple containing the prompt and langfuse object
-
-        """
         try:
             langfuse = Langfuse()
-            langfuse_prompt = langfuse.get_prompt(name=name, cache_ttl_seconds=cache_ttl_seconds)
+            get_prompt_kwargs = {"name": name, "cache_ttl_seconds": cache_ttl_seconds}
 
-            if not langfuse_prompt:
-                raise ValueError(f"Prompt '{name}' not found in Langfuse")
+            if label:
+                get_prompt_kwargs["label"] = label
+            elif kwargs.get("prompt_label"):
+                get_prompt_kwargs["label"] = kwargs.get("prompt_label")
 
-            langchain_prompts = langfuse_prompt.get_langchain_prompt()
+            if version is not None:
+                get_prompt_kwargs["version"] = version
+            elif kwargs.get("prompt_version"):
+                get_prompt_kwargs["version"] = kwargs.get("prompt_version")
 
-            # Use get_langchain_prompt method instead of creating a new ChatPromptTemplate
-            if return_with_prompt_object:
-                return langchain_prompts, langfuse_prompt
-            else:
-                return langchain_prompts
+            try:
+                langfuse_prompt = langfuse.get_prompt(**get_prompt_kwargs)
+            except Exception as e:
+                logger.debug(f"Prompt not found with parameters: {e}")
+                langfuse_prompt = langfuse.get_prompt(name=name, cache_ttl_seconds=cache_ttl_seconds)
+
+            # Process the prompt object using the base class helper
+            prompt = self._process_prompt_object(langfuse_prompt.prompt, template_format=template_format)
+
+            return (prompt, langfuse_prompt) if return_with_prompt_object else prompt
 
         except Exception as e:
             logger.warning(f"Failed to pull prompt from Langfuse: {e}")
-
-            local_prompt = super().pull_prompt(name)
-
-            if return_with_prompt_object:
-                return local_prompt, None
-            else:
-                return local_prompt
+            local_prompt = super().pull_prompt(name, template_format=template_format, **kwargs)
+            return (local_prompt, None) if return_with_prompt_object else local_prompt
 
     @BaseObservabilityPlatform.requires_env_vars
     def delete_prompt(self, name: str) -> None:
-        """Delete a prompt from Langfuse.
-
-        Args:
-            name: Name of the prompt to delete
-
-        """
         logger.warning(f"Skipping deletion of prompt '{name}' from Langfuse")
-
-        # Delete the local files
         super().delete_prompt(name)

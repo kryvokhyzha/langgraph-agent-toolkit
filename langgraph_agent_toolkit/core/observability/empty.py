@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
@@ -48,14 +48,14 @@ class EmptyObservability(BaseObservabilityPlatform):
         """
         super().push_prompt(name, prompt_template, metadata, create_new_version)
 
-    def pull_prompt(self, name: str) -> PromptReturnType:
-        """Pull a prompt from local storage.
-
-        Returns:
-            The prompt object or template string
-
-        """
-        return super().pull_prompt(name)
+    def pull_prompt(
+        self,
+        name: str,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
+        **kwargs,
+    ) -> PromptReturnType:
+        """Pull a prompt from local storage."""
+        return super().pull_prompt(name, template_format=template_format, **kwargs)
 
     def delete_prompt(self, name: str) -> None:
         """Delete a prompt from local storage.

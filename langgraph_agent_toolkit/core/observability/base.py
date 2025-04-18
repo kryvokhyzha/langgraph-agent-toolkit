@@ -3,14 +3,22 @@ import os
 import tempfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, cast
 
 import joblib
 from jinja2 import Template
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts.chat import (
+    AIMessagePromptTemplate,
+    BaseMessage,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+    SystemMessagePromptTemplate,
+)
 
-from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
+from langgraph_agent_toolkit.core.observability.types import MessageRole, PromptReturnType, PromptTemplateType
+from langgraph_agent_toolkit.helper.logging import logger
 
 
 T = TypeVar("T")
@@ -22,7 +30,6 @@ class BaseObservabilityPlatform(ABC):
     __default_required_vars = []
 
     def __init__(self, prompts_dir: Optional[str] = None):
-        """Initialize the observability platform."""
         self._required_vars = self.__default_required_vars.copy()
 
         if prompts_dir:
@@ -35,27 +42,22 @@ class BaseObservabilityPlatform(ABC):
 
     @property
     def prompts_dir(self) -> Path:
-        """Get the directory where prompts are stored."""
         return self._prompts_dir
 
     @prompts_dir.setter
     def prompts_dir(self, path: str) -> None:
-        """Set the directory where prompts are stored."""
         self._prompts_dir = Path(path)
         self._prompts_dir.mkdir(exist_ok=True, parents=True)
 
     @property
     def required_vars(self) -> List[str]:
-        """Return the name of the observability platform."""
         return self._required_vars
 
     @required_vars.setter
     def required_vars(self, value: List[str]) -> None:
-        """Set the name of the observability platform."""
         self._required_vars = value
 
     def validate_environment(self) -> bool:
-        """Validate that all necessary environment variables are set."""
         missing_vars = [var for var in self._required_vars if not os.environ.get(var)]
 
         if missing_vars:
@@ -65,11 +67,8 @@ class BaseObservabilityPlatform(ABC):
 
     @staticmethod
     def requires_env_vars(func: Callable[..., T]) -> Callable[..., T]:
-        """Validate environment variables before executing a function."""
-
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            # Call validate_environment directly to raise the exception
             self.validate_environment()
             return func(self, *args, **kwargs)
 
@@ -77,106 +76,176 @@ class BaseObservabilityPlatform(ABC):
 
     @abstractmethod
     def get_callback_handler(self, **kwargs) -> Any:
-        """Get the callback handler for the observability platform."""
         pass
 
     @abstractmethod
     def before_shutdown(self) -> None:
-        """Perform any necessary cleanup before shutdown."""
         pass
 
     @abstractmethod
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        """Record feedback for a run."""
         pass
 
+    def _handle_existing_prompt(
+        self,
+        name: str,
+        create_new_version: bool = True,
+        client: Any = None,
+        client_pull_method: Optional[str] = None,
+        client_delete_method: Optional[str] = None,
+    ) -> Tuple[Any, Any]:
+        existing_prompt = None
+        url = None
+
+        if not client or not client_pull_method or not client_delete_method:
+            return (existing_prompt, url)
+
+        pull_method = getattr(client, client_pull_method, None)
+        delete_method = getattr(client, client_delete_method, None)
+
+        if not pull_method or not delete_method:
+            return (existing_prompt, url)
+
+        if not create_new_version:
+            try:
+                existing_prompt = pull_method(name=name)
+                url = getattr(existing_prompt, "url", None)
+                logger.debug(f"Using existing prompt '{name}' as create_new_version is False")
+            except Exception:
+                logger.debug(f"Existing prompt '{name}' not found, will create a new one")
+        else:
+            try:
+                pull_method(name=name)
+                delete_method(name=name)
+                logger.debug(f"Deleted existing prompt '{name}' to create new version")
+            except Exception:
+                pass
+
+        return (existing_prompt, url)
+
     def _convert_to_chat_prompt(self, prompt_template: PromptTemplateType) -> ChatPromptTemplate:
-        """Convert different prompt formats to a ChatPromptTemplate."""
         if isinstance(prompt_template, str):
             return ChatPromptTemplate.from_template(prompt_template)
         elif isinstance(prompt_template, list) and all(isinstance(msg, dict) for msg in prompt_template):
             messages = []
             for msg in prompt_template:
-                if msg["role"] == "system":
-                    messages.append(SystemMessage(content=msg["content"]))
-                elif msg["role"] == "human":
-                    messages.append(HumanMessage(content=msg["content"]))
-                # Add other role types if needed
+                role = msg.get("role", "")
+                content = msg.get("content", "")
+
+                if role == MessageRole.SYSTEM:
+                    messages.append(SystemMessage(content=content))
+                elif role in (MessageRole.HUMAN, MessageRole.USER):
+                    messages.append(HumanMessage(content=content))
+                elif role in (MessageRole.AI, MessageRole.ASSISTANT):
+                    messages.append(AIMessage(content=content))
+                elif role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
+                    messages.append(MessagesPlaceholder(variable_name=content))
             return ChatPromptTemplate.from_messages(messages)
         else:
-            # If it's already a prompt template or another object, return as is
             return cast(ChatPromptTemplate, prompt_template)
 
-    def push_prompt(
-        self,
-        name: str,
-        prompt_template: PromptTemplateType,
-        metadata: Optional[Dict[str, Any]] = None,
-        create_new_version: bool = True,
-    ) -> None:
-        """Push a prompt to the observability platform."""
-        self._prompts_dir.mkdir(exist_ok=True, parents=True)
+    def _process_messages_from_prompt(
+        self, messages: List[Any], template_format: Literal["f-string", "mustache", "jinja2"] = "f-string"
+    ) -> List[Any]:
+        MESSAGE_TYPE_MAP = {
+            MessageRole.SYSTEM: SystemMessagePromptTemplate,
+            MessageRole.HUMAN: HumanMessagePromptTemplate,
+            MessageRole.USER: HumanMessagePromptTemplate,
+            MessageRole.AI: AIMessagePromptTemplate,
+            MessageRole.ASSISTANT: AIMessagePromptTemplate,
+        }
 
-        file_path = self._prompts_dir / f"{name}.jinja2"
-        metadata_path = self._prompts_dir / f"{name}.metadata.joblib"
+        processed_messages = []
 
-        if create_new_version:
-            if file_path.exists():
-                file_path.unlink()
-            if metadata_path.exists():
-                metadata_path.unlink()
+        for msg in messages:
+            if isinstance(msg, MessagesPlaceholder):
+                processed_messages.append(msg)
+                continue
 
-        # Handle different prompt formats
-        chat_prompt = self._convert_to_chat_prompt(prompt_template)
+            if isinstance(msg, BaseMessage):
+                msg_type = MessageRole(msg.type)
+                if msg_type in MESSAGE_TYPE_MAP:
+                    template_class = MESSAGE_TYPE_MAP[msg_type]
+                    processed_messages.append(
+                        template_class.from_template(msg.content, template_format=template_format)
+                    )
+                continue
 
-        # Get template string and class info
+            if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                role, content = msg["role"], msg["content"]
+
+                if role in MESSAGE_TYPE_MAP:
+                    template_class = MESSAGE_TYPE_MAP[role]
+                    processed_messages.append(template_class.from_template(content, template_format=template_format))
+                    continue
+
+                if role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
+                    processed_messages.append(MessagesPlaceholder(variable_name=content))
+                    continue
+
+            if isinstance(msg, tuple) and len(msg) == 2:
+                role, content = msg
+                if role in MESSAGE_TYPE_MAP:
+                    template_class = MESSAGE_TYPE_MAP[role]
+                    processed_messages.append(template_class.from_template(content, template_format=template_format))
+                    continue
+
+                if role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
+                    processed_messages.append(MessagesPlaceholder(variable_name=content))
+                    continue
+
+            processed_messages.append(msg)
+
+        return processed_messages
+
+    def _process_prompt_object(
+        self, prompt_obj: Any, template_format: Literal["f-string", "mustache", "jinja2"] = "f-string"
+    ) -> ChatPromptTemplate:
+        if isinstance(prompt_obj, ChatPromptTemplate):
+            return prompt_obj
+
+        if hasattr(prompt_obj, "messages") and isinstance(prompt_obj.messages, list):
+            processed_messages = self._process_messages_from_prompt(
+                prompt_obj.messages, template_format=template_format
+            )
+            if processed_messages:
+                return ChatPromptTemplate.from_messages(processed_messages)
+
+        elif isinstance(prompt_obj, list):
+            if all(isinstance(item, dict) and "role" in item and "content" in item for item in prompt_obj):
+                processed_messages = self._process_messages_from_prompt(prompt_obj, template_format=template_format)
+                if processed_messages:
+                    return ChatPromptTemplate.from_messages(processed_messages)
+
+        elif isinstance(prompt_obj, str):
+            return ChatPromptTemplate.from_template(prompt_obj, template_format=template_format)
+
+        else:
+            raise ValueError(f"Could not process prompt object of type {type(prompt_obj)}")
+
+    def _extract_template_string(self, prompt_template: PromptTemplateType, prompt_obj: Any) -> str:
         if isinstance(prompt_template, str):
-            template_str = prompt_template
+            return prompt_template
         elif isinstance(prompt_template, list) and all(isinstance(msg, dict) for msg in prompt_template):
-            # For list of message dicts, serialize to a readable format
             template_str = ""
             for msg in prompt_template:
                 template_str += f"[{msg['role']}]: {msg['content']}\n\n"
+            return template_str
         else:
-            # Try to extract template string
-            if hasattr(chat_prompt, "template"):
-                template_str = chat_prompt.template
-            else:
-                template_str = str(chat_prompt)
+            if hasattr(prompt_obj, "template"):
+                return prompt_obj.template
+            return str(prompt_obj)
 
-        # Save the template
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(str(template_str))
-
-        # Save metadata with original prompt for exact reconstruction
-        full_metadata = metadata.copy() if metadata else {}
-        if not isinstance(prompt_template, str):
-            full_metadata["original_prompt"] = chat_prompt
-            full_metadata["original_format"] = "chat_message_dict" if isinstance(prompt_template, list) else "other"
-            joblib.dump(full_metadata, metadata_path)
-        elif metadata:
-            joblib.dump(full_metadata, metadata_path)
-
-    def pull_prompt(self, name: str) -> PromptReturnType:
-        """Pull a prompt from the observability platform.
-
-        Args:
-            name: Name of the prompt to pull
-
-        Returns:
-            The prompt object or template string
-
-        """
+    def _local_pull_prompt(self, name: str, template_format: str = "f-string", **kwargs) -> PromptReturnType:
+        """Local implementation of pull_prompt that reads from the file system."""
         file_path = self._prompts_dir / f"{name}.jinja2"
 
         if not file_path.exists():
             raise ValueError(f"Prompt '{name}' not found at {file_path}")
 
-        # Read the template
         with open(file_path, "r", encoding="utf-8") as f:
             template_content = f.read()
 
-        # Try to load metadata with joblib
         metadata_path = self._prompts_dir / f"{name}.metadata.joblib"
 
         if metadata_path.exists():
@@ -188,18 +257,48 @@ class BaseObservabilityPlatform(ABC):
             except Exception:
                 pass
 
-        return ChatPromptTemplate.from_template(template_content, template_format="jinja2")
+        return ChatPromptTemplate.from_template(template_content, template_format=template_format)
+
+    def pull_prompt(
+        self, name: str, template_format: Literal["f-string", "mustache", "jinja2"] = "f-string", **kwargs
+    ) -> PromptReturnType:
+        """Pull a prompt from the observability platform."""
+        # Use the local implementation
+        return self._local_pull_prompt(name, template_format=template_format, **kwargs)
+
+    def push_prompt(
+        self,
+        name: str,
+        prompt_template: PromptTemplateType,
+        metadata: Optional[Dict[str, Any]] = None,
+        create_new_version: bool = True,
+    ) -> None:
+        self._prompts_dir.mkdir(exist_ok=True, parents=True)
+
+        file_path = self._prompts_dir / f"{name}.jinja2"
+        metadata_path = self._prompts_dir / f"{name}.metadata.joblib"
+
+        if create_new_version:
+            if file_path.exists():
+                file_path.unlink()
+            if metadata_path.exists():
+                metadata_path.unlink()
+
+        chat_prompt = self._convert_to_chat_prompt(prompt_template)
+        template_str = self._extract_template_string(prompt_template, chat_prompt)
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(str(template_str))
+
+        full_metadata = metadata.copy() if metadata else {}
+        if not isinstance(prompt_template, str):
+            full_metadata["original_prompt"] = chat_prompt
+            full_metadata["original_format"] = "chat_message_dict" if isinstance(prompt_template, list) else "other"
+            joblib.dump(full_metadata, metadata_path)
+        elif metadata:
+            joblib.dump(full_metadata, metadata_path)
 
     def get_template(self, name: str) -> str:
-        """Get just the template string for a prompt.
-
-        Args:
-            name: Name of the prompt
-
-        Returns:
-            The template string
-
-        """
         file_path = self._prompts_dir / f"{name}.jinja2"
 
         if not file_path.exists():
@@ -209,27 +308,11 @@ class BaseObservabilityPlatform(ABC):
             return f.read()
 
     def render_prompt(self, prompt_name: str, **variables) -> str:
-        """Render a prompt with provided variables.
-
-        Args:
-            prompt_name: Name of the prompt to render
-            **variables: Variables to use in rendering
-
-        Returns:
-            Rendered prompt string
-
-        """
         template_content = self.get_template(prompt_name)
         template = Template(template_content)
         return template.render(**variables)
 
     def delete_prompt(self, name: str) -> None:
-        """Delete a prompt from storage.
-
-        Args:
-            name: Name of the prompt to delete
-
-        """
         file_path = self._prompts_dir / f"{name}.jinja2"
         metadata_path = self._prompts_dir / f"{name}.metadata.joblib"
         json_metadata_path = self._prompts_dir / f"{name}.metadata.json"

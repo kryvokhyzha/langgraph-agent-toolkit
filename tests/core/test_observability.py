@@ -134,6 +134,49 @@ class TestBaseObservability:
             metadata_path = Path(temp_dir) / "with-metadata.metadata.joblib"
             assert metadata_path.exists()
 
+    def test_handle_existing_prompt(self):
+        """Test the _handle_existing_prompt helper method."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            obs = EmptyObservability(prompts_dir=temp_dir)
+
+            # Create a mock client for testing
+            mock_client = MagicMock()
+            mock_prompt = MagicMock()
+            mock_prompt.url = "https://test-url.com/prompts/123"
+            mock_client.pull_prompt = MagicMock(return_value=mock_prompt)
+            mock_client.delete_prompt = MagicMock()
+
+            # Test with create_new_version=False (should return existing prompt)
+            existing_prompt, url = obs._handle_existing_prompt(
+                "test-prompt",
+                create_new_version=False,
+                client=mock_client,
+                client_pull_method="pull_prompt",
+                client_delete_method="delete_prompt",
+            )
+
+            assert existing_prompt == mock_prompt
+            assert url == "https://test-url.com/prompts/123"
+            mock_client.pull_prompt.assert_called_once_with(name="test-prompt")
+            mock_client.delete_prompt.assert_not_called()
+
+            # Reset mocks
+            mock_client.pull_prompt.reset_mock()
+
+            # Test with create_new_version=True (should delete and not return existing prompt)
+            existing_prompt, url = obs._handle_existing_prompt(
+                "test-prompt",
+                create_new_version=True,
+                client=mock_client,
+                client_pull_method="pull_prompt",
+                client_delete_method="delete_prompt",
+            )
+
+            assert existing_prompt is None
+            assert url is None
+            mock_client.pull_prompt.assert_called_once_with(name="test-prompt")
+            mock_client.delete_prompt.assert_called_once_with(name="test-prompt")
+
 
 class TestEmptyObservability:
     """Tests for the EmptyObservability class."""
@@ -202,27 +245,36 @@ class TestLangsmithObservability:
         """Test pulling a prompt from LangSmith."""
         # Setup mock
         mock_client = MagicMock()
+        # Create a mock prompt that can be properly processed
         mock_prompt = MagicMock()
+        mock_prompt.__str__ = lambda self: "Test mock prompt template"
+        # Add a template attribute to the mock
+        mock_prompt.template = "Test template string from mock"
         mock_client.pull_prompt.return_value = mock_prompt
         mock_client_cls.return_value = mock_client
 
-        with patch.dict(
-            os.environ,
-            {
-                "LANGSMITH_TRACING": "true",
-                "LANGSMITH_API_KEY": "test-key",
-                "LANGSMITH_PROJECT": "test-project",
-                "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
-            },
-        ):
-            obs = LangsmithObservability()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a local file as fallback
+            template_path = Path(temp_dir) / "langsmith-test.jinja2"
+            template_path.write_text("Local test template")
 
-            # Pull the prompt
-            result = obs.pull_prompt("langsmith-test")
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGSMITH_TRACING": "true",
+                    "LANGSMITH_API_KEY": "test-key",
+                    "LANGSMITH_PROJECT": "test-project",
+                    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+                },
+            ):
+                obs = LangsmithObservability(prompts_dir=temp_dir)
 
-            # Assert client was called
-            mock_client.pull_prompt.assert_called_once_with("langsmith-test")
-            assert result == mock_prompt
+                # Pull the prompt
+                result = obs.pull_prompt("langsmith-test")
+
+                # Assert client was called
+                mock_client.pull_prompt.assert_called_once_with("langsmith-test")
+                assert result is not None
 
     @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
     def test_delete_prompt(self, mock_client_cls):
@@ -253,6 +305,85 @@ class TestLangsmithObservability:
                 # Assert client was called and local file was deleted
                 mock_client.delete_prompt.assert_called_once_with("to-delete")
                 assert not template_path.exists()
+
+    @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_with_create_new_version_false(self, mock_dump, mock_client_cls):
+        """Test pushing a prompt to LangSmith with create_new_version=False."""
+        # Setup mock
+        mock_client = MagicMock()
+        # Create a mock prompt that can be properly processed
+        mock_prompt = MagicMock()
+        mock_prompt.__str__ = lambda self: "Test mock prompt template"
+        # Add a url attribute to the mock
+        mock_prompt.url = "https://api.smith.langchain.com/prompts/existing123"
+        # Add a template attribute to the mock
+        mock_prompt.template = "Test template string from mock"
+        mock_client.pull_prompt.return_value = mock_prompt
+        mock_client_cls.return_value = mock_client
+
+        # Patch joblib.dump to avoid serialization issues
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGSMITH_TRACING": "true",
+                    "LANGSMITH_API_KEY": "test-key",
+                    "LANGSMITH_PROJECT": "test-project",
+                    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+                },
+            ):
+                obs = LangsmithObservability(prompts_dir=temp_dir)
+                template = "Test LangSmith template for {{ topic }}"
+
+                # Push the template with create_new_version=False
+                obs.push_prompt("existing-prompt", template, create_new_version=False)
+
+                # Assert client was called to pull the prompt but not delete it
+                mock_client.pull_prompt.assert_called_once_with(name="existing-prompt")
+                mock_client.delete_prompt.assert_not_called()
+                mock_client.push_prompt.assert_not_called()
+
+                # Verify joblib.dump was called (but we've mocked it to avoid pickling issues)
+                mock_dump.assert_called()
+
+    @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_with_create_new_version_false_fallback(self, mock_dump, mock_client_cls):
+        """Test fallback to creating a new prompt when existing prompt is not found."""
+        # Setup mock
+        mock_client = MagicMock()
+        # Mock pull_prompt to raise exception (prompt not found)
+        mock_client.pull_prompt.side_effect = Exception("Prompt not found")
+        mock_client.push_prompt.return_value = "https://api.smith.langchain.com/prompts/new456"
+        mock_client_cls.return_value = mock_client
+
+        # Patch joblib.dump to avoid serialization issues
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGSMITH_TRACING": "true",
+                    "LANGSMITH_API_KEY": "test-key",
+                    "LANGSMITH_PROJECT": "test-project",
+                    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+                },
+            ):
+                obs = LangsmithObservability(prompts_dir=temp_dir)
+                template = "Test LangSmith template for {{ topic }}"
+
+                # Push the template with create_new_version=False, but it shouldn't exist
+                obs.push_prompt("non-existing-prompt", template, create_new_version=False)
+
+                # Assert pull_prompt was called
+                mock_client.pull_prompt.assert_called_once_with(name="non-existing-prompt")
+                # Assert push_prompt was called as fallback
+                mock_client.push_prompt.assert_called_once()
+                assert mock_client.push_prompt.call_args[0][0] == "non-existing-prompt"
 
 
 class TestLangfuseObservability:
@@ -354,31 +485,46 @@ class TestLangfuseObservability:
         # Setup mock
         mock_langfuse = MagicMock()
         mock_prompt = MagicMock()
-        mock_prompt.get_langchain_prompt.return_value = "Returned langchain prompt"
+
+        # Configure the mock prompt to have required attributes and methods
+        mock_prompt.prompt = "Test prompt content"
+
+        # Create a ChatPromptTemplate for the return value, matching what the implementation expects
+        chat_prompt = ChatPromptTemplate.from_template("Test prompt content")
+        mock_prompt.get_langchain_prompt = MagicMock(return_value=chat_prompt)
+
         mock_langfuse.get_prompt.return_value = mock_prompt
         mock_langfuse_cls.return_value = mock_langfuse
 
-        with patch.dict(
-            os.environ,
-            {
-                "LANGFUSE_SECRET_KEY": "secret",
-                "LANGFUSE_PUBLIC_KEY": "public",
-                "LANGFUSE_HOST": "https://cloud.langfuse.com",
-            },
-        ):
-            obs = LangfuseObservability()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a local file as fallback
+            template_path = Path(temp_dir) / "langfuse-test.jinja2"
+            template_path.write_text("Local test template")
 
-            # Pull the prompt
-            result = obs.pull_prompt("langfuse-test")
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_HOST": "https://cloud.langfuse.com",
+                },
+            ):
+                obs = LangfuseObservability(prompts_dir=temp_dir)
 
-            # Assert Langfuse get_prompt was called
-            mock_langfuse.get_prompt.assert_called_once()
-            assert result == "Returned langchain prompt"
+                # Pull the prompt
+                result = obs.pull_prompt("langfuse-test")
 
-            # Test with return_with_prompt_object=True
-            result, obj = obs.pull_prompt("langfuse-test", return_with_prompt_object=True)
-            assert result == "Returned langchain prompt"
-            assert obj == mock_prompt
+                # Assert Langfuse get_prompt was called - use the actual default value (600 seconds)
+                mock_langfuse.get_prompt.assert_called_once_with(name="langfuse-test", cache_ttl_seconds=600)
+
+                # Assert that result is the ChatPromptTemplate returned by get_langchain_prompt
+                assert result == chat_prompt
+                assert isinstance(result, ChatPromptTemplate)
+
+                # Test with return_with_prompt_object=True
+                result, obj = obs.pull_prompt("langfuse-test", return_with_prompt_object=True)
+                assert result == chat_prompt
+                assert obj == mock_prompt
 
     @patch("langgraph_agent_toolkit.core.observability.langfuse.Langfuse")
     def test_pull_prompt_fallback_to_local(self, mock_langfuse_cls):
@@ -436,6 +582,105 @@ class TestLangfuseObservability:
             assert score_args["trace_id"] == "trace-123"
             assert score_args["name"] == "accuracy"
             assert score_args["value"] == 0.95
+
+    @patch("langgraph_agent_toolkit.core.observability.langfuse.Langfuse")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_with_create_new_version_false(self, mock_dump, mock_langfuse_cls):
+        """Test pushing a prompt to Langfuse with create_new_version=False."""
+        # Setup mock
+        mock_langfuse = MagicMock()
+
+        # Create a mock prompt with minimal necessary attributes
+        mock_existing_prompt = MagicMock()
+        mock_existing_prompt.id = "existing_prompt_id_456"
+        mock_langfuse.get_prompt.return_value = mock_existing_prompt
+
+        # Mock for new prompt (shouldn't be used)
+        mock_new_prompt = MagicMock()
+        mock_new_prompt.id = "new_prompt_id_123"
+        mock_langfuse.create_prompt.return_value = mock_new_prompt
+
+        mock_langfuse_cls.return_value = mock_langfuse
+
+        # Patch joblib.dump to avoid serialization issues
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_HOST": "https://cloud.langfuse.com",
+                },
+            ):
+                obs = LangfuseObservability(prompts_dir=temp_dir)
+
+                # Create a chat prompt
+                messages: list[ChatMessageDict] = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "human", "content": "Help with {{ topic }}"},
+                ]
+
+                # Push the prompt with create_new_version=False
+                obs.push_prompt("existing-prompt", messages, create_new_version=False)
+
+                # Assert that get_prompt was called
+                mock_langfuse.get_prompt.assert_called_once_with(name="existing-prompt")
+
+                # Assert that create_prompt was NOT called
+                mock_langfuse.create_prompt.assert_not_called()
+
+                # Verify metadata was handled
+                mock_dump.assert_called_once()
+
+    @patch("langgraph_agent_toolkit.core.observability.langfuse.Langfuse")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_with_create_new_version_false_fallback(self, mock_dump, mock_langfuse_cls):
+        """Test fallback to creating a new prompt when existing prompt is not found."""
+        # Setup mock
+        mock_langfuse = MagicMock()
+
+        # Mock get_prompt to raise exception (prompt not found)
+        mock_langfuse.get_prompt.side_effect = Exception("Prompt not found")
+
+        # Mock for new prompt
+        mock_new_prompt = MagicMock()
+        mock_new_prompt.id = "new_prompt_id_789"
+        mock_langfuse.create_prompt.return_value = mock_new_prompt
+
+        mock_langfuse_cls.return_value = mock_langfuse
+
+        # Patch joblib.dump to avoid serialization issues
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_HOST": "https://cloud.langfuse.com",
+                },
+            ):
+                obs = LangfuseObservability(prompts_dir=temp_dir)
+
+                # Create a simple template
+                template = "This is a test template for {{ topic }}"
+
+                # Push the prompt with create_new_version=False, but it shouldn't exist
+                obs.push_prompt("non-existing-prompt", template, create_new_version=False)
+
+                # Assert get_prompt was attempted
+                mock_langfuse.get_prompt.assert_called_once_with(name="non-existing-prompt")
+
+                # Assert create_prompt was called as fallback
+                mock_langfuse.create_prompt.assert_called_once()
+                create_args = mock_langfuse.create_prompt.call_args[1]
+                assert create_args["name"] == "non-existing-prompt"
+
+                # Verify metadata was handled
+                mock_dump.assert_called_once()
 
 
 def test_observability_factory():

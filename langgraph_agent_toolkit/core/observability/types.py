@@ -1,5 +1,5 @@
 from enum import StrEnum, auto
-from typing import List, TypedDict, Union
+from typing import List, Literal, TypedDict, Union
 
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -10,8 +10,20 @@ class ObservabilityBackend(StrEnum):
     EMPTY = auto()
 
 
+class MessageRole(StrEnum):
+    """Enum for message roles in chat templates."""
+
+    SYSTEM = "system"
+    HUMAN = "human"
+    USER = "user"
+    AI = "ai"
+    ASSISTANT = "assistant"
+    PLACEHOLDER = "placeholder"
+    MESSAGES_PLACEHOLDER = "messages_placeholder"
+
+
 class ChatMessageDict(TypedDict):
-    role: str
+    role: str  # Using str instead of Literal to allow compatibility with MessageRole
     content: str
 
 

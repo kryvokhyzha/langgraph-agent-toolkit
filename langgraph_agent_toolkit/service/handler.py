@@ -69,7 +69,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     try:
                         agent = executor.get_agent(a.key)
                         agent.graph.checkpointer = saver
-                        agent.observability = observability
+
+                        # do not set up observability if it's already set
+                        if not agent.observability:
+                            agent.observability = observability
+
                         initialized_agents.append(a.key)
                         logger.info(f"Successfully initialized agent: {a.key}")
                     except Exception as e:
