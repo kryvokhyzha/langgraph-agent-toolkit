@@ -1,0 +1,5 @@
+[run]
+omit =
+    examples/*
+    tests/*
+    langgraph_agent_toolkit/agents/blueprints/*

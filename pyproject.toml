@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "tomli"]
 build-backend = "hatchling.build"
 
 [project]
@@ -29,39 +29,40 @@ requires-python = ">=3.11,<3.14"
 
 dependencies = [
     "rootutils >= 1.0.7",
-    "duckduckgo-search >=7.3.0",
-    "fastapi ~=0.115.5",
-    "grpcio >=1.68.0",
-    "httpx ~=0.28.1",
-    "jiter ~=0.9.0",
-    "langchain-core ~=0.3.33",
-    "langchain-community ~=0.3.16",
-    "langchain-litellm ~=0.1.4",
-    "langchain-openai ~=0.3.12",
-    "langgraph ~=0.3.28",
-    "langgraph-cli[inmem] ~=0.1.89",
-    "langgraph-checkpoint-sqlite ~=2.0.6",
-    "langgraph-checkpoint-postgres ~=2.0.19",
-    "langgraph-supervisor ~=0.0.16",
-    "langsmith ~=0.3.30",
-    "langfuse ~=2.60.2",
-    "litellm ~=1.66.0",
-    "numpy ~=1.26.4; python_version <= '3.12'",
-    "numpy ~=2.2.3; python_version >= '3.13'",
-    "pandas ~=2.2.3",
-    "psycopg[binary,pool] ~=3.2.4",
-    "pyarrow ~=19.0.1",
-    "pydantic ~=2.11.1",
-    "pydantic-settings ~=2.8.1",
-    "pyowm ~=3.3.0",
-    "python-dotenv ~=1.1.0",
-    "setuptools >=75.6.0",
-    "streamlit ~=1.44.1",
-    "watchdog ~=6.0.0",
-    "tiktoken >=0.8.0",
-    "joblib ~=1.4.2",
-    "uvicorn ~=0.34.0",
-    "loguru ~=0.7.3",
+    "duckduckgo-search >= 7.3.0",
+    "fastapi ~= 0.115.5",
+    "grpcio >= 1.68.0",
+    "httpx ~= 0.28.1",
+    "jiter ~= 0.9.0",
+    "langchain-core ~= 0.3.52",
+    "langchain-community ~= 0.3.21",
+    "langchain-openai ~= 0.3.12",
+    "langgraph ~= 0.3.30",
+    "langgraph-cli[inmem] ~= 0.2.3",
+    "langgraph-checkpoint-sqlite ~= 2.0.6",
+    "langgraph-checkpoint-postgres ~= 2.0.19",
+    "langgraph-supervisor ~= 0.0.16",
+    "langsmith ~= 0.3.31",
+    "langfuse ~= 2.60.3",
+    "litellm ~= 1.66.1",
+    "numpy ~= 1.26.4; python_version <= '3.12'",
+    "numpy ~= 2.2.3; python_version >= '3.13'",
+    "pandas ~= 2.2.3",
+    "psycopg[binary,pool] ~= 3.2.4",
+    "pyarrow ~= 19.0.1",
+    "pydantic ~= 2.11.1",
+    "pydantic-settings ~= 2.8.1",
+    "pyowm ~= 3.3.0",
+    "python-dotenv ~= 1.1.0",
+    "setuptools >= 75.6.0",
+    "streamlit ~= 1.44.1",
+    "watchdog ~= 6.0.0",
+    "tiktoken >= 0.8.0",
+    "joblib ~= 1.4.2",
+    "uvicorn ~= 0.34.0",
+    "loguru ~= 0.7.3",
+    "multidict > 6.3.2",
+    "Jinja2 ~= 3.1.6",
 ]
 
 [dependency-groups]
@@ -78,16 +79,17 @@ dev = [
 # These are also installed in the default dependencies.
 # To install run: `uv sync --frozen --only-group client`
 client = [
-    "httpx ~=0.28.1",
-    "pydantic ~=2.11.1",
-    "python-dotenv ~=1.1.0",
-    "streamlit~=1.44.1",
-    "watchdog ~=6.0.0",
+    "httpx ~= 0.28.1",
+    "pydantic ~= 2.11.1",
+    "python-dotenv ~= 1.1.0",
+    "streamlit ~= 1.44.1",
+    "watchdog ~= 6.0.0",
 ]
 
 [project.urls]
 # documentation = "https://langgraph-agent-toolkit.readthedocs.org"
 repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
+#"PyPI" = "https://pypi.org/project/xxxx/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["langgraph_agent_toolkit"]

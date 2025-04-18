@@ -6,7 +6,6 @@ from langgraph_agent_toolkit.schema import ChatMessage
 
 
 async def amain() -> None:
-    #### ASYNC ####
     client = AgentClient(settings.BASE_URL)
 
     print("Agent info:")
@@ -28,7 +27,6 @@ async def amain() -> None:
 
 
 def main() -> None:
-    #### SYNC ####
     client = AgentClient(settings.BASE_URL)
 
     print("Agent info:")

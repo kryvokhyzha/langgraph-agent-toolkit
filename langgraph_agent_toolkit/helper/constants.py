@@ -7,3 +7,4 @@ DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS = dict(
     top_p=0.7,
     streaming=True,
 )
+DEFAULT_CACHE_TTL_SECOND = 60 * 10  # 10 minutes
