@@ -5,8 +5,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
 
-  - package-ecosystem: pip
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -14,3 +18,7 @@ updates:
       python-packages:
         patterns:
           - "*"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"

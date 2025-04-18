@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
-from typing import Union
+from typing import Any, TypeVar
+
+
+T = TypeVar("T", bound=Any)
 
 
 class BaseMemoryBackend(ABC):
@@ -20,7 +23,7 @@ class BaseMemoryBackend(ABC):
         pass
 
     @abstractmethod
-    def get_checkpoint_saver(self) -> AbstractAsyncContextManager["BaseMemoryBackend"]:
+    def get_checkpoint_saver(self) -> AbstractAsyncContextManager[T]:
         """Get the checkpoint saver for the memory backend.
 
         Returns:

@@ -1,0 +1,10 @@
+from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
+from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
+from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
+from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
+
+
+# For backward compatibility
+create_observability_platform = ObservabilityFactory.create

@@ -1,5 +1,7 @@
 # 🧰 Langgraph Agent Toolkit
 
+<!-- [![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) -->
+
 [![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit)
@@ -330,24 +332,12 @@ The project works with
 
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
 
-## 👥 Contributing
+## 👥 Development and Contributing
 
-Contributions are welcome! To contribute:
+Thank you for considering contributing to `Langgraph Agent Toolkit`! We
+encourage the community to post Issues and Pull Requests.
 
-1. Ensure you're in the project root with your virtual environment activated
-
-2. Install development dependencies:
-
-   ```sh
-   pip install uv
-   uv sync --frozen
-   pre-commit install
-   ```
-
-3. Run tests:
-   ```sh
-   pytest
-   ```
+Before you get started, please see our [Contribution Guide](CONTRIBUTING.md).
 
 ## 📄 License
 

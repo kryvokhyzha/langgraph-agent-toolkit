@@ -12,4 +12,5 @@ class Agent:
     name: str
     description: str
     graph: CompiledStateGraph | Pregel
+    # prompt_manager: None = None
     observability: BaseObservabilityPlatform = EmptyObservability()

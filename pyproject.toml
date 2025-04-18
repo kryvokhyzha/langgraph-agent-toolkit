@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "tomli"]
 build-backend = "hatchling.build"
 
 [project]
@@ -62,6 +62,7 @@ dependencies = [
     "uvicorn ~= 0.34.0",
     "loguru ~= 0.7.3",
     "multidict > 6.3.2",
+    "Jinja2 ~= 3.1.6",
 ]
 
 [dependency-groups]
@@ -88,6 +89,7 @@ client = [
 [project.urls]
 # documentation = "https://langgraph-agent-toolkit.readthedocs.org"
 repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
+#"PyPI" = "https://pypi.org/project/xxxx/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["langgraph_agent_toolkit"]
