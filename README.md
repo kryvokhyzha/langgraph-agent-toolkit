@@ -271,7 +271,7 @@ enables live reloading:
    docker compose down
    ```
 
-> [!INFO]  
+> [!NOTE]  
 > If you modify `pyproject.toml` or `uv.lock`, rebuild with
 > `docker compose up --build`
 
