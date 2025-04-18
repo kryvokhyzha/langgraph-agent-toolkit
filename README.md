@@ -271,7 +271,8 @@ enables live reloading:
    docker compose down
    ```
 
-> **Note**: If you modify `pyproject.toml` or `uv.lock`, rebuild with
+> [!INFO]  
+> If you modify `pyproject.toml` or `uv.lock`, rebuild with
 > `docker compose up --build`
 
 ### 🔄 Using the AgentClient
