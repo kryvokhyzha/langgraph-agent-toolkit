@@ -242,8 +242,8 @@ services:
       LANGFUSE_INIT_PROJECT_NAME: "Test Projecct"
       LANGFUSE_INIT_PROJECT_PUBLIC_KEY: lf-pk-1234567890
       LANGFUSE_INIT_PROJECT_SECRET_KEY: lf-sk-1234567890
-      LANGFUSE_INIT_USER_EMAIL: kriwohizha@gmail.com
-      LANGFUSE_INIT_USER_NAME: kryvokhyzha
+      LANGFUSE_INIT_USER_EMAIL: randomemail@random.com
+      LANGFUSE_INIT_USER_NAME: username
       LANGFUSE_INIT_USER_PASSWORD: 11111111111111111
     deploy:
       resources:

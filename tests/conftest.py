@@ -32,11 +32,11 @@ def mock_env():
 def check_service_available():
     """Fixture to check if a service is available at a given URL."""
 
-    def _check(url, timeout=2):
+    def _check(url, timeout=5):
         try:
             response = httpx.get(f"{url}/info", timeout=timeout)
             return response.status_code < 500
-        except (httpx.ConnectError, httpx.TimeoutException):
+        except (httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError):
             return False
 
     return _check

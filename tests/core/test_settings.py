@@ -127,3 +127,109 @@ def test_settings_is_dev():
 
         settings = Settings(ENV_MODE="production", _env_file=None)
         assert settings.is_dev() is False
+
+
+def test_settings_with_langgraph_string_override():
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_HOST": "127.0.0.1",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.HOST == "127.0.0.1"
+
+
+def test_settings_with_langgraph_int_override():
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_PORT": "9000",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.PORT == 9000
+
+
+def test_settings_with_langgraph_boolean_override():
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_USE_FAKE_MODEL": "true",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.USE_FAKE_MODEL is True
+
+    # Test alternative boolean values
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_USE_FAKE_MODEL": "1",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.USE_FAKE_MODEL is True
+
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_USE_FAKE_MODEL": "false",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.USE_FAKE_MODEL is False
+
+
+def test_settings_with_langgraph_list_override():
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_AGENT_PATHS": '["custom.path.agent:agent", "another.agent:agent"]',
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.AGENT_PATHS == ["custom.path.agent:agent", "another.agent:agent"]
+
+
+def test_settings_with_langgraph_multiple_overrides():
+    with patch.dict(
+        os.environ,
+        {
+            "COMPATIBLE_BASE_URL": "http://api.example.com",
+            "COMPATIBLE_API_KEY": "test_key",
+            "COMPATIBLE_MODEL": "gpt-4",
+            "LANGGRAPH_HOST": "127.0.0.1",
+            "LANGGRAPH_PORT": "9000",
+            "LANGGRAPH_USE_FAKE_MODEL": "true",
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        assert settings.HOST == "127.0.0.1"
+        assert settings.PORT == 9000
+        assert settings.USE_FAKE_MODEL is True

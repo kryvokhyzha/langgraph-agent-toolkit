@@ -46,7 +46,6 @@ from langgraph.utils.runnable import RunnableCallable, RunnableLike
 from pydantic import BaseModel
 
 
-# Reuse any relevant functions from the original create_react_agent
 def create_react_agent(
     model: Union[str, LanguageModelLike],
     tools: Union[Sequence[Union[BaseTool, Callable]], ToolNode],

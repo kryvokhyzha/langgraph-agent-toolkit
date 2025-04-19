@@ -13,7 +13,7 @@ def test_service_with_fake_model(check_service_available):
     service_url = "http://0.0.0.0"
 
     # Skip test if service is not available
-    if not check_service_available(service_url):
+    if not check_service_available(service_url, timeout=60):
         pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
 
     client = AgentClient(service_url, agent="chatbot-agent")
@@ -30,21 +30,14 @@ def test_service_with_app():
     """
     try:
         # Increase timeout to allow app more time to load
-        at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py", default_timeout=10).run()
-
-        # Check if there are any errors in the app
-        errors = [
-            elem
-            for elem in at._tree.get(0, {}).get("children", {}).values()
-            if hasattr(elem, "type") and elem.type == "error"
-        ]
-
-        if errors:
-            pytest.skip(f"App failed to load properly: {errors}")
+        at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py", default_timeout=60).run()
 
         # First check for the welcome message that appears when the app first loads
-        assert len(at.chat_message) >= 1
-        assert at.chat_message[0].avatar == "assistant"
+        assert len(at.chat_message) >= 1, "Expected at least one chat message"
+        assert at.chat_message[0].avatar == "assistant", "Expected first message from assistant"
+
+        # Check that the title elements exist (indicating successful loading)
+        assert at.sidebar, "Expected sidebar to be present"
 
     except Exception as e:
         pytest.skip(f"Failed to run Streamlit app: {str(e)}")

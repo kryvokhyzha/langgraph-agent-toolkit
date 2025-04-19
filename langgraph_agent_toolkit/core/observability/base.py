@@ -132,14 +132,18 @@ class BaseObservabilityPlatform(ABC):
                 role = msg.get("role", "")
                 content = msg.get("content", "")
 
-                if role == MessageRole.SYSTEM:
-                    messages.append(SystemMessage(content=content))
-                elif role in (MessageRole.HUMAN, MessageRole.USER):
-                    messages.append(HumanMessage(content=content))
-                elif role in (MessageRole.AI, MessageRole.ASSISTANT):
-                    messages.append(AIMessage(content=content))
-                elif role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
-                    messages.append(MessagesPlaceholder(variable_name=content))
+                match role.lower():
+                    case MessageRole.SYSTEM:
+                        messages.append(SystemMessage(content=content))
+                    case MessageRole.HUMAN | MessageRole.USER:
+                        messages.append(HumanMessage(content=content))
+                    case MessageRole.AI | MessageRole.ASSISTANT:
+                        messages.append(AIMessage(content=content))
+                    case MessageRole.PLACEHOLDER | MessageRole.MESSAGES_PLACEHOLDER:
+                        messages.append(MessagesPlaceholder(variable_name=content))
+                    case _:
+                        raise ValueError(f"Unknown message role: {role}")
+
             return ChatPromptTemplate.from_messages(messages)
         else:
             return cast(ChatPromptTemplate, prompt_template)

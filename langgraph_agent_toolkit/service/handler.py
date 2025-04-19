@@ -10,6 +10,7 @@ from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
+from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
@@ -30,7 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         # Initialize observability platform
         try:
-            observability = ObservabilityFactory.create(settings.OBSERVABILITY_BACKEND)
+            observability = ObservabilityFactory.create(settings.OBSERVABILITY_BACKEND or ObservabilityBackend.EMPTY)
             logger.info(f"Initialized observability backend: {settings.OBSERVABILITY_BACKEND}")
         except Exception as e:
             logger.error(f"Failed to initialize observability backend: {e}")
