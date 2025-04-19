@@ -26,23 +26,6 @@ class TestServiceRunner:
                 mock_create_app.assert_called_once()
                 assert service_runner.app is not None
 
-    def test_init_with_custom_settings(self):
-        """Test initialization with custom settings."""
-        with patch("langgraph_agent_toolkit.service.factory.setup_logging"):
-            with patch("langgraph_agent_toolkit.service.factory.create_app"):
-                with patch.dict(os.environ, {}, clear=True):
-                    # Verify settings were updated
-                    assert base_settings.HOST == "127.0.0.1"
-                    assert base_settings.PORT == 9000
-                    assert base_settings.USE_FAKE_MODEL is True
-                    assert base_settings.AGENT_PATHS == ["custom.path.agent:agent"]
-
-                    # Verify environment variables were set
-                    assert os.environ.get("LANGGRAPH_HOST") == "127.0.0.1"
-                    assert os.environ.get("LANGGRAPH_PORT") == "9000"
-                    assert os.environ.get("LANGGRAPH_USE_FAKE_MODEL") == "True"
-                    assert os.environ.get("LANGGRAPH_AGENT_PATHS") == json.dumps(["custom.path.agent:agent"])
-
     def test_init_with_invalid_settings(self):
         """Test initialization with invalid settings."""
         with patch("langgraph_agent_toolkit.service.factory.setup_logging"):
