@@ -10,7 +10,7 @@ def test_service_with_fake_model():
 
     This test requires the service container to be running with USE_FAKE_MODEL=true
     """
-    service_url = "http://0.0.0.0:8080"
+    service_url = "http://0.0.0.0"
 
     # Skip test if service is not available
     # if not check_service_available(service_url):
