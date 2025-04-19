@@ -5,7 +5,7 @@ from langgraph_agent_toolkit.client import AgentClient
 
 
 @pytest.mark.docker
-def test_service_with_fake_model():
+def test_service_with_fake_model(check_service_available):
     """Test the service using the fake model.
 
     This test requires the service container to be running with USE_FAKE_MODEL=true
@@ -13,8 +13,8 @@ def test_service_with_fake_model():
     service_url = "http://0.0.0.0"
 
     # Skip test if service is not available
-    # if not check_service_available(service_url):
-    #     pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
+    if not check_service_available(service_url, timeout=60):
+        pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
 
     client = AgentClient(service_url, agent="chatbot-agent")
     response = client.invoke("Tell me a joke?", model="fake")
