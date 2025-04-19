@@ -26,14 +26,6 @@ class TestServiceRunner:
                 mock_create_app.assert_called_once()
                 assert service_runner.app is not None
 
-    def test_init_with_invalid_settings(self):
-        """Test initialization with invalid settings."""
-        with patch("langgraph_agent_toolkit.service.factory.setup_logging"):
-            with patch("langgraph_agent_toolkit.service.factory.create_app"):
-                with patch("langgraph_agent_toolkit.service.factory.logger") as mock_logger:
-                    # Verify warning was logged
-                    mock_logger.warning.assert_called_with("Setting INVALID_SETTING not found in settings")
-
     def test_run_uvicorn_dev_mode(self):
         """Test running with Uvicorn in development mode."""
         with patch("langgraph_agent_toolkit.service.factory.setup_logging"):

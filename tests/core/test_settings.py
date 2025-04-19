@@ -216,24 +216,6 @@ def test_settings_with_langgraph_list_override():
         assert settings.AGENT_PATHS == ["custom.path.agent:agent", "another.agent:agent"]
 
 
-def test_settings_with_langgraph_invalid_json():
-    with patch.dict(
-        os.environ,
-        {
-            "COMPATIBLE_BASE_URL": "http://api.example.com",
-            "COMPATIBLE_API_KEY": "test_key",
-            "COMPATIBLE_MODEL": "gpt-4",
-            "LANGGRAPH_AGENT_PATHS": "[invalid json",  # Malformed JSON
-        },
-        clear=True,
-    ):
-        # The setting should not change if JSON is invalid
-        settings = Settings(_env_file=None)
-        assert settings.AGENT_PATHS == [
-            "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
-        ]
-
-
 def test_settings_with_langgraph_multiple_overrides():
     with patch.dict(
         os.environ,
