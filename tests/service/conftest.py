@@ -7,7 +7,7 @@ from langchain_core.messages import AIMessage
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
 from langgraph_agent_toolkit.schema.schema import ChatMessage
-from langgraph_agent_toolkit.service.service import app
+from langgraph_agent_toolkit.service.factory import ServiceRunner
 
 
 class MockStateSnapshot:
@@ -16,6 +16,13 @@ class MockStateSnapshot:
     def __init__(self, values=None, tasks=None):
         self.values = values or {}
         self.tasks = tasks or []
+
+
+@pytest.fixture
+def app():
+    """Fixture to create a FastAPI app for testing."""
+    service_runner = ServiceRunner()
+    return service_runner.app
 
 
 @pytest.fixture
@@ -73,7 +80,7 @@ def mock_agent(mock_agent_executor):
 
 
 @pytest.fixture
-def test_client(mock_agent_executor):
+def test_client(mock_agent_executor, app):
     """Fixture to create a FastAPI test client."""
     # Setup mocks for the app lifecycle
     mock_observability = Mock()
@@ -128,7 +135,7 @@ def mock_settings(monkeypatch):
 
 
 @pytest.fixture
-def mock_httpx():
+def mock_httpx(app):
     """Patch httpx.stream and httpx.get to use our test client."""
     with TestClient(app) as client:
 

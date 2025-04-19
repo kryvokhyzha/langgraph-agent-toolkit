@@ -20,6 +20,7 @@ and this project adheres to
 - Agent executor
 - Prompt manager
 - Custom implementation of React Agent
+- Service runners: standard, aws lambda, azure functions
 
 ### Fixed
 

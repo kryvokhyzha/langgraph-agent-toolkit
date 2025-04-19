@@ -1,3 +1,5 @@
+import json
+import os
 from typing import Annotated, Any
 
 from dotenv import find_dotenv
@@ -11,6 +13,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
+from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import check_str_is_http
 from langgraph_agent_toolkit.schema.models import (
     AllModelEnum,
@@ -55,7 +58,6 @@ class Settings(BaseSettings):
     # Agent configuration
     AGENT_PATHS: list[str] = [
         "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
-        "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
         "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
     ]
 
@@ -83,6 +85,9 @@ class Settings(BaseSettings):
     POSTGRES_MAX_IDLE: int = Field(default=5, description="Maximum number of idle connections")
 
     def model_post_init(self, __context: Any) -> None:
+        # Check for LANGGRAPH_ prefixed environment variables that might override settings
+        self._apply_langgraph_env_overrides()
+
         api_keys = {
             Provider.OPENAI_COMPATIBLE: self.COMPATIBLE_BASE_URL and self.COMPATIBLE_MODEL,
             Provider.FAKE: self.USE_FAKE_MODEL,
@@ -103,6 +108,49 @@ class Settings(BaseSettings):
                     self.AVAILABLE_MODELS.update(set(FakeModelName))
                 case _:
                     raise ValueError(f"Unknown provider: {provider}")
+
+    def _apply_langgraph_env_overrides(self) -> None:
+        """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
+        for env_name, env_value in os.environ.items():
+            if env_name.startswith("LANGGRAPH_"):
+                setting_name = env_name[10:]  # Remove the "LANGGRAPH_" prefix
+                if hasattr(self, setting_name):
+                    try:
+                        current_value = getattr(self, setting_name)
+
+                        # Handle different types
+                        if isinstance(current_value, list):
+                            # Parse JSON array
+                            try:
+                                parsed_value = json.loads(env_value)
+                                if isinstance(parsed_value, list):
+                                    setattr(self, setting_name, parsed_value)
+                                    logger.info(f"Applied environment override for {setting_name}")
+                            except json.JSONDecodeError:
+                                logger.warning(f"Failed to parse JSON for {setting_name}: {env_value}")
+                        elif isinstance(current_value, bool):
+                            # Convert string to boolean
+                            if env_value.lower() in ("true", "1", "yes"):
+                                setattr(self, setting_name, True)
+                                logger.info(f"Applied environment override for {setting_name}")
+                            elif env_value.lower() in ("false", "0", "no"):
+                                setattr(self, setting_name, False)
+                                logger.info(f"Applied environment override for {setting_name}")
+                        elif current_value is None or isinstance(current_value, (str, int, float)):
+                            # Convert to the appropriate type
+                            if isinstance(current_value, int) or current_value is None and env_value.isdigit():
+                                setattr(self, setting_name, int(env_value))
+                            elif isinstance(current_value, float) or current_value is None and "." in env_value:
+                                try:
+                                    setattr(self, setting_name, float(env_value))
+                                except ValueError:
+                                    setattr(self, setting_name, env_value)
+                            else:
+                                setattr(self, setting_name, env_value)
+                            logger.info(f"Applied environment override for {setting_name}")
+                        # Add more type handling as needed
+                    except Exception as e:
+                        logger.warning(f"Failed to apply environment override for {setting_name}: {e}")
 
     @computed_field
     @property

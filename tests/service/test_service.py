@@ -7,7 +7,6 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.pregel.types import StateSnapshot
 
-from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import OpenAICompatibleName
 

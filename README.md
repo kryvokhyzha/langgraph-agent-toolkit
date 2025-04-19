@@ -69,6 +69,11 @@ Features include:
    - Support for both token-based and message-based streaming
    - Multiple agent support with URL path routing
    - Available agents and models listed at `/info` endpoint
+   - Supports different runners:
+     - unicorn
+     - ⚠️ gunicorn - _experimental_
+     - ⚠️ mangum (AWS Lambda) - _experimental_
+     - ⚠️ azure functions - _experimental_
 
 3. **Developer Experience**
 
@@ -332,6 +337,7 @@ The project works with
 ## 📚 Useful Resources
 
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
+- [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 
 ## 👥 Development and Contributing
 

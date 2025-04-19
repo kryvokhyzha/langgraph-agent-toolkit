@@ -15,6 +15,18 @@ uv_show_deps_tree:
 uv_build_wheel:
 	uv build --wheel
 
+# Install deployment dependencies (includes core dependencies + specified extras)
+uv_install_aws:
+	uv sync --extras "aws" --no-install-project
+uv_install_azure:
+	uv sync --extras "azure" --no-install-project
+uv_install_gunicorn:
+	uv sync --extras "gunicorn" --no-install-project
+uv_install_uvicorn:
+	uv sync --extras "uvicorn" --no-install-project
+uv_install_deploy_all:
+	uv sync --extras "deploy-all" --no-install-project
+
 pre_commit_install: .pre-commit-config.yaml
 	pre-commit install
 pre_commit_run: .pre-commit-config.yaml

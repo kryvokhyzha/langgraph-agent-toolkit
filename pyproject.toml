@@ -86,6 +86,32 @@ client = [
     "watchdog ~= 6.0.0",
 ]
 
+[project.optional-dependencies]
+aws = [
+    "mangum ~= 0.19.0",
+]
+
+azure = [
+    "azure-functions ~= 1.23.0",
+]
+
+gunicorn = [
+    "gunicorn ~= 23.0.0",
+    "uvicorn[standard] ~= 0.34.2",
+]
+
+uvicorn = [
+    "uvicorn ~= 0.34.2",
+]
+
+# Combined group for all deployment options
+deploy-all = [
+    "mangum ~= 0.19.0",
+    "azure-functions ~= 1.23.0", 
+    "gunicorn ~= 23.0.0",
+    "uvicorn ~= 0.34.2",
+]
+
 [project.urls]
 # documentation = "https://langgraph-agent-toolkit.readthedocs.org"
 repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
@@ -128,6 +154,7 @@ exclude=[
 # It's fine not to put the import at the top of the file in the examples
 # folder.
 "langgraph_agent_toolkit/run_agent.py"=["E402"]
+"langgraph_agent_toolkit/service/factory.py"=["F821"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2     # Use a single line after each import block.
