@@ -15,7 +15,7 @@ from langgraph.pregel import Pregel
 from langgraph.types import Command, Interrupt
 
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT, DEFAULT_RECURSION_LIMIT
+from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT, get_default_agent, set_default_agent
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import (
     convert_message_content_to_string,
@@ -25,7 +25,6 @@ from langgraph_agent_toolkit.helper.utils import (
 from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
 
 
-# Type variable for the decorator
 T = TypeVar("T")
 
 
@@ -45,7 +44,6 @@ class AgentExecutor:
         """
         self.agents: Dict[str, Agent] = {}
 
-        # Check if args is empty and raise an error
         if not args:
             raise ValueError("At least one agent must be provided to AgentExecutor.")
 
@@ -61,7 +59,6 @@ class AgentExecutor:
                 module = importlib.import_module(module_path)
                 agent_obj = getattr(module, object_name)
 
-                # Check if it's a raw graph or already an Agent instance
                 if isinstance(agent_obj, (CompiledStateGraph, Pregel)):
                     agent = Agent(name=object_name, description=f"Dynamically loaded {object_name}", graph=agent_obj)
                     self.agents[agent.name] = agent
@@ -73,16 +70,22 @@ class AgentExecutor:
                 print(f"Error loading agent from '{import_str}': {e}")
 
     def _validate_default_agent_loaded(self) -> None:
-        """Validate that the default agent is loaded.
+        """Validate that a default agent is available and set it if needed.
 
-        Raises:
-            ValueError: If the default agent is not loaded
-
+        If the default agent from constants.py is not available,
+        use the first loaded agent as the default and update the global value.
         """
-        if not self.agents or DEFAULT_AGENT not in self.agents:
-            raise ValueError(
-                f"Default agent '{DEFAULT_AGENT}' was not imported. Make sure to include it in your agent imports."
+        if not self.agents:
+            raise ValueError("No agents were loaded. Please check your imports.")
+
+        initial_default = get_default_agent()
+
+        if initial_default not in self.agents:
+            new_default = list(self.agents.keys())[0]
+            logger.warning(
+                f"Default agent '{initial_default}' not found in loaded agents. Using '{new_default}' as default."
             )
+            set_default_agent(new_default)
 
     def get_agent(self, agent_id: str) -> Agent:
         """Get an agent by its ID.

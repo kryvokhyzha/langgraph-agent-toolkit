@@ -7,7 +7,7 @@ from langchain_core.runnables import RunnableConfig
 from langfuse.callback import CallbackHandler
 
 
-load_dotenv(find_dotenv())
+load_dotenv(find_dotenv(), override=True)
 
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.settings import settings

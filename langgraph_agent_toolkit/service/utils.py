@@ -13,7 +13,7 @@ from langchain_core._api import LangChainBetaWarning
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.logging import InterceptHandler, logger
 from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
 
@@ -62,13 +62,16 @@ def get_all_agent_info(request: Request):
 
 
 async def message_generator(
-    user_input: StreamInput, request: Request, agent_id: str = DEFAULT_AGENT
+    user_input: StreamInput, request: Request, agent_id: str = None
 ) -> AsyncGenerator[str, None]:
     """Generate a stream of messages from the agent.
 
     This is the workhorse method for the /stream endpoint.
     """
     executor = get_agent_executor(request)
+
+    if agent_id is None:
+        agent_id = get_default_agent()
 
     try:
         async for item in executor.stream(

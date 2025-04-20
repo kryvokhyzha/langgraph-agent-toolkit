@@ -125,17 +125,17 @@ class Settings(BaseSettings):
                                 parsed_value = json.loads(env_value)
                                 if isinstance(parsed_value, list):
                                     setattr(self, setting_name, parsed_value)
-                                    logger.info(f"Applied environment override for {setting_name}")
+                                    logger.debug(f"Applied environment override for {setting_name}")
                             except json.JSONDecodeError:
                                 logger.warning(f"Failed to parse JSON for {setting_name}: {env_value}")
                         elif isinstance(current_value, bool):
                             # Convert string to boolean
                             if env_value.lower() in ("true", "1", "yes"):
                                 setattr(self, setting_name, True)
-                                logger.info(f"Applied environment override for {setting_name}")
+                                logger.debug(f"Applied environment override for {setting_name}")
                             elif env_value.lower() in ("false", "0", "no"):
                                 setattr(self, setting_name, False)
-                                logger.info(f"Applied environment override for {setting_name}")
+                                logger.debug(f"Applied environment override for {setting_name}")
                         elif current_value is None or isinstance(current_value, (str, int, float)):
                             # Convert to the appropriate type
                             if isinstance(current_value, int) or current_value is None and env_value.isdigit():
@@ -147,7 +147,7 @@ class Settings(BaseSettings):
                                     setattr(self, setting_name, env_value)
                             else:
                                 setattr(self, setting_name, env_value)
-                            logger.info(f"Applied environment override for {setting_name}")
+                            logger.debug(f"Applied environment override for {setting_name}")
                         # Add more type handling as needed
                     except Exception as e:
                         logger.warning(f"Failed to apply environment override for {setting_name}: {e}")

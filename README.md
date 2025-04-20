@@ -1,7 +1,8 @@
 # 🧰 Langgraph Agent Toolkit
 
-[![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
 [![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml)
+[![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit)
 [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml)
@@ -46,6 +47,7 @@ Features include:
    ```
 
 3. **Option 2: Run with Docker**
+
    ```sh
    docker compose watch
    ```
@@ -271,6 +273,7 @@ enables live reloading:
    - 📈 ClickHouse HTTP: `http://localhost:8123`
 
 4. Stop services:
+
    ```sh
    docker compose down
    ```

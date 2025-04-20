@@ -35,12 +35,9 @@ observability.push_prompt(
             content="messages",
         ),
     ],
-    create_new_version=True,
+    create_new_version=False,
 )
 
-print(observability.pull_prompt(name=PROMPT_NAME))
-
-# Create ObservabilityChatPromptTemplate that will load from observability platform at runtime
 prompt = ObservabilityChatPromptTemplate.from_observability_platform(
     prompt_name=PROMPT_NAME,
     observability_platform=observability,

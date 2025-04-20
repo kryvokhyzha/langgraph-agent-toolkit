@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.helper.constants import (
-    DEFAULT_AGENT,
     DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
     DEFAULT_RECURSION_LIMIT,
+    get_default_agent,
 )
 from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
 
@@ -35,7 +35,7 @@ class ServiceMetadata(BaseModel):
     )
     default_agent: str = Field(
         description="Default agent used when none is specified.",
-        examples=[DEFAULT_AGENT],
+        examples=[get_default_agent()],
     )
     default_model: AllModelEnum = Field(
         description="Default model used when none is specified.",
