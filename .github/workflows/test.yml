@@ -3,8 +3,18 @@ name: Build and test
 on:
   push:
     branches: ["main"]
+    paths:
+      - "docker/**"
+      - "langgraph_agent_toolkit/**"
+      - "tests/**"
+      - "pyproject.toml"
   pull_request:
     branches: ["main"]
+    paths:
+      - "docker/**"
+      - "langgraph_agent_toolkit/**"
+      - "tests/**"
+      - "pyproject.toml"
   workflow_call:
 
 permissions:
