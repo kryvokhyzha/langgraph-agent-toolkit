@@ -7,7 +7,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.schema import (
@@ -42,14 +42,14 @@ async def info(request: Request) -> ServiceMetadata:
     return ServiceMetadata(
         agents=get_all_agent_info(request),
         models=models,
-        default_agent=DEFAULT_AGENT,
+        default_agent=get_default_agent(),
         default_model=settings.DEFAULT_MODEL,
     )
 
 
 @private_router.post("/{agent_id}/invoke", tags=["agent"])
 @private_router.post("/invoke", tags=["agent"])
-async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> ChatMessage:
+async def invoke(user_input: UserInput, agent_id: str = None, request: Request = None) -> ChatMessage:
     """Invoke an agent with user input to retrieve a final response.
 
     If agent_id is not provided, the default agent will be used.
@@ -57,6 +57,9 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: 
     is also attached to messages for recording feedback.
     """
     executor = get_agent_executor(request)
+
+    if agent_id is None:
+        agent_id = get_default_agent()
 
     try:
         return await executor.invoke(
@@ -84,7 +87,7 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT, request: 
     responses=_sse_response_example(),
     tags=["agent"],
 )
-async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request: Request = None) -> StreamingResponse:
+async def stream(user_input: StreamInput, agent_id: str = None, request: Request = None) -> StreamingResponse:
     """Stream an agent's response to a user input, including intermediate messages and tokens.
 
     If agent_id is not provided, the default agent will be used.
@@ -93,6 +96,9 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request
 
     Set `stream_tokens=false` to return intermediate messages but not token-by-token.
     """
+    if agent_id is None:
+        agent_id = get_default_agent()
+
     return StreamingResponse(
         message_generator(user_input, request, agent_id),
         media_type="text/event-stream",
@@ -100,7 +106,9 @@ async def stream(user_input: StreamInput, agent_id: str = DEFAULT_AGENT, request
 
 
 @private_router.post("/feedback", status_code=status.HTTP_201_CREATED, tags=["feedback"])
-async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT, request: Request = None) -> FeedbackResponse:
+async def feedback(
+    feedback: Feedback, agent_id: str = get_default_agent(), request: Request = None
+) -> FeedbackResponse:
     """Record feedback for a run to the configured observability platform.
 
     This routes the feedback to the appropriate platform based on the agent's configuration.
@@ -130,7 +138,7 @@ async def feedback(feedback: Feedback, agent_id: str = DEFAULT_AGENT, request: R
 @private_router.post("/history", tags=["history"])
 def history(input: ChatHistoryInput, request: Request = None) -> ChatHistory:
     """Get chat history."""
-    agent: Agent = get_agent(request, DEFAULT_AGENT)
+    agent: Agent = get_agent(request, get_default_agent())
     try:
         agent_graph: CompiledStateGraph = agent.graph
         state_snapshot = agent_graph.get_state(

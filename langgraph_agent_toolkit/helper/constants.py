@@ -1,4 +1,18 @@
+# This is the initial default agent name, but it may be overridden at runtime
 DEFAULT_AGENT = "react-agent"
+_CURRENT_DEFAULT_AGENT = DEFAULT_AGENT
+
+
+def get_default_agent():
+    return _CURRENT_DEFAULT_AGENT
+
+
+def set_default_agent(agent_name):
+    global _CURRENT_DEFAULT_AGENT
+    _CURRENT_DEFAULT_AGENT = agent_name
+    return _CURRENT_DEFAULT_AGENT
+
+
 DEFAULT_MAX_MESSAGE_HISTORY_LENGTH = 6 + 1  # N messages + 1 system message
 DEFAULT_RECURSION_LIMIT = 25
 DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS = dict(

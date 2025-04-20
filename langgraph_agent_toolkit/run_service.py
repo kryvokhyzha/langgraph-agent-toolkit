@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from langgraph_agent_toolkit.service.factory import RunnerType, ServiceRunner
 
 
-load_dotenv()
+load_dotenv(override=True)
 
 if __name__ == "__main__":
     # Create and run the service with the ServiceRunner

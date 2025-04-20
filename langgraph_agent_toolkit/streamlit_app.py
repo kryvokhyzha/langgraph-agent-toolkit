@@ -54,7 +54,7 @@ async def main() -> None:
         st.rerun()
 
     if "agent_client" not in st.session_state:
-        load_dotenv()
+        load_dotenv(override=True)
         agent_url = os.getenv("AGENT_URL")
         if not agent_url:
             host = os.getenv("HOST", "0.0.0.0")

@@ -56,7 +56,6 @@ class ServiceRunner:
 
                     if env_value is not None:
                         os.environ[f"LANGGRAPH_{key}"] = env_value
-                        logger.info(f"Set environment variable LANGGRAPH_{key}={env_value}")
                 else:
                     logger.warning(f"Setting {key} not found in settings")
 
