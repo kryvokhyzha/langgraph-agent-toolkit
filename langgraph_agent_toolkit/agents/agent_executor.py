@@ -66,9 +66,9 @@ class AgentExecutor:
                 elif isinstance(agent_obj, Agent):
                     self.agents[agent_obj.name] = agent_obj
                 else:
-                    print(f"Warning: Object '{object_name}' is neither a graph nor an Agent instance")
+                    logger.warning(f"Object '{object_name}' is neither a graph nor an Agent instance")
             except (ImportError, AttributeError, ValueError) as e:
-                print(f"Error loading agent from '{import_str}': {e}")
+                logger.error(f"Error loading agent from '{import_str}': {e}")
 
     def _validate_default_agent_loaded(self) -> None:
         """Validate that a default agent is available and set it if needed.
