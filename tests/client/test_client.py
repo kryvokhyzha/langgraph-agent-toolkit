@@ -301,7 +301,7 @@ def test_info(agent_client):
     test_info = ServiceMetadata(
         default_agent="custom-agent",
         agents=[AgentInfo(key="custom-agent", description="Custom agent")],
-        default_model=OpenAICompatibleName.OPENAI_COMPATIBLE,
+        default_model_type=OpenAICompatibleName.OPENAI_COMPATIBLE,
         models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
     test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))

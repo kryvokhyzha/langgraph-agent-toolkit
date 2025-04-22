@@ -4,59 +4,60 @@ First off, thank you for considering contributing to `Langgraph Agent Toolkit`!
 
 ## Development Setup
 
-1.  Make sure you have Python 3.10+ installed
-2.  Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
-    package manager
-3.  Fork the repository
-4.  Clone your fork
+1. Make sure you have Python 3.10+ installed
+2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) package
+   manager
+3. Fork the repository
+4. Clone your fork
 
-    ```bash
-    git clone https://github.com/YOUR-USERNAME/langgraph-agent-toolkit.git
-    cd langgraph-agent-toolkit
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/langgraph-agent-toolkit.git
+   cd langgraph-agent-toolkit
 
-    # Add the upstream remote
-    git remote add upstream https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
-    ```
+   # Add the upstream remote
+   git remote add upstream https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
+   ```
 
-5.  Set up the development environment:
+5. Set up the development environment:
 
-    ```bash
-    uv sync
-    ```
+   ```bash
+   uv sync
+   ```
 
-    That's it! The `uv sync` command will automatically create and use a virtual
-    environment.
+   That's it! The `uv sync` command will automatically create and use a virtual
+   environment.
 
-6.  Install pre-commit hooks:
+6. Install pre-commit hooks:
 
-    ```bash
-    uv run pre-commit install
-    uv run pre-commit run
-    ```
+   ```bash
+   uv run pre-commit install
+   uv run pre-commit run
+   ```
 
-    Pre-commit hooks will automatically run checks (like ruff, formatting, etc.)
-    when you make a commit, ensuring your code follows our style guidelines.
+   Pre-commit hooks will automatically run checks (like ruff, formatting, etc.)
+   when you make a commit, ensuring your code follows our style guidelines.
 
 ### Running Commands
 
 You have two options for running commands:
 
-1.  **With the virtual environment activated**:
+1. **With the virtual environment activated**:
 
-    ```bash
-    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```bash
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-    # Then run commands directly
-    pytest
-    pre-commit run --all-files
-    ```
+   # Then run commands directly
+   pytest
+   pre-commit run --all-files
+   ```
 
-2.  **Without activating the virtual environment**:
-    ```bash
-    # Use uv run prefix for all commands
-    uv run pytest
-    uv run pre-commit run --all-files
-    ```
+2. **Without activating the virtual environment**:
+
+   ```bash
+   # Use uv run prefix for all commands
+   uv run pytest
+   uv run pre-commit run --all-files
+   ```
 
 Both approaches work - use whichever is more convenient for you.
 
@@ -69,26 +70,28 @@ Both approaches work - use whichever is more convenient for you.
 
 When adding new dependencies to the library:
 
-1.  **Runtime dependencies** - packages needed to run the application:
+1. **Runtime dependencies** - packages needed to run the application:
 
-    ```bash
-    uv add new-package
-    ```
+   ```bash
+   uv add new-package
+   ```
 
-2.  **Development dependencies** - packages needed for development, testing, or
-    CI:
-    ```bash
-    uv add --group dev new-package
-    ```
+2. **Development dependencies** - packages needed for development, testing, or
+   CI:
+
+   ```bash
+   uv add --group dev new-package
+   ```
 
 After adding dependencies, make sure to:
 
-1.  Test that everything works with the new package
-2.  Commit both `pyproject.toml` and `uv.lock` files:
-    ```bash
-    git add pyproject.toml uv.lock
-    git commit -m "Add new-package dependency"
-    ```
+1. Test that everything works with the new package
+2. Commit both `pyproject.toml` and `uv.lock` files:
+
+   ```bash
+   git add pyproject.toml uv.lock
+   git commit -m "Add new-package dependency"
+   ```
 
 ## Development Process
 

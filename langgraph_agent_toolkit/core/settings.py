@@ -39,8 +39,8 @@ class Settings(BaseSettings):
     AUTH_SECRET: SecretStr | None = None
     USE_FAKE_MODEL: bool = False
 
-    # If DEFAULT_MODEL is None, it will be set in model_post_init
-    DEFAULT_MODEL: AllModelEnum | None = None
+    # If DEFAULT_MODEL_TYPE is None, it will be set in model_post_init
+    DEFAULT_MODEL_TYPE: AllModelEnum | None = None
     AVAILABLE_MODELS: set[AllModelEnum] = Field(
         ...,
         description="Set of available models. If not set, all models will be available.",
@@ -48,9 +48,9 @@ class Settings(BaseSettings):
     )
 
     # Set openai compatible api, mainly used for proof of concept
-    COMPATIBLE_MODEL: str | None = None
-    COMPATIBLE_API_KEY: SecretStr | None = None
-    COMPATIBLE_BASE_URL: str | None = None
+    MODEL_NAME: str | None = None
+    MODEL_API_KEY: SecretStr | None = None
+    MODEL_BASE_URL: str | None = None
 
     # Observability platform
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
@@ -89,7 +89,7 @@ class Settings(BaseSettings):
         self._apply_langgraph_env_overrides()
 
         api_keys = {
-            Provider.OPENAI_COMPATIBLE: self.COMPATIBLE_BASE_URL and self.COMPATIBLE_MODEL,
+            Provider.OPENAI_COMPATIBLE: self.MODEL_BASE_URL and self.MODEL_NAME,
             Provider.FAKE: self.USE_FAKE_MODEL,
         }
         active_keys = [k for k, v in api_keys.items() if v]
@@ -99,12 +99,12 @@ class Settings(BaseSettings):
         for provider in active_keys:
             match provider:
                 case Provider.OPENAI_COMPATIBLE:
-                    if self.DEFAULT_MODEL is None:
-                        self.DEFAULT_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
+                    if self.DEFAULT_MODEL_TYPE is None:
+                        self.DEFAULT_MODEL_TYPE = OpenAICompatibleName.OPENAI_COMPATIBLE
                     self.AVAILABLE_MODELS.update(set(OpenAICompatibleName))
                 case Provider.FAKE:
-                    if self.DEFAULT_MODEL is None:
-                        self.DEFAULT_MODEL = FakeModelName.FAKE
+                    if self.DEFAULT_MODEL_TYPE is None:
+                        self.DEFAULT_MODEL_TYPE = FakeModelName.FAKE
                     self.AVAILABLE_MODELS.update(set(FakeModelName))
                 case _:
                     raise ValueError(f"Unknown provider: {provider}")

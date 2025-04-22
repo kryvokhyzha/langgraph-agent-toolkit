@@ -16,11 +16,6 @@ model_list:
     model_info:
       supported_environments: ["development", "production", "staging"]
 
-litellm_settings:
-  num_retries: 2 # retry call 3 times on each model_name (e.g. zephyr-beta)
-  request_timeout: 40 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
-  allowed_fails: 3 # cooldown model if it fails > 1 call in a minute.
-
 credential_list:
   - credential_name: default_azure_credential
     credential_values:
@@ -29,6 +24,12 @@ credential_list:
       api_version: "2023-05-15"
     credential_info:
       description: "Production credentials for EU region"
+
+litellm_settings:
+  drop_params: True
+  num_retries: 2 # retry call 3 times on each model_name (e.g. zephyr-beta)
+  request_timeout: 40 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
+  allowed_fails: 3 # cooldown model if it fails > 1 call in a minute.
 
 router_settings: # router_settings are optional
   routing_strategy: latency-based-routing # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
@@ -41,3 +42,6 @@ router_settings: # router_settings are optional
 
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
+  database_connection_pool_limit: 1000
+  store_model_in_db: True
+  store_prompts_in_spend_logs: True

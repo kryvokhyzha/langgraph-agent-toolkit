@@ -29,7 +29,7 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
 
 
 async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
-    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL_TYPE))
     model_runnable = wrap_model(m)
     response = await model_runnable.ainvoke(state, config)
 

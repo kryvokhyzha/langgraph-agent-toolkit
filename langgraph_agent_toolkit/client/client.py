@@ -26,7 +26,7 @@ class AgentClient:
     def __init__(
         self,
         base_url: str = "http://0.0.0.0",
-        agent: str = None,
+        agent: str | None = None,
         timeout: float | None = None,
         get_info: bool = True,
         verify: bool = False,
@@ -71,7 +71,7 @@ class AgentClient:
         except httpx.HTTPError as e:
             raise AgentClientError(f"Error getting service info: {e}")
 
-        self.info: ServiceMetadata = ServiceMetadata.model_validate(response.json())
+        self.info = ServiceMetadata.model_validate(response.json())
         if not self.agent or self.agent not in [a.key for a in self.info.agents]:
             self.agent = self.info.default_agent
 
@@ -89,6 +89,7 @@ class AgentClient:
         message: str,
         model: str | None = None,
         thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
         """Invoke the agent asynchronously. Only the final message is returned.
@@ -97,6 +98,7 @@ class AgentClient:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
         Returns:
@@ -105,6 +107,7 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
         request = UserInput(message=message)
         if thread_id:
             request.thread_id = thread_id
@@ -112,6 +115,9 @@ class AgentClient:
             request.model = model
         if agent_config:
             request.agent_config = agent_config
+        if user_id:
+            request.user_id = user_id
+
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
@@ -131,6 +137,7 @@ class AgentClient:
         message: str,
         model: str | None = None,
         thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
         """Invoke the agent synchronously. Only the final message is returned.
@@ -139,6 +146,7 @@ class AgentClient:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
         Returns:
@@ -147,6 +155,7 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
         request = UserInput(message=message)
         if thread_id:
             request.thread_id = thread_id
@@ -154,6 +163,9 @@ class AgentClient:
             request.model = model
         if agent_config:
             request.agent_config = agent_config
+        if user_id:
+            request.user_id = user_id
+
         try:
             response = httpx.post(
                 f"{self.base_url}/{self.agent}/invoke",
@@ -188,7 +200,8 @@ class AgentClient:
                     # Yield the str token directly
                     return parsed["content"]
                 case "error":
-                    raise Exception(parsed["content"])
+                    error_msg = "Error: " + parsed["content"]
+                    return ChatMessage(type="ai", content=error_msg)
         return None
 
     def stream(
@@ -196,6 +209,7 @@ class AgentClient:
         message: str,
         model: str | None = None,
         thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> Generator[ChatMessage | str, None, None]:
@@ -209,6 +223,7 @@ class AgentClient:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
@@ -219,6 +234,7 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
         request = StreamInput(message=message, stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
@@ -226,6 +242,9 @@ class AgentClient:
             request.model = model
         if agent_config:
             request.agent_config = agent_config
+        if user_id:
+            request.user_id = user_id
+
         try:
             with httpx.stream(
                 "POST",
@@ -249,6 +268,7 @@ class AgentClient:
         message: str,
         model: str | None = None,
         thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> AsyncGenerator[ChatMessage | str, None]:
@@ -262,6 +282,7 @@ class AgentClient:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
@@ -272,6 +293,7 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
         request = StreamInput(message=message, stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
@@ -279,6 +301,9 @@ class AgentClient:
             request.model = model
         if agent_config:
             request.agent_config = agent_config
+        if user_id:
+            request.user_id = user_id
+
         async with httpx.AsyncClient() as client:
             try:
                 async with client.stream(
@@ -298,14 +323,16 @@ class AgentClient:
             except httpx.HTTPError as e:
                 raise AgentClientError(f"Error: {e}")
 
-    async def acreate_feedback(self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}) -> None:
+    async def acreate_feedback(
+        self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}, user_id: str | None = None
+    ) -> None:
         """Create a feedback record for a run.
 
         This is a simple wrapper for the LangSmith create_feedback API, so the
         credentials can be stored and managed in the service rather than the client.
         See: https://api.smith.langchain.com/redoc#tag/feedback/operation/create_feedback_api_v1_feedback_post
         """
-        request = Feedback(run_id=run_id, key=key, score=score, kwargs=kwargs)
+        request = Feedback(run_id=run_id, key=key, score=score, user_id=user_id, kwargs=kwargs)
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
@@ -322,14 +349,16 @@ class AgentClient:
     def get_history(
         self,
         thread_id: str,
+        user_id: str | None = None,
     ) -> ChatHistory:
         """Get chat history.
 
         Args:
             thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
 
         """
-        request = ChatHistoryInput(thread_id=thread_id)
+        request = ChatHistoryInput(thread_id=thread_id, user_id=user_id)
         try:
             response = httpx.post(
                 f"{self.base_url}/history",

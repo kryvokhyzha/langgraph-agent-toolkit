@@ -1,13 +1,18 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
+from typing import TypeVar
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.store.postgres.aio import AsyncPostgresStore
 from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 
 from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
+
+
+T = TypeVar("T")
 
 
 class PostgresMemoryBackend(BaseMemoryBackend):
@@ -41,11 +46,16 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         )
 
     @asynccontextmanager
-    async def get_saver(self) -> AsyncGenerator[AsyncPostgresSaver, None]:
-        """Asynchronous context manager for acquiring and releasing the PostgreSQL connection pool.
+    async def _get_connection_context(
+        self, factory_func: Callable[[AsyncConnectionPool], T]
+    ) -> AsyncGenerator[T, None]:
+        """Yield the result of the factory function.
+
+        Args:
+            factory_func: Function that creates the appropriate object from the connection pool
 
         Yields:
-            AsyncPostgresSaver: The database saver instance
+            The object created by the factory_func
 
         """
         conn_string = self.get_connection_string()
@@ -66,11 +76,38 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             logger.info("PostgreSQL connection pool opened successfully")
 
             try:
-                yield AsyncPostgresSaver(conn=pool)
+                yield factory_func(pool)
             finally:
                 logger.info("PostgreSQL connection pool will be closed automatically")
+
+    @asynccontextmanager
+    async def get_saver(self) -> AsyncGenerator[AsyncPostgresSaver, None]:
+        """Asynchronous context manager for acquiring a PostgreSQL saver.
+
+        Yields:
+            AsyncPostgresSaver: The database saver instance
+
+        """
+        async with self._get_connection_context(lambda pool: AsyncPostgresSaver(conn=pool)) as saver:
+            yield saver
+
+    @asynccontextmanager
+    async def get_store(self) -> AsyncGenerator[AsyncPostgresStore, None]:
+        """Asynchronous context manager for acquiring a PostgreSQL store.
+
+        Yields:
+            AsyncPostgresStore: The database store instance
+
+        """
+        async with self._get_connection_context(lambda pool: AsyncPostgresStore(conn=pool)) as store:
+            yield store
 
     def get_checkpoint_saver(self) -> AbstractAsyncContextManager[AsyncPostgresSaver]:
         """Initialize and return a PostgreSQL saver instance."""
         self.validate_config()
         return self.get_saver()
+
+    def get_memory_store(self) -> AbstractAsyncContextManager[AsyncPostgresStore]:
+        """Initialize and return a PostgreSQL store instance."""
+        self.validate_config()
+        return self.get_store()

@@ -23,7 +23,7 @@ react_agent_so = Agent(
     name="react-agent-so",
     description="A react agent with structured output.",
     graph=create_react_agent(
-        model=ModelFactory.create(settings.DEFAULT_MODEL),
+        model=ModelFactory.create(settings.DEFAULT_MODEL_TYPE),
         tools=[add, multiply, DuckDuckGoSearchResults()],
         prompt=(
             "You are a team support agent that can perform calculations and search the web. "

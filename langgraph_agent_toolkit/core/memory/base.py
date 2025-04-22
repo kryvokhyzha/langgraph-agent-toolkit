@@ -31,3 +31,13 @@ class BaseMemoryBackend(ABC):
 
         """
         pass
+
+    @abstractmethod
+    def get_memory_store(self) -> AbstractAsyncContextManager[T]:
+        """Get the memory store for the memory backend.
+
+        Returns:
+            A configured memory store
+
+        """
+        pass

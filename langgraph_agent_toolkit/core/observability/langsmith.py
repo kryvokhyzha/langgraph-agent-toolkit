@@ -35,6 +35,12 @@ class LangsmithObservability(BaseObservabilityPlatform):
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
         """Record feedback for a run to LangSmith."""
         client = LangsmithClient()
+
+        if "user_id" in kwargs:
+            user_id = kwargs.pop("user_id")
+            kwargs["extra"] = kwargs["extra"] or {}
+            kwargs["extra"]["user_id"] = user_id
+
         client.create_feedback(
             run_id=run_id,
             key=key,

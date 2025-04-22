@@ -1,15 +1,16 @@
 import asyncio
 import os
 import urllib.parse
+import uuid
 from collections.abc import AsyncGenerator
 from typing import List
 
 import streamlit as st
 from dotenv import load_dotenv
 from pydantic import ValidationError
-from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
+from langgraph_agent_toolkit.helper.constants import DEFAULT_STREAMLIT_USER_ID
 from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.schema.task_data import TaskData, TaskDataStatus
 
@@ -72,11 +73,14 @@ async def main() -> None:
     if "thread_id" not in st.session_state:
         thread_id = st.query_params.get("thread_id")
         if not thread_id:
-            thread_id = get_script_run_ctx().session_id
+            thread_id = str(uuid.uuid4())
             messages = []
         else:
             try:
-                messages: List[ChatMessage] = agent_client.get_history(thread_id=thread_id).messages
+                messages: List[ChatMessage] = agent_client.get_history(
+                    thread_id=thread_id,
+                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                ).messages
             except AgentClientError:
                 st.error("No message history found for this Thread ID.")
                 messages = []
@@ -86,10 +90,18 @@ async def main() -> None:
     # Config options
     with st.sidebar:
         st.header(f"{APP_ICON} {APP_TITLE}")
+
         ""
         "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
+        ""
+
+        if st.button(":material/chat: New Chat", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.thread_id = str(uuid.uuid4())
+            st.rerun()
+
         with st.popover(":material/settings: Settings", use_container_width=True):
-            model_idx = agent_client.info.models.index(agent_client.info.default_model)
+            model_idx = agent_client.info.models.index(agent_client.info.default_model_type)
             model = st.selectbox("LLM to use", options=agent_client.info.models, index=model_idx)
             agent_list = [a.key for a in agent_client.info.agents]
             agent_idx = agent_list.index(agent_client.info.default_agent)
@@ -173,6 +185,7 @@ async def main() -> None:
                     message=user_input,
                     model=model,
                     thread_id=st.session_state.thread_id,
+                    user_id=DEFAULT_STREAMLIT_USER_ID,
                 )
                 await draw_messages(stream, is_new=True)
             else:
@@ -180,6 +193,7 @@ async def main() -> None:
                     message=user_input,
                     model=model,
                     thread_id=st.session_state.thread_id,
+                    user_id=DEFAULT_STREAMLIT_USER_ID,
                 )
                 messages.append(response)
                 st.chat_message("assistant").write(response.content)
@@ -356,6 +370,7 @@ async def handle_feedback() -> None:
                 key="human-feedback-stars",
                 score=normalized_score,
                 kwargs={"comment": "In-line human feedback"},
+                user_id=DEFAULT_STREAMLIT_USER_ID,
             )
         except AgentClientError as e:
             st.error(f"Error recording feedback: {e}")

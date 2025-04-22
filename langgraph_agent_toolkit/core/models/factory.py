@@ -17,7 +17,7 @@ from typing_extensions import TypeAlias
 
 from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
 from langgraph_agent_toolkit.core.settings import settings
-from langgraph_agent_toolkit.helper.constants import DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS
+from langgraph_agent_toolkit.helper.constants import DEFAULT_OPENAI_MODEL_TYPE_PARAMS
 from langgraph_agent_toolkit.schema.models import (
     AllModelEnum,
     FakeModelName,
@@ -33,7 +33,7 @@ class ModelFactory:
 
     # Map model enum names to their respective API model names
     _MODEL_TABLE = {
-        OpenAICompatibleName.OPENAI_COMPATIBLE: settings.COMPATIBLE_MODEL,
+        OpenAICompatibleName.OPENAI_COMPATIBLE: settings.MODEL_NAME,
         FakeModelName.FAKE: "fake",
     }
 
@@ -98,17 +98,17 @@ class ModelFactory:
 
         match model_name:
             case name if name in OpenAICompatibleName:
-                if not settings.COMPATIBLE_BASE_URL or not settings.COMPATIBLE_MODEL:
+                if not settings.MODEL_BASE_URL or not settings.MODEL_NAME:
                     raise ValueError("OpenAICompatible base url and endpoint must be configured")
 
                 model = ModelFactory.init_chat_model(
-                    model=settings.COMPATIBLE_MODEL,
+                    model=settings.MODEL_NAME,
                     model_provider="openai",
                     configurable_fields=("temperature", "max_tokens", "top_p", "streaming"),
                     config_prefix="agent",
-                    openai_api_base=settings.COMPATIBLE_BASE_URL,
-                    openai_api_key=settings.COMPATIBLE_API_KEY,
-                    **DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
+                    openai_api_base=settings.MODEL_BASE_URL,
+                    openai_api_key=settings.MODEL_API_KEY,
+                    **DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
                 )
 
                 return model

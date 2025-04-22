@@ -9,7 +9,7 @@ from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 
 
-model = ModelFactory.create(settings.DEFAULT_MODEL)
+model = ModelFactory.create(settings.DEFAULT_MODEL_TYPE)
 
 math_agent = create_react_agent(
     model=model,
