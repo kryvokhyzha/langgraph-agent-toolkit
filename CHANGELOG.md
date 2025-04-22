@@ -8,10 +8,21 @@ and this project adheres to
 
 ## [0.1.2]
 
+### Added
+
+- `user_id` parameter
+- `store` creator to memory classes
+
 ### Fixed
 
 - enhance error handling and testing in Streamlit app
 - add new chat button
+- variable names
+- type hints
+
+### Removed
+
+- print statements
 
 ## [0.1.1]
 
