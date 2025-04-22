@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.1.1"
+version = "0.1.2"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }]
@@ -113,7 +113,7 @@ deploy-all = [
 [project.urls]
 # documentation = "https://langgraph-agent-toolkit.readthedocs.org"
 repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
-#"PyPI" = "https://pypi.org/project/xxxx/"
+"PyPI" = "https://pypi.org/project/langgraph-agent-toolkit"
 
 [tool.hatch.build.targets.wheel]
 packages = ["langgraph_agent_toolkit"]
@@ -149,13 +149,11 @@ exclude=[
 ]
 
 [tool.ruff.per-file-ignores]
-# It's fine not to put the import at the top of the file in the examples
-# folder.
 "langgraph_agent_toolkit/run_agent.py"=["E402"]
 "langgraph_agent_toolkit/service/factory.py"=["F821"]
 
 [tool.ruff.lint.isort]
-lines-after-imports = 2     # Use a single line after each import block.
+lines-after-imports = 2
 
 [tool.nbqa.config]
 black = "pyproject.toml"

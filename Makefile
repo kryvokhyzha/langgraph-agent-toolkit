@@ -35,7 +35,7 @@ pre_commit_rm_hooks:
 	pre-commit --uninstall-hooks
 
 push_new_tag:
-	sh .github/release/tag_from_pyproject.sh
+	sh .github/scripts/tag_from_pyproject.sh
 
 run_langgraph:
 	uv run langgraph dev
