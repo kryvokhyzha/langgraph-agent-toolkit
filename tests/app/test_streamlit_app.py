@@ -6,9 +6,9 @@ import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 from langgraph_agent_toolkit.client import AgentClientError
+from langgraph_agent_toolkit.helper.constants import DEFAULT_STREAMLIT_USER_ID
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage
 from langgraph_agent_toolkit.schema.models import FakeModelName
-from langgraph_agent_toolkit.streamlit_app import USER_ID
 
 
 class MockUUID:
@@ -72,6 +72,7 @@ def test_app_settings(mock_agent_client):
         message=PROMPT,
         model=FakeModelName.FAKE,
         thread_id=at.session_state.thread_id,
+        user_id=DEFAULT_STREAMLIT_USER_ID,
     )
     assert not at.exception
 
@@ -95,10 +96,10 @@ def test_app_thread_id_history(mock_handle_feedback, mock_draw_messages, mock_ag
 
     # Call manually the portion of code that would check history
     # This is a stripped-down version of what would happen in the main() function
-    client_instance.get_history(thread_id="1234", user_id=USER_ID)
+    client_instance.get_history(thread_id="1234", user_id=DEFAULT_STREAMLIT_USER_ID)
 
     # Assert get_history was called with correct parameters including user_id
-    client_instance.get_history.assert_called_once_with(thread_id="1234", user_id=USER_ID)
+    client_instance.get_history.assert_called_once_with(thread_id="1234", user_id=DEFAULT_STREAMLIT_USER_ID)
 
 
 @pytest.mark.asyncio

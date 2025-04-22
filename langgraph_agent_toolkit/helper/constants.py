@@ -22,3 +22,5 @@ DEFAULT_OPENAI_MODEL_TYPE_PARAMS = dict(
     streaming=True,
 )
 DEFAULT_CACHE_TTL_SECOND = 60 * 10  # 10 minutes
+
+DEFAULT_STREAMLIT_USER_ID = "streamlit-user"

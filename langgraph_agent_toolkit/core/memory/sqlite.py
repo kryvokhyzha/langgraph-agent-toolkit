@@ -19,3 +19,9 @@ class SQLiteMemoryBackend(BaseMemoryBackend):
         """Initialize and return a SQLite saver instance."""
         self.validate_config()
         return AsyncSqliteSaver.from_conn_string(settings.SQLITE_DB_PATH)
+
+    def get_memory_store(self) -> AbstractAsyncContextManager[AsyncSqliteSaver]:
+        """Initialize and return a SQLite saver instance."""
+        raise NotImplementedError(
+            "`SQLiteMemoryBackend` does not support get_memory_store. Use `get_checkpoint_saver` instead."
+        )
