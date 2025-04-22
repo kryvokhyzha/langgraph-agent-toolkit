@@ -27,6 +27,7 @@ from langgraph_agent_toolkit.schema.task_data import TaskData, TaskDataStatus
 
 APP_TITLE = "Agent Service Toolkit"
 APP_ICON = "🧰"
+USER_ID = "streamlit-user"
 
 
 async def main() -> None:
@@ -76,7 +77,7 @@ async def main() -> None:
             messages = []
         else:
             try:
-                messages: List[ChatMessage] = agent_client.get_history(thread_id=thread_id).messages
+                messages: List[ChatMessage] = agent_client.get_history(thread_id=thread_id, user_id=USER_ID).messages
             except AgentClientError:
                 st.error("No message history found for this Thread ID.")
                 messages = []
@@ -364,6 +365,7 @@ async def handle_feedback() -> None:
                 key="human-feedback-stars",
                 score=normalized_score,
                 kwargs={"comment": "In-line human feedback"},
+                user_id=USER_ID,
             )
         except AgentClientError as e:
             st.error(f"Error recording feedback: {e}")

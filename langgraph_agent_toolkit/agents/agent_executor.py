@@ -171,6 +171,7 @@ class AgentExecutor:
         agent_id: str,
         message: str,
         thread_id: Optional[str] = None,
+        user_id: Optional[str] = None,
         model: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
@@ -181,6 +182,7 @@ class AgentExecutor:
             agent_id: ID of the agent to invoke
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
+            user_id: Optional user ID for the agent
             model: Optional model name to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
@@ -203,6 +205,7 @@ class AgentExecutor:
 
         configurable = {
             "thread_id": thread_id,
+            "user_id": user_id,
         }
 
         if model:
@@ -211,7 +214,7 @@ class AgentExecutor:
         if agent_config:
             configurable.update(agent_config)
 
-        callback = agent.observability.get_callback_handler(session_id=thread_id)
+        callback = agent.observability.get_callback_handler(session_id=thread_id, user_id=user_id)
 
         config = RunnableConfig(
             configurable=configurable,
@@ -239,6 +242,7 @@ class AgentExecutor:
         agent_id: str,
         message: str,
         thread_id: Optional[str] = None,
+        user_id: Optional[str] = None,
         model: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
@@ -249,6 +253,7 @@ class AgentExecutor:
             agent_id: ID of the agent to invoke
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
+            user_id: Optional user ID for the agent
             model: Optional model name to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
@@ -261,6 +266,7 @@ class AgentExecutor:
             agent_id=agent_id,
             message=message,
             thread_id=thread_id,
+            user_id=user_id,
             model=model,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
@@ -293,6 +299,7 @@ class AgentExecutor:
         agent_id: str,
         message: str,
         thread_id: Optional[str] = None,
+        user_id: Optional[str] = None,
         model: Optional[str] = None,
         stream_tokens: bool = True,
         agent_config: Optional[Dict[str, Any]] = None,
@@ -304,6 +311,7 @@ class AgentExecutor:
             agent_id: ID of the agent to invoke
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
+            user_id: Optional user ID for the agent
             model: Optional model name to override the default
             stream_tokens: Whether to stream individual tokens
             agent_config: Optional additional configuration for the agent
@@ -317,6 +325,7 @@ class AgentExecutor:
             agent_id=agent_id,
             message=message,
             thread_id=thread_id,
+            user_id=user_id,
             model=model,
             agent_config=agent_config,
             recursion_limit=recursion_limit,

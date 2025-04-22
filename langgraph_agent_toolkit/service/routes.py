@@ -66,6 +66,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
             agent_id=agent_id,
             message=user_input.message,
             thread_id=user_input.thread_id,
+            user_id=user_input.user_id,
             model=user_input.model,
             agent_config=user_input.agent_config,
             recursion_limit=user_input.recursion_limit,
@@ -119,6 +120,7 @@ async def feedback(
             run_id=feedback.run_id,
             key=feedback.key,
             score=feedback.score,
+            user_id=feedback.user_id,
             **feedback.kwargs,
         )
 
@@ -145,6 +147,7 @@ def history(input: ChatHistoryInput, request: Request = None) -> ChatHistory:
             config=RunnableConfig(
                 configurable={
                     "thread_id": input.thread_id,
+                    "user_id": input.user_id,
                 }
             )
         )

@@ -345,6 +345,7 @@ The project works with
 ## 📚 Useful Resources
 
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
+- [LangGraph Memory Concept](https://langchain-ai.github.io/langgraph/concepts/memory/)
 - [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
 - [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 

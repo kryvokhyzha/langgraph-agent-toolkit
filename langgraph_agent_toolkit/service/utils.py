@@ -76,6 +76,7 @@ async def message_generator(
             agent_id=agent_id,
             message=user_input.message,
             thread_id=user_input.thread_id,
+            user_id=user_input.user_id,
             model=user_input.model,
             stream_tokens=user_input.stream_tokens,
             agent_config=user_input.agent_config,

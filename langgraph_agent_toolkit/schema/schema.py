@@ -60,6 +60,11 @@ class UserInput(BaseModel):
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
+    user_id: str | None = Field(
+        description="User ID to persist in observability platform and share long-term memory.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
     agent_config: dict[str, Any] = Field(
         description="Additional configuration to pass through to the agent",
         default={},
@@ -161,6 +166,11 @@ class Feedback(BaseModel):
         description="Feedback score.",
         examples=[0.8],
     )
+    user_id: str | None = Field(
+        description="User ID to associate with the feedback.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
     kwargs: dict[str, Any] = Field(
         description="Additional feedback kwargs, passed to LangSmith.",
         default={},
@@ -188,6 +198,11 @@ class ChatHistoryInput(BaseModel):
     thread_id: str = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    user_id: str | None = Field(
+        description="User ID to persist in observability platform and share long-term memory.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
 
 

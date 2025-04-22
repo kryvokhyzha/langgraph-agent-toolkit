@@ -356,10 +356,12 @@ def test_feedback(test_client, mock_agent, mock_agent_executor) -> None:
                 ),
             }
 
+            # Updated assertion to include user_id=None
             mock_agent.observability.record_feedback.assert_called_once_with(
                 run_id="847c6285-8fc9-4560-a83f-4e6285809254",
                 key="human-feedback-stars",
                 score=0.8,
+                user_id=None,
                 comment="Great response!",
             )
 
@@ -459,11 +461,12 @@ def test_feedback_langsmith(mock_client: langsmith.Client, test_client, mock_age
                 ),
             }
 
-            # Verify that the agent's observability platform's record_feedback method was called correctly
+            # Updated assertion to include user_id=None
             mock_agent.observability.record_feedback.assert_called_once_with(
                 run_id="847c6285-8fc9-4560-a83f-4e6285809254",
                 key="human-feedback-stars",
                 score=0.8,
+                user_id=None,
             )
 
 
@@ -488,7 +491,10 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         with patch("langgraph_agent_toolkit.service.routes.get_agent", return_value=mock_agent):
-            response = test_client.post("/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6"})
+            # Add user_id=None to the request
+            response = test_client.post(
+                "/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6", "user_id": None}
+            )
             assert response.status_code == 200
 
             output = ChatHistory.model_validate(response.json())
