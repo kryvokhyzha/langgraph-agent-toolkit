@@ -15,7 +15,7 @@ def mock_agent_client(mock_env):
             AgentInfo(key="test-agent", description="Test agent"),
             AgentInfo(key="chatbot", description="Chatbot"),
         ],
-        default_model=OpenAICompatibleName.OPENAI_COMPATIBLE,
+        default_model_type=OpenAICompatibleName.OPENAI_COMPATIBLE,
         models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
 

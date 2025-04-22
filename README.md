@@ -113,9 +113,9 @@ Features include:
 
    ```env
    # LiteLLM configuration
-   COMPATIBLE_MODEL="gpt4o"                        # LiteLLM model name
-   COMPATIBLE_BASE_URL=http://litellm:4000/v1      # LiteLLM endpoint
-   COMPATIBLE_API_KEY=sk-any-string                # LiteLLM master key
+   MODEL_NAME="gpt4o"                         # LiteLLM model name
+   MODEL_BASE_URL=http://litellm:4000/v1      # LiteLLM endpoint
+   MODEL_API_KEY=sk-any-string                # LiteLLM master key
    ```
 
    **🗄️ Database Configuration**

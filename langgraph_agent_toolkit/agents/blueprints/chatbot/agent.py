@@ -22,7 +22,7 @@ async def chatbot(
     if previous:
         messages = previous["messages"] + messages
 
-    model = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    model = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL_TYPE))
     response = await model.ainvoke(messages)
     return entrypoint.final(value={"messages": [response]}, save={"messages": messages + [response]})
 

@@ -51,9 +51,9 @@ jobs:
         run: |
           uv run pytest --cov=langgraph_agent_toolkit/ --cov-report=xml
         env:
-          COMPATIBLE_MODEL: ${{ secrets.COMPATIBLE_MODEL }}
-          COMPATIBLE_API_KEY: ${{ secrets.COMPATIBLE_API_KEY }}
-          COMPATIBLE_BASE_URL: ${{ secrets.COMPATIBLE_BASE_URL }}
+          MODEL_NAME: ${{ secrets.MODEL_NAME }}
+          MODEL_API_KEY: ${{ secrets.MODEL_API_KEY }}
+          MODEL_BASE_URL: ${{ secrets.MODEL_BASE_URL }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

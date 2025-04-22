@@ -44,7 +44,7 @@ Don't tell the user what their sign is, you are just demonstrating your knowledg
 
 async def background(state: AgentState, config: RunnableConfig) -> AgentState:
     """Demonstrate doing work before the interrupt."""
-    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL_TYPE))
     model_runnable = wrap_model(m, background_prompt.format())
     response = await model_runnable.ainvoke(state, config)
 
@@ -74,7 +74,7 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
 
     If no birthdate is found, it will perform an interrupt before proceeding.
     """
-    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL_TYPE))
     model_runnable = wrap_model(
         m.with_structured_output(BirthdateExtraction),
         birthdate_extraction_prompt.format(),
@@ -117,7 +117,7 @@ async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentStat
     if not state.get("birthdate"):
         raise ValueError("No birthdate found in state")
 
-    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL))
+    m = ModelFactory.create(config["configurable"].get("model", settings.DEFAULT_MODEL_TYPE))
     model_runnable = wrap_model(m, sign_prompt.format(birthdate=state["birthdate"].strftime("%Y-%m-%d")))
     response = await model_runnable.ainvoke(state, config)
 

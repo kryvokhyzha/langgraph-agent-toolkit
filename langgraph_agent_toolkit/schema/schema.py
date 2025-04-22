@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.helper.constants import (
-    DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
+    DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
     DEFAULT_RECURSION_LIMIT,
     get_default_agent,
 )
@@ -37,7 +37,7 @@ class ServiceMetadata(BaseModel):
         description="Default agent used when none is specified.",
         examples=[get_default_agent()],
     )
-    default_model: AllModelEnum = Field(
+    default_model_type: AllModelEnum = Field(
         description="Default model used when none is specified.",
     )
 
@@ -66,7 +66,7 @@ class UserInput(BaseModel):
         examples=[
             {
                 "memory_saver_params": {"k": 6},
-                **DEFAULT_OPENAI_COMPATIBLE_MODEL_PARAMS,
+                **DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
             },
         ],
     )

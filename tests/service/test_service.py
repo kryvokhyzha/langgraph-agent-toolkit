@@ -501,7 +501,7 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
 def test_info(test_client, mock_settings, mock_agent_executor) -> None:
     """Test that /info returns the correct service metadata."""
     mock_settings.AUTH_SECRET = None
-    mock_settings.DEFAULT_MODEL = OpenAICompatibleName.OPENAI_COMPATIBLE
+    mock_settings.DEFAULT_MODEL_TYPE = OpenAICompatibleName.OPENAI_COMPATIBLE
     mock_settings.AVAILABLE_MODELS = {OpenAICompatibleName.OPENAI_COMPATIBLE}
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
@@ -518,7 +518,7 @@ def test_info(test_client, mock_settings, mock_agent_executor) -> None:
     assert output.agents[0].key == "base-agent"
     assert output.agents[0].description == "A base agent."
 
-    assert output.default_model == OpenAICompatibleName.OPENAI_COMPATIBLE
+    assert output.default_model_type == OpenAICompatibleName.OPENAI_COMPATIBLE
     assert output.models == [OpenAICompatibleName.OPENAI_COMPATIBLE]
 
 

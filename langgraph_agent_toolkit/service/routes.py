@@ -43,7 +43,7 @@ async def info(request: Request) -> ServiceMetadata:
         agents=get_all_agent_info(request),
         models=models,
         default_agent=get_default_agent(),
-        default_model=settings.DEFAULT_MODEL,
+        default_model_type=settings.DEFAULT_MODEL_TYPE,
     )
 
 

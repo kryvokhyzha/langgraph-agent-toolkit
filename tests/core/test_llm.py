@@ -19,9 +19,9 @@ def test_get_model_openai_compatible():
 
     with patch("langgraph_agent_toolkit.core.models.factory.settings") as mock_settings:
         # Mock the settings attributes directly
-        mock_settings.COMPATIBLE_MODEL = "gpt-4"
-        mock_settings.COMPATIBLE_BASE_URL = "http://api.example.com"
-        mock_settings.COMPATIBLE_API_KEY = "test_key"
+        mock_settings.MODEL_NAME = "gpt-4"
+        mock_settings.MODEL_BASE_URL = "http://api.example.com"
+        mock_settings.MODEL_API_KEY = "test_key"
 
         model = ModelFactory.create(OpenAICompatibleName.OPENAI_COMPATIBLE)
         assert isinstance(model, (ChatOpenAI, RunnableSerializable, _ConfigurableModel))
@@ -37,8 +37,8 @@ def test_get_model_openai_compatible_missing_config():
 
     with patch("langgraph_agent_toolkit.core.models.factory.settings") as mock_settings:
         # Set the required attributes to None to simulate missing configuration
-        mock_settings.COMPATIBLE_BASE_URL = None
-        mock_settings.COMPATIBLE_MODEL = None
+        mock_settings.MODEL_BASE_URL = None
+        mock_settings.MODEL_NAME = None
 
         with pytest.raises(ValueError, match="OpenAICompatible base url and endpoint must be configured"):
             ModelFactory.create(OpenAICompatibleName.OPENAI_COMPATIBLE)
