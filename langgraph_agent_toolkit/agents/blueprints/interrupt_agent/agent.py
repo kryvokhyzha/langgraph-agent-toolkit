@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import Any, cast
 
 from langchain.prompts import SystemMessagePromptTemplate
+from langchain_core.language_models.base import LanguageModelInput
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnableSerializable
+from langchain_core.runnables import Runnable, RunnableConfig, RunnableLambda, RunnableSerializable
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import interrupt
@@ -24,7 +25,9 @@ class AgentState(MessagesState, total=False):
     birthdate: datetime | None
 
 
-def wrap_model(model: BaseChatModel, system_prompt: BaseMessage) -> RunnableSerializable[Any, BaseMessage]:
+def wrap_model(
+    model: BaseChatModel | Runnable[LanguageModelInput, Any], system_prompt: BaseMessage
+) -> RunnableSerializable[Any, BaseMessage]:
     preprocessor = RunnableLambda(
         lambda state: [system_prompt] + state["messages"],
         name="StateModifier",
@@ -76,8 +79,7 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
         m.with_structured_output(BirthdateExtraction),
         birthdate_extraction_prompt.format(),
     ).with_config(tags=["skip_stream"])
-    response = await model_runnable.ainvoke(state, config)
-    response = cast(BirthdateExtraction, response)
+    response: BirthdateExtraction = await model_runnable.ainvoke(state, config)
 
     # If no birthdate found, interrupt
     if response.birthdate is None:
@@ -99,6 +101,7 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
 
     # Birthdate found
     return {
+        "messages": [],
         "birthdate": birthdate,
     }
 

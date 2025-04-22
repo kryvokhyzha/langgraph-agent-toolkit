@@ -2,8 +2,6 @@ import json
 import logging
 import secrets
 import warnings
-from asyncio import CancelledError
-from builtins import GeneratorExit
 from typing import Annotated, Any, AsyncGenerator
 
 from fastapi import Depends, HTTPException, Request, status
@@ -90,16 +88,10 @@ async def message_generator(
                 # Complete message
                 yield f"data: {json.dumps({'type': 'message', 'content': item.model_dump()})}\n\n"
 
-        yield "data: [DONE]\n\n"
-    except GeneratorExit:
-        logger.info("Stream closed by client")
-        return
-    except CancelledError:
-        logger.info("Stream cancelled")
-        return
     except Exception as e:
         logger.error(f"Error in message_generator: {e}")
-        yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+        yield f"data: {json.dumps({'type': 'error', 'content': f'Internal server error: {e}'})}\n\n"
+    finally:
         yield "data: [DONE]\n\n"
 
 

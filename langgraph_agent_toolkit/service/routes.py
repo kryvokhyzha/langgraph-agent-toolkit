@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
-from langgraph.graph.state import CompiledStateGraph
+from langgraph.func import Pregel
 
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent import Agent
@@ -140,7 +140,7 @@ def history(input: ChatHistoryInput, request: Request = None) -> ChatHistory:
     """Get chat history."""
     agent: Agent = get_agent(request, get_default_agent())
     try:
-        agent_graph: CompiledStateGraph = agent.graph
+        agent_graph: Pregel = agent.graph
         state_snapshot = agent_graph.get_state(
             config=RunnableConfig(
                 configurable={

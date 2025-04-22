@@ -272,13 +272,11 @@ enables live reloading:
 
 3. Access endpoints:
 
-   - 🖥️ Streamlit app: `http://localhost:8501`
+   - 🖥️ Streamlit app: `http://0.0.0.0:8501`
    - 🔌 Agent API: `http://0.0.0.0:8080`
-   - 📚 API docs: `http://0.0.0.0:8080/redoc`
-   - 📊 Langfuse dashboard: `http://localhost:3000`
-   - 📦 MinIO console: `http://localhost:9091`
-   - 🤖 LiteLLM API: `http://localhost:4000`
-   - 📈 ClickHouse HTTP: `http://localhost:8123`
+   - 📚 API docs: `http://0.0.0.0:8080/docs`
+   - 📊 Langfuse dashboard: `http://0.0.0.0:3000`
+   - 🤖 LiteLLM API: `http://0.0.0.0:4000`
 
 4. Stop services:
 
@@ -347,6 +345,7 @@ The project works with
 ## 📚 Useful Resources
 
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
+- [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
 - [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 
 ## 👥 Development and Contributing

@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from streamlit.testing.v1 import AppTest
@@ -64,39 +64,39 @@ def test_app_settings(mock_agent_client):
     mock_agent_client.ainvoke.assert_called_with(
         message=PROMPT,
         model=FakeModelName.FAKE,
-        thread_id="test session id",
+        thread_id=at.session_state.thread_id,
     )
     assert not at.exception
 
 
+class MockUUID:
+    def __str__(self):
+        return "test session id"
+
+
 def test_app_thread_id_history(mock_agent_client):
     """Test the thread_id is generated."""
-    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
-    assert at.session_state.thread_id == "test session id"
+    with patch("uuid.uuid4", return_value=MockUUID()):
+        at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
+        assert at.session_state.thread_id == "test session id"
 
-    # Reset and set thread_id
-    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py")
-    at.query_params["thread_id"] = "1234"
-    HISTORY = [
-        ChatMessage(type="human", content="What is the weather?"),
-        ChatMessage(type="ai", content="The weather is sunny."),
-    ]
-    mock_agent_client.get_history.return_value = ChatHistory(messages=HISTORY)
-    at.run()
-    print(at)
-    assert at.session_state.thread_id == "1234"
-    mock_agent_client.get_history.assert_called_with(thread_id="1234")
-    assert at.chat_message[0].avatar == "user"
-    assert at.chat_message[0].markdown[0].value == "What is the weather?"
-    assert at.chat_message[1].avatar == "assistant"
-    assert at.chat_message[1].markdown[0].value == "The weather is sunny."
-    assert not at.exception
-
-
-def test_app_feedback(mock_agent_client):
-    """Test the feedback button."""
-    # TODO: Implement feedback test. Can't figure out how to interact with st.feedback.
-    pass
+        # Reset and set thread_id
+        at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py")
+        at.query_params["thread_id"] = "1234"
+        HISTORY = [
+            ChatMessage(type="human", content="What is the weather?"),
+            ChatMessage(type="ai", content="The weather is sunny."),
+        ]
+        mock_agent_client.get_history.return_value = ChatHistory(messages=HISTORY)
+        at.run()
+        print(at)
+        assert at.session_state.thread_id == "1234"
+        mock_agent_client.get_history.assert_called_with(thread_id="1234")
+        assert at.chat_message[0].avatar == "user"
+        assert at.chat_message[0].markdown[0].value == "What is the weather?"
+        assert at.chat_message[1].avatar == "assistant"
+        assert at.chat_message[1].markdown[0].value == "The weather is sunny."
+        assert not at.exception
 
 
 @pytest.mark.asyncio
@@ -158,4 +158,14 @@ async def test_app_init_error(mock_agent_client):
     assert at.chat_message[1].avatar == "user"
     assert at.chat_message[1].markdown[0].value == PROMPT
     assert at.error[0].value == "Error generating response: Error connecting to agent"
+    assert not at.exception
+
+
+def test_app_new_chat_btn(mock_agent_client):
+    at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py").run()
+    thread_id_a = at.session_state.thread_id
+
+    at.sidebar.button[0].click().run()
+
+    assert at.session_state.thread_id != thread_id_a
     assert not at.exception

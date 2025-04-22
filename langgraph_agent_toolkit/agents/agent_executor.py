@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import importlib
+import json
 import os
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
@@ -143,6 +144,7 @@ class AgentExecutor:
                 logger.error(f"GraphRecursionError occurred: {e}")
             else:
                 logger.error(f"Error during agent execution: {e}")
+
             raise e
 
         @functools.wraps(func)
@@ -222,6 +224,7 @@ class AgentExecutor:
         state = await agent_graph.aget_state(config=config)
         interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
 
+        input_data: Command | dict[str, Any]
         if interrupted_tasks:
             # User input is a response to resume agent execution from interrupt
             input_data = Command(resume=message)
@@ -264,7 +267,11 @@ class AgentExecutor:
         )
 
         # Invoke the agent
-        response_events = await agent.graph.ainvoke(input=input_data, config=config, stream_mode=["updates", "values"])
+        response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
+            input=input_data,
+            config=config,
+            stream_mode=["updates", "values"],
+        )
 
         response_type, response = response_events[-1]
         if response_type == "values":
@@ -336,6 +343,7 @@ class AgentExecutor:
                             new_messages.append(AIMessage(content=interrupt.value))
                         continue
 
+                    updates = updates or {}
                     update_messages = updates.get("messages", [])
 
                     # Special case for supervisor agent

@@ -26,7 +26,7 @@ class AgentClient:
     def __init__(
         self,
         base_url: str = "http://0.0.0.0",
-        agent: str = None,
+        agent: str | None = None,
         timeout: float | None = None,
         get_info: bool = True,
         verify: bool = False,
@@ -71,7 +71,7 @@ class AgentClient:
         except httpx.HTTPError as e:
             raise AgentClientError(f"Error getting service info: {e}")
 
-        self.info: ServiceMetadata = ServiceMetadata.model_validate(response.json())
+        self.info = ServiceMetadata.model_validate(response.json())
         if not self.agent or self.agent not in [a.key for a in self.info.agents]:
             self.agent = self.info.default_agent
 
@@ -188,7 +188,8 @@ class AgentClient:
                     # Yield the str token directly
                     return parsed["content"]
                 case "error":
-                    raise Exception(parsed["content"])
+                    error_msg = "Error: " + parsed["content"]
+                    return ChatMessage(type="ai", content=error_msg)
         return None
 
     def stream(
