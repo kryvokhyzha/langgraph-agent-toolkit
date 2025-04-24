@@ -62,7 +62,8 @@ Features include:
 
 ## 🏗️ Architecture
 
-<img src="docs/media/agent_architecture.png" width="800">
+<!-- <img src="docs/media/agent_architecture.png" width="800"> -->
+<img src="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true" width="800">
 
 ## ✨ Key Features
 
