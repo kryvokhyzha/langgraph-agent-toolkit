@@ -324,13 +324,22 @@ class AgentClient:
                 raise AgentClientError(f"Error: {e}")
 
     async def acreate_feedback(
-        self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}, user_id: str | None = None
+        self,
+        run_id: str,
+        key: str,
+        score: float,
+        kwargs: dict[str, Any] = {},
+        user_id: str | None = None,
     ) -> None:
         """Create a feedback record for a run.
 
-        This is a simple wrapper for the LangSmith create_feedback API, so the
-        credentials can be stored and managed in the service rather than the client.
-        See: https://api.smith.langchain.com/redoc#tag/feedback/operation/create_feedback_api_v1_feedback_post
+        Args:
+            run_id (str): The ID of the run to provide feedback for
+            key (str): The key for the feedback
+            score (float): The score for the feedback
+            kwargs (dict[str, Any], optional): Additional metadata for the feedback
+            user_id (str, optional): User ID for identifying the user
+
         """
         request = Feedback(run_id=run_id, key=key, score=score, user_id=user_id, kwargs=kwargs)
         async with httpx.AsyncClient() as client:
