@@ -6,12 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.3]
+## [0.2.0]
 
 ### Fixed
 
-- Minor fixes
-- Refactoring
+- Refactored code structure for better maintainability
+- Refactored Model factory
+
+### Removed
+
+- Removed AllModels and added environment variables for different providers
 
 ## [0.1.2]
 

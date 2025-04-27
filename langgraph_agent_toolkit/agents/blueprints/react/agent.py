@@ -10,6 +10,7 @@ from langgraph_agent_toolkit.core.observability.factory import ObservabilityFact
 from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole, ObservabilityBackend
 from langgraph_agent_toolkit.core.prompts.chat_prompt_template import ObservabilityChatPromptTemplate
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 PROMPT_NAME = "react-assistant"
@@ -50,7 +51,12 @@ react_agent = Agent(
     name="react-agent",
     description="A react agent.",
     graph=create_react_agent(
-        model=ModelFactory.create(settings.DEFAULT_MODEL_TYPE),
+        model=ModelFactory.create(
+            model_provider=ModelProvider.OPENAI,
+            model_name=settings.OPENAI_MODEL_NAME,
+            openai_api_base=settings.OPENAI_API_BASE_URL,
+            openai_api_key=settings.OPENAI_API_KEY,
+        ),
         tools=[add, multiply, DuckDuckGoSearchResults()],
         prompt=prompt,
         pre_model_hook=pre_model_hook_standard,

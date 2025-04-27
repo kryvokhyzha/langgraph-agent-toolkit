@@ -37,13 +37,9 @@ public_router = APIRouter()
 
 @private_router.get("/info", tags=["info"])
 async def info(request: Request) -> ServiceMetadata:
-    models = list(settings.AVAILABLE_MODELS)
-    models.sort()
     return ServiceMetadata(
         agents=get_all_agent_info(request),
-        models=models,
         default_agent=get_default_agent(),
-        default_model_type=settings.DEFAULT_MODEL_TYPE,
     )
 
 

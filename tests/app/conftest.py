@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from langgraph_agent_toolkit.schema import AgentInfo, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import FakeModelName, OpenAICompatibleName
 
 
 @pytest.fixture
@@ -15,8 +14,6 @@ def mock_agent_client(mock_env):
             AgentInfo(key="test-agent", description="Test agent"),
             AgentInfo(key="chatbot", description="Chatbot"),
         ],
-        default_model_type=OpenAICompatibleName.OPENAI_COMPATIBLE,
-        models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
 
     with patch("langgraph_agent_toolkit.client.AgentClient") as mock_agent_client:

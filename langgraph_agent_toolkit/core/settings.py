@@ -15,12 +15,6 @@ from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import check_str_is_http
-from langgraph_agent_toolkit.schema.models import (
-    AllModelEnum,
-    FakeModelName,
-    OpenAICompatibleName,
-    Provider,
-)
 
 
 class Settings(BaseSettings):
@@ -39,18 +33,41 @@ class Settings(BaseSettings):
     AUTH_SECRET: SecretStr | None = None
     USE_FAKE_MODEL: bool = False
 
-    # If DEFAULT_MODEL_TYPE is None, it will be set in model_post_init
-    DEFAULT_MODEL_TYPE: AllModelEnum | None = None
-    AVAILABLE_MODELS: set[AllModelEnum] = Field(
-        ...,
-        description="Set of available models. If not set, all models will be available.",
-        default_factory=set,
-    )
+    # OpenAI Settings
+    OPENAI_API_KEY: SecretStr | None = None
+    OPENAI_API_BASE_URL: str | None = None
+    OPENAI_API_VERSION: str | None = None
+    OPENAI_MODEL_NAME: str | None = None
 
-    # Set openai compatible api, mainly used for proof of concept
-    MODEL_NAME: str | None = None
-    MODEL_API_KEY: SecretStr | None = None
-    MODEL_BASE_URL: str | None = None
+    # Azure OpenAI Settings
+    AZURE_OPENAI_API_KEY: SecretStr | None = None
+    AZURE_OPENAI_ENDPOINT: str | None = None
+    AZURE_OPENAI_API_VERSION: str | None = None
+    AZURE_OPENAI_MODEL_NAME: str | None = None
+    AZURE_OPENAI_DEPLOYMENT_NAME: str | None = None
+
+    # Anthropic Settings
+    ANTHROPIC_MODEL_NAME: str | None = None
+    ANTHROPIC_API_KEY: SecretStr | None = None
+
+    # Google VertexAI Settings
+    GOOGLE_VERTEXAI_MODEL_NAME: str | None = None
+    GOOGLE_VERTEXAI_API_KEY: SecretStr | None = None
+
+    # Google GenAI Settings
+    GOOGLE_GENAI_MODEL_NAME: str | None = None
+    GOOGLE_GENAI_API_KEY: SecretStr | None = None
+
+    # Bedrock Settings
+    AWS_BEDROCK_MODEL_NAME: str | None = None
+
+    # DeepSeek Settings
+    DEEPSEEK_MODEL_NAME: str | None = None
+    DEEPSEEK_API_KEY: SecretStr | None = None
+
+    # Ollama Settings
+    OLLAMA_MODEL_NAME: str | None = None
+    OLLAMA_BASE_URL: str | None = None
 
     # Observability platform
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
@@ -83,31 +100,6 @@ class Settings(BaseSettings):
     POSTGRES_POOL_SIZE: int = Field(default=10, description="Maximum number of connections in the pool")
     POSTGRES_MIN_SIZE: int = Field(default=3, description="Minimum number of connections in the pool")
     POSTGRES_MAX_IDLE: int = Field(default=5, description="Maximum number of idle connections")
-
-    def model_post_init(self, __context: Any) -> None:
-        # Check for LANGGRAPH_ prefixed environment variables that might override settings
-        self._apply_langgraph_env_overrides()
-
-        api_keys = {
-            Provider.OPENAI_COMPATIBLE: self.MODEL_BASE_URL and self.MODEL_NAME,
-            Provider.FAKE: self.USE_FAKE_MODEL,
-        }
-        active_keys = [k for k, v in api_keys.items() if v]
-        if not active_keys:
-            raise ValueError("At least one LLM API key must be provided.")
-
-        for provider in active_keys:
-            match provider:
-                case Provider.OPENAI_COMPATIBLE:
-                    if self.DEFAULT_MODEL_TYPE is None:
-                        self.DEFAULT_MODEL_TYPE = OpenAICompatibleName.OPENAI_COMPATIBLE
-                    self.AVAILABLE_MODELS.update(set(OpenAICompatibleName))
-                case Provider.FAKE:
-                    if self.DEFAULT_MODEL_TYPE is None:
-                        self.DEFAULT_MODEL_TYPE = FakeModelName.FAKE
-                    self.AVAILABLE_MODELS.update(set(FakeModelName))
-                case _:
-                    raise ValueError(f"Unknown provider: {provider}")
 
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""

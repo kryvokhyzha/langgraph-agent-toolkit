@@ -4,11 +4,10 @@ from pydantic import BaseModel, Field, SerializeAsAny
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.helper.constants import (
-    DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
+    DEFAULT_MODEL_PARAMETER_VALUES,
     DEFAULT_RECURSION_LIMIT,
     get_default_agent,
 )
-from langgraph_agent_toolkit.schema.models import AllModelEnum, OpenAICompatibleName
 
 
 class AgentInfo(BaseModel):
@@ -30,15 +29,9 @@ class ServiceMetadata(BaseModel):
     agents: list[AgentInfo] = Field(
         description="List of available agents.",
     )
-    models: list[AllModelEnum] = Field(
-        description="List of available LLMs.",
-    )
     default_agent: str = Field(
         description="Default agent used when none is specified.",
         examples=[get_default_agent()],
-    )
-    default_model_type: AllModelEnum = Field(
-        description="Default model used when none is specified.",
     )
 
 
@@ -49,11 +42,11 @@ class UserInput(BaseModel):
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )
-    model: SerializeAsAny[AllModelEnum] | None = Field(
+    model: str | None = Field(
         title="Model",
-        description="LLM Model to use for the agent.",
-        default=OpenAICompatibleName.OPENAI_COMPATIBLE,
-        examples=[OpenAICompatibleName.OPENAI_COMPATIBLE],
+        description="LLM Model Name to use for the agent.",
+        default=None,
+        examples=["gpt-3.5-turbo", "gpt-4o"],
     )
     thread_id: str | None = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",
@@ -71,13 +64,13 @@ class UserInput(BaseModel):
         examples=[
             {
                 "memory_saver_params": {"k": 6},
-                **DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
+                **DEFAULT_MODEL_PARAMETER_VALUES,
             },
         ],
     )
     recursion_limit: int | None = Field(
         description="Recursion limit for the agent.",
-        default=None,  # Changed from DEFAULT_RECURSION_LIMIT to None
+        default=None,
         examples=[DEFAULT_RECURSION_LIMIT],
     )
 

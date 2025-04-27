@@ -113,10 +113,29 @@ Features include:
    **🔑 LLM API Configuration**
 
    ```env
-   # LiteLLM configuration
-   MODEL_NAME="gpt4o"                         # LiteLLM model name
-   MODEL_BASE_URL=http://litellm:4000/v1      # LiteLLM endpoint
-   MODEL_API_KEY=sk-any-string                # LiteLLM master key
+   # OpenAI Settings
+   OPENAI_API_KEY=sk-xxxxxxxxxxxxx
+   OPENAI_API_BASE_URL=http://litellm:4000/v1      # Can be OpenAI API or LiteLLM proxy
+   OPENAI_API_VERSION=2025-01-01
+   OPENAI_MODEL_NAME=gpt-4o-mini
+
+   # Azure OpenAI Settings (Optional)
+   AZURE_OPENAI_API_KEY=
+   AZURE_OPENAI_ENDPOINT=
+   AZURE_OPENAI_API_VERSION=
+   AZURE_OPENAI_MODEL_NAME=
+   AZURE_OPENAI_DEPLOYMENT_NAME=
+
+   # Anthropic Settings (Optional)
+   ANTHROPIC_API_KEY=
+   ANTHROPIC_MODEL_NAME=
+
+   # Other provider settings are also available:
+   # - Google VertexAI
+   # - Google GenAI
+   # - AWS Bedrock
+   # - DeepSeek
+   # - Ollama
    ```
 
    **🗄️ Database Configuration**

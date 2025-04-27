@@ -7,7 +7,6 @@ from httpx import HTTPStatusError, Request, Response
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import FakeModelName, OpenAICompatibleName
 
 
 def test_init(mock_env):
@@ -301,8 +300,6 @@ def test_info(agent_client):
     test_info = ServiceMetadata(
         default_agent="custom-agent",
         agents=[AgentInfo(key="custom-agent", description="Custom agent")],
-        default_model_type=OpenAICompatibleName.OPENAI_COMPATIBLE,
-        models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
     test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))
 

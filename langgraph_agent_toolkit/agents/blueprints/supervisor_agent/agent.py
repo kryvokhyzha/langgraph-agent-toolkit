@@ -7,9 +7,15 @@ from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
-model = ModelFactory.create(settings.DEFAULT_MODEL_TYPE)
+model = ModelFactory.create(
+    model_provider=ModelProvider.OPENAI,
+    model_name=settings.OPENAI_MODEL_NAME,
+    openai_api_base=settings.OPENAI_API_BASE_URL,
+    openai_api_key=settings.OPENAI_API_KEY,
+)
 
 math_agent = create_react_agent(
     model=model,
