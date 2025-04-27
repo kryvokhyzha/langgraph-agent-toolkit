@@ -7,7 +7,6 @@ from httpx import HTTPStatusError, Request, Response
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
-from langgraph_agent_toolkit.schema.models import FakeModelName, OpenAICompatibleName
 
 
 def test_init(mock_env):
@@ -59,18 +58,20 @@ def test_invoke(agent_client):
         assert response.type == "ai"
         assert response.content == ANSWER
 
-    # Test with model and thread_id
+    # Test with model_name and thread_id
     with patch("httpx.post", return_value=mock_response) as mock_post:
         response = agent_client.invoke(
             QUESTION,
-            model="openai-compatible",
+            model_name="gpt-4o",
+            model_provider="openai",
             thread_id="test-thread",
         )
         assert isinstance(response, ChatMessage)
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["message"] == QUESTION
-        assert kwargs["json"]["model"] == "openai-compatible"
+        assert kwargs["json"]["model_name"] == "gpt-4o"
+        assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["thread_id"] == "test-thread"
 
     # Test error response
@@ -96,11 +97,12 @@ async def test_ainvoke(agent_client):
         assert response.type == "ai"
         assert response.content == ANSWER
 
-    # Test with model and thread_id
+    # Test with model_name and thread_id
     with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
         response = await agent_client.ainvoke(
             QUESTION,
-            model="openai-compatible",
+            model_name="gpt-4o",
+            model_provider="openai",
             thread_id="test-thread",
         )
         assert isinstance(response, ChatMessage)
@@ -109,7 +111,8 @@ async def test_ainvoke(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["message"] == QUESTION
-        assert kwargs["json"]["model"] == "openai-compatible"
+        assert kwargs["json"]["model_name"] == "gpt-4o"
+        assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["thread_id"] == "test-thread"
 
     # Test error response
@@ -301,8 +304,6 @@ def test_info(agent_client):
     test_info = ServiceMetadata(
         default_agent="custom-agent",
         agents=[AgentInfo(key="custom-agent", description="Custom agent")],
-        default_model_type=OpenAICompatibleName.OPENAI_COMPATIBLE,
-        models=[OpenAICompatibleName.OPENAI_COMPATIBLE, FakeModelName.FAKE],
     )
     test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))
 

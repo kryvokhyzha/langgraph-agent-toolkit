@@ -101,8 +101,6 @@ async def main() -> None:
             st.rerun()
 
         with st.popover(":material/settings: Settings", use_container_width=True):
-            model_idx = agent_client.info.models.index(agent_client.info.default_model_type)
-            model = st.selectbox("LLM to use", options=agent_client.info.models, index=model_idx)
             agent_list = [a.key for a in agent_client.info.agents]
             agent_idx = agent_list.index(agent_client.info.default_agent)
             agent_client.agent = st.selectbox(
@@ -183,7 +181,6 @@ async def main() -> None:
             if use_streaming:
                 stream = agent_client.astream(
                     message=user_input,
-                    model=model,
                     thread_id=st.session_state.thread_id,
                     user_id=DEFAULT_STREAMLIT_USER_ID,
                 )
@@ -191,7 +188,6 @@ async def main() -> None:
             else:
                 response = await agent_client.ainvoke(
                     message=user_input,
-                    model=model,
                     thread_id=st.session_state.thread_id,
                     user_id=DEFAULT_STREAMLIT_USER_ID,
                 )

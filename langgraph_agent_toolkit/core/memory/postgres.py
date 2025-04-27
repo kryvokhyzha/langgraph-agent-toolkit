@@ -36,7 +36,8 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             )
         return True
 
-    def get_connection_string(self) -> str:
+    @staticmethod
+    def get_connection_string() -> str:
         """Build and return the PostgreSQL connection string from settings."""
         return (
             f"postgresql://{settings.POSTGRES_USER}:"

@@ -1,4 +1,3 @@
-from langgraph_agent_toolkit.schema.models import AllModelEnum
 from langgraph_agent_toolkit.schema.schema import (
     AgentInfo,
     ChatHistory,
@@ -15,7 +14,6 @@ from langgraph_agent_toolkit.schema.schema import (
 
 __all__ = [
     "AgentInfo",
-    "AllModelEnum",
     "UserInput",
     "ChatMessage",
     "ServiceMetadata",

@@ -1,5 +1,6 @@
 [run]
 omit =
     examples/*
+    scripts/*
     tests/*
     langgraph_agent_toolkit/agents/blueprints/*

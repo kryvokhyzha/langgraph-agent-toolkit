@@ -96,7 +96,7 @@ async def test_invoke_method(agent_executor, mock_agent):
         message="Hello, agent!",
         thread_id="test-thread-123",
         user_id="test-user",
-        model="test-model",
+        model_name="test-model",
     )
 
     # Verify the result
@@ -115,7 +115,7 @@ async def test_invoke_method(agent_executor, mock_agent):
     config = call_args["config"]
     assert config["configurable"]["thread_id"] == "test-thread-123"
     assert config["configurable"]["user_id"] == "test-user"
-    assert config["configurable"]["model"] == "test-model"
+    assert config["configurable"]["model_name"] == "test-model"
 
 
 @pytest.mark.asyncio
@@ -152,14 +152,14 @@ async def test_stream_method(agent_executor, mock_agent):
     message = "Hello, stream!"
     thread_id = "test-thread-123"
     user_id = "test-user"
-    model = "test-model"
+    model_name = "test-model"
 
     # Patch the _setup_agent_execution method to return our mock agent
     with patch.object(agent_executor, "_setup_agent_execution") as mock_setup:
         mock_setup.return_value = (
             mock_agent,
             {},
-            {"configurable": {"thread_id": thread_id, "user_id": user_id, "model": model}},
+            {"configurable": {"thread_id": thread_id, "user_id": user_id, "model_name": model_name}},
             UUID("12345678-1234-5678-1234-567812345678"),
         )
 
@@ -178,7 +178,7 @@ async def test_stream_method(agent_executor, mock_agent):
                 message=message,
                 thread_id=thread_id,
                 user_id=user_id,
-                model=model,
+                model_name=model_name,
                 stream_tokens=True,
             ):
                 results.append(item)
@@ -313,7 +313,7 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
         message="Hello, setup!",
         thread_id="test-thread-123",
         user_id="test-user-456",
-        model="test-model",
+        model_name="test-model",
         agent_config={"temperature": 0.7},
     )
 
@@ -329,7 +329,7 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
     # Verify config is correct - access as a dictionary, not an object
     assert config["configurable"]["thread_id"] == "test-thread-123"
     assert config["configurable"]["user_id"] == "test-user-456"
-    assert config["configurable"]["model"] == "test-model"
+    assert config["configurable"]["model_name"] == "test-model"
     assert config["configurable"]["temperature"] == 0.7
 
     # Verify run_id is a UUID
@@ -351,7 +351,7 @@ async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_a
         message="Hello, setup!",
         thread_id="test-thread-123",
         user_id="test-user",
-        model="test-model",
+        model_name="test-model",
         agent_config={"temperature": 0.7},
         recursion_limit=custom_recursion_limit,
     )
@@ -365,7 +365,7 @@ async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_a
         message="Hello, setup!",
         thread_id="test-thread-123",
         user_id="test-user",
-        model="test-model",
+        model_name="test-model",
     )
 
     # Verify default recursion_limit from constant is used

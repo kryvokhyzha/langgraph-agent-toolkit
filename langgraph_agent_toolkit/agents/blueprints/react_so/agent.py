@@ -8,6 +8,7 @@ from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.agents.components.utils import AgentStateWithRemainingSteps, pre_model_hook_standard
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 class ResponseSchema(BaseModel):
@@ -23,7 +24,12 @@ react_agent_so = Agent(
     name="react-agent-so",
     description="A react agent with structured output.",
     graph=create_react_agent(
-        model=ModelFactory.create(settings.DEFAULT_MODEL_TYPE),
+        model=ModelFactory.create(
+            model_provider=ModelProvider.OPENAI,
+            model_name=settings.OPENAI_MODEL_NAME,
+            openai_api_base=settings.OPENAI_API_BASE_URL,
+            openai_api_key=settings.OPENAI_API_KEY,
+        ),
         tools=[add, multiply, DuckDuckGoSearchResults()],
         prompt=(
             "You are a team support agent that can perform calculations and search the web. "

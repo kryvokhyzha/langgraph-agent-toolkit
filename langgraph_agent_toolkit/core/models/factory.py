@@ -12,30 +12,22 @@ from typing import (
 
 from langchain.chat_models.base import _ConfigurableModel, _init_chat_model_helper
 from langchain_core.language_models import BaseChatModel
-from langchain_core.runnables import RunnableSerializable
 from typing_extensions import TypeAlias
 
 from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
-from langgraph_agent_toolkit.core.settings import settings
-from langgraph_agent_toolkit.helper.constants import DEFAULT_OPENAI_MODEL_TYPE_PARAMS
-from langgraph_agent_toolkit.schema.models import (
-    AllModelEnum,
-    FakeModelName,
-    OpenAICompatibleName,
+from langgraph_agent_toolkit.helper.constants import (
+    DEFAULT_CONFIG_PREFIX,
+    DEFAULT_CONFIGURABLE_FIELDS,
+    DEFAULT_MODEL_PARAMETER_VALUES,
 )
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
-ModelT: TypeAlias = ChatOpenAIPatched | FakeToolModel | RunnableSerializable | _ConfigurableModel
+ModelT: TypeAlias = FakeToolModel | _ConfigurableModel | BaseChatModel
 
 
 class ModelFactory:
     """Factory for creating model instances."""
-
-    # Map model enum names to their respective API model names
-    _MODEL_TABLE = {
-        OpenAICompatibleName.OPENAI_COMPATIBLE: settings.MODEL_NAME,
-        FakeModelName.FAKE: "fake",
-    }
 
     @staticmethod
     def __init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
@@ -79,11 +71,23 @@ class ModelFactory:
 
     @staticmethod
     @cache
-    def create(model_name: AllModelEnum) -> ModelT:
+    def create(
+        model_provider: ModelProvider,
+        model_name: Optional[str] = None,
+        configurable_fields: Optional[Union[Literal["any"], List[str], Tuple[str, ...]]] = None,
+        config_prefix: Optional[str] = None,
+        model_parameter_values: Optional[dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> ModelT:
         """Create and return a model instance.
 
         Args:
-            model_name: The model to create from AllModelEnum
+            model_provider: The model provider to use. This should be one of the supported model providers.
+            model_name: The name of the model to use. If not provided, the default model name will be used.
+            configurable_fields: The fields that are configurable. If not provided, the default fields will be used.
+            config_prefix: The prefix to use for the configuration. If not provided, the default prefix will be used.
+            model_parameter_values: The values for the model parameters. If not provided, the default values will be used.
+            **kwargs: Additional keyword arguments to pass to the model.
 
         Returns:
             An instance of the requested model
@@ -91,28 +95,23 @@ class ModelFactory:
         Raises:
             ValueError: If the requested model is not supported
 
-        """
-        api_model_name = ModelFactory._MODEL_TABLE.get(model_name)
-        if not api_model_name:
-            raise ValueError(f"Unsupported model: {model_name}")
+        """  # noqa: E501
+        _configurable_fields = configurable_fields or DEFAULT_CONFIGURABLE_FIELDS
+        _config_prefix = config_prefix or DEFAULT_CONFIG_PREFIX
+        _model_parameter_values = model_parameter_values or DEFAULT_MODEL_PARAMETER_VALUES
 
-        match model_name:
-            case name if name in OpenAICompatibleName:
-                if not settings.MODEL_BASE_URL or not settings.MODEL_NAME:
-                    raise ValueError("OpenAICompatible base url and endpoint must be configured")
-
-                model = ModelFactory.init_chat_model(
-                    model=settings.MODEL_NAME,
-                    model_provider="openai",
-                    configurable_fields=("temperature", "max_tokens", "top_p", "streaming"),
-                    config_prefix="agent",
-                    openai_api_base=settings.MODEL_BASE_URL,
-                    openai_api_key=settings.MODEL_API_KEY,
-                    **DEFAULT_OPENAI_MODEL_TYPE_PARAMS,
-                )
-
-                return model
-            case name if name in FakeModelName:
+        match model_provider:
+            case ModelProvider.FAKE:
                 return FakeToolModel(responses=["This is a test response from the fake model."])
             case _:
-                raise ValueError(f"Unsupported model: {model_name}")
+                if model_name is None:
+                    raise ValueError("Model name must be provided for non-fake models.")
+
+                return ModelFactory.init_chat_model(
+                    model=model_name,
+                    model_provider=model_provider,
+                    configurable_fields=_configurable_fields,
+                    config_prefix=_config_prefix,
+                    **_model_parameter_values,
+                    **kwargs,
+                )
