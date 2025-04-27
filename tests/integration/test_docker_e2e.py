@@ -2,6 +2,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 @pytest.mark.docker
@@ -17,7 +18,7 @@ def test_service_with_fake_model(check_service_available):
         pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
 
     client = AgentClient(service_url, agent="chatbot-agent")
-    response = client.invoke("Tell me a joke?", model="fake")
+    response = client.invoke("Tell me a joke?", model_provider=ModelProvider.FAKE)
     assert response.type == "ai"
     assert response.content == "This is a test response from the fake model."
 

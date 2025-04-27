@@ -22,8 +22,8 @@ async def chatbot(
         messages = previous["messages"] + messages
 
     model = ModelFactory.create(
-        model_provider=ModelProvider.OPENAI,
-        model_name=settings.OPENAI_MODEL_NAME,
+        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
     )

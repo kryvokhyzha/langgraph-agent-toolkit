@@ -172,7 +172,8 @@ class AgentExecutor:
         message: str,
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
-        model: Optional[str] = None,
+        model_name: Optional[str] = None,
+        model_provider: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> Tuple[Agent, Any, Any, UUID]:
@@ -183,7 +184,8 @@ class AgentExecutor:
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
-            model: Optional model name to override the default
+            model_name: Optional model name to override the default
+            model_provider: Optional model provider to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
 
@@ -208,8 +210,11 @@ class AgentExecutor:
             "user_id": user_id,
         }
 
-        if model:
-            configurable["model"] = model
+        if model_name:
+            configurable["model_name"] = model_name
+
+        if model_provider:
+            configurable["model_provider"] = model_provider
 
         if agent_config:
             configurable.update(agent_config)
@@ -243,7 +248,8 @@ class AgentExecutor:
         message: str,
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
-        model: Optional[str] = None,
+        model_name: Optional[str] = None,
+        model_provider: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> ChatMessage:
@@ -254,7 +260,8 @@ class AgentExecutor:
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
-            model: Optional model name to override the default
+            model_name: Optional model name to override the default
+            model_provider: Optional model provider to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
 
@@ -267,7 +274,8 @@ class AgentExecutor:
             message=message,
             thread_id=thread_id,
             user_id=user_id,
-            model=model,
+            model_name=model_name,
+            model_provider=model_provider,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )
@@ -300,7 +308,8 @@ class AgentExecutor:
         message: str,
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
-        model: Optional[str] = None,
+        model_name: Optional[str] = None,
+        model_provider: Optional[str] = None,
         stream_tokens: bool = True,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
@@ -312,7 +321,8 @@ class AgentExecutor:
             message: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
-            model: Optional model name to override the default
+            model_name: Optional model name to override the default
+            model_provider: Optional model provider to override the default
             stream_tokens: Whether to stream individual tokens
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
@@ -326,7 +336,8 @@ class AgentExecutor:
             message=message,
             thread_id=thread_id,
             user_id=user_id,
-            model=model,
+            model_name=model_name,
+            model_provider=model_provider,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )

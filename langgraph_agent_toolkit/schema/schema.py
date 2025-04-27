@@ -42,11 +42,17 @@ class UserInput(BaseModel):
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )
-    model: str | None = Field(
+    model_name: str | None = Field(
         title="Model",
         description="LLM Model Name to use for the agent.",
         default=None,
         examples=["gpt-3.5-turbo", "gpt-4o"],
+    )
+    model_provider: str | None = Field(
+        title="Model Provider",
+        description="LLM Model Provider to use for the agent.",
+        default=None,
+        examples=["openai", "anthropic"],
     )
     thread_id: str | None = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",

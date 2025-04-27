@@ -87,7 +87,8 @@ class AgentClient:
     async def ainvoke(
         self,
         message: str,
-        model: str | None = None,
+        model_name: str | None = None,
+        model_provider: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
@@ -96,7 +97,8 @@ class AgentClient:
 
         Args:
             message (str): The message to send to the agent
-            model (str, optional): LLM model to use for the agent
+            model_name (str, optional): LLM model to use for the agent
+            model_provider (str, optional): LLM model provider to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
@@ -111,8 +113,10 @@ class AgentClient:
         request = UserInput(message=message)
         if thread_id:
             request.thread_id = thread_id
-        if model:
-            request.model = model
+        if model_name:
+            request.model_name = model_name
+        if model_provider:
+            request.model_provider = model_provider
         if agent_config:
             request.agent_config = agent_config
         if user_id:
@@ -135,7 +139,8 @@ class AgentClient:
     def invoke(
         self,
         message: str,
-        model: str | None = None,
+        model_name: str | None = None,
+        model_provider: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
@@ -144,7 +149,8 @@ class AgentClient:
 
         Args:
             message (str): The message to send to the agent
-            model (str, optional): LLM model to use for the agent
+            model_name (str, optional): LLM model to use for the agent
+            model_provider (str, optional): LLM model provider to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
@@ -159,8 +165,10 @@ class AgentClient:
         request = UserInput(message=message)
         if thread_id:
             request.thread_id = thread_id
-        if model:
-            request.model = model
+        if model_name:
+            request.model_name = model_name
+        if model_provider:
+            request.model_provider = model_provider
         if agent_config:
             request.agent_config = agent_config
         if user_id:
@@ -207,7 +215,8 @@ class AgentClient:
     def stream(
         self,
         message: str,
-        model: str | None = None,
+        model_name: str | None = None,
+        model_provider: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
@@ -221,7 +230,8 @@ class AgentClient:
 
         Args:
             message (str): The message to send to the agent
-            model (str, optional): LLM model to use for the agent
+            model_name (str, optional): LLM model to use for the agent
+            model_provider (str, optional): LLM model provider to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
@@ -238,8 +248,10 @@ class AgentClient:
         request = StreamInput(message=message, stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
-        if model:
-            request.model = model
+        if model_name:
+            request.model_name = model_name
+        if model_provider:
+            request.model_provider = model_provider
         if agent_config:
             request.agent_config = agent_config
         if user_id:
@@ -266,7 +278,8 @@ class AgentClient:
     async def astream(
         self,
         message: str,
-        model: str | None = None,
+        model_name: str | None = None,
+        model_provider: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
@@ -280,7 +293,8 @@ class AgentClient:
 
         Args:
             message (str): The message to send to the agent
-            model (str, optional): LLM model to use for the agent
+            model_name (str, optional): LLM model to use for the agent
+            model_provider (str, optional): LLM model provider to use for the agent
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
@@ -297,8 +311,10 @@ class AgentClient:
         request = StreamInput(message=message, stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
-        if model:
-            request.model = model
+        if model_name:
+            request.model_name = model_name
+        if model_provider:
+            request.model_provider = model_provider
         if agent_config:
             request.agent_config = agent_config
         if user_id:

@@ -63,7 +63,8 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
             message=user_input.message,
             thread_id=user_input.thread_id,
             user_id=user_input.user_id,
-            model=user_input.model,
+            model_name=user_input.model_name,
+            model_provider=user_input.model_provider,
             agent_config=user_input.agent_config,
             recursion_limit=user_input.recursion_limit,
         )

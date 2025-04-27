@@ -46,8 +46,8 @@ Don't tell the user what their sign is, you are just demonstrating your knowledg
 async def background(state: AgentState, config: RunnableConfig) -> AgentState:
     """Demonstrate doing work before the interrupt."""
     m = ModelFactory.create(
-        model_provider=ModelProvider.OPENAI,
-        model_name=settings.OPENAI_MODEL_NAME,
+        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
     )
@@ -81,8 +81,8 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
     If no birthdate is found, it will perform an interrupt before proceeding.
     """
     m = ModelFactory.create(
-        model_provider=ModelProvider.OPENAI,
-        model_name=settings.OPENAI_MODEL_NAME,
+        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
     )
@@ -129,8 +129,8 @@ async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentStat
         raise ValueError("No birthdate found in state")
 
     m = ModelFactory.create(
-        model_provider=ModelProvider.OPENAI,
-        model_name=settings.OPENAI_MODEL_NAME,
+        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
     )

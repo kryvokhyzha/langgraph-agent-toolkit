@@ -77,7 +77,8 @@ async def message_generator(
             message=user_input.message,
             thread_id=user_input.thread_id,
             user_id=user_input.user_id,
-            model=user_input.model,
+            model_name=user_input.model_name,
+            model_provider=user_input.model_provider,
             stream_tokens=user_input.stream_tokens,
             agent_config=user_input.agent_config,
             recursion_limit=user_input.recursion_limit,
@@ -124,7 +125,7 @@ def setup_logging():
 
     # Additional loggers that should be quieter in production
     logging.getLogger("asyncio").setLevel(logging.WARNING)
-    logging.getLogger("fastapi").setLevel(logging.INFO)
+    logging.getLogger("fastapi").setLevel(logging.WARNING)
 
     # Suppress LangChain beta warnings
     warnings.filterwarnings("ignore", category=LangChainBetaWarning)
