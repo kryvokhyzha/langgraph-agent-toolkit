@@ -235,7 +235,8 @@ Features include:
    STORE_MODEL_IN_DB=True
    ```
 
-> **Note**: LiteLLM relies on Redis for request caching and rate limiting.
+> [!NOTE]  
+> LiteLLM relies on Redis for request caching and rate limiting.
 
 ## 📂 Project Structure
 
