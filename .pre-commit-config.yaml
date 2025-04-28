@@ -27,11 +27,11 @@ repos:
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.9.1
     hooks:
-      - id: nbqa-ruff-format
-        additional_dependencies: [ruff==0.11.4]
       - id: nbqa-ruff
         additional_dependencies: [ruff==0.11.4]
-        args: ["--fix", "--show-source"]
+        args: ["--fix", "--show-files"]
+      - id: nbqa-ruff-format
+        additional_dependencies: [ruff==0.11.4]
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1

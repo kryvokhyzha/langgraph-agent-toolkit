@@ -48,7 +48,7 @@ dependencies = [
     "numpy ~= 2.2.3; python_version >= '3.13'",
     "pandas ~= 2.2.3",
     "psycopg[binary,pool] ~= 3.2.4",
-    "pyarrow ~= 19.0.1",
+    "pyarrow ~= 20.0.0",
     "pydantic ~= 2.11.1",
     "pydantic-settings ~= 2.9.1",
     "pyowm ~= 3.3.0",
@@ -144,6 +144,7 @@ exclude=[
     ".git",
     "__pycache__",
     ".ruff_cache",
+    ".github",
     "build",
     "dist",
 ]
@@ -156,14 +157,12 @@ exclude=[
 lines-after-imports = 2
 
 [tool.nbqa.config]
-black = "pyproject.toml"
 ruff = "pyproject.toml"
 
 [tool.nbqa.addopts]
 ruff = ["--extend-ignore=E402"]
 
 [tool.nbqa.mutate]
-black = 1
 ruff = 1
 
 [tool.pytest.ini_options]
