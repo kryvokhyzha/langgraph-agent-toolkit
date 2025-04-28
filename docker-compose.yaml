@@ -4,57 +4,11 @@ x-healthcheck-defaults: &healthcheck-defaults
   retries: 10
   start_period: 60s
 
-x-postgres-credentials: &postgres-credentials
-  POSTGRES_USER: ${POSTGRES_USER:-postgres}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  POSTGRES_DB: ${POSTGRES_DB:-postgres}
-
-x-redis-credentials: &redis-credentials
-  REDIS_HOST: ${REDIS_HOST:-redis}
-  REDIS_PORT: ${REDIS_PORT:-6379}
-  REDIS_AUTH: ${REDIS_AUTH:-myredissecret}
-
-x-langfuse-env: &langfuse-env
-  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/langfuse
-  SALT: ${LANGFUSE_SALT:-mysalt}
-  ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
-  TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
-  LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: ${LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES:-true}
-  CLICKHOUSE_MIGRATION_URL: ${CLICKHOUSE_MIGRATION_URL:-clickhouse://clickhouse:9000}
-  CLICKHOUSE_URL: ${CLICKHOUSE_URL:-http://clickhouse:8123}
-  CLICKHOUSE_USER: ${CLICKHOUSE_USER:-clickhouse}
-  CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse}
-  CLICKHOUSE_CLUSTER_ENABLED: ${CLICKHOUSE_CLUSTER_ENABLED:-false}
-  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: ${LANGFUSE_S3_EVENT_UPLOAD_BUCKET:-langfuse}
-  LANGFUSE_S3_EVENT_UPLOAD_REGION: ${LANGFUSE_S3_EVENT_UPLOAD_REGION:-auto}
-  LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID:-minio}
-  LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY:-miniosecret}
-  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: ${LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT:-http://minio:9000}
-  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: ${LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE:-true}
-  LANGFUSE_S3_EVENT_UPLOAD_PREFIX: ${LANGFUSE_S3_EVENT_UPLOAD_PREFIX:-events/}
-  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: ${LANGFUSE_S3_MEDIA_UPLOAD_BUCKET:-langfuse}
-  LANGFUSE_S3_MEDIA_UPLOAD_REGION: ${LANGFUSE_S3_MEDIA_UPLOAD_REGION:-auto}
-  LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID:-minio}
-  LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY:-miniosecret}
-  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: ${LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT:-http://localhost:9090}
-  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: ${LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE:-true}
-  LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: ${LANGFUSE_S3_MEDIA_UPLOAD_PREFIX:-media/}
-  LANGFUSE_S3_BATCH_EXPORT_ENABLED: ${LANGFUSE_S3_BATCH_EXPORT_ENABLED:-false}
-  LANGFUSE_S3_BATCH_EXPORT_BUCKET: ${LANGFUSE_S3_BATCH_EXPORT_BUCKET:-langfuse}
-  LANGFUSE_S3_BATCH_EXPORT_PREFIX: ${LANGFUSE_S3_BATCH_EXPORT_PREFIX:-exports/}
-  LANGFUSE_S3_BATCH_EXPORT_REGION: ${LANGFUSE_S3_BATCH_EXPORT_REGION:-auto}
-  LANGFUSE_S3_BATCH_EXPORT_ENDPOINT: ${LANGFUSE_S3_BATCH_EXPORT_ENDPOINT:-http://minio:9000}
-  LANGFUSE_S3_BATCH_EXPORT_EXTERNAL_ENDPOINT: ${LANGFUSE_S3_BATCH_EXPORT_EXTERNAL_ENDPOINT:-http://localhost:9090}
-  LANGFUSE_S3_BATCH_EXPORT_ACCESS_KEY_ID: ${LANGFUSE_S3_BATCH_EXPORT_ACCESS_KEY_ID:-minio}
-  LANGFUSE_S3_BATCH_EXPORT_SECRET_ACCESS_KEY: ${LANGFUSE_S3_BATCH_EXPORT_SECRET_ACCESS_KEY:-miniosecret}
-  LANGFUSE_S3_BATCH_EXPORT_FORCE_PATH_STYLE: ${LANGFUSE_S3_BATCH_EXPORT_FORCE_PATH_STYLE:-true}
-  LANGFUSE_INGESTION_QUEUE_DELAY_MS: ${LANGFUSE_INGESTION_QUEUE_DELAY_MS:-}
-  LANGFUSE_INGESTION_CLICKHOUSE_WRITE_INTERVAL_MS: ${LANGFUSE_INGESTION_CLICKHOUSE_WRITE_INTERVAL_MS:-}
-  <<: *redis-credentials
-  REDIS_TLS_ENABLED: ${REDIS_TLS_ENABLED:-false}
-  REDIS_TLS_CA: ${REDIS_TLS_CA:-/certs/ca.crt}
-  REDIS_TLS_CERT: ${REDIS_TLS_CERT:-/certs/redis.crt}
-  REDIS_TLS_KEY: ${REDIS_TLS_KEY:-/certs/redis.key}
+x-service-defaults: &service-defaults
+  restart: always
+  init: true
+  security_opt:
+    - no-new-privileges:true
 
 x-langfuse-depends-on: &langfuse-depends-on
   postgres:
@@ -66,14 +20,10 @@ x-langfuse-depends-on: &langfuse-depends-on
   clickhouse:
     condition: service_healthy
 
-x-service-defaults: &service-defaults
-  restart: always
-
 services:
   # === LLM Services ===
   litellm:
     <<: *service-defaults
-    #    image: ghcr.io/berriai/litellm-non_root:main-stable
     image: ghcr.io/berriai/litellm:main-stable
     platform: linux/amd64
     container_name: litellm
@@ -81,9 +31,9 @@ services:
       - ./configs/litellm/.litellm.env
       - ./configs/redis/.redis.env
     ports:
-      - 4000:4000
+      - "4000:4000"
     volumes:
-      - ./configs/litellm/config.yaml:/app/config.yaml
+      - ./configs/litellm/config.yaml:/app/config.yaml:ro
     command:
       ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "1"]
     depends_on:
@@ -91,7 +41,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    init: true
     deploy:
       resources:
         limits:
@@ -114,15 +63,13 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
       timeout: 3s
-    environment:
-      <<: *postgres-credentials
     env_file:
       - ./configs/postgres/.postgres.env
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/postgres-init:/docker-entrypoint-initdb.d
+      - ./scripts/postgres-init:/docker-entrypoint-initdb.d:ro
     deploy:
       resources:
         limits:
@@ -139,8 +86,8 @@ services:
       - langfuse_clickhouse_data:/var/lib/clickhouse
       - langfuse_clickhouse_logs:/var/log/clickhouse-server
     ports:
-      - 127.0.0.1:8123:8123
-      - 127.0.0.1:9000:9000
+      - "8123:8123"
+      - "9000:9000"
     healthcheck:
       <<: *healthcheck-defaults
       test:
@@ -160,12 +107,12 @@ services:
     <<: *service-defaults
     image: redis:7
     container_name: redis
-    environment:
-      - REDIS_AUTH=${REDIS_AUTH:-myredissecret}
+    env_file:
+      - ./configs/redis/.redis.env
     command: >
       --requirepass ${REDIS_AUTH:-myredissecret}
     ports:
-      - 127.0.0.1:6379:6379
+      - "6379:6379"
     healthcheck:
       <<: *healthcheck-defaults
       test: ["CMD", "redis-cli", "-a", "${REDIS_AUTH:-myredissecret}", "ping"]
@@ -189,8 +136,8 @@ services:
     env_file:
       - ./configs/minio/.minio.env
     ports:
-      - 9090:9000
-      - 127.0.0.1:9091:9001
+      - "9090:9000"
+      - "9091:9001"
     volumes:
       - langfuse_minio_data:/data
     healthcheck:
@@ -211,12 +158,13 @@ services:
     <<: *service-defaults
     image: langfuse/langfuse-worker:3
     depends_on: *langfuse-depends-on
-    ports:
-      - 3030:3030
     env_file:
       - ./configs/minio/.minio.env
       - ./configs/clickhouse/.clickhouse.env
-    environment: *langfuse-env
+      - ./configs/langfuse/.langfuse.env
+      - ./configs/redis/.redis.env
+    ports:
+      - "3030:3030"
     deploy:
       resources:
         limits:
@@ -227,24 +175,15 @@ services:
     <<: *service-defaults
     image: langfuse/langfuse:3
     depends_on: *langfuse-depends-on
-    ports:
-      - 3000:3000
     env_file:
       - ./configs/minio/.minio.env
       - ./configs/clickhouse/.clickhouse.env
+      - ./configs/langfuse/.langfuse.env
+      - ./configs/redis/.redis.env
     environment:
-      <<: *langfuse-env
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-mysecret}
-      LANGFUSE_INIT_ORG_ID: 1111111
-      LANGFUSE_INIT_ORG_NAME: "Test Organization"
-      LANGFUSE_INIT_PROJECT_ID: 1111111
-      LANGFUSE_INIT_PROJECT_NAME: "Test Projecct"
-      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: lf-pk-1234567890
-      LANGFUSE_INIT_PROJECT_SECRET_KEY: lf-sk-1234567890
-      LANGFUSE_INIT_USER_EMAIL: randomemail@random.com
-      LANGFUSE_INIT_USER_NAME: username
-      LANGFUSE_INIT_USER_PASSWORD: 11111111111111111
+    ports:
+      - "3000:3000"
     deploy:
       resources:
         limits:
@@ -253,6 +192,7 @@ services:
 
   # === Application Services ===
   backend-agent-service:
+    <<: *service-defaults
     build:
       context: .
       dockerfile: docker/service/Dockerfile
@@ -307,6 +247,7 @@ services:
           target: /app/langgraph_agent_toolkit/run_service.py
 
   frontend-streamlit-app:
+    <<: *service-defaults
     build:
       context: .
       dockerfile: docker/app/Dockerfile
