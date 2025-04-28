@@ -1,32 +1,9 @@
--- create_databases.sql
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'postgres') THEN
-        CREATE DATABASE postgres;
-    END IF;
-END
-$$;
+-- Create required databases - using simple statements (not in functions/blocks)
+CREATE DATABASE langfuse;
+CREATE DATABASE litellm;
+CREATE DATABASE agents;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'langfuse') THEN
-        CREATE DATABASE langfuse;
-    END IF;
-END
-$$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'litellm') THEN
-        CREATE DATABASE litellm;
-    END IF;
-END
-$$;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'agents') THEN
-        CREATE DATABASE agents;
-    END IF;
-END
-$$;
+-- Grant all privileges to postgres user
+ALTER DATABASE langfuse OWNER TO postgres;
+ALTER DATABASE litellm OWNER TO postgres;
+ALTER DATABASE agents OWNER TO postgres;

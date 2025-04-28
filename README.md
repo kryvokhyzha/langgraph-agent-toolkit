@@ -213,13 +213,20 @@ Features include:
      redis_password: os.environ/REDIS_AUTH
    ```
 
-3. Setup LiteLLM environment:
+3. Setup service environment files:
+
+   Each service has its own environment file:
 
    ```sh
    cp configs/litellm/.litellm.env.example configs/litellm/.litellm.env
+   cp configs/redis/.redis.env.example configs/redis/.redis.env
+   cp configs/postgres/.postgres.env.example configs/postgres/.postgres.env
+   cp configs/minio/.minio.env.example configs/minio/.minio.env
+   cp configs/clickhouse/.clickhouse.env.example configs/clickhouse/.clickhouse.env
+   cp configs/langfuse/.langfuse.env.example configs/langfuse/.langfuse.env
    ```
 
-   Edit to include:
+   For example, edit LiteLLM environment:
 
    ```env
    LITELLM_MASTER_KEY=sk-your-master-key  # Create a strong key here
@@ -268,7 +275,7 @@ To customize the agent:
 
 ### 🐳 Docker Setup
 
-The `docker-compose.yaml` defines these services:
+The `docker-compose.yaml` defines these services with enhanced security:
 
 - `backend-agent-service`: FastAPI service
 - `frontend-streamlit-app`: Streamlit chat interface
@@ -296,7 +303,7 @@ enables live reloading:
    - 🔌 Agent API: `http://0.0.0.0:8080`
    - 📚 API docs: `http://0.0.0.0:8080/docs`
    - 📊 Langfuse dashboard: `http://0.0.0.0:3000`
-   - 🤖 LiteLLM API: `http://0.0.0.0:4000`
+   - 🤖 LiteLLM API: `http://0.0.0.0:4000` (accessible from any host)
 
 4. Stop services:
 
