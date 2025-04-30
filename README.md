@@ -28,6 +28,27 @@ Features include:
   support
 - Complete template for building and deploying your own LangGraph-based agents
 
+## 📑 Contents
+
+- [Introduction](#-introduction)
+- [Quickstart](#-quickstart)
+- [Installation Options](#-installation-options)
+- [Architecture](#-architecture)
+- [Key Features](#-key-features)
+- [Environment Setup](#-environment-setup)
+  - [Creating Your `.env` File](#-creating-your-env-file)
+  - [LiteLLM Configuration](#-litellm-configuration)
+- [Project Structure](#-project-structure)
+- [Setup and Usage](#-setup-and-usage)
+  - [Building Your Own Agent](#-building-your-own-agent)
+  - [Docker Setup](#-docker-setup)
+  - [Using the AgentClient](#-using-the-agentclient)
+  - [Development with LangGraph Studio](#-development-with-langgraph-studio)
+  - [Local Development Without Docker](#-local-development-without-docker)
+- [Useful Resources](#-useful-resources)
+- [Development and Contributing](#-development-and-contributing)
+- [License](#-license)
+
 ## 🚀 Quickstart
 
 1. Create a `.env` file based on [`.env.example`](./.env.example)
@@ -54,11 +75,33 @@ Features include:
    pip install langgraph-agent-toolkit
    ```
 
+   ℹ️ You can check available extras in
+   [Installation Options](#-installation-options) section or directly in
+   [pyproject.toml](pyproject.toml) file.
+
 4. **Option 3: Run with Docker**
 
    ```sh
    docker compose watch
    ```
+
+## 📦 Installation Options
+
+The toolkit supports multiple installation options using "extras" to include
+just the dependencies you need:
+
+### Available Extras
+
+```sh
+# LLM Provider Extras
+pip install "langgraph-agent-toolkit[openai,uvicorn-backend]"      # OpenAI and Uvicorn backend
+pip install "langgraph-agent-toolkit[anthropic,aws-backend]"   # Anthropic and AWS Lambda backend
+# Also available: google-vertexai, aws, ollama, groq, deepseek
+pip install "langgraph-agent-toolkit[all-llms,ll-backends]"    # All LLM providers and all backends
+
+# Client-Only Installation
+pip install "langgraph-agent-toolkit[client]"      # Just the client and Streamlit app
+```
 
 ## 🏗️ Architecture
 
