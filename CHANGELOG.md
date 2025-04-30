@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0]
+
+### Added
+
+- `MODEL_CONFIGS` to unify LLM env variables
+- New blueprint with AWS KB
+
+### Fixed
+
+- Streaming messages handling
+- Refactored code structure for better maintainability
+- Optional dependencies
+- API exception handling
+
 ## [0.2.0]
 
 ### Fixed
