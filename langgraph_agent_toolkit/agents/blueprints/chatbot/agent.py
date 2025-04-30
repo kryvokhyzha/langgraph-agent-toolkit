@@ -21,12 +21,22 @@ async def chatbot(
     if previous:
         messages = previous["messages"] + messages
 
-    model = ModelFactory.create(
-        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
-        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
-        openai_api_base=settings.OPENAI_API_BASE_URL,
-        openai_api_key=settings.OPENAI_API_KEY,
-    )
+    # Check if a model_config is specified in agent_config
+    model_config_key = config["configurable"].get("agent_config", {}).get("model_config")
+
+    if model_config_key and model_config_key in settings.MODEL_CONFIGS:
+        # Use the model configuration from settings
+        model_config = settings.MODEL_CONFIGS[model_config_key]
+        model = ModelFactory.get_model_from_config(model_config)
+    else:
+        # Fall back to the traditional approach
+        model = ModelFactory.create(
+            model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+            model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
+            openai_api_base=settings.OPENAI_API_BASE_URL,
+            openai_api_key=settings.OPENAI_API_KEY,
+        )
+
     response = await model.ainvoke(messages)
     return entrypoint.final(value={"messages": [response]}, save={"messages": messages + [response]})
 

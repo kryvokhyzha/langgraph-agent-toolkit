@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Annotated, Any
+from typing import Annotated, Any, Dict, Optional
 
 from dotenv import find_dotenv
 from pydantic import (
@@ -101,6 +101,9 @@ class Settings(BaseSettings):
     POSTGRES_MIN_SIZE: int = Field(default=3, description="Minimum number of connections in the pool")
     POSTGRES_MAX_IDLE: int = Field(default=5, description="Maximum number of idle connections")
 
+    # Model configurations dictionary
+    MODEL_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
         for env_name, env_value in os.environ.items():
@@ -144,6 +147,37 @@ class Settings(BaseSettings):
                     except Exception as e:
                         logger.warning(f"Failed to apply environment override for {setting_name}: {e}")
 
+    def _initialize_model_configs(self) -> None:
+        """Initialize model configurations from environment variables."""
+        model_configs_env = os.environ.get("MODEL_CONFIGS")
+        if model_configs_env:
+            try:
+                configs = json.loads(model_configs_env)
+                if isinstance(configs, dict):
+                    self.MODEL_CONFIGS = configs
+                    logger.info(f"Loaded {len(configs)} model configurations from MODEL_CONFIGS")
+                else:
+                    logger.warning("MODEL_CONFIGS environment variable is not a valid JSON object")
+            except json.JSONDecodeError:
+                logger.error("Failed to parse MODEL_CONFIGS environment variable as JSON")
+
+    def get_model_config(self, config_key: str) -> Optional[Dict[str, Any]]:
+        """Get a model configuration by key.
+
+        Args:
+            config_key: The key of the model configuration to get
+
+        Returns:
+            The model configuration dict if found, None otherwise
+
+        """
+        return self.MODEL_CONFIGS.get(config_key)
+
+    def setup(self) -> None:
+        """Initialize all settings."""
+        self._apply_langgraph_env_overrides()
+        self._initialize_model_configs()
+
     @computed_field
     @property
     def BASE_URL(self) -> str:
@@ -154,3 +188,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+settings.setup()

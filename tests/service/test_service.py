@@ -501,9 +501,9 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
             assert output.messages[1].content == ANSWER
 
 
-def test_info(test_client, mock_settings, mock_agent_executor) -> None:
+def test_info(test_client, mock_settings, mock_agent_executor):
     """Test that /info returns the correct service metadata."""
-    mock_settings.AUTH_SECRET = None
+    # Note: mock_settings is fixed to patch the correct modules
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         with patch(

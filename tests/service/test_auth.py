@@ -6,6 +6,7 @@ from pydantic import SecretStr
 
 from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.service.routes import private_router
+from langgraph_agent_toolkit.service.utils import verify_bearer
 
 
 def test_no_auth_secret(mock_settings, mock_agent_executor, test_client):
@@ -16,17 +17,18 @@ def test_no_auth_secret(mock_settings, mock_agent_executor, test_client):
     mock_response = ChatMessage(type="ai", content="This is a test response")
     mock_agent_executor.invoke.return_value = mock_response
 
-    with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post(
-            "/invoke",
-            json={"message": "test"},
-            headers={"Authorization": "Bearer any-token"},
-        )
-        assert response.status_code == 200
+    with patch("langgraph_agent_toolkit.service.utils.verify_bearer", side_effect=verify_bearer):  # Patch verify_bearer
+        with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
+            response = test_client.post(
+                "/invoke",
+                json={"message": "test"},
+                headers={"Authorization": "Bearer any-token"},
+            )
+            assert response.status_code == 200
 
-        # Should also work without any auth header
-        response = test_client.post("/invoke", json={"message": "test"})
-        assert response.status_code == 200
+            # Should also work without any auth header
+            response = test_client.post("/invoke", json={"message": "test"})
+            assert response.status_code == 200
 
 
 def test_auth_secret_correct(mock_settings, mock_agent_executor, test_client):
@@ -37,13 +39,14 @@ def test_auth_secret_correct(mock_settings, mock_agent_executor, test_client):
     mock_response = ChatMessage(type="ai", content="This is a test response")
     mock_agent_executor.invoke.return_value = mock_response
 
-    with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post(
-            "/invoke",
-            json={"message": "test"},
-            headers={"Authorization": "Bearer test-secret"},
-        )
-        assert response.status_code == 200
+    with patch("langgraph_agent_toolkit.service.utils.verify_bearer", side_effect=verify_bearer):
+        with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
+            response = test_client.post(
+                "/invoke",
+                json={"message": "test"},
+                headers={"Authorization": "Bearer test-secret"},
+            )
+            assert response.status_code == 200
 
 
 def test_auth_secret_incorrect(mock_settings, mock_agent_executor, app):

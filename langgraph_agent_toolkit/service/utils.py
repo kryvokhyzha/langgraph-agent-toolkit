@@ -2,7 +2,7 @@ import json
 import logging
 import secrets
 import warnings
-from typing import Annotated, Any, AsyncGenerator
+from typing import Annotated, Any, AsyncGenerator, Optional
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -11,7 +11,6 @@ from langchain_core._api import LangChainBetaWarning
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.logging import InterceptHandler, logger
 from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
 
@@ -60,35 +59,32 @@ def get_all_agent_info(request: Request):
 
 
 async def message_generator(
-    user_input: StreamInput, request: Request, agent_id: str = None
+    stream_input: StreamInput,
+    request: Request,
+    agent_id: str,
 ) -> AsyncGenerator[str, None]:
-    """Generate a stream of messages from the agent.
-
-    This is the workhorse method for the /stream endpoint.
-    """
+    """Generate messages from an agent."""
     executor = get_agent_executor(request)
 
-    if agent_id is None:
-        agent_id = get_default_agent()
-
     try:
-        async for item in executor.stream(
+        async for message in executor.stream(
             agent_id=agent_id,
-            message=user_input.message,
-            thread_id=user_input.thread_id,
-            user_id=user_input.user_id,
-            model_name=user_input.model_name,
-            model_provider=user_input.model_provider,
-            stream_tokens=user_input.stream_tokens,
-            agent_config=user_input.agent_config,
-            recursion_limit=user_input.recursion_limit,
+            message=stream_input.message,
+            thread_id=stream_input.thread_id,
+            user_id=stream_input.user_id,
+            model_name=stream_input.model_name,
+            model_provider=stream_input.model_provider,
+            model_config_key=stream_input.model_config_key,
+            stream_tokens=stream_input.stream_tokens,
+            agent_config=stream_input.agent_config,
+            recursion_limit=stream_input.recursion_limit,
         ):
-            if isinstance(item, str):
+            if isinstance(message, str):
                 # Token output
-                yield f"data: {json.dumps({'type': 'token', 'content': item})}\n\n"
-            elif isinstance(item, ChatMessage):
+                yield f"data: {json.dumps({'type': 'token', 'content': message})}\n\n"
+            elif isinstance(message, ChatMessage):
                 # Complete message
-                yield f"data: {json.dumps({'type': 'message', 'content': item.model_dump()})}\n\n"
+                yield f"data: {json.dumps({'type': 'message', 'content': message.model_dump()})}\n\n"
 
     except Exception as e:
         logger.error(f"Error in message_generator: {e}")

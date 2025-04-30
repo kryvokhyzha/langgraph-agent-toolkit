@@ -2,6 +2,7 @@ import warnings
 from functools import cache
 from typing import (
     Any,
+    Dict,
     List,
     Literal,
     Optional,
@@ -115,3 +116,43 @@ class ModelFactory:
                     **_model_parameter_values,
                     **kwargs,
                 )
+
+    @classmethod
+    def get_model_from_config(cls, config: Dict[str, Any], **override_params) -> BaseChatModel:
+        """Create a model from a configuration dictionary.
+
+        Args:
+            config: Model configuration dictionary
+            **override_params: Parameters to override from the configuration
+
+        Returns:
+            A BaseChatModel instance
+
+        Example:
+            >>> config = {"provider": "openai", "name": "gpt-4", "temperature": 0.7}
+            >>> model = ModelFactory.get_model_from_config(config)
+
+        """
+        if not config:
+            raise ValueError("Model configuration cannot be empty")
+
+        # Extract basic parameters
+        provider = config.get("provider", "openai")
+        model_name = config.get("name") or config.get("model_name")
+
+        if not model_name:
+            raise ValueError("Model name must be specified in the configuration")
+
+        # Copy the config to avoid modifying the original
+        params = dict(config)
+
+        # Remove some keys that are handled separately
+        params.pop("provider", None)
+        params.pop("name", None)
+        params.pop("model_name", None)
+
+        # Apply overrides
+        params.update(override_params)
+
+        # Create and return the model
+        return cls.create(model_provider=provider, model_name=model_name, **params)

@@ -227,3 +227,38 @@ def test_settings_with_langgraph_multiple_overrides():
         assert settings.HOST == "127.0.0.1"
         assert settings.PORT == 9000
         assert settings.USE_FAKE_MODEL is True
+
+
+def test_model_configs_initialization():
+    """Test that model configurations are correctly initialized from environment."""
+    test_config = '{"gpt4o": {"provider": "azure_openai", "name": "gpt-4o"}}'
+
+    with patch.dict(
+        os.environ,
+        {
+            "MODEL_CONFIGS": test_config,
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+        settings._initialize_model_configs()
+
+        assert "gpt4o" in settings.MODEL_CONFIGS
+        assert settings.MODEL_CONFIGS["gpt4o"]["provider"] == "azure_openai"
+        assert settings.MODEL_CONFIGS["gpt4o"]["name"] == "gpt-4o"
+
+
+def test_get_model_config():
+    """Test getting a model configuration by key."""
+    with patch.dict(os.environ, {}, clear=True):
+        settings = Settings(_env_file=None)
+        settings.MODEL_CONFIGS = {
+            "gpt4o": {"provider": "azure_openai", "name": "gpt-4o"},
+            "gemini": {"provider": "google_genai", "name": "gemini-pro"},
+        }
+
+        # Test getting existing config
+        assert settings.get_model_config("gpt4o") == {"provider": "azure_openai", "name": "gpt-4o"}
+
+        # Test getting non-existent config
+        assert settings.get_model_config("non-existent") is None

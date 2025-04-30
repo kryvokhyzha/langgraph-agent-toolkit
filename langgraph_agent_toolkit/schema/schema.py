@@ -54,6 +54,12 @@ class UserInput(BaseModel):
         default=None,
         examples=["openai", "anthropic"],
     )
+    model_config_key: str | None = Field(
+        title="Model Configuration Key",
+        description="Key for predefined model configuration in MODEL_CONFIGS.",
+        default=None,
+        examples=["gpt4o", "gemini"],
+    )
     thread_id: str | None = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",
         default=None,

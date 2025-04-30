@@ -138,6 +138,44 @@ Features include:
    # - Ollama
    ```
 
+   **🔀 Multi-Provider Model Configuration**
+
+   ```env
+   # Configure multiple models from different providers in a single environment variable
+   MODEL_CONFIGS={\
+     "gpt4o": {\
+       "provider": "azure_openai",\
+       "name": "gpt-4o",\
+       "api_key": "azure-key-123",\
+       "endpoint": "https://your-resource.openai.azure.com/",\
+       "api_version": "2023-05-15",\
+       "deployment": "gpt4o-deployment",\
+       "temperature": 0.7\
+     },\
+     "gpt4o-mini": {\
+       "provider": "azure_openai",\
+       "name": "gpt-4o-mini",\
+       "api_key": "azure-key-123",\
+       "endpoint": "https://your-resource.openai.azure.com/",\
+       "api_version": "2023-05-15",\
+       "deployment": "gpt4o-mini-deployment"\
+     },\
+     "gemini": {\
+       "provider": "google_genai",\
+       "name": "gemini-pro",\
+       "api_key": "google-key-123",\
+       "temperature": 0.7\
+     }\
+   }
+   ```
+
+   This configuration allows you to:
+
+   - Define multiple models with different providers in one place
+   - Reference them by logical names in your application
+   - Set provider-specific parameters for each model
+   - Switch between models without changing code
+
    **🗄️ Database Configuration**
 
    ```env

@@ -6,7 +6,6 @@ from langgraph.func import Pregel
 
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent import Agent
-from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
@@ -65,6 +64,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
             user_id=user_input.user_id,
             model_name=user_input.model_name,
             model_provider=user_input.model_provider,
+            model_config_key=user_input.model_config_key,
             agent_config=user_input.agent_config,
             recursion_limit=user_input.recursion_limit,
         )

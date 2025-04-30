@@ -30,12 +30,22 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
 
 
 async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
-    m = ModelFactory.create(
-        mmodel_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
-        model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
-        openai_api_base=settings.OPENAI_API_BASE_URL,
-        openai_api_key=settings.OPENAI_API_KEY,
-    )
+    # Check for model_config_key in configurable
+    model_config_key = config["configurable"].get("model_config_key")
+
+    if model_config_key and model_config_key in settings.MODEL_CONFIGS:
+        # Create model from configuration
+        model_config = settings.MODEL_CONFIGS[model_config_key]
+        m = ModelFactory.get_model_from_config(model_config)
+    else:
+        # Fall back to traditional approach
+        m = ModelFactory.create(
+            mmodel_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+            model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
+            openai_api_base=settings.OPENAI_API_BASE_URL,
+            openai_api_key=settings.OPENAI_API_KEY,
+        )
+
     model_runnable = wrap_model(m)
     response = await model_runnable.ainvoke(state, config)
 
