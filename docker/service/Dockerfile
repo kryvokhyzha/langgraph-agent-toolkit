@@ -8,7 +8,8 @@ ENV PYTHONPATH="/app"
 
 COPY pyproject.toml uv.lock ./
 RUN pip install --no-cache-dir uv
-RUN uv sync --frozen --no-install-project --no-dev
+RUN uv sync --frozen --no-install-project --no-dev --extra uvicorn-backend --extra openai \
+    && rm -rf /root/.cache
 
 COPY langgraph_agent_toolkit/ ./langgraph_agent_toolkit/
 

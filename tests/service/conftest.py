@@ -129,9 +129,15 @@ def test_client(mock_agent_executor, app):
 @pytest.fixture
 def mock_settings(monkeypatch):
     """Fixture to ensure settings are clean for each test."""
-    with patch("langgraph_agent_toolkit.service.routes.settings") as mock_settings:
-        mock_settings.AUTH_SECRET = None
-        yield mock_settings
+    # Patch settings in the modules where it's actually used
+    with patch("langgraph_agent_toolkit.core.settings.settings") as mock_settings:
+        with patch("langgraph_agent_toolkit.agents.agent_executor.settings", mock_settings):
+            with patch("langgraph_agent_toolkit.agents.blueprints.bg_task_agent.agent.settings", mock_settings):
+                with patch("langgraph_agent_toolkit.agents.blueprints.chatbot.agent.settings", mock_settings):
+                    # Set up the mock settings
+                    mock_settings.AUTH_SECRET = None
+                    mock_settings.MODEL_CONFIGS = {}
+                    yield mock_settings
 
 
 @pytest.fixture

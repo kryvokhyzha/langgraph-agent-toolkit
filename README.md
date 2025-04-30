@@ -28,6 +28,27 @@ Features include:
   support
 - Complete template for building and deploying your own LangGraph-based agents
 
+## 📑 Contents
+
+- [Introduction](#-introduction)
+- [Quickstart](#-quickstart)
+- [Installation Options](#-installation-options)
+- [Architecture](#architecture)
+- [Key Features](#-key-features)
+- [Environment Setup](#environment-setup)
+  - [Creating Your `.env` File](#-creating-your-env-file)
+  - [LiteLLM Configuration](#-litellm-configuration)
+- [Project Structure](#-project-structure)
+- [Setup and Usage](#setup-and-usage)
+  - [Building Your Own Agent](#-building-your-own-agent)
+  - [Docker Setup](#-docker-setup)
+  - [Using the AgentClient](#-using-the-agentclient)
+  - [Development with LangGraph Studio](#-development-with-langgraph-studio)
+  - [Local Development Without Docker](#-local-development-without-docker)
+- [Useful Resources](#-useful-resources)
+- [Development and Contributing](#-development-and-contributing)
+- [License](#-license)
+
 ## 🚀 Quickstart
 
 1. Create a `.env` file based on [`.env.example`](./.env.example)
@@ -54,11 +75,36 @@ Features include:
    pip install langgraph-agent-toolkit
    ```
 
+   ℹ️ You can check available extras in
+   [Installation Options](#-installation-options) section or directly in
+   [pyproject.toml](pyproject.toml) file.
+
 4. **Option 3: Run with Docker**
 
    ```sh
    docker compose watch
    ```
+
+## 📦 Installation Options
+
+The toolkit supports multiple installation options using "extras" to include
+just the dependencies you need:
+
+### Available Extras
+
+```sh
+# LLM Provider Extras
+pip install "langgraph-agent-toolkit[openai,uvicorn-backend]"        # OpenAI and Uvicorn backend
+pip install "langgraph-agent-toolkit[anthropic,aws-backend]"         # Anthropic and AWS Lambda backend
+
+# Also available: google-vertexai, aws, ollama, groq, deepseek
+pip install "langgraph-agent-toolkit[all-llms,ll-backends]"          # All LLM providers and all backends
+
+# Client-Only Installation
+pip install "langgraph-agent-toolkit[client]"                        # Just the client and Streamlit app
+```
+
+<a name="architecture"></a>
 
 ## 🏗️ Architecture
 
@@ -97,6 +143,8 @@ Features include:
    - User feedback system
    - Prompt management system
    - LiteLLM proxy integration
+
+<a name="environment-setup"></a>
 
 ## ⚙️ Environment Setup
 
@@ -137,6 +185,44 @@ Features include:
    # - DeepSeek
    # - Ollama
    ```
+
+   **🔀 Multi-Provider Model Configuration**
+
+   ```env
+   # Configure multiple models from different providers in a single environment variable
+   MODEL_CONFIGS={\
+     "gpt4o": {\
+       "provider": "azure_openai",\
+       "name": "gpt-4o",\
+       "api_key": "azure-key-123",\
+       "endpoint": "https://your-resource.openai.azure.com/",\
+       "api_version": "2023-05-15",\
+       "deployment": "gpt4o-deployment",\
+       "temperature": 0.7\
+     },\
+     "gpt4o-mini": {\
+       "provider": "azure_openai",\
+       "name": "gpt-4o-mini",\
+       "api_key": "azure-key-123",\
+       "endpoint": "https://your-resource.openai.azure.com/",\
+       "api_version": "2023-05-15",\
+       "deployment": "gpt4o-mini-deployment"\
+     },\
+     "gemini": {\
+       "provider": "google_genai",\
+       "name": "gemini-pro",\
+       "api_key": "google-key-123",\
+       "temperature": 0.7\
+     }\
+   }
+   ```
+
+   This configuration allows you to:
+
+   - Define multiple models with different providers in one place
+   - Reference them by logical names in your application
+   - Set provider-specific parameters for each model
+   - Switch between models without changing code
 
    **🗄️ Database Configuration**
 
@@ -235,7 +321,8 @@ Features include:
    STORE_MODEL_IN_DB=True
    ```
 
-> **Note**: LiteLLM relies on Redis for request caching and rate limiting.
+> [!NOTE]  
+> LiteLLM relies on Redis for request caching and rate limiting.
 
 ## 📂 Project Structure
 
@@ -250,6 +337,8 @@ The repository contains:
 - `langgraph_agent_toolkit/streamlit_app.py`: Chat interface
 - `docker/`: Docker configurations
 - `tests/`: Test suite
+
+<a name="setup-and-usage"></a>
 
 ## 🛠️ Setup and Usage
 

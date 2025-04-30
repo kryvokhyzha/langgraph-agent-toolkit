@@ -1,3 +1,5 @@
+import inspect
+
 from langchain_core.messages import (
     AIMessage,
     BaseMessage,
@@ -78,3 +80,10 @@ def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]
     return [
         content_item for content_item in content if isinstance(content_item, str) or content_item["type"] != "tool_use"
     ]
+
+
+def create_ai_message(parts: dict) -> AIMessage:
+    sig = inspect.signature(AIMessage)
+    valid_keys = set(sig.parameters)
+    filtered = {k: v for k, v in parts.items() if k in valid_keys}
+    return AIMessage(**filtered)

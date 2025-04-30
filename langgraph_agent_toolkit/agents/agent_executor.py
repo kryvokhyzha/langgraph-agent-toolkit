@@ -16,10 +16,12 @@ from langgraph.pregel import Pregel
 from langgraph.types import Command, Interrupt
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT, get_default_agent, set_default_agent
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import (
     convert_message_content_to_string,
+    create_ai_message,
     langchain_to_chat_message,
     remove_tool_calls,
 )
@@ -174,6 +176,7 @@ class AgentExecutor:
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
         model_provider: Optional[str] = None,
+        model_config_key: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> Tuple[Agent, Any, Any, UUID]:
@@ -186,6 +189,7 @@ class AgentExecutor:
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
             model_provider: Optional model provider to override the default
+            model_config_key: Optional model config key to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
 
@@ -210,11 +214,25 @@ class AgentExecutor:
             "user_id": user_id,
         }
 
-        if model_name:
-            configurable["model_name"] = model_name
+        # Handle model_config_key if provided (takes precedence over individual model settings)
+        if model_config_key and model_config_key in settings.MODEL_CONFIGS:
+            # Store the model_config_key so agents can use it if needed
+            configurable["model_config_key"] = model_config_key
 
-        if model_provider:
-            configurable["model_provider"] = model_provider
+            # Extract basic model info for backward compatibility with agents that
+            # don't explicitly check for model_config_key
+            model_config = settings.MODEL_CONFIGS[model_config_key]
+            if "provider" in model_config:
+                configurable["model_provider"] = model_config["provider"]
+            if "name" in model_config:
+                configurable["model_name"] = model_config["name"]
+        else:
+            # Fall back to individual parameters
+            if model_name:
+                configurable["model_name"] = model_name
+
+            if model_provider:
+                configurable["model_provider"] = model_provider
 
         if agent_config:
             configurable.update(agent_config)
@@ -250,6 +268,7 @@ class AgentExecutor:
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
         model_provider: Optional[str] = None,
+        model_config_key: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> ChatMessage:
@@ -262,6 +281,7 @@ class AgentExecutor:
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
             model_provider: Optional model provider to override the default
+            model_config_key: Optional model config key to override the default
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
 
@@ -276,6 +296,7 @@ class AgentExecutor:
             user_id=user_id,
             model_name=model_name,
             model_provider=model_provider,
+            model_config_key=model_config_key,  # Pass this parameter
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )
@@ -310,6 +331,7 @@ class AgentExecutor:
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
         model_provider: Optional[str] = None,
+        model_config_key: Optional[str] = None,
         stream_tokens: bool = True,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
@@ -323,6 +345,7 @@ class AgentExecutor:
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
             model_provider: Optional model provider to override the default
+            model_config_key: Optional model config key to override the default
             stream_tokens: Whether to stream individual tokens
             agent_config: Optional additional configuration for the agent
             recursion_limit: Optional recursion limit for the agent
@@ -338,6 +361,7 @@ class AgentExecutor:
             user_id=user_id,
             model_name=model_name,
             model_provider=model_provider,
+            model_config_key=model_config_key,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )
@@ -400,8 +424,29 @@ class AgentExecutor:
                     # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
                     yield convert_message_content_to_string(content)
 
-            # Process and yield all collected messages
-            for msg in new_messages:
+            # LangGraph streaming may emit tuples: (field_name, field_value)
+            # e.g. ('content', <str>), ('tool_calls', [ToolCall,...]), ('additional_kwargs', {...}), etc.
+            # We accumulate only supported fields into `parts` and skip unsupported metadata.
+            # More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/
+            processed_messages = []
+            current_message: dict[str, Any] = {}
+            for message in new_messages:
+                if isinstance(message, tuple):
+                    key, value = message
+                    # Store parts in temporary dict
+                    current_message[key] = value
+                else:
+                    # Add complete message if we have one in progress
+                    if current_message:
+                        processed_messages.append(create_ai_message(current_message))
+                        current_message = {}
+                    processed_messages.append(message)
+
+            # Add any remaining message parts
+            if current_message:
+                processed_messages.append(create_ai_message(current_message))
+
+            for message in processed_messages:
                 try:
                     chat_message = langchain_to_chat_message(msg)
                     chat_message.run_id = str(run_id)
