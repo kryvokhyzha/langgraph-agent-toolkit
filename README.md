@@ -33,13 +33,13 @@ Features include:
 - [Introduction](#-introduction)
 - [Quickstart](#-quickstart)
 - [Installation Options](#-installation-options)
-- [Architecture](#-architecture)
+- [Architecture](#architecture)
 - [Key Features](#-key-features)
-- [Environment Setup](#-environment-setup)
+- [Environment Setup](#environment-setup)
   - [Creating Your `.env` File](#-creating-your-env-file)
   - [LiteLLM Configuration](#-litellm-configuration)
 - [Project Structure](#-project-structure)
-- [Setup and Usage](#-setup-and-usage)
+- [Setup and Usage](#setup-and-usage)
   - [Building Your Own Agent](#-building-your-own-agent)
   - [Docker Setup](#-docker-setup)
   - [Using the AgentClient](#-using-the-agentclient)
@@ -103,6 +103,8 @@ pip install "langgraph-agent-toolkit[all-llms,ll-backends]"    # All LLM provide
 pip install "langgraph-agent-toolkit[client]"      # Just the client and Streamlit app
 ```
 
+<a name="architecture"></a>
+
 ## 🏗️ Architecture
 
 <!-- <img src="docs/media/agent_architecture.png" width="800"> -->
@@ -140,6 +142,8 @@ pip install "langgraph-agent-toolkit[client]"      # Just the client and Streaml
    - User feedback system
    - Prompt management system
    - LiteLLM proxy integration
+
+<a name="environment-setup"></a>
 
 ## ⚙️ Environment Setup
 
@@ -332,6 +336,8 @@ The repository contains:
 - `langgraph_agent_toolkit/streamlit_app.py`: Chat interface
 - `docker/`: Docker configurations
 - `tests/`: Test suite
+
+<a name="setup-and-usage"></a>
 
 ## 🛠️ Setup and Usage
 
