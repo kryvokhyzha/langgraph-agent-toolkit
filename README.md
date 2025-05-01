@@ -98,7 +98,7 @@ pip install "langgraph-agent-toolkit[openai,uvicorn-backend]"        # OpenAI an
 pip install "langgraph-agent-toolkit[anthropic,aws-backend]"         # Anthropic and AWS Lambda backend
 
 # Also available: google-vertexai, aws, ollama, groq, deepseek
-pip install "langgraph-agent-toolkit[all-llms,ll-backends]"          # All LLM providers and all backends
+pip install "langgraph-agent-toolkit[all-llms,all-backends]"         # All LLM providers and all backends
 
 # Client-Only Installation
 pip install "langgraph-agent-toolkit[client]"                        # Just the client and Streamlit app
