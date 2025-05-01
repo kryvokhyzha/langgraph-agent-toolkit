@@ -127,7 +127,7 @@ pip install "langgraph-agent-toolkit[client]"                        # Just the 
    - Available agents and models listed at `/info` endpoint
    - Supports different runners:
      - unicorn
-     - ⚠️ gunicorn - _experimental_
+     - gunicorn
      - ⚠️ mangum (AWS Lambda) - _experimental_
      - ⚠️ azure functions - _experimental_
 
