@@ -94,14 +94,14 @@ just the dependencies you need:
 
 ```sh
 # LLM Provider Extras
-pip install "langgraph-agent-toolkit[openai,uvicorn-backend]"        # OpenAI and Uvicorn backend
-pip install "langgraph-agent-toolkit[anthropic,aws-backend]"         # Anthropic and AWS Lambda backend
+pip install "langgraph-agent-toolkit[openai,uvicorn-backend,langfuse]"              # OpenAI, Uvicorn backend, and Langfuse observability
+pip install "langgraph-agent-toolkit[anthropic,aws-backend,langsmith]"              # Anthropic, AWS Lambda backend, and Langsmith observability
 
 # Also available: google-vertexai, aws, ollama, groq, deepseek
-pip install "langgraph-agent-toolkit[all-llms,all-backends]"         # All LLM providers and all backends
+pip install "langgraph-agent-toolkit[all-llms,all-backends,all-observability]"      # All LLM providers, all backends, and all observability platforms
 
 # Client-Only Installation
-pip install "langgraph-agent-toolkit[client]"                        # Just the client and Streamlit app
+pip install "langgraph-agent-toolkit[client]"                                       # Just the client and Streamlit app
 ```
 
 <a name="architecture"></a>
