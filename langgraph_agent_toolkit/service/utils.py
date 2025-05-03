@@ -58,6 +58,15 @@ def get_all_agent_info(request: Request):
     return executor.get_all_agent_info()
 
 
+def _validate_thread_or_user_id(thread_id: Optional[str], user_id: Optional[str]) -> None:
+    """Validate that either thread_id or user_id is provided."""
+    if thread_id is None and user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either thread_id or user_id must be provided.",
+        )
+
+
 async def message_generator(
     stream_input: StreamInput,
     request: Request,

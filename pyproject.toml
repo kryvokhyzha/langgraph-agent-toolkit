@@ -206,7 +206,8 @@ exclude=[
     "dist",
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
+"scripts/python/*"=["E402"]
 "langgraph_agent_toolkit/run_agent.py"=["E402"]
 "langgraph_agent_toolkit/service/factory.py"=["F821"]
 

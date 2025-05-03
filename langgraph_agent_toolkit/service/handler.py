@@ -105,7 +105,12 @@ def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     logger.info(f"Initializing API service v{__version__}")
 
-    app = FastAPI(lifespan=lifespan)
+    app = FastAPI(
+        lifespan=lifespan,
+        title="LangGraph Agent API",
+        description="API for interacting with LangGraph agents",
+        version=__version__,
+    )
 
     # add middleware
     app.add_middleware(LoggingMiddleware)
