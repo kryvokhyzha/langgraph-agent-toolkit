@@ -4,7 +4,6 @@ import os
 import sys
 from typing import Any, Dict, Optional
 
-import uvicorn
 from fastapi import FastAPI
 
 from langgraph_agent_toolkit.core import settings as base_settings
@@ -61,37 +60,56 @@ class ServiceRunner:
 
         self.app = create_app()
 
-    def run_uvicorn(self):
+    def run_uvicorn(self, **kwargs):
         """Run the API service with uvicorn."""
-        # Set Compatible event loop policy on Windows Systems.
-        if sys.platform == "win32":
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        try:
+            import uvicorn
 
-        # In development mode with reload=True, we need to use an import string
-        # instead of passing the app instance directly
-        if base_settings.is_dev():
-            logger.info("Starting in development mode with hot reload enabled")
-            uvicorn.run(
-                "langgraph_agent_toolkit.service.handler:create_app",
-                host=base_settings.HOST,
-                port=base_settings.PORT,
-                reload=True,
-                factory=True,
-            )
-        else:
-            # In production mode, use the app instance directly
-            uvicorn.run(
-                self.app,
-                host=base_settings.HOST,
-                port=base_settings.PORT,
-                reload=False,
-            )
+            # Set Compatible event loop policy on Windows Systems.
+            if sys.platform == "win32":
+                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    def run_gunicorn(self, workers: int = 4):
+            # In development mode with reload=True, we need to use an import string
+            # instead of passing the app instance directly
+            if base_settings.is_dev():
+                logger.info("Starting in development mode with hot reload enabled")
+
+                # union of dict and kwargs
+                parameters = (
+                    dict(
+                        host=base_settings.HOST,
+                        port=base_settings.PORT,
+                        reload=True,
+                        factory=True,
+                    )
+                    | kwargs
+                )
+
+                uvicorn.run("langgraph_agent_toolkit.service.handler:create_app", **parameters)
+            else:
+                # In production mode, use the app instance directly
+                parameters = (
+                    dict(
+                        host=base_settings.HOST,
+                        port=base_settings.PORT,
+                        reload=False,
+                    )
+                    | kwargs
+                )
+
+                uvicorn.run(
+                    self.app,
+                    **parameters,
+                )
+        except ImportError:
+            logger.error("Uvicorn not installed. Install it with 'pip install uvicorn'")
+            sys.exit(1)
+
+    def run_gunicorn(self, **kwargs):
         """Run the API service with gunicorn.
 
         Args:
-            workers: Number of worker processes.
+            **kwargs: Additional arguments to pass to gunicorn
 
         """
         try:
@@ -112,26 +130,25 @@ class ServiceRunner:
 
             options = {
                 "bind": f"{base_settings.HOST}:{base_settings.PORT}",
-                "workers": workers,
                 "worker_class": "uvicorn.workers.UvicornWorker",
-            }
+            } | kwargs
 
             GunicornApp(self.app, options).run()
         except ImportError:
             logger.error("Gunicorn not installed. Install it with 'pip install gunicorn'")
             sys.exit(1)
 
-    def run_aws_lambda(self):
+    def run_aws_lambda(self, **kwargs):
         """Prepare the API service for AWS Lambda."""
         try:
             from mangum import Mangum
 
-            return Mangum(self.app)
+            return Mangum(self.app, **kwargs)
         except ImportError:
             logger.error("Mangum not installed. Install it with 'pip install mangum'")
             sys.exit(1)
 
-    def run_azure_functions(self):
+    def run_azure_functions(self, **kwargs):
         """Prepare the API service for Azure Functions."""
         try:
             import azure.functions as func
@@ -198,15 +215,17 @@ class ServiceRunner:
             **kwargs: Additional arguments to pass to the runner.
 
         """
+        runner_type = RunnerType(runner_type)
+        logger.info(f"Running service with runner type {runner_type.value} with options: {kwargs}")
+
         match runner_type:
             case RunnerType.UVICORN:
-                self.run_uvicorn()
+                self.run_uvicorn(**kwargs)
             case RunnerType.GUNICORN:
-                workers = kwargs.get("workers", 4)
-                self.run_gunicorn(workers=workers)
+                self.run_gunicorn(**kwargs)
             case RunnerType.AWS_LAMBDA:
-                return self.run_aws_lambda()
+                return self.run_aws_lambda(**kwargs)
             case RunnerType.AZURE_FUNCTIONS:
-                return self.run_azure_functions()
+                return self.run_azure_functions(**kwargs)
             case _:
                 raise ValueError(f"Unknown runner type: {runner_type}")

@@ -94,14 +94,14 @@ just the dependencies you need:
 
 ```sh
 # LLM Provider Extras
-pip install "langgraph-agent-toolkit[openai,uvicorn-backend]"        # OpenAI and Uvicorn backend
-pip install "langgraph-agent-toolkit[anthropic,aws-backend]"         # Anthropic and AWS Lambda backend
+pip install "langgraph-agent-toolkit[openai,uvicorn-backend,langfuse]"              # OpenAI, Uvicorn backend, and Langfuse observability
+pip install "langgraph-agent-toolkit[anthropic,aws-backend,langsmith]"              # Anthropic, AWS Lambda backend, and Langsmith observability
 
 # Also available: google-vertexai, aws, ollama, groq, deepseek
-pip install "langgraph-agent-toolkit[all-llms,ll-backends]"          # All LLM providers and all backends
+pip install "langgraph-agent-toolkit[all-llms,all-backends,all-observability]"      # All LLM providers, all backends, and all observability platforms
 
 # Client-Only Installation
-pip install "langgraph-agent-toolkit[client]"                        # Just the client and Streamlit app
+pip install "langgraph-agent-toolkit[client]"                                       # Just the client and Streamlit app
 ```
 
 <a name="architecture"></a>
@@ -127,7 +127,7 @@ pip install "langgraph-agent-toolkit[client]"                        # Just the 
    - Available agents and models listed at `/info` endpoint
    - Supports different runners:
      - unicorn
-     - ⚠️ gunicorn - _experimental_
+     - gunicorn
      - ⚠️ mangum (AWS Lambda) - _experimental_
      - ⚠️ azure functions - _experimental_
 
@@ -462,6 +462,8 @@ The project works with
 
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
 - [LangGraph Memory Concept](https://langchain-ai.github.io/langgraph/concepts/memory/)
+- [LangGraph Memory Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/#memory)
+- [How to edit graph state](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/edit-graph-state/)
 - [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
 - [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 

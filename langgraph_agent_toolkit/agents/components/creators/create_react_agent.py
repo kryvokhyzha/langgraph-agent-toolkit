@@ -366,6 +366,10 @@ def create_react_agent(
     # Define the function that determines whether to continue or not
     def should_continue(state: Any) -> Union[str, list]:
         messages = _get_state_value(state, "messages")
+
+        if not messages:
+            return END if response_format is None else "generate_structured_response"
+
         last_message = messages[-1]
         # If there is no function call, then we finish
         if not isinstance(last_message, AIMessage) or not last_message.tool_calls:

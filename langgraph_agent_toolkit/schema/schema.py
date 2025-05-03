@@ -1,6 +1,6 @@
 from typing import Any, Literal, NotRequired
 
-from pydantic import BaseModel, Field, SerializeAsAny
+from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.helper.constants import (
@@ -197,11 +197,110 @@ class FeedbackResponse(BaseModel):
     )
 
 
+class MessageInput(BaseModel):
+    """Input for a message to be added to the chat history."""
+
+    type: Literal["human", "ai", "tool", "custom"] = Field(
+        description="Role of the message.",
+        examples=["human", "ai", "tool", "custom"],
+    )
+    content: str = Field(
+        description="Content of the message.",
+        examples=["Hello, world!"],
+    )
+
+
+class AddMessagesInput(BaseModel):
+    """Input for adding messages to the chat history."""
+
+    thread_id: str | None = Field(
+        description="Thread ID to persist and continue a multi-turn conversation.",
+        default=None,
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    user_id: str | None = Field(
+        description="User ID to persist in observability platform and share long-term memory.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
+    messages: list[MessageInput] = Field(
+        description="List of messages to add to the chat history.",
+        examples=[
+            [
+                {
+                    "type": "human",
+                    "content": "Hello, how are you?",
+                },
+                {
+                    "type": "ai",
+                    "content": "I'm doing well, thank you! How can I assist you today?",
+                },
+            ]
+        ],
+    )
+
+
+class AddMessagesResponse(BaseModel):
+    """Response after adding messages to the chat history."""
+
+    status: Literal["success"] = "success"
+    thread_id: str | None = Field(
+        description="Thread ID for which the message was added.",
+        default=None,
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    user_id: str | None = Field(
+        description="User ID associated with the message.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
+    message: str = Field(
+        description="Descriptive message about the operation.",
+        default="Messages added successfully.",
+    )
+
+
+class ClearHistoryInput(BaseModel):
+    """Input for clearing messages from the chat history."""
+
+    thread_id: str | None = Field(
+        description="Thread ID to persist and continue a multi-turn conversation.",
+        default=None,
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    user_id: str | None = Field(
+        description="User ID to persist in observability platform and share long-term memory.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
+
+
+class ClearHistoryResponse(BaseModel):
+    """Response after clearing messages from the chat history."""
+
+    status: Literal["success"] = "success"
+    thread_id: str | None = Field(
+        description="Thread ID for which the messages were cleared.",
+        default=None,
+        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    user_id: str | None = Field(
+        description="User ID associated with the operation.",
+        default=None,
+        examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
+    )
+    message: str = Field(
+        description="Descriptive message about the operation.",
+        default="Messages cleared successfully.",
+    )
+
+
 class ChatHistoryInput(BaseModel):
     """Input for retrieving chat history."""
 
-    thread_id: str = Field(
+    thread_id: str | None = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",
+        default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     user_id: str | None = Field(
