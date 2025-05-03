@@ -473,7 +473,7 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
     user_question = HumanMessage(content=QUESTION)
     agent_response = AIMessage(content=ANSWER)
 
-    # Create a proper StateSnapshot
+    # Create a proper StateSnapshot with messages
     state_snapshot = StateSnapshot(
         values={"messages": [user_question, agent_response]},
         next=(),
@@ -484,17 +484,20 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
         tasks=(),
     )
 
-    mock_agent.graph.get_state.return_value = state_snapshot
+    # Mock get_state to return our state snapshot with messages
+    mock_agent.graph.aget_state = AsyncMock(return_value=state_snapshot)
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         with patch("langgraph_agent_toolkit.service.routes.get_agent", return_value=mock_agent):
-            # Add user_id=None to the request
-            response = test_client.post(
-                "/history", json={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6", "user_id": None}
+            # Use GET request with query parameters
+            response = test_client.get(
+                "/history", params={"thread_id": "7bcc7cc1-99d7-4b1d-bdb5-e6f90ed44de6", "user_id": None}
             )
             assert response.status_code == 200
 
             output = ChatHistory.model_validate(response.json())
+            # Ensure there are messages before accessing them
+            assert len(output.messages) > 0
             assert output.messages[0].type == "human"
             assert output.messages[0].content == QUESTION
             assert output.messages[1].type == "ai"

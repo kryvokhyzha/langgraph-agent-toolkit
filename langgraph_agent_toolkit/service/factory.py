@@ -215,6 +215,7 @@ class ServiceRunner:
             **kwargs: Additional arguments to pass to the runner.
 
         """
+        runner_type = RunnerType(runner_type)
         logger.info(f"Running service with runner type {runner_type.value} with options: {kwargs}")
 
         match runner_type:
