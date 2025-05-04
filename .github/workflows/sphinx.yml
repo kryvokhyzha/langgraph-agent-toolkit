@@ -50,20 +50,38 @@ jobs:
       - name: Create static directory if it doesn't exist
         run: |
           mkdir -p docs/_static
-          # Don't try to create a placeholder logo since we're not using one
-          # if [ ! -f docs/_static/logo.png ]; then
-          #   touch docs/_static/logo.png
-          # fi
 
       - name: Generate API docs
         run: |
-          # Use improved options for better API docs
+          # Enhanced API documentation generation with better code documentation
           sphinx-apidoc -f -e -o docs/generated langgraph_agent_toolkit \
             --separate \
             --no-toc \
-            --module-first \
             --no-headings \
+            --module-first \
             --doc-project="API Reference"
+
+      - name: Create autosummary template files
+        run: |
+          mkdir -p docs/_templates/autosummary
+          echo '{{ fullname | escape | underline }}
+
+          .. automodule:: {{ fullname }}
+             :members:
+             :undoc-members:
+             :show-inheritance:
+             :special-members: __init__' > docs/_templates/autosummary/module.rst
+
+          echo '{{ fullname | escape | underline }}
+
+          .. currentmodule:: {{ module }}
+
+          .. autoclass:: {{ objname }}
+             :members:
+             :show-inheritance:
+             :inherited-members:
+             :special-members: __init__
+             :undoc-members:' > docs/_templates/autosummary/class.rst
 
       - name: Build documentation
         run: |

@@ -16,6 +16,17 @@ from sphinx_pyproject import SphinxConfig
 sys.path.insert(0, os.path.abspath("../"))
 config = SphinxConfig("../pyproject.toml", globalns=globals())
 
+# Explicitly set project information from pyproject.toml
+project = "LangGraph Agent Toolkit"
+author = ", ".join([author["name"] for author in config.config.get("project", {}).get("authors", [])])
+copyright = f"2025, {author}"
+release = config.version
+version = ".".join(release.split(".")[:2])
+
+# Additional project information from pyproject.toml
+html_title = project
+description = config.config.get("project", {}).get("description", "")
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -91,10 +102,18 @@ def linkcode_resolve(domain, info):
     except TypeError:
         return None
 
+    # Create a clean relative path from project root
     source_file = os.path.relpath(source_file, start=os.path.dirname(os.path.abspath("../")))
 
-    # GitHub URL pattern
-    github_url = f"https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/{source_file}"
+    # Get GitHub URL from pyproject.toml
+    repo_url = (
+        config.config.get("project", {})
+        .get("urls", {})
+        .get("repository", "https://github.com/kryvokhyzha/langgraph-agent-toolkit")
+    )
+
+    # GitHub URL pattern - use specific branch (main) and organization/repo
+    github_url = f"{repo_url}/blob/main/{source_file}"
 
     try:
         source_lines, lineno = inspect.getsourcelines(obj)
@@ -116,3 +135,9 @@ html_theme_options = {
     "display_version": True,
     "style_external_links": True,
 }
+
+# Set the master document
+master_doc = "index"
+
+# Show source links for all entities
+html_show_sourcelink = True
