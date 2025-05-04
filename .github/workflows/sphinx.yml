@@ -44,7 +44,7 @@ jobs:
         run: |
           # Install the package itself with all dependencies (instead of just installing the dev dependencies)
           uv pip install -e ".[all-llms,all-backends,all-observability]"
-          uv pip install sphinx-rtd-theme sphinx-pyproject rootutils
+          uv pip install sphinx-rtd-theme sphinx-pyproject rootutils mock
         env:
           UV_SYSTEM_PYTHON: 1
 
