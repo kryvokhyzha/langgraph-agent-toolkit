@@ -80,6 +80,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.linkcode",  # Add linkcode extension for better source links
+    "sphinx.ext.githubpages",  # Enable linking to GitHub repository
 ]
 
 templates_path = ["_templates"]
@@ -135,3 +136,69 @@ master_doc = "index"
 
 # Show source links for all entities
 html_show_sourcelink = True
+
+# Enable linking to GitHub repository
+html_context = {
+    "display_github": True,
+    "github_user": "kryvokhyzha",
+    "github_repo": "langgraph-agent-toolkit",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
+}
+
+# Build documentation URL
+html_baseurl = "https://kryvokhyzha.github.io/langgraph-agent-toolkit/"
+
+
+# Function to resolve links to GitHub source code
+def linkcode_resolve(domain, info):
+    """Determine the URL corresponding to a Python object.
+
+    This function links documentation to the source code on GitHub.
+    """
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    # Handle special cases like imported modules or objects
+    if not modname:
+        return None
+
+    try:
+        obj = sys.modules[modname]
+        for part in fullname.split("."):
+            obj = getattr(obj, part)
+
+        # Get the source file
+        import inspect
+
+        try:
+            source_file = inspect.getsourcefile(obj)
+        except (TypeError, AttributeError):
+            return None
+
+        if source_file is None:
+            return None
+
+        # Convert source file path to relative path in the repository
+        source_file = os.path.relpath(source_file, start=root_path)
+
+        # Convert to URL
+        # Line number info (if available)
+        try:
+            source_lines, lineno = inspect.getsourcelines(obj)
+        except (OSError, TypeError):
+            lineno = None
+
+        if lineno:
+            linespec = f"#L{lineno}-L{lineno + len(source_lines) - 1}"
+        else:
+            linespec = ""
+
+        # Create GitHub URL
+        github_url = f"{repository_url}/blob/main/{source_file}{linespec}"
+        return github_url
+    except Exception:
+        return None
