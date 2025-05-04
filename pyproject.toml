@@ -69,6 +69,8 @@ dev = [
     "pytest-env",
     "pytest-asyncio",
     "ruff",
+    "sphinx",
+    "sphinx-pyproject",
 ]
 
 # Group for the minimal dependencies to run just the client and Streamlit app.
@@ -168,7 +170,7 @@ all-observability = [
 ]
 
 [project.urls]
-# documentation = "https://langgraph-agent-toolkit.readthedocs.org"
+documentation = "https://kryvokhyzha.github.io/langgraph-agent-toolkit"
 repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
 "PyPI" = "https://pypi.org/project/langgraph-agent-toolkit"
 
