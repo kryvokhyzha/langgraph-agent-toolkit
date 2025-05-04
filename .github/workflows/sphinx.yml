@@ -50,14 +50,24 @@ jobs:
       - name: Create static directory if it doesn't exist
         run: |
           mkdir -p docs/_static
+          # Don't try to create a placeholder logo since we're not using one
+          # if [ ! -f docs/_static/logo.png ]; then
+          #   touch docs/_static/logo.png
+          # fi
 
       - name: Generate API docs
         run: |
-          sphinx-apidoc -f -e -M -o docs/generated langgraph_agent_toolkit
+          # Use improved options for better API docs
+          sphinx-apidoc -f -e -o docs/generated langgraph_agent_toolkit \
+            --separate \
+            --no-toc \
+            --module-first \
+            --no-headings \
+            --doc-project="API Reference"
 
       - name: Build documentation
         run: |
-          cd docs && sphinx-build -b html . _build/html
+          cd docs && sphinx-build -b html -a -E . _build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

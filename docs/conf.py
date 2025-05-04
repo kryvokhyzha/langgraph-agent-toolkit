@@ -6,6 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import inspect
 import os
 import sys
 
@@ -25,6 +26,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
+    "sphinx.ext.linkcode",  # Add linkcode extension for better source links
 ]
 
 templates_path = ["_templates"]
@@ -35,6 +37,8 @@ napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = False
+napoleon_use_param = True  # Show parameter types and descriptions
+napoleon_use_rtype = True  # Show return types
 
 # Autodoc settings
 autodoc_default_options = {
@@ -42,9 +46,15 @@ autodoc_default_options = {
     "member-order": "bysource",
     "undoc-members": True,
     "special-members": "__init__",
+    "show-inheritance": True,
+    "inherited-members": True,
 }
 autodoc_typehints = "description"
 autoclass_content = "both"
+autodoc_preserve_defaults = True  # Preserve default values in signature
+
+# Enable autosummary
+autosummary_generate = True
 
 # Intersphinx mappings
 intersphinx_mapping = {
@@ -54,12 +64,53 @@ intersphinx_mapping = {
     "fastapi": ("https://fastapi.tiangolo.com/", None),
 }
 
+
+# Setup linkcode for source code links to GitHub
+def linkcode_resolve(domain, info):
+    """Link source code to GitHub repository."""
+    if domain != "py" or not info["module"]:
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    obj = sys.modules.get(modname)
+    if obj is None:
+        return None
+
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    try:
+        source_file = inspect.getsourcefile(obj)
+        if source_file is None:
+            return None
+    except TypeError:
+        return None
+
+    source_file = os.path.relpath(source_file, start=os.path.dirname(os.path.abspath("../")))
+
+    # GitHub URL pattern
+    github_url = f"https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/{source_file}"
+
+    try:
+        source_lines, lineno = inspect.getsourcelines(obj)
+        github_url += f"#L{lineno}-L{lineno + len(source_lines) - 1}"
+    except (OSError, TypeError):
+        pass
+
+    return github_url
+
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_logo = "_static/logo.png"  # Add your logo later
+# html_logo = "_static/logo.png"  # Comment out logo as it doesn't exist
 html_theme_options = {
     "logo_only": False,
     "display_version": True,
