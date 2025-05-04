@@ -10,43 +10,35 @@ import inspect
 import os
 import sys
 
-import toml
+import rootutils
 from sphinx_pyproject import SphinxConfig
 
 
-sys.path.insert(0, os.path.abspath("../"))
-config = SphinxConfig("../pyproject.toml", globalns=globals())
+# Find project root path
+root_path = rootutils.find_root(search_from=__file__, indicator=["p.project-root"])
 
-# Load pyproject.toml directly to access all metadata
-pyproject_path = os.path.join(os.path.dirname(os.path.abspath("../")), "pyproject.toml")
-pyproject = toml.load(pyproject_path)
+# Add the package to the path for autodoc to find it
+sys.path.insert(0, os.path.abspath(root_path))
 
-# Explicitly set project information from pyproject.toml
-project = "LangGraph Agent Toolkit"
-copyright = f"2023-2025, {config.author}"
-author = config.author
+# Load configuration from pyproject.toml
+config = SphinxConfig(os.path.join(root_path, "pyproject.toml"), globalns=globals())
 
-# Extract version
+# Explicitly set project information from pyproject.toml via SphinxConfig
+project = config.name  # Use name from pyproject.toml
+author = "Roman Kryvokhyzha"  # Hardcoded as requested
+copyright = f"2023-2025, {author}"
+
+# Extract version from pyproject.toml
 release = config.version
 version = ".".join(release.split(".")[:2])
 
 # Additional project information from pyproject.toml
-description = pyproject.get("project", {}).get(
-    "description", "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
-)
+description = config.description  # Use description from pyproject.toml
 html_title = project
 
-# URLs from pyproject.toml
-repository_url = (
-    pyproject.get("project", {})
-    .get("urls", {})
-    .get("repository", "https://github.com/kryvokhyzha/langgraph-agent-toolkit")
-)
-documentation_url = (
-    pyproject.get("project", {})
-    .get("urls", {})
-    .get("documentation", "https://kryvokhyzha.github.io/langgraph-agent-toolkit")
-)
+# URLs from pyproject.toml using SphinxConfig
+repository_url = config.repository  # SphinxConfig provides this directly
+documentation_url = config.documentation  # SphinxConfig provides this directly
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -126,7 +118,7 @@ def linkcode_resolve(domain, info):
     # Create a clean relative path from project root
     source_file = os.path.relpath(source_file, start=os.path.dirname(os.path.abspath("../")))
 
-    # GitHub URL pattern - use specific branch (main) and organization/repo from pyproject.toml
+    # GitHub URL pattern - use specific branch (main) and organization/repo
     github_url = f"{repository_url}/blob/main/{source_file}"
 
     try:

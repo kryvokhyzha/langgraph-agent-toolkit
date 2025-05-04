@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies with uv
         run: |
           uv sync --all-extras --frozen --group dev
-          uv pip install sphinx-rtd-theme sphinx-pyproject toml
+          uv pip install sphinx-rtd-theme sphinx-pyproject rootutils
         env:
           UV_SYSTEM_PYTHON: 1
 
