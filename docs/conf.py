@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.abspath(root_path))
 config = SphinxConfig(os.path.join(root_path, "pyproject.toml"), globalns=globals())
 
 # Explicitly set project information from pyproject.toml via SphinxConfig
-project = config.name  # Use name from pyproject.toml
-author = "Roman Kryvokhyzha"  # Hardcoded as requested
+project = config.name
+author = "Roman Kryvokhyzha"
 copyright = f"2023-2025, {author}"
 
 # Extract version from pyproject.toml
@@ -33,12 +33,12 @@ release = config.version
 version = ".".join(release.split(".")[:2])
 
 # Additional project information from pyproject.toml
-description = config.description  # Use description from pyproject.toml
+description = config.description
 html_title = project
 
 # URLs from pyproject.toml using SphinxConfig
-repository_url = config.repository  # SphinxConfig provides this directly
-documentation_url = config.documentation  # SphinxConfig provides this directly
+repository_url = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
+documentation_url = "https://kryvokhyzha.github.io/langgraph-agent-toolkit"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
