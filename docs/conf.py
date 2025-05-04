@@ -6,19 +6,71 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import importlib.util
 import inspect
 import os
 import sys
+import warnings
 
 import rootutils
 from sphinx_pyproject import SphinxConfig
 
+
+# Set environment variables for fake models and authentication bypass
+os.environ["USE_FAKE_MODEL"] = "true"
+os.environ["OPENAI_API_KEY"] = "sk-fake-key-for-docs-generation"
+os.environ["OPENAI_MODEL_NAME"] = "gpt-4-fake-model"
+os.environ["OPENAI_API_BASE_URL"] = "https://fake-api.openai.com/v1"
+os.environ["OPENAI_API_VERSION"] = "2023-05-15"
+os.environ["LANGFUSE_SECRET_KEY"] = "lf-sk-fake-for-docs"
+os.environ["LANGFUSE_PUBLIC_KEY"] = "lf-pk-fake-for-docs"
+os.environ["LANGFUSE_HOST"] = "http://localhost:3000"
+os.environ["MEMORY_BACKEND"] = "sqlite"
+os.environ["SQLITE_DB_PATH"] = ":memory:"
+os.environ["ANTHROPIC_API_KEY"] = "sk-ant-fake-key"
+os.environ["ANTHROPIC_MODEL_NAME"] = "claude-3-fake"
+os.environ["GOOGLE_VERTEXAI_API_KEY"] = "fake-vertexai-key"
+os.environ["GOOGLE_VERTEXAI_MODEL_NAME"] = "gemini-fake"
+os.environ["GOOGLE_GENAI_API_KEY"] = "fake-genai-key"
+os.environ["GOOGLE_GENAI_MODEL_NAME"] = "gemini-pro-fake"
+# Disable all observability
+os.environ["OBSERVABILITY_BACKEND"] = "none"
 
 # Find project root path
 root_path = rootutils.find_root(search_from=__file__, indicator=[".project-root"])
 
 # Add the package to the path for autodoc to find it
 sys.path.insert(0, os.path.abspath(root_path))
+
+# Create a warning filter to ignore specific warnings during documentation building
+warnings.filterwarnings("ignore", message=".*Model name must be provided for non-fake models.*")
+warnings.filterwarnings("ignore", message=".*Missing required environment variables.*")
+warnings.filterwarnings("ignore", message=".*Agent .* not found.*")
+
+
+# Handle missing modules and blueprint imports
+class MockModule:
+    """Mock class for modules that might be missing or causing import issues."""
+
+    def __init__(self, *args, **kwargs):
+        self.__all__ = []
+        self.__version__ = "1.0.0"
+
+    def __call__(self, *args, **kwargs):
+        return MockModule()
+
+    def __getattr__(self, name):
+        if name in ("__file__", "__path__"):
+            return "/dev/null"
+        elif name[0] == name[0].upper():
+            # Return mock class for any capitalized name (likely a class)
+            mocktype = type(name, (), {})
+            mocktype.__module__ = __name__
+            return mocktype
+        else:
+            # Return mock object for anything else
+            return MockModule()
+
 
 # Load configuration from pyproject.toml
 config = SphinxConfig(os.path.join(root_path, "pyproject.toml"), globalns=globals())
@@ -36,7 +88,7 @@ version = ".".join(release.split(".")[:2])
 description = config.description
 html_title = project
 
-# URLs from pyproject.toml using SphinxConfig
+# Repository URLs
 repository_url = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
 documentation_url = "https://kryvokhyzha.github.io/langgraph-agent-toolkit"
 
@@ -55,6 +107,31 @@ extensions = [
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+# Configure autodoc to be more forgiving of missing imports
+autodoc_mock_imports = [
+    "langchain_core",
+    "langchain_community",
+    "langgraph",
+    "langgraph_checkpoint_sqlite",
+    "langgraph_checkpoint_postgres",
+    "langgraph_supervisor",
+    "joblib",
+    "fastapi",
+    "streamlit",
+    "pydantic",
+    "langchain_openai",
+    "langchain_anthropic",
+    "langchain_google_vertexai",
+    "langchain_google_genai",
+    "langchain_ollama",
+    "langchain_aws",
+    "langchain_groq",
+    "langchain_deepseek",
+    "langfuse",
+    "langsmith",
+    "duckduckgo_search",
+]
 
 # Napoleon settings
 napoleon_google_docstring = True

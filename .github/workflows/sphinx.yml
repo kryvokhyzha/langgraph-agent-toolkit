@@ -48,14 +48,6 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1
 
-      - name: Verify package installation
-        run: |
-          python -c "import sys; print('Python:', sys.version)"
-          python -c "import langgraph_agent_toolkit; print('Package version:', langgraph_agent_toolkit.__version__)"
-          # Check for specific dependencies that are causing import issues
-          python -c "import langchain_core; print('langchain_core version:', langchain_core.__version__)"
-          python -c "import joblib; print('joblib version:', joblib.__version__)"
-
       - name: Create static directory if it doesn't exist
         run: |
           mkdir -p docs/_static
@@ -69,6 +61,26 @@ jobs:
             --no-headings \
             --module-first \
             --doc-project="API Reference"
+        env:
+          # Environment variables to enable fake model and bypass authentication
+          USE_FAKE_MODEL: "true"
+          OPENAI_API_KEY: "sk-fake-key-for-docs-generation"
+          OPENAI_MODEL_NAME: "gpt-4-fake-model"
+          OPENAI_API_BASE_URL: "https://fake-api.openai.com/v1"
+          OPENAI_API_VERSION: "2023-05-15"
+          LANGFUSE_SECRET_KEY: "lf-sk-fake-for-docs"
+          LANGFUSE_PUBLIC_KEY: "lf-pk-fake-for-docs"
+          LANGFUSE_HOST: "http://localhost:3000"
+          MEMORY_BACKEND: "sqlite"
+          SQLITE_DB_PATH: ":memory:"
+          ANTHROPIC_API_KEY: "sk-ant-fake-key"
+          ANTHROPIC_MODEL_NAME: "claude-3-fake"
+          GOOGLE_VERTEXAI_API_KEY: "fake-vertexai-key"
+          GOOGLE_VERTEXAI_MODEL_NAME: "gemini-fake"
+          GOOGLE_GENAI_API_KEY: "fake-genai-key"
+          GOOGLE_GENAI_MODEL_NAME: "gemini-pro-fake"
+          # Disable all observability
+          OBSERVABILITY_BACKEND: "none"
 
       - name: Create autosummary template files
         run: |
@@ -96,6 +108,26 @@ jobs:
         run: |
           cd docs && sphinx-build -b html -a -E -v . _build/html
           # The -v flag provides verbose output to see any import errors
+        env:
+          # Environment variables to enable fake model and bypass authentication
+          USE_FAKE_MODEL: "true"
+          OPENAI_API_KEY: "sk-fake-key-for-docs-generation"
+          OPENAI_MODEL_NAME: "gpt-4-fake-model"
+          OPENAI_API_BASE_URL: "https://fake-api.openai.com/v1"
+          OPENAI_API_VERSION: "2023-05-15"
+          LANGFUSE_SECRET_KEY: "lf-sk-fake-for-docs"
+          LANGFUSE_PUBLIC_KEY: "lf-pk-fake-for-docs"
+          LANGFUSE_HOST: "http://localhost:3000"
+          MEMORY_BACKEND: "sqlite"
+          SQLITE_DB_PATH: ":memory:"
+          ANTHROPIC_API_KEY: "sk-ant-fake-key"
+          ANTHROPIC_MODEL_NAME: "claude-3-fake"
+          GOOGLE_VERTEXAI_API_KEY: "fake-vertexai-key"
+          GOOGLE_VERTEXAI_MODEL_NAME: "gemini-fake"
+          GOOGLE_GENAI_API_KEY: "fake-genai-key"
+          GOOGLE_GENAI_MODEL_NAME: "gemini-pro-fake"
+          # Disable all observability
+          OBSERVABILITY_BACKEND: "none"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
