@@ -31,8 +31,7 @@ os.environ["GOOGLE_VERTEXAI_API_KEY"] = "fake-vertexai-key"
 os.environ["GOOGLE_VERTEXAI_MODEL_NAME"] = "gemini-fake"
 os.environ["GOOGLE_GENAI_API_KEY"] = "fake-genai-key"
 os.environ["GOOGLE_GENAI_MODEL_NAME"] = "gemini-pro-fake"
-# Disable all observability
-os.environ["OBSERVABILITY_BACKEND"] = "none"
+os.environ["OBSERVABILITY_BACKEND"] = "empty"
 
 # Find project root path - using pyproject.toml as indicator since .project-root might not exist
 root_path = rootutils.find_root(search_from=__file__, indicator=["pyproject.toml"])

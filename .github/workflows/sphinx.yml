@@ -79,8 +79,7 @@ jobs:
           GOOGLE_VERTEXAI_MODEL_NAME: "gemini-fake"
           GOOGLE_GENAI_API_KEY: "fake-genai-key"
           GOOGLE_GENAI_MODEL_NAME: "gemini-pro-fake"
-          # Disable all observability
-          OBSERVABILITY_BACKEND: "none"
+          OBSERVABILITY_BACKEND: "empty"
 
       - name: Create autosummary template files
         run: |
