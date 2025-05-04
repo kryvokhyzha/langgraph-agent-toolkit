@@ -11,6 +11,10 @@ on:
       - "pyproject.toml"
   workflow_dispatch: # Allow manual triggering
 
+# Add permissions to allow GitHub Actions to push to gh-pages
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,10 +24,14 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history for proper versioning
 
+      - name: Create pip cache directory
+        run: mkdir -p /home/runner/.cache/pip
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          # Only enable caching if the directory exists
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
@@ -34,7 +42,7 @@ jobs:
 
       - name: Install dependencies with uv
         run: |
-          uv pip install -e ".[dev]"
+          uv sync --all-extras --frozen --group dev
           uv pip install sphinx-rtd-theme sphinx-pyproject
         env:
           UV_SYSTEM_PYTHON: 1
