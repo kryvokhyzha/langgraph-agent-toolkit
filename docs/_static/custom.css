@@ -1,0 +1,43 @@
+/* Project styles */
+.project-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.project-description {
+    font-size: 0.9em;
+    margin: 10px 0 15px 0;
+    color: #888;
+}
+
+/* Improve code block styling */
+.highlight {
+    background: #f8f8f8;
+    border-radius: 3px;
+}
+
+/* Improve class documentation */
+dl.class, dl.function, dl.method {
+    padding: 10px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    border-left: 3px solid #2980b9;
+}
+
+/* Version display */
+.version {
+    color: #2980b9;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Footer links */
+.footer a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}

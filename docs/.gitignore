@@ -1,0 +1,13 @@
+# Sphinx documentation
+_build/
+_autosummary/
+generated/
+
+# Other generated files
+.doctrees/
+_static/css/custom.css.map
+_static/js/custom.js.map
+objects.inv
+.buildinfo
+.DS_Store
+*.pyc
