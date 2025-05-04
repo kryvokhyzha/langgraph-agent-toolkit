@@ -3,7 +3,7 @@ name: Build and Deploy Sphinx Docs
 on:
   push:
     branches:
-      - dev
+      - main
     paths:
       - "docs/**"
       - ".github/workflows/sphinx.yml"
