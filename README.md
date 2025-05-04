@@ -187,14 +187,17 @@ Full documentation is available in the `docs/` directory and includes:
 - [Installation Guide](docs/installation.rst)
 - [Environment Setup](docs/environment_setup.rst)
 - [Usage Guide](docs/usage.rst)
-- [Contributing Guide](docs/contributing.rst)
 
 <a name="useful-resources"></a>
 
 ## 📚 Useful Resources
 
-For a comprehensive list of useful resources, see the
-[Contributing Documentation](docs/contributing.rst).
+- [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
+- [LangGraph Memory Concept](https://langchain-ai.github.io/langgraph/concepts/memory/)
+- [LangGraph Memory Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/#memory)
+- [How to edit graph state](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/edit-graph-state/)
+- [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
+- [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 
 <a name="development-and-contributing"></a>
 
