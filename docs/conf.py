@@ -6,13 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import importlib.util
-import inspect
 import os
 import sys
-import types
 import warnings
-from unittest.mock import MagicMock
 
 import rootutils
 from sphinx_pyproject import SphinxConfig
@@ -53,98 +49,6 @@ warnings.filterwarnings("ignore", message=".*Agent .* not found.*")
 warnings.filterwarnings("ignore", message=".*unsupported operand type.*")
 warnings.filterwarnings("ignore", message=".*has no attribute.*")
 
-
-# Advanced mocking for Python types that cause issues
-class UnionTypeMock(MagicMock):
-    """Special mock for Union types from typing."""
-
-    def __or__(self, other):
-        return MagicMock()
-
-    def __ror__(self, other):
-        return MagicMock()
-
-
-# Create mocks for modules and types that are causing issues
-MOCK_MODULES = [
-    "langchain_core",
-    "langchain_core.language_models.chat_models",
-    "langchain_core.language_models",
-    "langchain_core.messages",
-    "langchain_core.prompts",
-    "langchain_core.runnables",
-    "langchain_core.tools",
-    "langchain_community",
-    "langgraph",
-    "langgraph.graph",
-    "langgraph.checkpoint",
-    "langgraph.prebuilt",
-    "langgraph_checkpoint_sqlite",
-    "langgraph_checkpoint_postgres",
-    "langgraph_supervisor",
-    "joblib",
-    "fastapi",
-    "fastapi.middleware",
-    "fastapi.responses",
-    "streamlit",
-    "pydantic",
-    "pydantic.v1",
-    "pydantic_settings",
-    "langchain_openai",
-    "langchain_anthropic",
-    "langchain_google_vertexai",
-    "langchain_google_genai",
-    "langchain_ollama",
-    "langchain_aws",
-    "langchain_groq",
-    "langchain_deepseek",
-    "langfuse",
-    "langsmith",
-    "duckduckgo_search",
-    "types.UnionType",
-    "httpx",
-    "uvicorn",
-    "loguru",
-    "asyncio",
-    "jiter",
-]
-
-# Apply mocks
-for mod_name in MOCK_MODULES:
-    parts = mod_name.split(".")
-    parent_mod = None
-
-    # Build parent modules if needed
-    for i in range(len(parts) - 1):
-        parent_name = ".".join(parts[: i + 1])
-        if parent_name not in sys.modules:
-            sys.modules[parent_name] = MagicMock()
-        parent_mod = sys.modules[parent_name]
-
-    # Create the actual module
-    if mod_name not in sys.modules:
-        if mod_name == "types.UnionType":
-            sys.modules[mod_name] = UnionTypeMock()
-        else:
-            sys.modules[mod_name] = MagicMock()
-
-# Set up specific mocks for BaseChatModel and other complex types
-sys.modules["langchain_core.language_models.chat_models.BaseChatModel"] = MagicMock()
-
-
-# Create custom module with BaseChatModel
-class BaseChatModelMock(MagicMock):
-    pass
-
-
-# Add BaseChatModel to langchain_core
-if "langchain_core" in sys.modules:
-    if not hasattr(sys.modules["langchain_core"], "language_models"):
-        sys.modules["langchain_core"].language_models = MagicMock()
-    if not hasattr(sys.modules["langchain_core"].language_models, "chat_models"):
-        sys.modules["langchain_core"].language_models.chat_models = MagicMock()
-    sys.modules["langchain_core"].language_models.chat_models.BaseChatModel = BaseChatModelMock
-
 # Load configuration from pyproject.toml
 config = SphinxConfig(os.path.join(root_path, "pyproject.toml"), globalns=globals())
 
@@ -181,9 +85,6 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-# Configure autodoc to be more forgiving of missing imports
-autodoc_mock_imports = MOCK_MODULES
-
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
@@ -215,54 +116,6 @@ intersphinx_mapping = {
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "fastapi": ("https://fastapi.tiangolo.com/", None),
 }
-
-
-# Setup linkcode for source code links to GitHub
-def linkcode_resolve(domain, info):
-    """Link source code to GitHub repository."""
-    if domain != "py" or not info["module"]:
-        return None
-
-    modname = info["module"]
-    fullname = info["fullname"]
-
-    # Check for mocked modules
-    if modname in sys.modules and isinstance(sys.modules[modname], MagicMock):
-        return None
-
-    try:
-        obj = sys.modules.get(modname)
-        if obj is None:
-            return None
-
-        for part in fullname.split("."):
-            try:
-                obj = getattr(obj, part)
-            except (AttributeError, TypeError):
-                return None
-
-        try:
-            source_file = inspect.getsourcefile(obj)
-            if source_file is None:
-                return None
-        except (TypeError, ValueError):
-            return None
-
-        # Create a clean relative path from project root
-        source_file = os.path.relpath(source_file, start=os.path.dirname(os.path.abspath(root_path)))
-
-        # GitHub URL pattern - use specific branch (main) and organization/repo
-        github_url = f"{repository_url}/blob/main/{source_file}"
-
-        try:
-            source_lines, lineno = inspect.getsourcelines(obj)
-            github_url += f"#L{lineno}-L{lineno + len(source_lines) - 1}"
-        except (OSError, TypeError):
-            pass
-
-        return github_url
-    except Exception:
-        return None
 
 
 # -- Options for HTML output -------------------------------------------------
