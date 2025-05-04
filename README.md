@@ -19,7 +19,7 @@
 A comprehensive toolkit for building, deploying, and managing AI agents using
 LangGraph, FastAPI, and Streamlit. It provides a production-ready framework for
 creating conversational AI agents with features like multi-provider LLM support,
-streaming responses, observability, and memory management.
+streaming responses, observability, memory and prompt management.
 
 ### What is langgraph-agent-toolkit?
 
