@@ -3,13 +3,17 @@ name: Build and Deploy Sphinx Docs
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
       - "docs/**"
       - ".github/workflows/sphinx.yml"
       - "langgraph_agent_toolkit/**"
       - "pyproject.toml"
   workflow_dispatch: # Allow manual triggering
+
+# Add permissions to allow GitHub Actions to push to gh-pages
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -34,7 +38,7 @@ jobs:
 
       - name: Install dependencies with uv
         run: |
-          uv pip install -e ".[dev]"
+          uv sync --all-extras --frozen --group dev
           uv pip install sphinx-rtd-theme sphinx-pyproject
         env:
           UV_SYSTEM_PYTHON: 1
