@@ -10,22 +10,43 @@ import inspect
 import os
 import sys
 
+import toml
 from sphinx_pyproject import SphinxConfig
 
 
 sys.path.insert(0, os.path.abspath("../"))
 config = SphinxConfig("../pyproject.toml", globalns=globals())
 
+# Load pyproject.toml directly to access all metadata
+pyproject_path = os.path.join(os.path.dirname(os.path.abspath("../")), "pyproject.toml")
+pyproject = toml.load(pyproject_path)
+
 # Explicitly set project information from pyproject.toml
 project = "LangGraph Agent Toolkit"
-author = ", ".join([author["name"] for author in config.config.get("project", {}).get("authors", [])])
-copyright = f"2025, {author}"
+copyright = f"2023-2025, {config.author}"
+author = config.author
+
+# Extract version
 release = config.version
 version = ".".join(release.split(".")[:2])
 
 # Additional project information from pyproject.toml
+description = pyproject.get("project", {}).get(
+    "description", "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
+)
 html_title = project
-description = config.config.get("project", {}).get("description", "")
+
+# URLs from pyproject.toml
+repository_url = (
+    pyproject.get("project", {})
+    .get("urls", {})
+    .get("repository", "https://github.com/kryvokhyzha/langgraph-agent-toolkit")
+)
+documentation_url = (
+    pyproject.get("project", {})
+    .get("urls", {})
+    .get("documentation", "https://kryvokhyzha.github.io/langgraph-agent-toolkit")
+)
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -105,15 +126,8 @@ def linkcode_resolve(domain, info):
     # Create a clean relative path from project root
     source_file = os.path.relpath(source_file, start=os.path.dirname(os.path.abspath("../")))
 
-    # Get GitHub URL from pyproject.toml
-    repo_url = (
-        config.config.get("project", {})
-        .get("urls", {})
-        .get("repository", "https://github.com/kryvokhyzha/langgraph-agent-toolkit")
-    )
-
-    # GitHub URL pattern - use specific branch (main) and organization/repo
-    github_url = f"{repo_url}/blob/main/{source_file}"
+    # GitHub URL pattern - use specific branch (main) and organization/repo from pyproject.toml
+    github_url = f"{repository_url}/blob/main/{source_file}"
 
     try:
         source_lines, lineno = inspect.getsourcelines(obj)
