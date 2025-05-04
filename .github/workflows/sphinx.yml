@@ -24,10 +24,14 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history for proper versioning
 
+      - name: Create pip cache directory
+        run: mkdir -p /home/runner/.cache/pip
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          # Only enable caching if the directory exists
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
 
