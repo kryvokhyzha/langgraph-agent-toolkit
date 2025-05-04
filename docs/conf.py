@@ -38,6 +38,8 @@ os.environ["OBSERVABILITY_BACKEND"] = "none"
 
 # Find project root path
 root_path = rootutils.find_root(search_from=__file__, indicator=[".project-root"])
+# Add project root to path so packages can be imported
+rootutils.setup_root(root_path, indicator=[".project-root"], pythonpath=True)
 
 # Add the package to the path for autodoc to find it
 sys.path.insert(0, os.path.abspath(root_path))
