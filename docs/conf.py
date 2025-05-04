@@ -15,7 +15,7 @@ from sphinx_pyproject import SphinxConfig
 
 
 # Find project root path
-root_path = rootutils.find_root(search_from=__file__, indicator=["p.project-root"])
+root_path = rootutils.find_root(search_from=__file__, indicator=[".project-root"])
 
 # Add the package to the path for autodoc to find it
 sys.path.insert(0, os.path.abspath(root_path))
