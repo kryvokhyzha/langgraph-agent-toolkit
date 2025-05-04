@@ -6,7 +6,16 @@ import pytest
 from httpx import HTTPStatusError, Request, Response
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
-from langgraph_agent_toolkit.schema import AgentInfo, ChatHistory, ChatMessage, ServiceMetadata
+from langgraph_agent_toolkit.schema import (
+    AddMessagesResponse,
+    AgentInfo,
+    ChatHistory,
+    ChatMessage,
+    ClearHistoryResponse,
+    FeedbackResponse,
+    MessageInput,
+    ServiceMetadata,
+)
 
 
 def test_init(mock_env):
@@ -58,13 +67,17 @@ def test_invoke(agent_client):
         assert response.type == "ai"
         assert response.content == ANSWER
 
-    # Test with model_name and thread_id
+    # Test with all parameters
     with patch("httpx.post", return_value=mock_response) as mock_post:
         response = agent_client.invoke(
             QUESTION,
             model_name="gpt-4o",
             model_provider="openai",
+            model_config_key="gpt4o",
             thread_id="test-thread",
+            user_id="test-user",
+            agent_config={"temperature": 0.7},
+            recursion_limit=5,
         )
         assert isinstance(response, ChatMessage)
         # Verify request
@@ -72,7 +85,11 @@ def test_invoke(agent_client):
         assert kwargs["json"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
+        assert kwargs["json"]["model_config_key"] == "gpt4o"
         assert kwargs["json"]["thread_id"] == "test-thread"
+        assert kwargs["json"]["user_id"] == "test-user"
+        assert kwargs["json"]["agent_config"] == {"temperature": 0.7}
+        assert kwargs["json"]["recursion_limit"] == 5
 
     # Test error response
     error_response = Response(500, text="Internal Server Error", request=mock_request)
@@ -97,13 +114,17 @@ async def test_ainvoke(agent_client):
         assert response.type == "ai"
         assert response.content == ANSWER
 
-    # Test with model_name and thread_id
+    # Test with all parameters
     with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
         response = await agent_client.ainvoke(
             QUESTION,
             model_name="gpt-4o",
             model_provider="openai",
+            model_config_key="gpt4o",
             thread_id="test-thread",
+            user_id="test-user",
+            agent_config={"temperature": 0.7},
+            recursion_limit=5,
         )
         assert isinstance(response, ChatMessage)
         assert response.type == "ai"
@@ -113,7 +134,11 @@ async def test_ainvoke(agent_client):
         assert kwargs["json"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
+        assert kwargs["json"]["model_config_key"] == "gpt4o"
         assert kwargs["json"]["thread_id"] == "test-thread"
+        assert kwargs["json"]["user_id"] == "test-user"
+        assert kwargs["json"]["agent_config"] == {"temperature": 0.7}
+        assert kwargs["json"]["recursion_limit"] == 5
 
     # Test error response
     error_response = Response(500, text="Internal Server Error", request=mock_request)
@@ -158,6 +183,33 @@ def test_stream(agent_client):
         assert isinstance(final_message, ChatMessage)
         assert final_message.type == "ai"
         assert final_message.content == FINAL_ANSWER
+
+    # Test with all parameters
+    with patch("httpx.stream", return_value=mock_response) as mock_stream:
+        list(
+            agent_client.stream(
+                QUESTION,
+                model_name="gpt-4o",
+                model_provider="openai",
+                model_config_key="gpt4o",
+                thread_id="test-thread",
+                user_id="test-user",
+                agent_config={"temperature": 0.7},
+                recursion_limit=5,
+                stream_tokens=True,
+            )
+        )
+        # Verify request
+        args, kwargs = mock_stream.call_args
+        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["model_name"] == "gpt-4o"
+        assert kwargs["json"]["model_provider"] == "openai"
+        assert kwargs["json"]["model_config_key"] == "gpt4o"
+        assert kwargs["json"]["thread_id"] == "test-thread"
+        assert kwargs["json"]["user_id"] == "test-user"
+        assert kwargs["json"]["agent_config"] == {"temperature": 0.7}
+        assert kwargs["json"]["recursion_limit"] == 5
+        assert kwargs["json"]["stream_tokens"] is True
 
     # Test error response
     error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/stream"))
@@ -222,6 +274,37 @@ async def test_astream(agent_client):
         assert final_message.type == "ai"
         assert final_message.content == FINAL_ANSWER
 
+    # Test with all parameters
+    with patch("httpx.AsyncClient", return_value=mock_client) as mock_client_class:
+        async for _ in agent_client.astream(
+            QUESTION,
+            model_name="gpt-4o",
+            model_provider="openai",
+            model_config_key="gpt4o",
+            thread_id="test-thread",
+            user_id="test-user",
+            agent_config={"temperature": 0.7},
+            recursion_limit=5,
+            stream_tokens=True,
+        ):
+            pass
+
+        # Get the json payload that was passed to stream
+        # This is a bit complex due to the multiple layers of mocking
+        mock_client_instance = mock_client_class.return_value.__aenter__.return_value
+        stream_call = mock_client_instance.stream.call_args
+        kwargs = stream_call[1]
+
+        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["model_name"] == "gpt-4o"
+        assert kwargs["json"]["model_provider"] == "openai"
+        assert kwargs["json"]["model_config_key"] == "gpt4o"
+        assert kwargs["json"]["thread_id"] == "test-thread"
+        assert kwargs["json"]["user_id"] == "test-user"
+        assert kwargs["json"]["agent_config"] == {"temperature": 0.7}
+        assert kwargs["json"]["recursion_limit"] == 5
+        assert kwargs["json"]["stream_tokens"] is True
+
     # Test error response
     http_error = HTTPStatusError(
         "500 Internal Server Error",
@@ -239,6 +322,41 @@ async def test_astream(agent_client):
         with pytest.raises(AgentClientError) as exc:
             async for _ in agent_client.astream(QUESTION):
                 pass
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+def test_create_feedback(agent_client):
+    """Test synchronous feedback creation."""
+    RUN_ID = "test-run"
+    KEY = "test-key"
+    SCORE = 0.8
+    KWARGS = {"comment": "Great response!"}
+
+    # Test successful response
+    mock_response = Response(
+        200,
+        json={"status": "success", "run_id": RUN_ID, "message": "Feedback recorded successfully."},
+        request=Request("POST", "http://test/feedback"),
+    )
+
+    with patch("httpx.post", return_value=mock_response) as mock_post:
+        response = agent_client.create_feedback(RUN_ID, KEY, SCORE, KWARGS)
+        assert isinstance(response, FeedbackResponse)
+        assert response.status == "success"
+        assert response.run_id == RUN_ID
+
+        # Verify request
+        args, kwargs = mock_post.call_args
+        assert kwargs["json"]["run_id"] == RUN_ID
+        assert kwargs["json"]["key"] == KEY
+        assert kwargs["json"]["score"] == SCORE
+        assert kwargs["json"]["kwargs"] == KWARGS
+
+    # Test error response
+    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/feedback"))
+    with patch("httpx.post", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            agent_client.create_feedback(RUN_ID, KEY, SCORE)
         assert "500 Internal Server Error" in str(exc.value)
 
 
@@ -280,19 +398,257 @@ def test_get_history(agent_client):
     }
 
     # Mock successful response
-    mock_response = Response(200, json=HISTORY, request=Request("POST", "http://test/history"))
-    with patch("httpx.post", return_value=mock_response):
+    mock_response = Response(200, json=HISTORY, request=Request("GET", "http://test/history"))
+    with patch("httpx.get", return_value=mock_response) as mock_get:
         history = agent_client.get_history(THREAD_ID)
         assert isinstance(history, ChatHistory)
         assert len(history.messages) == 2
         assert history.messages[0].type == "human"
         assert history.messages[1].type == "ai"
 
+        # Verify correct endpoint and params
+        args, kwargs = mock_get.call_args
+        assert args[0].endswith("/history")
+        assert "thread_id" in kwargs["params"]
+        assert kwargs["params"]["thread_id"] == THREAD_ID
+
     # Test error response
-    error_response = Response(500, text="Internal Server Error", request=Request("POST", "http://test/history"))
-    with patch("httpx.post", return_value=error_response):
+    error_response = Response(500, text="Internal Server Error", request=Request("GET", "http://test/history"))
+    with patch("httpx.get", return_value=error_response):
         with pytest.raises(AgentClientError) as exc:
             agent_client.get_history(THREAD_ID)
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_aget_history(agent_client):
+    """Test asynchronous chat history retrieval."""
+    THREAD_ID = "test-thread"
+    HISTORY = {
+        "messages": [
+            {"type": "human", "content": "What is the weather?"},
+            {"type": "ai", "content": "The weather is sunny."},
+        ]
+    }
+
+    # Mock successful response
+    mock_response = Response(200, json=HISTORY, request=Request("GET", "http://test/history"))
+    with patch("httpx.AsyncClient.get", return_value=mock_response) as mock_get:
+        history = await agent_client.aget_history(THREAD_ID, user_id="test-user")
+        assert isinstance(history, ChatHistory)
+        assert len(history.messages) == 2
+        assert history.messages[0].type == "human"
+        assert history.messages[1].type == "ai"
+
+        # Verify correct endpoint and params
+        args, kwargs = mock_get.call_args
+        assert args[0].endswith("/history")
+        assert "thread_id" in kwargs["params"]
+        assert kwargs["params"]["thread_id"] == THREAD_ID
+        assert "user_id" in kwargs["params"]
+        assert kwargs["params"]["user_id"] == "test-user"
+
+    # Test error response
+    error_response = Response(500, text="Internal Server Error", request=Request("GET", "http://test/history"))
+    with patch("httpx.AsyncClient.get", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            await agent_client.aget_history(THREAD_ID)
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+def test_clear_history(agent_client):
+    """Test synchronous history clearing."""
+    THREAD_ID = "test-thread"
+    USER_ID = "test-user"
+
+    # Mock successful response
+    mock_response = Response(
+        200,
+        json={
+            "status": "success",
+            "thread_id": THREAD_ID,
+            "user_id": USER_ID,
+            "message": "Messages cleared successfully.",
+        },
+        request=Request("DELETE", "http://test/history/clear"),
+    )
+
+    with patch("httpx.delete", return_value=mock_response) as mock_delete:
+        response = agent_client.clear_history(THREAD_ID, USER_ID)
+        assert isinstance(response, ClearHistoryResponse)
+        assert response.status == "success"
+        assert response.thread_id == THREAD_ID
+        assert response.user_id == USER_ID
+
+        # Verify request
+        args, kwargs = mock_delete.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert kwargs["json"]["user_id"] == USER_ID
+
+    # Test error when neither thread_id nor user_id is provided
+    with pytest.raises(AgentClientError) as exc:
+        agent_client.clear_history()
+    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
+
+    # Test error response
+    error_response = Response(500, text="Internal Server Error", request=Request("DELETE", "http://test/history/clear"))
+    with patch("httpx.delete", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            agent_client.clear_history(THREAD_ID)
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_aclear_history(agent_client):
+    """Test asynchronous history clearing."""
+    THREAD_ID = "test-thread"
+    USER_ID = "test-user"
+
+    # Mock successful response
+    mock_response = Response(
+        200,
+        json={
+            "status": "success",
+            "thread_id": THREAD_ID,
+            "user_id": USER_ID,
+            "message": "Messages cleared successfully.",
+        },
+        request=Request("DELETE", "http://test/history/clear"),
+    )
+
+    with patch("httpx.AsyncClient.delete", return_value=mock_response) as mock_delete:
+        response = await agent_client.aclear_history(THREAD_ID, USER_ID)
+        assert isinstance(response, ClearHistoryResponse)
+        assert response.status == "success"
+        assert response.thread_id == THREAD_ID
+        assert response.user_id == USER_ID
+
+        # Verify request
+        args, kwargs = mock_delete.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert kwargs["json"]["user_id"] == USER_ID
+
+    # Test error when neither thread_id nor user_id is provided
+    with pytest.raises(AgentClientError) as exc:
+        await agent_client.aclear_history()
+    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
+
+    # Test error response
+    error_response = Response(500, text="Internal Server Error", request=Request("DELETE", "http://test/history/clear"))
+    with patch("httpx.AsyncClient.delete", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            await agent_client.aclear_history(THREAD_ID)
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+def test_add_messages(agent_client):
+    """Test synchronous adding messages to history."""
+    THREAD_ID = "test-thread"
+    MESSAGES = [{"type": "human", "content": "Hello!"}, {"type": "ai", "content": "Hi there!"}]
+
+    # Mock successful response
+    mock_response = Response(
+        201,
+        json={"status": "success", "thread_id": THREAD_ID, "message": "Added 2 messages to chat history."},
+        request=Request("POST", "http://test/history/add_messages"),
+    )
+
+    with patch("httpx.post", return_value=mock_response) as mock_post:
+        response = agent_client.add_messages(MESSAGES, THREAD_ID)
+        assert isinstance(response, AddMessagesResponse)
+        assert response.status == "success"
+        assert response.thread_id == THREAD_ID
+
+        # Verify request
+        args, kwargs = mock_post.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+
+    # Test with MessageInput objects
+    message_inputs = [MessageInput(type="human", content="Hello!"), MessageInput(type="ai", content="Hi there!")]
+
+    with patch("httpx.post", return_value=mock_response) as mock_post:
+        response = agent_client.add_messages(message_inputs, THREAD_ID)
+        assert isinstance(response, AddMessagesResponse)
+        assert response.status == "success"
+
+        # Verify request
+        args, kwargs = mock_post.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+
+    # Test error when neither thread_id nor user_id is provided
+    with pytest.raises(AgentClientError) as exc:
+        agent_client.add_messages(MESSAGES)
+    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
+
+    # Test error response
+    error_response = Response(
+        500, text="Internal Server Error", request=Request("POST", "http://test/history/add_messages")
+    )
+    with patch("httpx.post", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            agent_client.add_messages(MESSAGES, THREAD_ID)
+        assert "500 Internal Server Error" in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_aadd_messages(agent_client):
+    """Test asynchronous adding messages to history."""
+    THREAD_ID = "test-thread"
+    MESSAGES = [{"type": "human", "content": "Hello!"}, {"type": "ai", "content": "Hi there!"}]
+
+    # Mock successful response
+    mock_response = Response(
+        201,
+        json={"status": "success", "thread_id": THREAD_ID, "message": "Added 2 messages to chat history."},
+        request=Request("POST", "http://test/history/add_messages"),
+    )
+
+    with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
+        response = await agent_client.aadd_messages(MESSAGES, THREAD_ID)
+        assert isinstance(response, AddMessagesResponse)
+        assert response.status == "success"
+        assert response.thread_id == THREAD_ID
+
+        # Verify request
+        args, kwargs = mock_post.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+
+    # Test with MessageInput objects
+    message_inputs = [MessageInput(type="human", content="Hello!"), MessageInput(type="ai", content="Hi there!")]
+
+    with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
+        response = await agent_client.aadd_messages(message_inputs, THREAD_ID)
+        assert isinstance(response, AddMessagesResponse)
+        assert response.status == "success"
+
+        # Verify request
+        args, kwargs = mock_post.call_args
+        assert kwargs["json"]["thread_id"] == THREAD_ID
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+
+    # Test error when neither thread_id nor user_id is provided
+    with pytest.raises(AgentClientError) as exc:
+        await agent_client.aadd_messages(MESSAGES)
+    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
+
+    # Test error response
+    error_response = Response(
+        500, text="Internal Server Error", request=Request("POST", "http://test/history/add_messages")
+    )
+    with patch("httpx.AsyncClient.post", return_value=error_response):
+        with pytest.raises(AgentClientError) as exc:
+            await agent_client.aadd_messages(MESSAGES, THREAD_ID)
         assert "500 Internal Server Error" in str(exc.value)
 
 

@@ -10,6 +10,7 @@ from langgraph_agent_toolkit.schema.schema import (
     Feedback,
     FeedbackResponse,
     HealthCheck,
+    MessageInput,
     ServiceMetadata,
     StreamInput,
     UserInput,
@@ -31,4 +32,5 @@ __all__ = [
     "ChatHistoryInput",
     "ChatHistory",
     "HealthCheck",
+    "MessageInput",
 ]

@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1]
+
+### Updated
+
+- Client API to fully align with server endpoints
+- Extended invoke, stream methods with additional parameters
+
+### Added
+
+- Message management methods in the client (add_messages, aadd_messages)
+- Chat history retrieval methods (get_history, aget_history)
+- History clearing methods (clear_history, aclear_history)
+- Synchronous feedback creation method (create_feedback)
+- Support for model_config_key parameter
+- Support for recursion_limit parameter
+
+### Fixed
+
+- Client tests to properly mock API endpoints
+- Parameter handling in stream and invoke methods
+
 ## [0.4.0]
 
 ### Updated
