@@ -6,10 +6,16 @@ from typing import Any
 import httpx
 
 from langgraph_agent_toolkit.schema import (
+    AddMessagesInput,
+    AddMessagesResponse,
     ChatHistory,
     ChatHistoryInput,
     ChatMessage,
+    ClearHistoryInput,
+    ClearHistoryResponse,
     Feedback,
+    FeedbackResponse,
+    MessageInput,
     ServiceMetadata,
     StreamInput,
     UserInput,
@@ -89,9 +95,11 @@ class AgentClient:
         message: str,
         model_name: str | None = None,
         model_provider: str | None = None,
+        model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
     ) -> ChatMessage:
         """Invoke the agent asynchronously. Only the final message is returned.
 
@@ -99,12 +107,14 @@ class AgentClient:
             message (str): The message to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
+            model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
+            recursion_limit (int, optional): Recursion limit for the agent
 
         Returns:
-            AnyMessage: The response from the agent
+            ChatMessage: The response from the agent
 
         """
         if not self.agent:
@@ -117,10 +127,14 @@ class AgentClient:
             request.model_name = model_name
         if model_provider:
             request.model_provider = model_provider
+        if model_config_key:
+            request.model_config_key = model_config_key
         if agent_config:
             request.agent_config = agent_config
         if user_id:
             request.user_id = user_id
+        if recursion_limit is not None:
+            request.recursion_limit = recursion_limit
 
         async with httpx.AsyncClient() as client:
             try:
@@ -141,9 +155,11 @@ class AgentClient:
         message: str,
         model_name: str | None = None,
         model_provider: str | None = None,
+        model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
     ) -> ChatMessage:
         """Invoke the agent synchronously. Only the final message is returned.
 
@@ -151,9 +167,11 @@ class AgentClient:
             message (str): The message to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
+            model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
+            recursion_limit (int, optional): Recursion limit for the agent
 
         Returns:
             ChatMessage: The response from the agent
@@ -169,10 +187,14 @@ class AgentClient:
             request.model_name = model_name
         if model_provider:
             request.model_provider = model_provider
+        if model_config_key:
+            request.model_config_key = model_config_key
         if agent_config:
             request.agent_config = agent_config
         if user_id:
             request.user_id = user_id
+        if recursion_limit is not None:
+            request.recursion_limit = recursion_limit
 
         try:
             response = httpx.post(
@@ -217,9 +239,11 @@ class AgentClient:
         message: str,
         model_name: str | None = None,
         model_provider: str | None = None,
+        model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
         stream_tokens: bool = True,
     ) -> Generator[ChatMessage | str, None, None]:
         """Stream the agent's response synchronously.
@@ -232,9 +256,11 @@ class AgentClient:
             message (str): The message to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
+            model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
+            recursion_limit (int, optional): Recursion limit for the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
 
@@ -252,10 +278,14 @@ class AgentClient:
             request.model_name = model_name
         if model_provider:
             request.model_provider = model_provider
+        if model_config_key:
+            request.model_config_key = model_config_key
         if agent_config:
             request.agent_config = agent_config
         if user_id:
             request.user_id = user_id
+        if recursion_limit is not None:
+            request.recursion_limit = recursion_limit
 
         try:
             with httpx.stream(
@@ -280,24 +310,28 @@ class AgentClient:
         message: str,
         model_name: str | None = None,
         model_provider: str | None = None,
+        model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
         stream_tokens: bool = True,
     ) -> AsyncGenerator[ChatMessage | str, None]:
         """Stream the agent's response asynchronously.
 
-        Each intermediate message of the agent process is yielded as an AnyMessage.
+        Each intermediate message of the agent process is yielded as a ChatMessage.
         If stream_tokens is True (the default value), the response will also yield
-        content tokens from streaming modelsas they are generated.
+        content tokens from streaming models as they are generated.
 
         Args:
             message (str): The message to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
+            model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
+            recursion_limit (int, optional): Recursion limit for the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
 
@@ -315,10 +349,14 @@ class AgentClient:
             request.model_name = model_name
         if model_provider:
             request.model_provider = model_provider
+        if model_config_key:
+            request.model_config_key = model_config_key
         if agent_config:
             request.agent_config = agent_config
         if user_id:
             request.user_id = user_id
+        if recursion_limit is not None:
+            request.recursion_limit = recursion_limit
 
         async with httpx.AsyncClient() as client:
             try:
@@ -385,9 +423,9 @@ class AgentClient:
         """
         request = ChatHistoryInput(thread_id=thread_id, user_id=user_id)
         try:
-            response = httpx.post(
-                f"{self.base_url}/history",
-                json=request.model_dump(),
+            response = httpx.get(
+                f"{self.base_url}/{self.agent}/history" if self.agent else f"{self.base_url}/history",
+                params=request.model_dump(),
                 headers=self._headers,
                 timeout=self.timeout,
             )
@@ -396,3 +434,197 @@ class AgentClient:
             raise AgentClientError(f"Error: {e}")
 
         return ChatHistory.model_validate(response.json())
+
+    async def aget_history(
+        self,
+        thread_id: str,
+        user_id: str | None = None,
+    ) -> ChatHistory:
+        """Get chat history asynchronously.
+
+        Args:
+            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        request = ChatHistoryInput(thread_id=thread_id, user_id=user_id)
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(
+                    f"{self.base_url}/{self.agent}/history" if self.agent else f"{self.base_url}/history",
+                    params=request.model_dump(),
+                    headers=self._headers,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+            except httpx.HTTPError as e:
+                raise AgentClientError(f"Error: {e}")
+
+        return ChatHistory.model_validate(response.json())
+
+    def clear_history(
+        self,
+        thread_id: str | None = None,
+        user_id: str | None = None,
+    ) -> ClearHistoryResponse:
+        """Clear chat history.
+
+        Args:
+            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        if not thread_id and not user_id:
+            raise AgentClientError("At least one of thread_id or user_id must be provided")
+
+        request = ClearHistoryInput(thread_id=thread_id, user_id=user_id)
+        try:
+            response = httpx.delete(
+                f"{self.base_url}/{self.agent}/history/clear" if self.agent else f"{self.base_url}/history/clear",
+                json=request.model_dump(),
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise AgentClientError(f"Error: {e}")
+
+        return ClearHistoryResponse.model_validate(response.json())
+
+    async def aclear_history(
+        self,
+        thread_id: str | None = None,
+        user_id: str | None = None,
+    ) -> ClearHistoryResponse:
+        """Clear chat history asynchronously.
+
+        Args:
+            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        if not thread_id and not user_id:
+            raise AgentClientError("At least one of thread_id or user_id must be provided")
+
+        request = ClearHistoryInput(thread_id=thread_id, user_id=user_id)
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.delete(
+                    f"{self.base_url}/{self.agent}/history/clear" if self.agent else f"{self.base_url}/history/clear",
+                    json=request.model_dump(),
+                    headers=self._headers,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+            except httpx.HTTPError as e:
+                raise AgentClientError(f"Error: {e}")
+
+        return ClearHistoryResponse.model_validate(response.json())
+
+    def add_messages(
+        self,
+        messages: list[dict[str, str]] | list[MessageInput],
+        thread_id: str | None = None,
+        user_id: str | None = None,
+    ) -> AddMessagesResponse:
+        """Add messages to chat history.
+
+        Args:
+            messages (list[dict[str, str]] | list[MessageInput]): Messages to add
+            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        if not thread_id and not user_id:
+            raise AgentClientError("At least one of thread_id or user_id must be provided")
+
+        # Convert dict messages to MessageInput if needed
+        message_inputs = [
+            m if isinstance(m, MessageInput) else MessageInput(type=m["type"], content=m["content"]) for m in messages
+        ]
+
+        request = AddMessagesInput(thread_id=thread_id, user_id=user_id, messages=message_inputs)
+        try:
+            response = httpx.post(
+                f"{self.base_url}/{self.agent}/history/add_messages"
+                if self.agent
+                else f"{self.base_url}/history/add_messages",
+                json=request.model_dump(),
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise AgentClientError(f"Error: {e}")
+
+        return AddMessagesResponse.model_validate(response.json())
+
+    async def aadd_messages(
+        self,
+        messages: list[dict[str, str]] | list[MessageInput],
+        thread_id: str | None = None,
+        user_id: str | None = None,
+    ) -> AddMessagesResponse:
+        """Add messages to chat history asynchronously.
+
+        Args:
+            messages (list[dict[str, str]] | list[MessageInput]): Messages to add
+            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        if not thread_id and not user_id:
+            raise AgentClientError("At least one of thread_id or user_id must be provided")
+
+        # Convert dict messages to MessageInput if needed
+        message_inputs = [
+            m if isinstance(m, MessageInput) else MessageInput(type=m["type"], content=m["content"]) for m in messages
+        ]
+
+        request = AddMessagesInput(thread_id=thread_id, user_id=user_id, messages=message_inputs)
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    f"{self.base_url}/{self.agent}/history/add_messages"
+                    if self.agent
+                    else f"{self.base_url}/history/add_messages",
+                    json=request.model_dump(),
+                    headers=self._headers,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+            except httpx.HTTPError as e:
+                raise AgentClientError(f"Error: {e}")
+
+        return AddMessagesResponse.model_validate(response.json())
+
+    def create_feedback(
+        self,
+        run_id: str,
+        key: str,
+        score: float,
+        kwargs: dict[str, Any] = {},
+        user_id: str | None = None,
+    ) -> FeedbackResponse:
+        """Create a feedback record for a run.
+
+        Args:
+            run_id (str): The ID of the run to provide feedback for
+            key (str): The key for the feedback
+            score (float): The score for the feedback
+            kwargs (dict[str, Any], optional): Additional metadata for the feedback
+            user_id (str, optional): User ID for identifying the user
+
+        """
+        request = Feedback(run_id=run_id, key=key, score=score, user_id=user_id, kwargs=kwargs)
+        try:
+            response = httpx.post(
+                f"{self.base_url}/{self.agent}/feedback" if self.agent else f"{self.base_url}/feedback",
+                json=request.model_dump(),
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return FeedbackResponse.model_validate(response.json())
+        except httpx.HTTPError as e:
+            raise AgentClientError(f"Error: {e}")

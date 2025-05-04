@@ -1,32 +1,51 @@
+<picture align="center">
+   <img alt="LangGraph Agent Toolkit Logo" src="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/logo.svg?raw=true" width="300">
+</picture>
+
+---
+
 # 🧰 Langgraph Agent Toolkit
 
-[![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml)
-[![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit)
-[![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/LICENSE)
-
-<!-- [![GitHub License](https://img.shields.io/github/license/kryvokhyzha/langgraph-agent-toolkit)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/LICENSE) -->
+|            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI/Testing | [![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit)                                                                                                                                                                                            |
+| Package    | [![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml) |
+| Meta       | [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff) [![GitHub License](https://img.shields.io/github/license/kryvokhyzha/langgraph-agent-toolkit)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/LICENSE)                                                                                                                                                                                                                                                                     |
 
 <!-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_red.svg)](https://langgraph-agent-toolkit.streamlit.app/) -->
 
 ## 📋 Introduction
 
-A full toolkit for running an AI agent service built with:
+A comprehensive toolkit for building, deploying, and managing AI agents using
+LangGraph, FastAPI, and Streamlit. It provides a production-ready framework for
+creating conversational AI agents with features like multi-provider LLM support,
+streaming responses, observability, and memory management.
+
+### What is langgraph-agent-toolkit?
+
+The langgraph-agent-toolkit is a full-featured framework for developing and
+deploying AI agent services. Built on the foundation of:
 
 - **[LangGraph](https://langchain-ai.github.io/langgraph/)** for agent creation
-- **[FastAPI](https://fastapi.tiangolo.com/)** for API service
-- **[Streamlit](https://streamlit.io/)** for user interface
+  with advanced flows and human-in-the-loop capabilities
+- **[FastAPI](https://fastapi.tiangolo.com/)** for robust, high-performance API
+  services with streaming support
+- **[Streamlit](https://streamlit.io/)** for intuitive user interfaces
 
-Features include:
+Key components include:
 
 - Data structures and settings built with
   **[Pydantic](https://github.com/pydantic/pydantic)**
-- **[LiteLLM](https://github.com/BerriAI/litellm)** proxy for multi-provider LLM
-  support
-- Complete template for building and deploying your own LangGraph-based agents
+- **[LiteLLM](https://github.com/BerriAI/litellm)** proxy for universal
+  multi-provider LLM support
+- Comprehensive memory management and persistence using PostgreSQL/SQLite
+- Advanced observability tooling via Langfuse and Langsmith
+- Modular architecture allowing customization while maintaining a consistent
+  application structure
+
+Whether you're building a simple chatbot or complex multi-agent system, this
+toolkit provides the infrastructure to develop, test, and deploy your
+LangGraph-based agents with confidence.
 
 ## 📑 Contents
 

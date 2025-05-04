@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 from langchain.chat_models.base import _ConfigurableModel
 from langchain_community.chat_models import FakeListChatModel

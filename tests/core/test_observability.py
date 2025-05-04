@@ -6,11 +6,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from langchain_core.prompts import ChatPromptTemplate
 
-from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
 from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
-from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, ObservabilityBackend, PromptTemplateType
+from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, ObservabilityBackend
 
 
 class TestBaseObservability:
