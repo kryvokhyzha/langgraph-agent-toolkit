@@ -387,8 +387,7 @@ class AgentExecutor:
                             new_messages.append(AIMessage(content=interrupt.value))
                         continue
 
-                    updates = updates or {}
-                    update_messages = updates.get("messages", [])
+                    update_messages = (updates or {}).get("messages", [])
 
                     # Special case for supervisor agent
                     if node == "supervisor":
@@ -430,9 +429,9 @@ class AgentExecutor:
             # More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/
             processed_messages = []
             current_message: dict[str, Any] = {}
-            for message in new_messages:
-                if isinstance(message, tuple):
-                    key, value = message
+            for msg in new_messages:
+                if isinstance(msg, tuple):
+                    key, value = msg
                     # Store parts in temporary dict
                     current_message[key] = value
                 else:
@@ -440,18 +439,18 @@ class AgentExecutor:
                     if current_message:
                         processed_messages.append(create_ai_message(current_message))
                         current_message = {}
-                    processed_messages.append(message)
+                    processed_messages.append(msg)
 
             # Add any remaining message parts
             if current_message:
                 processed_messages.append(create_ai_message(current_message))
 
-            for message in processed_messages:
+            for msg in new_messages:
                 try:
                     chat_message = langchain_to_chat_message(msg)
                     chat_message.run_id = str(run_id)
                     # Skip the input message if it's repeated by LangGraph
-                    if chat_message.type == "human" and chat_message.content == message:
+                    if chat_message.type == "human" and chat_message.content == msg:
                         continue
                     yield chat_message
                 except Exception as e:

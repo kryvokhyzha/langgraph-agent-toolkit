@@ -6,10 +6,10 @@ ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
 ENV UV_COMPILE_BYTECODE=1
 ENV PYTHONPATH="/app"
 
-COPY pyproject.toml .
-COPY uv.lock .
+COPY pyproject.toml uv.lock ./
+
 RUN pip install --no-cache-dir uv
-RUN uv sync --frozen --only-group client \
+RUN uv sync --frozen --no-install-project --only-group client \
     && rm -rf /root/.cache
 
 COPY langgraph_agent_toolkit/ ./langgraph_agent_toolkit/
