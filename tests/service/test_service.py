@@ -482,6 +482,7 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
         created_at=None,
         parent_config=None,
         tasks=(),
+        interrupts=(),
     )
 
     # Mock get_state to return our state snapshot with messages
