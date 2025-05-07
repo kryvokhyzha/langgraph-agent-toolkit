@@ -59,8 +59,6 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             The object created by the factory_func
 
         """
-        conn_string = self.get_connection_string()
-
         logger.info(
             f"Creating PostgreSQL connection pool: min_size={settings.POSTGRES_MIN_SIZE}, "
             f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}"
@@ -68,7 +66,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
         # Use AsyncConnectionPool as an async context manager
         async with AsyncConnectionPool(
-            conn_string,
+            self.get_connection_string(),
             min_size=settings.POSTGRES_MIN_SIZE,
             max_size=settings.POSTGRES_POOL_SIZE,
             max_idle=settings.POSTGRES_MAX_IDLE,

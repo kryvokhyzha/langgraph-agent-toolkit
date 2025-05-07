@@ -370,10 +370,14 @@ class AgentClient:
                     response.raise_for_status()
                     async for line in response.aiter_lines():
                         if line.strip():
-                            parsed = self._parse_stream_line(line)
-                            if parsed is None:
+                            try:
+                                parsed = self._parse_stream_line(line)
+                                if parsed is None:
+                                    break
+                                yield parsed
+                            except GeneratorExit:
+                                # Handle GeneratorExit properly to close the stream gracefully
                                 break
-                            yield parsed
             except httpx.HTTPError as e:
                 raise AgentClientError(f"Error: {e}")
 

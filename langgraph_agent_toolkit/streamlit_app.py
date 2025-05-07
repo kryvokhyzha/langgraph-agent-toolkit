@@ -75,6 +75,19 @@ async def main() -> None:
         if not thread_id:
             thread_id = str(uuid.uuid4())
             messages = []
+            # Add welcome message to messages when creating a new thread
+            welcome_message = None
+            match agent_client.agent:
+                case "chatbot":
+                    welcome_content = "Hello! I'm a simple chatbot. Ask me anything!"
+                case "interrupt-agent":
+                    welcome_content = (
+                        "Hello! I'm an interrupt agent. Tell me your birthday and I will predict your personality!"
+                    )
+                case _:
+                    welcome_content = "Hello! I'm an AI agent. Ask me anything!"
+            welcome_message = ChatMessage(type="ai", content=welcome_content)
+            messages.append(welcome_message)
         else:
             try:
                 messages: List[ChatMessage] = agent_client.get_history(
@@ -155,17 +168,6 @@ async def main() -> None:
     # Draw existing messages
     messages: list[ChatMessage] = st.session_state.messages
 
-    if len(messages) == 0:
-        match agent_client.agent:
-            case "chatbot":
-                WELCOME = "Hello! I'm a simple chatbot. Ask me anything!"
-            case "interrupt-agent":
-                WELCOME = "Hello! I'm an interrupt agent. Tell me your birthday and I will predict your personality!"
-            case _:
-                WELCOME = "Hello! I'm an AI agent. Ask me anything!"
-        with st.chat_message("assistant"):
-            st.write(WELCOME)
-
     # draw_messages() expects an async iterator over messages
     async def amessage_iter() -> AsyncGenerator[ChatMessage, None]:
         for m in messages:
@@ -198,7 +200,7 @@ async def main() -> None:
             st.error(f"Error generating response: {e}")
             st.stop()
 
-    # If messages have been generated, show feedback widget
+    # If messages have been generated, show feedback widget only for AI messages
     if len(messages) > 0 and st.session_state.last_message:
         with st.session_state.last_message:
             await handle_feedback()
@@ -248,6 +250,7 @@ async def draw_messages(
             streaming_content += msg
             streaming_placeholder.write(streaming_content)
             continue
+
         if not isinstance(msg, ChatMessage):
             st.error(f"Unexpected message type: {type(msg)}")
             st.write(msg)
