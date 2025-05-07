@@ -1,5 +1,5 @@
 <div align="center">
-   <img alt="LangGraph Agent Toolkit Logo" src="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/logo.svg?raw=true" width="300">
+   <img alt="LangGraph Agent Toolkit Logo" src="https://raw.githubusercontent.com/kryvokhyzha/langgraph-agent-toolkit/main/docs/media/logo.svg" width="300">
 </div>
 
 ---
@@ -9,7 +9,7 @@
 |            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CI/Testing | [![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml) [![docs status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml) [![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit) |
-| Package    | [![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml)           |
+| Package    | [![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml)                          |
 | Meta       | [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff) [![GitHub License](https://img.shields.io/github/license/kryvokhyzha/langgraph-agent-toolkit)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/LICENSE)                                                                                                                                                                                                                                                                               |
 
 <!-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_red.svg)](https://langgraph-agent-toolkit.streamlit.app/) -->
@@ -111,7 +111,7 @@ For detailed installation instructions and available extras, see the
 
 ## 🏗️ Architecture
 
-<img src="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true" width="800">
+<img src="https://raw.githubusercontent.com/kryvokhyzha/langgraph-agent-toolkit/main/docs/media/agent_architecture.png" width="800">
 
 <a name="key-features"></a>
 
@@ -182,11 +182,13 @@ Docker setup, using the AgentClient, and local development, see the
 
 ## 📚 Documentation
 
-Full documentation is available in the `docs/` directory and includes:
+Full documentation is available at
+[GitHub repository](https://github.com/kryvokhyzha/langgraph-agent-toolkit/tree/main/docs/)
+and includes:
 
-- [Installation Guide](docs/installation.rst)
-- [Environment Setup](docs/environment_setup.rst)
-- [Usage Guide](docs/usage.rst)
+- [Installation Guide](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/installation.rst)
+- [Environment Setup](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/environment_setup.rst)
+- [Usage Guide](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/usage.rst)
 
 <a name="useful-resources"></a>
 
