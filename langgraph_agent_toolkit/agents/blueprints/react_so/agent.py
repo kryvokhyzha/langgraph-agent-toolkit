@@ -5,7 +5,10 @@ from pydantic import BaseModel, Field
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.components.creators.create_react_agent import create_react_agent
 from langgraph_agent_toolkit.agents.components.tools import add, multiply
-from langgraph_agent_toolkit.agents.components.utils import AgentStateWithRemainingSteps, pre_model_hook_standard
+from langgraph_agent_toolkit.agents.components.utils import (
+    AgentStateWithStructuredResponseAndRemainingSteps,
+    pre_model_hook_standard,
+)
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 from langgraph_agent_toolkit.schema.models import ModelProvider
@@ -37,8 +40,8 @@ react_agent_so = Agent(
             "You can also ask clarifying questions to the user. "
         ),
         pre_model_hook=pre_model_hook_standard,
-        response_format=ResponseSchema,
-        state_schema=AgentStateWithRemainingSteps,
+        # response_format=ResponseSchema,
+        state_schema=AgentStateWithStructuredResponseAndRemainingSteps,
         checkpointer=MemorySaver(),
         immediate_step_threshold=5,
     ),
