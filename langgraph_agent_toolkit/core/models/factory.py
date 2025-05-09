@@ -87,7 +87,7 @@ class ModelFactory:
         model_name: Optional[str] = None,
         configurable_fields: Optional[Union[Literal["any"], List[str], Tuple[str, ...]]] = None,
         config_prefix: Optional[str] = None,
-        model_parameter_values: Optional[dict[str, Any]] = None,
+        model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,  # Changed to tuple of tuples
         **kwargs: Any,
     ) -> ModelT:
         """Create and return a model instance.
@@ -97,7 +97,8 @@ class ModelFactory:
             model_name: The name of the model to use. If not provided, the default model name will be used.
             configurable_fields: The fields that are configurable. If not provided, the default fields will be used.
             config_prefix: The prefix to use for the configuration. If not provided, the default prefix will be used.
-            model_parameter_values: The values for the model parameters. If not provided, the default values will be used.
+            model_parameter_values: The values for the model parameters as a tuple of (key, value) pairs.
+                                    If not provided, the default values will be used.
             **kwargs: Additional keyword arguments to pass to the model.
 
         Returns:
@@ -108,8 +109,10 @@ class ModelFactory:
 
         """  # noqa: E501
         _configurable_fields = DEFAULT_CONFIGURABLE_FIELDS if configurable_fields is None else configurable_fields
-        _config_prefix = config_prefix or DEFAULT_CONFIG_PREFIX
-        _model_parameter_values = model_parameter_values or DEFAULT_MODEL_PARAMETER_VALUES
+        _config_prefix = DEFAULT_CONFIG_PREFIX if config_prefix is None else config_prefix
+        _model_parameter_values = (
+            DEFAULT_MODEL_PARAMETER_VALUES if model_parameter_values is None else dict(model_parameter_values)
+        )
 
         match model_provider:
             case ModelProvider.FAKE:
@@ -165,4 +168,4 @@ class ModelFactory:
         params.update(override_params)
 
         # Create and return the model
-        return cls.create(model_provider=provider, model_name=model_name, **params)
+        return cls.create(model_provider=provider, model_name=model_name, model_parameter_values=(), **params)
