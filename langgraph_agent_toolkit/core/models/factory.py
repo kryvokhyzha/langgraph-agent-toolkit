@@ -13,6 +13,7 @@ from typing import (
 
 from langchain.chat_models.base import _ConfigurableModel, _init_chat_model_helper
 from langchain_core.language_models import BaseChatModel
+from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
 from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
@@ -27,11 +28,20 @@ from langgraph_agent_toolkit.schema.models import ModelProvider
 ModelT: TypeAlias = FakeToolModel | _ConfigurableModel | BaseChatModel
 
 
+class _ConfigurableModelCustom(_ConfigurableModel):
+    def _model(self, config: Optional[RunnableConfig] = None) -> Runnable:
+        params = {**self._default_config, **self._model_params(config)}
+        model = ModelFactory._init_chat_model_helper(**params)
+        for name, args, kwargs in self._queued_declarative_operations:
+            model = getattr(model, name)(*args, **kwargs)
+        return model
+
+
 class ModelFactory:
     """Factory for creating model instances."""
 
     @staticmethod
-    def __init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
+    def _init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
         if model_provider == "openai":
             return ChatOpenAIPatched(model_name=model, **kwargs)
         else:
@@ -58,13 +68,13 @@ class ModelFactory:
             )
 
         if not configurable_fields:
-            return ModelFactory.__init_chat_model_helper(cast(str, model), model_provider=model_provider, **kwargs)
+            return ModelFactory._init_chat_model_helper(cast(str, model), model_provider=model_provider, **kwargs)
         else:
             if model:
                 kwargs["model"] = model
             if model_provider:
                 kwargs["model_provider"] = model_provider
-            return _ConfigurableModel(
+            return _ConfigurableModelCustom(
                 default_config=kwargs,
                 config_prefix=config_prefix,
                 configurable_fields=configurable_fields,
@@ -97,7 +107,7 @@ class ModelFactory:
             ValueError: If the requested model is not supported
 
         """  # noqa: E501
-        _configurable_fields = configurable_fields or DEFAULT_CONFIGURABLE_FIELDS
+        _configurable_fields = DEFAULT_CONFIGURABLE_FIELDS if configurable_fields is None else configurable_fields
         _config_prefix = config_prefix or DEFAULT_CONFIG_PREFIX
         _model_parameter_values = model_parameter_values or DEFAULT_MODEL_PARAMETER_VALUES
 

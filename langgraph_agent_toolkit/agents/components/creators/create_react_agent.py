@@ -10,6 +10,7 @@ from typing import (
     get_type_hints,
 )
 
+from langchain.chat_models.base import _ConfigurableModel
 from langchain_core.language_models import (
     BaseChatModel,
     LanguageModelInput,
@@ -24,16 +25,17 @@ from langchain_core.messages import (
 )
 from langchain_core.runnables import (
     Runnable,
+    RunnableBinding,
     RunnableConfig,
+    RunnableSequence,
 )
 from langchain_core.tools import BaseTool
-from langgraph.graph import END, StateGraph
+from langgraph.graph import END, START, StateGraph
 from langgraph.graph.graph import CompiledGraph
 from langgraph.prebuilt.chat_agent_executor import (
     AgentState,
     AgentStateWithStructuredResponse,
     StructuredResponseSchema,
-    _get_model,
     _get_prompt_runnable,
     _get_state_value,
     _should_bind_tools,
@@ -44,6 +46,30 @@ from langgraph.store.base import BaseStore
 from langgraph.types import Checkpointer, Send
 from langgraph.utils.runnable import RunnableCallable, RunnableLike
 from pydantic import BaseModel
+
+from langgraph_agent_toolkit.agents.components.utils import default_pre_model_hook
+
+
+def _get_model(model: LanguageModelLike, config: RunnableConfig) -> BaseChatModel:
+    """Get the underlying model from a RunnableBinding or return the model itself."""
+    if isinstance(model, _ConfigurableModel):
+        return model._model(config)
+
+    if isinstance(model, RunnableSequence):
+        model = next(
+            (step for step in model.steps if isinstance(step, (RunnableBinding, BaseChatModel))),
+            model,
+        )
+
+    if isinstance(model, RunnableBinding):
+        model = model.bound
+
+    if not isinstance(model, BaseChatModel):
+        raise TypeError(
+            f"Expected `model` to be a ChatModel or RunnableBinding (e.g. model.bind_tools(...)), got {type(model)}"
+        )
+
+    return model
 
 
 def create_react_agent(
@@ -64,8 +90,8 @@ def create_react_agent(
     debug: bool = False,
     version: Literal["v1", "v2"] = "v1",
     name: Optional[str] = None,
-    immediate_step_threshold: int = 5,  # New parameter for customizing when to use immediate generation
-    immediate_generation_prompt: Optional[str] = None,  # New parameter for customizing the immediate generation prompt
+    immediate_step_threshold: int = 5,
+    immediate_generation_prompt: Optional[str] = None,
 ) -> CompiledGraph:
     """Create a graph that works with a chat model that utilizes tool calling with an additional router.
 
@@ -230,7 +256,7 @@ def create_react_agent(
         prompt_with_instruction = [immediate_prompt] + list(messages)
 
         # Use the model directly without tool calling capabilities
-        base_model = _get_model(model)
+        base_model = _get_model(model, config)
         response = cast(AIMessage, base_model.invoke(prompt_with_instruction, config))
         response.name = name
 
@@ -248,7 +274,7 @@ def create_react_agent(
         messages = _get_state_value(state, "messages")
         prompt_with_instruction = [immediate_prompt] + list(messages)
 
-        base_model = _get_model(model)
+        base_model = _get_model(model, config)
         # Fix: Use ainvoke instead of invoke for async function
         response = cast(AIMessage, await base_model.ainvoke(prompt_with_instruction, config))
         response.name = name
@@ -292,7 +318,7 @@ def create_react_agent(
             system_prompt, structured_response_schema = response_format
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
-        model_with_structured_output = _get_model(model).with_structured_output(
+        model_with_structured_output = _get_model(model, config).with_structured_output(
             cast(StructuredResponseSchema, structured_response_schema)
         )
         response = model_with_structured_output.invoke(messages, config)
@@ -305,11 +331,15 @@ def create_react_agent(
             system_prompt, structured_response_schema = response_format
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
-        model_with_structured_output = _get_model(model).with_structured_output(
+        model_with_structured_output = _get_model(model, config).with_structured_output(
             cast(StructuredResponseSchema, structured_response_schema)
         )
         response = await model_with_structured_output.ainvoke(messages, config)
         return {"structured_response": response}
+
+    # Use default_pre_model_hook if pre_model_hook is None
+    if pre_model_hook is None:
+        pre_model_hook = default_pre_model_hook
 
     if not tool_calling_enabled:
         # Define a new graph
@@ -328,16 +358,14 @@ def create_react_agent(
             input=input_schema,
         )
 
-        # Set up routing structure
-        if pre_model_hook is not None:
-            workflow.add_node("pre_model_hook", pre_model_hook)
-            # Route pre_model_hook directly to either agent or immediate_generation based on condition
-            workflow.add_conditional_edges("pre_model_hook", router_condition, ["agent", "immediate_generation"])
-            entrypoint = "pre_model_hook"
-        else:
-            # If no pre_model_hook, use START as the conditional router
-            workflow.add_conditional_edges("START", router_condition, ["agent", "immediate_generation"])
-            entrypoint = "START"
+        # Always add pre_model_hook
+        workflow.add_node("pre_model_hook", pre_model_hook)
+
+        # Route pre_model_hook directly to either agent or immediate_generation based on condition
+        workflow.add_conditional_edges("pre_model_hook", router_condition, ["agent", "immediate_generation"])
+
+        # Always set START as entry point
+        workflow.add_edge(START, "pre_model_hook")
 
         # Connect both agent and immediate_generation to END or structured response
         if response_format is not None:
@@ -351,8 +379,6 @@ def create_react_agent(
         else:
             workflow.add_edge("agent", END)
             workflow.add_edge("immediate_generation", END)
-
-        workflow.set_entry_point(entrypoint)
 
         return workflow.compile(
             checkpointer=checkpointer,
@@ -379,10 +405,7 @@ def create_react_agent(
             if version == "v1":
                 return "tools"
             elif version == "v2":
-                tool_calls = [
-                    tool_node.inject_tool_args(call, state, store)  # type: ignore[arg-type]
-                    for call in last_message.tool_calls
-                ]
+                tool_calls = [tool_node.inject_tool_args(call, state, store) for call in last_message.tool_calls]
                 return [Send("tools", [tool_call]) for tool_call in tool_calls]
 
     # Define a new graph
@@ -395,19 +418,14 @@ def create_react_agent(
     )
     workflow.add_node("tools", tool_node)
 
-    # Set up the routing structure
-    if pre_model_hook is not None:
-        workflow.add_node("pre_model_hook", pre_model_hook)
-        # Route pre_model_hook directly to either agent or immediate_generation based on condition
-        workflow.add_conditional_edges("pre_model_hook", router_condition, ["agent", "immediate_generation"])
-        entrypoint = "pre_model_hook"
-    else:
-        # If no pre_model_hook, use START as the conditional router
-        workflow.add_conditional_edges("START", router_condition, ["agent", "immediate_generation"])
-        entrypoint = "START"
+    # Always add pre_model_hook node
+    workflow.add_node("pre_model_hook", pre_model_hook)
 
-    # Set the entrypoint
-    workflow.set_entry_point(entrypoint)
+    # Route pre_model_hook to either agent or immediate_generation based on condition
+    workflow.add_conditional_edges("pre_model_hook", router_condition, ["agent", "immediate_generation"])
+
+    # Set START as the entry point and route to pre_model_hook
+    workflow.add_edge(START, "pre_model_hook")
 
     # Add structured output node if response_format is provided
     if response_format is not None:
@@ -436,21 +454,14 @@ def create_react_agent(
             if m.name in should_return_direct:
                 return END
 
-        # After tools, go back to the conditional routing - either pre_model_hook or router_condition
-        return "pre_model_hook" if pre_model_hook is not None else "START"
+        # After tools, always go to pre_model_hook
+        return "pre_model_hook"
 
     if should_return_direct:
-        destinations = []
-        if pre_model_hook is not None:
-            destinations.append("pre_model_hook")
-        else:
-            destinations.append("START")
-
-        destinations.append(END)
-        workflow.add_conditional_edges("tools", route_tool_responses, destinations)
+        workflow.add_conditional_edges("tools", route_tool_responses, ["pre_model_hook", END])
     else:
-        # After tools, go back to the conditional routing
-        workflow.add_edge("tools", "pre_model_hook" if pre_model_hook is not None else "START")
+        # After tools, always go to pre_model_hook
+        workflow.add_edge("tools", "pre_model_hook")
 
     # Finally, we compile it!
     return workflow.compile(

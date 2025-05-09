@@ -2,12 +2,19 @@ import asyncio
 import random
 from uuid import UUID
 
+import rootutils
 from dotenv import find_dotenv, load_dotenv
 from langchain_core.runnables import RunnableConfig
 from langfuse.callback import CallbackHandler
 
 
-load_dotenv(find_dotenv(), override=True)
+_ = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
 
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.settings import settings
@@ -47,7 +54,7 @@ async def main() -> None:
         ),
     )
     logger.info(result.keys())
-    logger.info(result)
+    # logger.info(result)
 
     try:
         result["messages"][-1].pretty_print()
