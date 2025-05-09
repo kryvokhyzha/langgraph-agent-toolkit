@@ -107,7 +107,7 @@ class ModelFactory:
             ValueError: If the requested model is not supported
 
         """  # noqa: E501
-        _configurable_fields = configurable_fields or DEFAULT_CONFIGURABLE_FIELDS
+        _configurable_fields = DEFAULT_CONFIGURABLE_FIELDS if configurable_fields is None else configurable_fields
         _config_prefix = config_prefix or DEFAULT_CONFIG_PREFIX
         _model_parameter_values = model_parameter_values or DEFAULT_MODEL_PARAMETER_VALUES
 

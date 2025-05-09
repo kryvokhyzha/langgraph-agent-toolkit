@@ -50,8 +50,11 @@ from pydantic import BaseModel
 from langgraph_agent_toolkit.agents.components.utils import default_pre_model_hook
 
 
-def _get_model(model: LanguageModelLike) -> BaseChatModel:
+def _get_model(model: LanguageModelLike, config: RunnableConfig) -> BaseChatModel:
     """Get the underlying model from a RunnableBinding or return the model itself."""
+    if isinstance(model, _ConfigurableModel):
+        return model._model(config)
+
     if isinstance(model, RunnableSequence):
         model = next(
             (step for step in model.steps if isinstance(step, (RunnableBinding, BaseChatModel))),
@@ -60,9 +63,6 @@ def _get_model(model: LanguageModelLike) -> BaseChatModel:
 
     if isinstance(model, RunnableBinding):
         model = model.bound
-
-    if isinstance(model, _ConfigurableModel):
-        return model
 
     if not isinstance(model, BaseChatModel):
         raise TypeError(
@@ -256,7 +256,7 @@ def create_react_agent(
         prompt_with_instruction = [immediate_prompt] + list(messages)
 
         # Use the model directly without tool calling capabilities
-        base_model = _get_model(model)
+        base_model = _get_model(model, config)
         response = cast(AIMessage, base_model.invoke(prompt_with_instruction, config))
         response.name = name
 
@@ -274,7 +274,7 @@ def create_react_agent(
         messages = _get_state_value(state, "messages")
         prompt_with_instruction = [immediate_prompt] + list(messages)
 
-        base_model = _get_model(model)
+        base_model = _get_model(model, config)
         # Fix: Use ainvoke instead of invoke for async function
         response = cast(AIMessage, await base_model.ainvoke(prompt_with_instruction, config))
         response.name = name
@@ -318,7 +318,7 @@ def create_react_agent(
             system_prompt, structured_response_schema = response_format
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
-        model_with_structured_output = _get_model(model).with_structured_output(
+        model_with_structured_output = _get_model(model, config).with_structured_output(
             cast(StructuredResponseSchema, structured_response_schema)
         )
         response = model_with_structured_output.invoke(messages, config)
@@ -331,7 +331,7 @@ def create_react_agent(
             system_prompt, structured_response_schema = response_format
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
-        model_with_structured_output = _get_model(model).with_structured_output(
+        model_with_structured_output = _get_model(model, config).with_structured_output(
             cast(StructuredResponseSchema, structured_response_schema)
         )
         response = await model_with_structured_output.ainvoke(messages, config)

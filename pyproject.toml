@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.4.3"
+version = "0.4.4"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }, { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
@@ -34,13 +34,13 @@ dependencies = [
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter ~= 0.9.0",
-    "langchain-core ~= 0.3.52",
-    "langchain-community ~= 0.3.21",
-    "langgraph ~= 0.4.1",
-    "langgraph-cli[inmem] ~= 0.2.3",
-    "langgraph-checkpoint-sqlite ~= 2.0.6",
-    "langgraph-checkpoint-postgres ~= 2.0.19",
-    "langgraph-supervisor ~= 0.0.16",
+    "langchain-core ~= 0.3.59",
+    "langchain-community ~= 0.3.23",
+    "langgraph ~= 0.4.3",
+    "langgraph-cli[inmem] ~= 0.2.8",
+    "langgraph-checkpoint-sqlite ~= 2.0.7",
+    "langgraph-checkpoint-postgres ~= 2.0.21",
+    "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
     "numpy ~= 2.2.3; python_version >= '3.13'",
     "pandas ~= 2.2.3",
@@ -141,7 +141,7 @@ deepseek = [
 ]
 
 openai = [
-    "langchain-openai ~= 0.3.12",
+    "langchain-openai ~= 0.3.16",
 ]
 
 all-llms = [
@@ -152,7 +152,7 @@ all-llms = [
     "langchain-ollama ~= 0.3.2",
     "langchain-groq ~= 0.3.2",
     "langchain-deepseek ~= 0.1.3",
-    "langchain-openai ~= 0.3.12",
+    "langchain-openai ~= 0.3.16",
 ]
 
 # Observability tools and platforms
