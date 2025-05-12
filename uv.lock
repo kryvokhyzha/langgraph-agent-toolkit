@@ -1585,7 +1585,7 @@ wheels = [
 
 [[package]]
 name = "langgraph-agent-toolkit"
-version = "0.4.3"
+version = "0.4.6"
 source = { editable = "." }
 dependencies = [
     { name = "duckduckgo-search" },
@@ -1735,7 +1735,7 @@ requires-dist = [
     { name = "langchain-groq", marker = "extra == 'groq'", specifier = "~=0.3.2" },
     { name = "langchain-ollama", marker = "extra == 'all-llms'", specifier = "~=0.3.2" },
     { name = "langchain-ollama", marker = "extra == 'ollama'", specifier = "~=0.3.2" },
-    { name = "langchain-openai", marker = "extra == 'all-llms'", specifier = "~=0.3.12" },
+    { name = "langchain-openai", marker = "extra == 'all-llms'", specifier = "~=0.3.16" },
     { name = "langchain-openai", marker = "extra == 'openai'", specifier = "~=0.3.16" },
     { name = "langfuse", marker = "extra == 'all-observability'", specifier = "~=2.60.3" },
     { name = "langfuse", marker = "extra == 'langfuse'", specifier = "~=2.60.3" },

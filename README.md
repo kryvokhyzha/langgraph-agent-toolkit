@@ -201,6 +201,8 @@ and includes:
 - [LangGraph - Examples](https://github.com/langchain-ai/langgraph/tree/main/examples)
 - [Complex data extraction with function calling](https://langchain-ai.github.io/langgraph/tutorials/extraction/retries/)
 - [How to edit graph state](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/edit-graph-state/)
+- [Memory in the background](https://www.youtube.com/watch?v=R1jKQ1Jn5T4&ab_channel=LangChain)
+- [Building an agent with LangGraph](https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/)
 - [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
 - [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
 
