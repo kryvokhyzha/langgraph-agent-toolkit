@@ -1,11 +1,19 @@
 import rootutils
 from dotenv import find_dotenv, load_dotenv
 
+
+PATH_TO_ROOT = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
+
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 
 
-load_dotenv(find_dotenv())
-custom_dir = rootutils.find_root(__file__, indicator=".project-root") / "data" / "prompts"
+custom_dir = PATH_TO_ROOT / "data" / "prompts"
 
 
 if __name__ == "__main__":

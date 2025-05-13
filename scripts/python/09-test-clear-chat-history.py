@@ -1,13 +1,18 @@
-import sys
-
+import rootutils
 from dotenv import find_dotenv, load_dotenv
+
+
+_ = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
+
 from langchain_core.messages import AnyMessage, RemoveMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.func import Pregel
-
-
-load_dotenv(find_dotenv(filename=".local.env"), override=True)
-sys.path.append(".")
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.blueprints.react.agent import react_agent

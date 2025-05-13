@@ -1,10 +1,18 @@
+import rootutils
 from dotenv import find_dotenv, load_dotenv
+
+
+_ = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
 
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, ObservabilityBackend
 
-
-load_dotenv(find_dotenv())
 
 if __name__ == "__main__":
     # Create observability instance using the factory

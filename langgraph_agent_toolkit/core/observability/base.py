@@ -89,7 +89,7 @@ class BaseObservabilityPlatform(ABC):
     def _handle_existing_prompt(
         self,
         name: str,
-        create_new_version: bool = True,
+        force_create_new_version: bool = True,
         client: Any = None,
         client_pull_method: Optional[str] = None,
         client_delete_method: Optional[str] = None,
@@ -106,11 +106,11 @@ class BaseObservabilityPlatform(ABC):
         if not pull_method or not delete_method:
             return (existing_prompt, url)
 
-        if not create_new_version:
+        if not force_create_new_version:
             try:
                 existing_prompt = pull_method(name=name)
                 url = getattr(existing_prompt, "url", None)
-                logger.debug(f"Using existing prompt '{name}' as create_new_version is False")
+                logger.debug(f"Using existing prompt '{name}' as force_create_new_version is False")
             except Exception:
                 logger.debug(f"Existing prompt '{name}' not found, will create a new one")
         else:
@@ -275,14 +275,14 @@ class BaseObservabilityPlatform(ABC):
         name: str,
         prompt_template: PromptTemplateType,
         metadata: Optional[Dict[str, Any]] = None,
-        create_new_version: bool = True,
+        force_create_new_version: bool = True,
     ) -> None:
         self._prompts_dir.mkdir(exist_ok=True, parents=True)
 
         file_path = self._prompts_dir / f"{name}.jinja2"
         metadata_path = self._prompts_dir / f"{name}.metadata.joblib"
 
-        if create_new_version:
+        if force_create_new_version:
             if file_path.exists():
                 file_path.unlink()
             if metadata_path.exists():

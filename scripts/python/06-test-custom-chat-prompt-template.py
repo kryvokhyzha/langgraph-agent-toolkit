@@ -1,10 +1,20 @@
 import time
 from typing import List
 
+import rootutils
 from dotenv import find_dotenv, load_dotenv
+
+
+_ = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
+
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langgraph.prebuilt import create_react_agent
 
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, ObservabilityBackend
@@ -24,9 +34,6 @@ def print_separator(title: str = None):
     else:
         print(f"\n{'=' * width}")
 
-
-# Load environment variables
-load_dotenv(find_dotenv())
 
 if __name__ == "__main__":
     print_separator("ObservabilityChatPromptTemplate Demo")

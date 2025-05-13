@@ -1,3 +1,6 @@
+import os
+
+
 # This is the initial default agent name, but it may be overridden at runtime
 DEFAULT_AGENT = "react-agent"
 _CURRENT_DEFAULT_AGENT = DEFAULT_AGENT
@@ -13,7 +16,7 @@ def set_default_agent(agent_name):
     return _CURRENT_DEFAULT_AGENT
 
 
-DEFAULT_MAX_MESSAGE_HISTORY_LENGTH = 6 + 1  # N messages + 1 system message
+DEFAULT_MAX_MESSAGE_HISTORY_LENGTH = os.getenv("DEFAULT_MAX_MESSAGE_HISTORY_LENGTH", 18)
 DEFAULT_RECURSION_LIMIT = 25
 DEFAULT_CONFIG_PREFIX = "agent"
 DEFAULT_CONFIGURABLE_FIELDS = ("temperature", "max_tokens", "top_p", "streaming")

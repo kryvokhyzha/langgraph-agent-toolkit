@@ -1,3 +1,5 @@
+import hashlib
+import json
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from langfuse import Langfuse
@@ -32,44 +34,85 @@ class LangfuseObservability(BaseObservabilityPlatform):
             **kwargs,
         )
 
+    def _compute_prompt_hash(self, prompt_template: PromptTemplateType) -> str:
+        """Compute a hash of the prompt content to detect changes."""
+        if isinstance(prompt_template, str):
+            content_to_hash = prompt_template
+        elif isinstance(prompt_template, list):
+            content_to_hash = json.dumps(prompt_template, sort_keys=True)
+        else:
+            content_to_hash = str(prompt_template)
+
+        return hashlib.md5(content_to_hash.encode("utf-8")).hexdigest()
+
     @BaseObservabilityPlatform.requires_env_vars
     def push_prompt(
         self,
         name: str,
         prompt_template: PromptTemplateType,
         metadata: Optional[Dict[str, Any]] = None,
-        create_new_version: bool = True,
+        force_create_new_version: bool = True,
     ) -> None:
         langfuse = Langfuse()
         labels = metadata.get("labels", ["production"]) if metadata else ["production"]
 
+        # Generate hash for the current prompt
+        prompt_hash = self._compute_prompt_hash(prompt_template)
+
         # Handle existing prompt versions - custom implementation for Langfuse
         existing_prompt = None
-        if not create_new_version:
-            try:
-                existing_prompt = langfuse.get_prompt(name=name)
-                logger.debug(f"Using existing prompt '{name}' as create_new_version is False")
-            except Exception:
-                logger.debug(f"Existing prompt '{name}' not found, will create a new one")
+        content_changed = True
+
+        try:
+            existing_prompt = langfuse.get_prompt(name=name)
+
+            # Check if content has changed by comparing hashes
+            if existing_prompt.commit_message and existing_prompt.commit_message == prompt_hash:
+                content_changed = False
+                logger.debug(f"Prompt '{name}' content unchanged")
+            else:
+                logger.debug(f"Prompt '{name}' content changed from previous version")
+        except Exception:
+            logger.debug(f"Existing prompt '{name}' not found, will create a new one")
 
         prompt_obj = self._convert_to_chat_prompt(prompt_template)
         type_prompt = "text" if isinstance(prompt_template, str) else "chat"
 
-        if existing_prompt:
-            langfuse_prompt = existing_prompt
-        else:
+        create_new = (
+            # When force_create_new_version=True, always create a new version
+            force_create_new_version
+            or
+            # When no existing prompt, create a new one
+            existing_prompt is None
+            or
+            # When content has changed and we're not forcing to keep the old version
+            content_changed
+        )
+
+        if create_new:
             langfuse_prompt = langfuse.create_prompt(
                 name=name,
                 prompt=prompt_template,
                 labels=labels,
                 type=type_prompt,
+                commit_message=prompt_hash,  # Store hash in commit_message
             )
+            if existing_prompt is None:
+                logger.debug(f"Created new prompt '{name}' as it didn't exist before")
+            elif content_changed:
+                logger.debug(f"Created new prompt version '{name}' because content changed (hash: {prompt_hash})")
+            else:
+                logger.debug(f"Created new prompt version '{name}' because force_create_new_version=True")
+        else:
+            # Content unchanged and not forcing new version
+            langfuse_prompt = existing_prompt
+            logger.debug(f"Reusing existing prompt '{name}' as content is unchanged and force_create_new_version=False")
 
         full_metadata = metadata.copy() if metadata else {}
         full_metadata["langfuse_prompt"] = langfuse_prompt
         full_metadata["original_prompt"] = prompt_obj
 
-        super().push_prompt(name, prompt_template, full_metadata)
+        super().push_prompt(name, prompt_template, full_metadata, force_create_new_version)
 
     @BaseObservabilityPlatform.requires_env_vars
     def pull_prompt(

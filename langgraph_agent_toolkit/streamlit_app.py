@@ -30,6 +30,20 @@ APP_TITLE = "Agent Service Toolkit"
 APP_ICON = "🧰"
 
 
+def create_welcome_message(agent: str) -> ChatMessage:
+    """Create a welcome message based on the current agent."""
+    match agent:
+        case "chatbot":
+            welcome_content = "Hello! I'm a simple chatbot. Ask me anything!"
+        case "interrupt-agent":
+            welcome_content = (
+                "Hello! I'm an interrupt agent. Tell me your birthday and I will predict your personality!"
+            )
+        case _:
+            welcome_content = "Hello! I'm an AI agent. Ask me anything!"
+    return ChatMessage(type="ai", content=welcome_content)
+
+
 async def main() -> None:
     st.set_page_config(
         page_title=APP_TITLE,
@@ -76,18 +90,7 @@ async def main() -> None:
             thread_id = str(uuid.uuid4())
             messages = []
             # Add welcome message to messages when creating a new thread
-            welcome_message = None
-            match agent_client.agent:
-                case "chatbot":
-                    welcome_content = "Hello! I'm a simple chatbot. Ask me anything!"
-                case "interrupt-agent":
-                    welcome_content = (
-                        "Hello! I'm an interrupt agent. Tell me your birthday and I will predict your personality!"
-                    )
-                case _:
-                    welcome_content = "Hello! I'm an AI agent. Ask me anything!"
-            welcome_message = ChatMessage(type="ai", content=welcome_content)
-            messages.append(welcome_message)
+            messages.append(create_welcome_message(agent_client.agent))
         else:
             try:
                 messages: List[ChatMessage] = agent_client.get_history(
@@ -111,6 +114,8 @@ async def main() -> None:
         if st.button(":material/chat: New Chat", use_container_width=True):
             st.session_state.messages = []
             st.session_state.thread_id = str(uuid.uuid4())
+            # Add welcome message to new chat
+            st.session_state.messages.append(create_welcome_message(agent_client.agent))
             st.rerun()
 
         with st.popover(":material/settings: Settings", use_container_width=True):
