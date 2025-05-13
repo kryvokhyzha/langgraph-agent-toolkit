@@ -35,7 +35,7 @@ class EmptyObservability(BaseObservabilityPlatform):
         name: str,
         prompt_template: PromptTemplateType,
         metadata: Optional[Dict[str, Any]] = None,
-        create_new_version: bool = True,
+        force_create_new_version: bool = True,
     ) -> None:
         """Push a prompt using local storage.
 
@@ -43,10 +43,10 @@ class EmptyObservability(BaseObservabilityPlatform):
             name: Name of the prompt
             prompt_template: String template, list of message dicts, or prompt object
             metadata: Additional metadata for the prompt
-            create_new_version: If True, overwrite existing prompt with new version
+            force_create_new_version: If True, overwrite existing prompt with new version
 
         """
-        super().push_prompt(name, prompt_template, metadata, create_new_version)
+        super().push_prompt(name, prompt_template, metadata, force_create_new_version)
 
     def pull_prompt(
         self,

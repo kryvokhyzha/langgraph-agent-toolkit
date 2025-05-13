@@ -54,7 +54,7 @@ class LangsmithObservability(BaseObservabilityPlatform):
         name: str,
         prompt_template: PromptTemplateType,
         metadata: Optional[Dict[str, Any]] = None,
-        create_new_version: bool = True,
+        force_create_new_version: bool = True,
     ) -> None:
         """Push a prompt to LangSmith."""
         client = LangsmithClient()
@@ -64,7 +64,11 @@ class LangsmithObservability(BaseObservabilityPlatform):
 
         # Handle existing prompt versions
         existing_prompt, existing_url = self._handle_existing_prompt(
-            name, create_new_version, client, client_pull_method="pull_prompt", client_delete_method="delete_prompt"
+            name,
+            force_create_new_version,
+            client,
+            client_pull_method="pull_prompt",
+            client_delete_method="delete_prompt",
         )
 
         url = None
