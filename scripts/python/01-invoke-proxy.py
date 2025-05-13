@@ -1,12 +1,20 @@
 import os
 
+import rootutils
 from dotenv import find_dotenv, load_dotenv
+
+
+_ = rootutils.setup_root(
+    search_from=__file__,
+    indicator=".project-root",
+    pythonpath=True,
+    dotenv=False,
+)
+load_dotenv(find_dotenv(".local.env"), override=True)
+
 from langchain.schema import HumanMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
-
-
-load_dotenv(find_dotenv())
 
 
 class Response(BaseModel):

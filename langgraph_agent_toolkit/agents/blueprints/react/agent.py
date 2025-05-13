@@ -36,7 +36,7 @@ observability.push_prompt(
             content="messages",
         ),
     ],
-    create_new_version=False,
+    force_create_new_version=False,
 )
 
 prompt = ObservabilityChatPromptTemplate.from_observability_platform(
