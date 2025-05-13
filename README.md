@@ -197,6 +197,8 @@ and includes:
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
 - [LangGraph Memory Concept](https://langchain-ai.github.io/langgraph/concepts/memory/)
 - [LangGraph Memory Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/#memory)
+- [LangGraph Memory Template](https://github.com/langchain-ai/memory-template)
+- [LangGraph Human in the Loop](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/wait-user-input/)
 - [LangGraph 101 - blueprints](https://github.com/langchain-ai/langgraph-101)
 - [LangGraph - Examples](https://github.com/langchain-ai/langgraph/tree/main/examples)
 - [Complex data extraction with function calling](https://langchain-ai.github.io/langgraph/tutorials/extraction/retries/)

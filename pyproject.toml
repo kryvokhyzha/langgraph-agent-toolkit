@@ -43,6 +43,7 @@ dependencies = [
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
     "numpy ~= 2.2.3; python_version >= '3.13'",
+    "onnxruntime ~= 1.21.1",
     "pandas ~= 2.2.3",
     "psycopg[binary,pool] ~= 3.2.4",
     "pyarrow >= 19.0.1",
