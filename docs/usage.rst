@@ -76,7 +76,7 @@ The toolkit includes ``AgentClient`` for interacting with the agent service:
    from client import AgentClient
    client = AgentClient()
 
-   response = client.invoke("Tell me a brief joke?")
+   response = client.invoke({"message": "Tell me a brief joke?"})
    response.pretty_print()
    # ================================== Ai Message ==================================
    #
