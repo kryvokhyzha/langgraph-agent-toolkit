@@ -83,7 +83,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
     try:
         return await executor.invoke(
             agent_id=agent_id,
-            message=user_input.message,
+            input=user_input.input,
             thread_id=user_input.thread_id,
             user_id=user_input.user_id,
             model_name=user_input.model_name,

@@ -30,6 +30,7 @@ react_agent_so = Agent(
         model=ModelFactory.create(
             model_provider=ModelProvider.OPENAI,
             model_name=settings.OPENAI_MODEL_NAME,
+            config_prefix="",
             configurable_fields=(),
             model_parameter_values=(("temperature", 0.0), ("top_p", 0.7), ("streaming", False)),
             openai_api_base=settings.OPENAI_API_BASE_URL,

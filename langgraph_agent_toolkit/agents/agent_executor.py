@@ -2,6 +2,7 @@ import asyncio
 import functools
 import importlib
 import os
+import sys
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
@@ -142,9 +143,9 @@ class AgentExecutor:
         def _handle_error(e: Exception):
             """Handle and re-raise errors with logging."""
             if isinstance(e, GraphRecursionError):
-                logger.opt(exception=e).error(f"GraphRecursionError occurred: {e}")
+                logger.opt(exception=sys.exc_info()).error(f"GraphRecursionError occurred: {e}")
             else:
-                logger.opt(exception=e).error(f"Error during agent execution: {e}")
+                logger.opt(exception=sys.exc_info()).error(f"Error during agent execution: {e}")
 
             raise e
 
@@ -170,7 +171,7 @@ class AgentExecutor:
     async def _setup_agent_execution(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -183,7 +184,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -249,12 +250,14 @@ class AgentExecutor:
         state = await agent_graph.aget_state(config=config)
         interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
 
+        _input = input.model_dump()
         input_data: Command | dict[str, Any]
         if interrupted_tasks:
             # User input is a response to resume agent execution from interrupt
-            input_data = Command(resume=message)
+            input_data = Command(resume=_input)
         else:
-            input_data = {"messages": [HumanMessage(content=message)]}
+            message = _input.pop("message", "")
+            input_data = {"messages": [HumanMessage(content=message)], **_input}
 
         return agent, input_data, config, run_id
 
@@ -262,7 +265,7 @@ class AgentExecutor:
     async def invoke(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -275,7 +278,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -290,7 +293,7 @@ class AgentExecutor:
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
-            message=message,
+            input=input,
             thread_id=thread_id,
             user_id=user_id,
             model_name=model_name,
@@ -330,7 +333,7 @@ class AgentExecutor:
     async def stream(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -344,7 +347,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -360,7 +363,7 @@ class AgentExecutor:
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
-            message=message,
+            input=input,
             thread_id=thread_id,
             user_id=user_id,
             model_name=model_name,
@@ -390,10 +393,6 @@ class AgentExecutor:
                         for interrupt in updates:
                             new_messages.append(AIMessage(content=interrupt.value))
                         continue
-
-                    structured_response = (updates or {}).get("structured_response")
-                    if structured_response:
-                        raise ValueError("Structured response not supported in streaming mode.")
 
                     update_messages = (updates or {}).get("messages", [])
 
@@ -453,7 +452,7 @@ class AgentExecutor:
             if current_message:
                 processed_messages.append(create_ai_message(current_message))
 
-            for msg in new_messages:
+            for msg in processed_messages:
                 try:
                     chat_message = langchain_to_chat_message(msg)
                     chat_message.run_id = str(run_id)

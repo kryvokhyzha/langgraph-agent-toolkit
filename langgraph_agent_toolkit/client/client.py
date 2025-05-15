@@ -1,7 +1,7 @@
 import json
 import os
 from collections.abc import AsyncGenerator, Generator
-from typing import Any
+from typing import Any, Dict
 
 import httpx
 
@@ -18,6 +18,7 @@ from langgraph_agent_toolkit.schema import (
     MessageInput,
     ServiceMetadata,
     StreamInput,
+    UserComplexInput,
     UserInput,
 )
 
@@ -92,7 +93,7 @@ class AgentClient:
 
     async def ainvoke(
         self,
-        message: str,
+        input: Dict[str, Any],
         model_name: str | None = None,
         model_provider: str | None = None,
         model_config_key: str | None = None,
@@ -104,7 +105,7 @@ class AgentClient:
         """Invoke the agent asynchronously. Only the final message is returned.
 
         Args:
-            message (str): The message to send to the agent
+            input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
@@ -120,7 +121,7 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = UserInput(message=message)
+        request = UserInput(input=UserComplexInput(**input))
         if thread_id:
             request.thread_id = thread_id
         if model_name:
@@ -152,7 +153,7 @@ class AgentClient:
 
     def invoke(
         self,
-        message: str,
+        input: Dict[str, Any],
         model_name: str | None = None,
         model_provider: str | None = None,
         model_config_key: str | None = None,
@@ -164,7 +165,7 @@ class AgentClient:
         """Invoke the agent synchronously. Only the final message is returned.
 
         Args:
-            message (str): The message to send to the agent
+            input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
@@ -180,7 +181,7 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = UserInput(message=message)
+        request = UserInput(input=UserComplexInput(**input))
         if thread_id:
             request.thread_id = thread_id
         if model_name:
@@ -236,7 +237,7 @@ class AgentClient:
 
     def stream(
         self,
-        message: str,
+        input: Dict[str, Any],
         model_name: str | None = None,
         model_provider: str | None = None,
         model_config_key: str | None = None,
@@ -253,7 +254,7 @@ class AgentClient:
         content tokens from streaming models as they are generated.
 
         Args:
-            message (str): The message to send to the agent
+            input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
@@ -271,7 +272,7 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = StreamInput(message=message, stream_tokens=stream_tokens)
+        request = StreamInput(input=UserComplexInput(**input), stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
         if model_name:
@@ -307,7 +308,7 @@ class AgentClient:
 
     async def astream(
         self,
-        message: str,
+        input: Dict[str, Any],
         model_name: str | None = None,
         model_provider: str | None = None,
         model_config_key: str | None = None,
@@ -324,7 +325,7 @@ class AgentClient:
         content tokens from streaming models as they are generated.
 
         Args:
-            message (str): The message to send to the agent
+            input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
             model_provider (str, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
@@ -342,7 +343,7 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = StreamInput(message=message, stream_tokens=stream_tokens)
+        request = StreamInput(input=UserComplexInput(**input), stream_tokens=stream_tokens)
         if thread_id:
             request.thread_id = thread_id
         if model_name:

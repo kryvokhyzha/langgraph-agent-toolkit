@@ -37,10 +37,11 @@ def convert_message_content_to_string(content: str | list[str | dict]) -> str:
 
 def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMessage:
     """Create a ChatMessage from a LangChain message."""
-    if isinstance(message, BaseModel):
-        message = message.model_dump_json()
-    elif isinstance(message, dict):
-        message = json.dumps(message["raw"].content)
+    if not isinstance(message, (BaseMessage, AIMessage, HumanMessage, ToolMessage, LangchainChatMessage)):
+        if isinstance(message, BaseModel):
+            message = message.model_dump_json()
+        elif isinstance(message, dict):
+            message = json.dumps(message["raw"].content)
 
     match message:
         case HumanMessage():

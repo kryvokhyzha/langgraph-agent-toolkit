@@ -187,14 +187,14 @@ async def main() -> None:
         try:
             if use_streaming:
                 stream = agent_client.astream(
-                    message=user_input,
+                    input=dict(message=user_input),
                     thread_id=st.session_state.thread_id,
                     user_id=DEFAULT_STREAMLIT_USER_ID,
                 )
                 await draw_messages(stream, is_new=True)
             else:
                 response = await agent_client.ainvoke(
-                    message=user_input,
+                    input=dict(message=user_input),
                     thread_id=st.session_state.thread_id,
                     user_id=DEFAULT_STREAMLIT_USER_ID,
                 )
