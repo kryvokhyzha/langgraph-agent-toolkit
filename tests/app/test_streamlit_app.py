@@ -80,11 +80,11 @@ def test_app_settings(mock_agent_client, patch_feedback):
 
     # Check the args match the settings
     assert mock_agent_client.agent == "chatbot"
+    # Update assertion to match the new input schema structure
     mock_agent_client.ainvoke.assert_called_with(
-        message=PROMPT,
+        input={"message": PROMPT},
         thread_id=at.session_state.thread_id,
         user_id=DEFAULT_STREAMLIT_USER_ID,
-        # Remove the model parameter since it's no longer being set in the app
     )
     assert not at.exception
 

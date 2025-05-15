@@ -5,11 +5,12 @@ import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.types import Command
+from pydantic import BaseModel
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
-from langgraph_agent_toolkit.schema import ChatMessage
+from langgraph_agent_toolkit.schema import ChatMessage, UserComplexInput, UserInput
 
 
 class MockStateSnapshot:
@@ -83,6 +84,11 @@ def agent_executor(mock_agent):
             return executor
 
 
+# Helper function to create UserInput objects for testing
+def create_user_input(message="Test message"):
+    return UserInput(input=UserComplexInput(message=message))
+
+
 @pytest.mark.asyncio
 async def test_invoke_method(agent_executor, mock_agent):
     """Test the invoke method."""
@@ -90,10 +96,10 @@ async def test_invoke_method(agent_executor, mock_agent):
     mock_response = [("values", {"messages": [AIMessage(content="Test response")]})]
     mock_agent.graph.ainvoke.return_value = mock_response
 
-    # Call invoke
+    # Call invoke with the new input structure
     result = await agent_executor.invoke(
         agent_id="test-agent",
-        message="Hello, agent!",
+        input=create_user_input(message="Hello, agent!"),
         thread_id="test-thread-123",
         user_id="test-user",
         model_name="test-model",
@@ -130,26 +136,28 @@ async def test_invoke_with_interrupt(agent_executor, mock_agent):
     mock_response = [("updates", {"__interrupt__": [Mock(value="Please provide more information")]})]
     mock_agent.graph.ainvoke.return_value = mock_response
 
-    # Call invoke
-    result = await agent_executor.invoke(agent_id="test-agent", message="Continue", thread_id="test-thread-123")
+    # Use a proper UserInput object with model_dump() method
+    user_input = create_user_input(message="Continue")
+
+    # Call invoke with this proper input structure
+    result = await agent_executor.invoke(agent_id="test-agent", input=user_input, thread_id="test-thread-123")
 
     # Verify result is from the interrupt
     assert result.content == "Please provide more information"
 
     # Verify invoke was called with resume command
     mock_agent.graph.ainvoke.assert_called_once()
-    from langgraph.types import Command
-
     call_args = mock_agent.graph.ainvoke.call_args[1]
     assert isinstance(call_args["input"], Command)
-    assert call_args["input"].resume == "Continue"
+    # The implementation uses the entire input dict in resume
+    assert call_args["input"].resume == user_input.model_dump()
 
 
 @pytest.mark.asyncio
 async def test_stream_method(agent_executor, mock_agent):
     """Test the stream method."""
     # Set up test data
-    message = "Hello, stream!"
+    input_obj = create_user_input(message="Hello, stream!")
     thread_id = "test-thread-123"
     user_id = "test-user"
     model_name = "test-model"
@@ -175,7 +183,7 @@ async def test_stream_method(agent_executor, mock_agent):
             results = []
             async for item in agent_executor.stream(
                 agent_id="test-agent",
-                message=message,
+                input=input_obj,
                 thread_id=thread_id,
                 user_id=user_id,
                 model_name=model_name,
@@ -232,11 +240,15 @@ async def test_stream_with_interrupt(agent_executor, mock_agent):
     interrupt_task.interrupts = [Mock()]
     mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
 
+    # Use a proper UserInput object
+    user_input = create_user_input(message="Continue")
+
     # Directly test the implementation by using a known response
     async def mock_astream(**kwargs):
         # Check that we're receiving a resume command
         assert isinstance(kwargs["input"], Command)
-        assert kwargs["input"].resume == "Continue"
+        # The resume command contains the model_dump() result
+        assert kwargs["input"].resume == user_input.model_dump()
 
         # Return an interrupt response
         yield ("updates", {"__interrupt__": [Mock(value="Please provide more information")]})
@@ -251,10 +263,10 @@ async def test_stream_with_interrupt(agent_executor, mock_agent):
 
     # Patch _setup_agent_execution to return our mock setup
     with patch.object(agent_executor, "_setup_agent_execution") as mock_setup:
-        # Return mock values that will be used by stream
+        # Return mock values that will be used by stream - match what the implementation expects
         mock_setup.return_value = (
             mock_agent,
-            Command(resume="Continue"),
+            Command(resume=user_input.model_dump()),
             {},
             UUID("12345678-1234-5678-1234-567812345678"),
         )
@@ -277,9 +289,9 @@ async def test_error_handling_decorator(agent_executor, mock_agent):
     # Configure mock to raise GraphRecursionError
     mock_agent.graph.ainvoke.side_effect = GraphRecursionError("Recursion limit exceeded")
 
-    # Test with invoke
+    # Test with invoke using a proper UserInput object
     with pytest.raises(GraphRecursionError) as excinfo:
-        await agent_executor.invoke(agent_id="test-agent", message="Hello, world!")
+        await agent_executor.invoke(agent_id="test-agent", input=create_user_input(message="Hello, world!"))
 
     assert "Recursion limit exceeded" in str(excinfo.value)
 
@@ -304,13 +316,25 @@ async def test_error_handling_decorator(agent_executor, mock_agent):
     assert hasattr(AgentExecutor.invoke, "__wrapped__")
 
 
+# Create a simple mock class that matches the implementation expectations
+class MockInput(BaseModel):
+    message: str
+
+    def model_dump(self):
+        return {"message": self.message}
+
+
 @pytest.mark.asyncio
 async def test_setup_agent_execution(agent_executor, mock_agent):
     """Test the _setup_agent_execution method."""
+    # Use a simple mock that matches the implementation's expectations
+    message_content = "Hello, setup!"
+    input_obj = MockInput(message=message_content)
+
     # Call the setup method directly
     agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
         agent_id="test-agent",
-        message="Hello, setup!",
+        input=input_obj,
         thread_id="test-thread-123",
         user_id="test-user-456",
         model_name="test-model",
@@ -320,11 +344,11 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
     # Verify agent is correct
     assert agent is mock_agent
 
-    # Verify input is a HumanMessage
+    # Verify input is a HumanMessage with expected content
     assert isinstance(input_data, dict)
     assert "messages" in input_data
     assert isinstance(input_data["messages"][0], HumanMessage)
-    assert input_data["messages"][0].content == "Hello, setup!"
+    assert input_data["messages"][0].content == message_content
 
     # Verify config is correct - access as a dictionary, not an object
     assert config["configurable"]["thread_id"] == "test-thread-123"
@@ -344,11 +368,15 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
 @pytest.mark.asyncio
 async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_agent):
     """Test the _setup_agent_execution method with custom recursion_limit."""
+    # Use a simple mock that matches the implementation's expectations
+    message_content = "Hello, setup!"
+    input_obj = MockInput(message=message_content)
+
     # Call the setup method directly with custom recursion_limit
     custom_recursion_limit = 50
     agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
         agent_id="test-agent",
-        message="Hello, setup!",
+        input=input_obj,
         thread_id="test-thread-123",
         user_id="test-user",
         model_name="test-model",
@@ -362,7 +390,7 @@ async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_a
     # Call with default recursion_limit (None)
     agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
         agent_id="test-agent",
-        message="Hello, setup!",
+        input=input_obj,
         thread_id="test-thread-123",
         user_id="test-user",
         model_name="test-model",
