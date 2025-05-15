@@ -15,7 +15,7 @@ from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 class ResponseSchema(BaseModel):
-    response: list[str] = Field(
+    response: str = Field(
         description="The response on user query.",
     )
     alternative_response: str = Field(
@@ -30,6 +30,8 @@ react_agent_so = Agent(
         model=ModelFactory.create(
             model_provider=ModelProvider.OPENAI,
             model_name=settings.OPENAI_MODEL_NAME,
+            configurable_fields=(),
+            model_parameter_values=(("temperature", 0.0), ("top_p", 0.7), ("streaming", False)),
             openai_api_base=settings.OPENAI_API_BASE_URL,
             openai_api_key=settings.OPENAI_API_KEY,
         ),
@@ -40,7 +42,7 @@ react_agent_so = Agent(
             "You can also ask clarifying questions to the user. "
         ),
         pre_model_hook=pre_model_hook_standard,
-        # response_format=ResponseSchema,
+        response_format=ResponseSchema,
         state_schema=AgentStateWithStructuredResponseAndRemainingSteps,
         checkpointer=MemorySaver(),
         immediate_step_threshold=5,

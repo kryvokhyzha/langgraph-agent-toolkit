@@ -1,7 +1,6 @@
 import asyncio
 import functools
 import importlib
-import json
 import os
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
@@ -143,9 +142,9 @@ class AgentExecutor:
         def _handle_error(e: Exception):
             """Handle and re-raise errors with logging."""
             if isinstance(e, GraphRecursionError):
-                logger.error(f"GraphRecursionError occurred: {e}")
+                logger.opt(exception=e).error(f"GraphRecursionError occurred: {e}")
             else:
-                logger.error(f"Error during agent execution: {e}")
+                logger.opt(exception=e).error(f"Error during agent execution: {e}")
 
             raise e
 
@@ -296,7 +295,7 @@ class AgentExecutor:
             user_id=user_id,
             model_name=model_name,
             model_provider=model_provider,
-            model_config_key=model_config_key,  # Pass this parameter
+            model_config_key=model_config_key,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )
@@ -309,9 +308,14 @@ class AgentExecutor:
         )
 
         response_type, response = response_events[-1]
+
         if response_type == "values":
+            generated_message = response.get("structured_response")
+            if not generated_message:
+                generated_message = response["messages"][-1]
+
             # Normal response, the agent completed successfully
-            output = langchain_to_chat_message(response["messages"][-1])
+            output = langchain_to_chat_message(generated_message)
         elif response_type == "updates" and "__interrupt__" in response:
             # The last thing to occur was an interrupt
             # Return the value of the first interrupt as an AIMessage
@@ -386,6 +390,10 @@ class AgentExecutor:
                         for interrupt in updates:
                             new_messages.append(AIMessage(content=interrupt.value))
                         continue
+
+                    structured_response = (updates or {}).get("structured_response")
+                    if structured_response:
+                        raise ValueError("Structured response not supported in streaming mode.")
 
                     update_messages = (updates or {}).get("messages", [])
 
