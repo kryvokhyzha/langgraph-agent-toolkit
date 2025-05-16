@@ -62,7 +62,7 @@ def test_invoke(agent_client):
         request=mock_request,
     )
     with patch("httpx.post", return_value=mock_response):
-        response = agent_client.invoke(QUESTION)
+        response = agent_client.invoke({"message": QUESTION})
         assert isinstance(response, ChatMessage)
         assert response.type == "ai"
         assert response.content == ANSWER
@@ -70,7 +70,7 @@ def test_invoke(agent_client):
     # Test with all parameters
     with patch("httpx.post", return_value=mock_response) as mock_post:
         response = agent_client.invoke(
-            QUESTION,
+            {"message": QUESTION},
             model_name="gpt-4o",
             model_provider="openai",
             model_config_key="gpt4o",
@@ -82,7 +82,7 @@ def test_invoke(agent_client):
         assert isinstance(response, ChatMessage)
         # Verify request
         args, kwargs = mock_post.call_args
-        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -95,7 +95,7 @@ def test_invoke(agent_client):
     error_response = Response(500, text="Internal Server Error", request=mock_request)
     with patch("httpx.post", return_value=error_response):
         with pytest.raises(AgentClientError) as exc:
-            agent_client.invoke(QUESTION)
+            agent_client.invoke({"message": QUESTION})
         assert "500 Internal Server Error" in str(exc.value)
 
 
@@ -109,7 +109,7 @@ async def test_ainvoke(agent_client):
     mock_request = Request("POST", "http://test/invoke")
     mock_response = Response(200, json={"type": "ai", "content": ANSWER}, request=mock_request)
     with patch("httpx.AsyncClient.post", return_value=mock_response):
-        response = await agent_client.ainvoke(QUESTION)
+        response = await agent_client.ainvoke({"message": QUESTION})
         assert isinstance(response, ChatMessage)
         assert response.type == "ai"
         assert response.content == ANSWER
@@ -117,7 +117,7 @@ async def test_ainvoke(agent_client):
     # Test with all parameters
     with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
         response = await agent_client.ainvoke(
-            QUESTION,
+            {"message": QUESTION},
             model_name="gpt-4o",
             model_provider="openai",
             model_config_key="gpt4o",
@@ -131,7 +131,7 @@ async def test_ainvoke(agent_client):
         assert response.content == ANSWER
         # Verify request
         args, kwargs = mock_post.call_args
-        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -144,7 +144,7 @@ async def test_ainvoke(agent_client):
     error_response = Response(500, text="Internal Server Error", request=mock_request)
     with patch("httpx.AsyncClient.post", return_value=error_response):
         with pytest.raises(AgentClientError) as exc:
-            await agent_client.ainvoke(QUESTION)
+            await agent_client.ainvoke({"message": QUESTION})
         assert "500 Internal Server Error" in str(exc.value)
 
 
@@ -171,7 +171,7 @@ def test_stream(agent_client):
 
     with patch("httpx.stream", return_value=mock_response):
         # Collect all streamed responses
-        responses = list(agent_client.stream(QUESTION))
+        responses = list(agent_client.stream({"message": QUESTION}))
 
         # Verify tokens were streamed
         assert len(responses) == len(TOKENS) + 1  # tokens + final message
@@ -188,7 +188,7 @@ def test_stream(agent_client):
     with patch("httpx.stream", return_value=mock_response) as mock_stream:
         list(
             agent_client.stream(
-                QUESTION,
+                {"message": QUESTION},
                 model_name="gpt-4o",
                 model_provider="openai",
                 model_config_key="gpt4o",
@@ -201,7 +201,7 @@ def test_stream(agent_client):
         )
         # Verify request
         args, kwargs = mock_stream.call_args
-        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -218,7 +218,7 @@ def test_stream(agent_client):
     error_response_mock.__exit__ = Mock(return_value=None)
     with patch("httpx.stream", return_value=error_response_mock):
         with pytest.raises(AgentClientError) as exc:
-            list(agent_client.stream(QUESTION))
+            list(agent_client.stream({"message": QUESTION}))
         assert "500 Internal Server Error" in str(exc.value)
 
 
@@ -260,7 +260,7 @@ async def test_astream(agent_client):
     with patch("httpx.AsyncClient", return_value=mock_client):
         # Collect all streamed responses
         responses = []
-        async for response in agent_client.astream(QUESTION):
+        async for response in agent_client.astream({"message": QUESTION}):
             responses.append(response)
 
         # Verify tokens were streamed
@@ -277,7 +277,7 @@ async def test_astream(agent_client):
     # Test with all parameters
     with patch("httpx.AsyncClient", return_value=mock_client) as mock_client_class:
         async for _ in agent_client.astream(
-            QUESTION,
+            {"message": QUESTION},
             model_name="gpt-4o",
             model_provider="openai",
             model_config_key="gpt4o",
@@ -295,7 +295,7 @@ async def test_astream(agent_client):
         stream_call = mock_client_instance.stream.call_args
         kwargs = stream_call[1]
 
-        assert kwargs["json"]["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -320,7 +320,7 @@ async def test_astream(agent_client):
 
     with patch("httpx.AsyncClient", return_value=error_mock_client):
         with pytest.raises(AgentClientError) as exc:
-            async for _ in agent_client.astream(QUESTION):
+            async for _ in agent_client.astream({"message": QUESTION}):
                 pass
         assert "500 Internal Server Error" in str(exc.value)
 

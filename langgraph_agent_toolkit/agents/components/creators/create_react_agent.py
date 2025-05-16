@@ -319,7 +319,9 @@ def create_react_agent(
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
         model_with_structured_output = _get_model(model, config).with_structured_output(
-            cast(StructuredResponseSchema, structured_response_schema)
+            cast(StructuredResponseSchema, structured_response_schema),
+            strict=True,
+            # include_raw=True,
         )
         response = model_with_structured_output.invoke(messages, config)
         return {"structured_response": response}
@@ -332,7 +334,9 @@ def create_react_agent(
             messages = [SystemMessage(content=system_prompt)] + list(messages)
 
         model_with_structured_output = _get_model(model, config).with_structured_output(
-            cast(StructuredResponseSchema, structured_response_schema)
+            cast(StructuredResponseSchema, structured_response_schema),
+            strict=True,
+            # include_raw=True,
         )
         response = await model_with_structured_output.ainvoke(messages, config)
         return {"structured_response": response}

@@ -35,12 +35,29 @@ class ServiceMetadata(BaseModel):
     )
 
 
-class UserInput(BaseModel):
-    """Basic user input for the agent."""
+class UserComplexInput(BaseModel):
+    """Basic user input for the agent, supporting dynamic fields."""
 
     message: str = Field(
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
+    )
+
+    model_config = {
+        "extra": "allow"  # allow unknown fields
+    }
+
+
+class UserInput(BaseModel):
+    """Basic user input for the agent."""
+
+    input: UserComplexInput = Field(
+        description="Structured input from the user, including a message and optional dynamic fields.",
+        examples=[
+            {
+                "message": "What is the weather in Tokyo?",
+            }
+        ],
     )
     model_name: str | None = Field(
         title="Model",

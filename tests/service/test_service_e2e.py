@@ -161,7 +161,8 @@ def test_agent_stream(mock_httpx, sqlite_db_settings):
             # Use stream to get intermediate responses
             messages = []
 
-            for response in client.stream("Test message", stream_tokens=False):
+            # Update to use the new input schema structure
+            for response in client.stream({"message": "Test message"}, stream_tokens=False):
                 if isinstance(response, ChatMessage):
                     messages.append(response)
 

@@ -1,4 +1,5 @@
 import inspect
+import json
 
 from langchain_core.messages import (
     AIMessage,
@@ -9,7 +10,7 @@ from langchain_core.messages import (
 from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
-from pydantic import HttpUrl, TypeAdapter
+from pydantic import BaseModel, HttpUrl, TypeAdapter
 
 from langgraph_agent_toolkit.schema import ChatMessage
 
@@ -22,7 +23,9 @@ def check_str_is_http(x: str) -> str:
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:
     if isinstance(content, str):
         return content
+
     text: list[str] = []
+
     for content_item in content:
         if isinstance(content_item, str):
             text.append(content_item)
@@ -32,8 +35,14 @@ def convert_message_content_to_string(content: str | list[str | dict]) -> str:
     return "".join(text)
 
 
-def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
+def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMessage:
     """Create a ChatMessage from a LangChain message."""
+    if not isinstance(message, (BaseMessage, AIMessage, HumanMessage, ToolMessage, LangchainChatMessage)):
+        if isinstance(message, BaseModel):
+            message = message.model_dump_json()
+        elif isinstance(message, dict):
+            message = json.dumps(message["raw"].content)
+
     match message:
         case HumanMessage():
             human_message = ChatMessage(
@@ -68,6 +77,11 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
                 return custom_message
             else:
                 raise ValueError(f"Unsupported chat message role: {message.role}")
+        case str():
+            return ChatMessage(
+                type="ai",
+                content=message,
+            )
         case _:
             raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
 

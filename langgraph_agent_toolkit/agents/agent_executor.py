@@ -1,8 +1,8 @@
 import asyncio
 import functools
 import importlib
-import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
@@ -143,9 +143,9 @@ class AgentExecutor:
         def _handle_error(e: Exception):
             """Handle and re-raise errors with logging."""
             if isinstance(e, GraphRecursionError):
-                logger.error(f"GraphRecursionError occurred: {e}")
+                logger.opt(exception=sys.exc_info()).error(f"GraphRecursionError occurred: {e}")
             else:
-                logger.error(f"Error during agent execution: {e}")
+                logger.opt(exception=sys.exc_info()).error(f"Error during agent execution: {e}")
 
             raise e
 
@@ -171,7 +171,7 @@ class AgentExecutor:
     async def _setup_agent_execution(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -184,7 +184,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -250,12 +250,14 @@ class AgentExecutor:
         state = await agent_graph.aget_state(config=config)
         interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
 
+        _input = input.model_dump()
         input_data: Command | dict[str, Any]
         if interrupted_tasks:
             # User input is a response to resume agent execution from interrupt
-            input_data = Command(resume=message)
+            input_data = Command(resume=_input)
         else:
-            input_data = {"messages": [HumanMessage(content=message)]}
+            message = _input.pop("message", "")
+            input_data = {"messages": [HumanMessage(content=message)], **_input}
 
         return agent, input_data, config, run_id
 
@@ -263,7 +265,7 @@ class AgentExecutor:
     async def invoke(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -276,7 +278,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -291,12 +293,12 @@ class AgentExecutor:
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
-            message=message,
+            input=input,
             thread_id=thread_id,
             user_id=user_id,
             model_name=model_name,
             model_provider=model_provider,
-            model_config_key=model_config_key,  # Pass this parameter
+            model_config_key=model_config_key,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
         )
@@ -309,9 +311,14 @@ class AgentExecutor:
         )
 
         response_type, response = response_events[-1]
+
         if response_type == "values":
+            generated_message = response.get("structured_response")
+            if not generated_message:
+                generated_message = response["messages"][-1]
+
             # Normal response, the agent completed successfully
-            output = langchain_to_chat_message(response["messages"][-1])
+            output = langchain_to_chat_message(generated_message)
         elif response_type == "updates" and "__interrupt__" in response:
             # The last thing to occur was an interrupt
             # Return the value of the first interrupt as an AIMessage
@@ -326,7 +333,7 @@ class AgentExecutor:
     async def stream(
         self,
         agent_id: str,
-        message: str,
+        input: Dict[str, Any],
         thread_id: Optional[str] = None,
         user_id: Optional[str] = None,
         model_name: Optional[str] = None,
@@ -340,7 +347,7 @@ class AgentExecutor:
 
         Args:
             agent_id: ID of the agent to invoke
-            message: User message to send to the agent
+            input: User message to send to the agent
             thread_id: Optional thread ID for conversation history
             user_id: Optional user ID for the agent
             model_name: Optional model name to override the default
@@ -356,7 +363,7 @@ class AgentExecutor:
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
             agent_id=agent_id,
-            message=message,
+            input=input,
             thread_id=thread_id,
             user_id=user_id,
             model_name=model_name,
@@ -445,7 +452,7 @@ class AgentExecutor:
             if current_message:
                 processed_messages.append(create_ai_message(current_message))
 
-            for msg in new_messages:
+            for msg in processed_messages:
                 try:
                     chat_message = langchain_to_chat_message(msg)
                     chat_message.run_id = str(run_id)

@@ -81,7 +81,7 @@ def test_invoke(test_client, mock_agent_executor) -> None:
     mock_agent_executor.invoke.return_value = chat_message
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post("/invoke", json={"message": QUESTION})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}})
         assert response.status_code == 200
 
         # Just verify it was called, don't check the exact parameters
@@ -103,7 +103,7 @@ def test_invoke_custom_agent(test_client, mock_agent_executor) -> None:
     mock_agent_executor.invoke.return_value = chat_message
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post(f"/{CUSTOM_AGENT}/invoke", json={"message": QUESTION})
+        response = test_client.post(f"/{CUSTOM_AGENT}/invoke", json={"input": {"message": QUESTION}})
         assert response.status_code == 200
 
         # Just verify it was called with the custom agent_id
@@ -125,7 +125,9 @@ def test_invoke_model_param(test_client, mock_agent_executor) -> None:
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         # Test with a valid model
-        response = test_client.post("/invoke", json={"message": QUESTION, "model": ModelProvider.OPENAI})
+        response = test_client.post(
+            "/invoke", json={"input": {"message": QUESTION}, "model_provider": ModelProvider.OPENAI}
+        )
         assert response.status_code == 200
 
         output = ChatMessage.model_validate(response.json())
@@ -134,7 +136,7 @@ def test_invoke_model_param(test_client, mock_agent_executor) -> None:
 
         # Since we're mocking, we don't need to validate that an invalid model fails
         # The validation would happen at the schema level
-        response = test_client.post("/invoke", json={"message": QUESTION, "model": "invalid-model"})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}, "model_provider": "invalid-model"})
         assert response.status_code == 200
 
 
@@ -150,7 +152,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent_executor) -> None:
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         # Test valid config first
-        response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": CUSTOM_CONFIG})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}, "agent_config": CUSTOM_CONFIG})
         assert response.status_code == 200
 
         # Just verify the config was passed
@@ -165,7 +167,7 @@ def test_invoke_custom_agent_config(test_client, mock_agent_executor) -> None:
         # If your service should be rejecting this, then you need to fix the service
         # For now, we'll update the test to match the actual behavior
         INVALID_CONFIG = {"model": "gpt-4o"}
-        response = test_client.post("/invoke", json={"message": QUESTION, "agent_config": INVALID_CONFIG})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}, "agent_config": INVALID_CONFIG})
 
         # If the service is accepting this config, we'll change our assertion
         assert response.status_code == 200  # Changed from 422 to 200
@@ -179,7 +181,7 @@ def test_invoke_error_handling(test_client, mock_agent_executor) -> None:
     mock_agent_executor.invoke.side_effect = GraphRecursionError("Recursion limit exceeded")
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post("/invoke", json={"message": QUESTION})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}})
         # Your service is returning 500 for this error
         assert response.status_code == 500
         # The service returns a generic error message
@@ -189,7 +191,7 @@ def test_invoke_error_handling(test_client, mock_agent_executor) -> None:
     mock_agent_executor.invoke.side_effect = ValueError("Something went wrong")
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post("/invoke", json={"message": QUESTION})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}})
         # Service turns this into a 500 error
         assert response.status_code == 500
         # The service also returns a generic error message here, not the specific error text
@@ -216,7 +218,9 @@ async def test_stream(test_client, mock_agent_executor) -> None:
     with patch.object(mock_agent_executor, "stream", side_effect=[custom_mock_stream()]):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
             # Make request with streaming
-            with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": True}) as response:
+            with test_client.stream(
+                "POST", "/stream", json={"input": {"message": QUESTION}, "stream_tokens": True}
+            ) as response:
                 assert response.status_code == 200
 
                 # Collect all SSE messages
@@ -253,7 +257,9 @@ async def test_stream_no_tokens(test_client, mock_agent_executor) -> None:
     with patch.object(mock_agent_executor, "stream", side_effect=[custom_mock_stream()]):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
             # Make request with streaming disabled
-            with test_client.stream("POST", "/stream", json={"message": QUESTION, "stream_tokens": False}) as response:
+            with test_client.stream(
+                "POST", "/stream", json={"input": {"message": QUESTION}, "stream_tokens": False}
+            ) as response:
                 assert response.status_code == 200
 
                 # Collect all SSE messages
@@ -289,7 +295,7 @@ def test_stream_error_handling(test_client, mock_agent_executor) -> None:
     # Replace the stream method
     with patch.object(mock_agent_executor, "stream", side_effect=[mock_stream_with_error()]):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-            with test_client.stream("POST", "/stream", json={"message": QUESTION}) as response:
+            with test_client.stream("POST", "/stream", json={"input": {"message": QUESTION}}) as response:
                 assert response.status_code == 200
 
                 messages = []
@@ -313,7 +319,7 @@ def test_stream_error_handling(test_client, mock_agent_executor) -> None:
     # Replace the stream method
     with patch.object(mock_agent_executor, "stream", side_effect=[mock_stream_with_general_error()]):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-            with test_client.stream("POST", "/stream", json={"message": QUESTION}) as response:
+            with test_client.stream("POST", "/stream", json={"input": {"message": QUESTION}}) as response:
                 assert response.status_code == 200
 
                 messages = []
@@ -544,7 +550,9 @@ def test_invoke_with_recursion_limit(test_client, mock_agent_executor) -> None:
     mock_agent_executor.invoke = AsyncMock(side_effect=mock_invoke)
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        response = test_client.post("/invoke", json={"message": QUESTION, "recursion_limit": CUSTOM_RECURSION_LIMIT})
+        response = test_client.post(
+            "/invoke", json={"input": {"message": QUESTION}, "recursion_limit": CUSTOM_RECURSION_LIMIT}
+        )
         assert response.status_code == 200
 
         # Verify the recursion_limit was passed correctly
@@ -556,7 +564,7 @@ def test_invoke_with_recursion_limit(test_client, mock_agent_executor) -> None:
 
         # Test with default recursion_limit by omitting the parameter
         called_args.clear()  # Clear the previous call data
-        response = test_client.post("/invoke", json={"message": QUESTION})
+        response = test_client.post("/invoke", json={"input": {"message": QUESTION}})
         assert response.status_code == 200
 
         # Should use None as default, which gets translated to DEFAULT_RECURSION_LIMIT in the agent_executor
@@ -586,7 +594,7 @@ async def test_stream_with_recursion_limit(test_client, mock_agent_executor) -> 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         # Make request with custom recursion_limit
         with test_client.stream(
-            "POST", "/stream", json={"message": QUESTION, "recursion_limit": CUSTOM_RECURSION_LIMIT}
+            "POST", "/stream", json={"input": {"message": QUESTION}, "recursion_limit": CUSTOM_RECURSION_LIMIT}
         ) as response:
             assert response.status_code == 200
 
@@ -607,7 +615,7 @@ async def test_stream_with_recursion_limit(test_client, mock_agent_executor) -> 
             # Now test with default recursion_limit
             called_args.clear()
 
-        with test_client.stream("POST", "/stream", json={"message": QUESTION}) as response:
+        with test_client.stream("POST", "/stream", json={"input": {"message": QUESTION}}) as response:
             assert response.status_code == 200
 
             # Just verify we get some response

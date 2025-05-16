@@ -18,7 +18,8 @@ def test_service_with_fake_model(check_service_available):
         pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
 
     client = AgentClient(service_url, agent="chatbot-agent")
-    response = client.invoke("Tell me a joke?", model_provider=ModelProvider.FAKE)
+    # Update to use the new input schema structure
+    response = client.invoke({"message": "Tell me a joke?"}, model_provider=ModelProvider.FAKE)
     assert response.type == "ai"
     assert response.content == "This is a test response from the fake model."
 

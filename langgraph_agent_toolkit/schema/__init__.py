@@ -13,6 +13,7 @@ from langgraph_agent_toolkit.schema.schema import (
     MessageInput,
     ServiceMetadata,
     StreamInput,
+    UserComplexInput,
     UserInput,
 )
 
@@ -21,6 +22,7 @@ __all__ = [
     "AddMessagesInput",
     "AddMessagesResponse",
     "AgentInfo",
+    "UserComplexInput",
     "UserInput",
     "ChatMessage",
     "ClearHistoryInput",

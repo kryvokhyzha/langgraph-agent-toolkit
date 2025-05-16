@@ -78,7 +78,7 @@ async def message_generator(
     try:
         async for message in executor.stream(
             agent_id=agent_id,
-            message=stream_input.message,
+            input=stream_input.input,
             thread_id=stream_input.thread_id,
             user_id=stream_input.user_id,
             model_name=stream_input.model_name,

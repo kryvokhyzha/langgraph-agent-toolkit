@@ -21,13 +21,13 @@ def test_no_auth_secret(mock_settings, mock_agent_executor, test_client):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
             response = test_client.post(
                 "/invoke",
-                json={"message": "test"},
+                json={"input": {"message": "test"}},
                 headers={"Authorization": "Bearer any-token"},
             )
             assert response.status_code == 200
 
             # Should also work without any auth header
-            response = test_client.post("/invoke", json={"message": "test"})
+            response = test_client.post("/invoke", json={"input": {"message": "test"}})
             assert response.status_code == 200
 
 
@@ -43,7 +43,7 @@ def test_auth_secret_correct(mock_settings, mock_agent_executor, test_client):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
             response = test_client.post(
                 "/invoke",
-                json={"message": "test"},
+                json={"input": {"message": "test"}},
                 headers={"Authorization": "Bearer test-secret"},
             )
             assert response.status_code == 200

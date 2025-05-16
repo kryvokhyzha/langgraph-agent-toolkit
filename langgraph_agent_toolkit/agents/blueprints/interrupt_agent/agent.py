@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, cast
+from typing import Any
 
 from langchain.prompts import SystemMessagePromptTemplate
 from langchain_core.language_models.base import LanguageModelInput
@@ -83,20 +83,31 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
     m = ModelFactory.create(
         model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
+        config_prefix="",
+        configurable_fields=(),
+        model_parameter_values=(("temperature", 0.0), ("top_p", 0.7), ("streaming", False)),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
     )
     model_runnable = wrap_model(
-        m.with_structured_output(BirthdateExtraction),
+        m.with_structured_output(BirthdateExtraction, strict=True, include_raw=True),
         birthdate_extraction_prompt.format(),
     ).with_config(tags=["skip_stream"])
-    response: BirthdateExtraction = await model_runnable.ainvoke(state, config)
+    raw_response: BirthdateExtraction = await model_runnable.ainvoke(state, config)
+
+    if raw_response["parsed"] is not None:
+        response: BirthdateExtraction = raw_response["parsed"]
+    elif raw_response["raw"].tool_calls is not None:
+        raw_result = raw_response["raw"].tool_calls[-1]["args"]
+        response = BirthdateExtraction(**raw_result)
+    else:
+        raise ValueError("No valid response from the model")
 
     # If no birthdate found, interrupt
     if response.birthdate is None:
         birthdate_input = interrupt(f"{response.reasoning}\nPlease tell me your birthdate?")
         # Re-run extraction with the new input
-        state["messages"].append(HumanMessage(birthdate_input))
+        state["messages"].append(HumanMessage(birthdate_input["message"]))
         return await determine_birthdate(state, config)
 
     # Birthdate found - convert string to datetime
@@ -107,7 +118,7 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
         birthdate_input = interrupt(
             "I couldn't understand the date format. Please provide your birthdate in YYYY-MM-DD format."
         )
-        state["messages"].append(HumanMessage(birthdate_input))
+        state["messages"].append(HumanMessage(birthdate_input["message"]))
         return await determine_birthdate(state, config)
 
     # Birthdate found
