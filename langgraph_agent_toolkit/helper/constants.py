@@ -17,8 +17,8 @@ def set_default_agent(agent_name):
 
 
 DEFAULT_MAX_MESSAGE_HISTORY_LENGTH = os.getenv("DEFAULT_MAX_MESSAGE_HISTORY_LENGTH", 18)
-DEFAULT_RECURSION_LIMIT = 25
-DEFAULT_CONFIG_PREFIX = "agent"
+DEFAULT_RECURSION_LIMIT = os.getenv("DEFAULT_RECURSION_LIMIT", 25)
+DEFAULT_CONFIG_PREFIX = os.getenv("DEFAULT_CONFIG_PREFIX", "agent")
 DEFAULT_CONFIGURABLE_FIELDS = ("temperature", "max_tokens", "top_p", "streaming")
 DEFAULT_MODEL_PARAMETER_VALUES = dict(
     temperature=0.0,

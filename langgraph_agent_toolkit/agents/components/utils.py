@@ -20,7 +20,7 @@ class AgentStateWithStructuredResponseAndRemainingSteps(AgentStateWithStructured
 
 
 def pre_model_hook_standard(state: T, config: RunnableConfig):
-    _max_messages = config.get("configurable", {}).get("memory_saver_params", {}).get("k", None)
+    _max_messages = config.get("configurable", {}).get("checkpointer_params", {}).get("k", None)
 
     updated_messages = trim_messages(
         state["messages"],
