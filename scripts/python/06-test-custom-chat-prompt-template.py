@@ -62,6 +62,30 @@ if __name__ == "__main__":
     os_platform.push_prompt("tool-using-agent", agent_chat_messages)
     print("✓ Stored tool-using agent prompt")
 
+    # Conditional prompt with Jinja2 if-else statements
+    conditional_chat_messages: List[ChatMessageDict] = [
+        {"role": "system", "content": "You are an AI assistant specialized in {{ domain }}."},
+        {
+            "role": "human",
+            "content": """
+            {% if expertise_level == 'beginner' %}
+            Please explain {{ topic }} in simple terms suitable for beginners.
+            Use basic examples and avoid technical jargon.
+            {% elif expertise_level == 'intermediate' %}
+            Provide a comprehensive explanation of {{ topic }} with some technical details.
+            Include practical examples that demonstrate the concepts.
+            {% else %}
+            Give an advanced analysis of {{ topic }} with in-depth technical details.
+            Include complex examples and reference relevant research or methodologies.
+            {% endif %}
+
+            Additional context: {{ context }}
+        """,
+        },
+    ]
+    os_platform.push_prompt("conditional-assistant", conditional_chat_messages)
+    print("✓ Stored conditional chat prompt with Jinja2 if-else statements")
+
     # Step 3: Create ObservabilityChatPromptTemplate instances with different configurations
     print_separator("Creating prompt templates")
 
@@ -151,6 +175,41 @@ if __name__ == "__main__":
     print("\n   Messages:")
     for msg in result2.to_messages():
         print(f"   - [{msg.type}]: {msg.content}")
+
+    # Test conditional template with Jinja2 if-else
+    print("\nInvoking conditional template with different expertise levels:")
+
+    # Create conditional template
+    conditional_template = ObservabilityChatPromptTemplate.from_observability_platform(
+        prompt_name="conditional-assistant",
+        observability_platform=os_platform,
+        load_at_runtime=True,
+        template_format="jinja2",
+        input_variables=["domain", "expertise_level", "topic", "context"],
+    )
+
+    # Test with different expertise levels
+    expertise_levels = ["beginner", "intermediate", "advanced"]
+
+    for level in expertise_levels:
+        print(f"\n   Testing with expertise_level='{level}':")
+        result = conditional_template.invoke(
+            input=dict(
+                domain="data science",
+                expertise_level=level,
+                topic="neural networks",
+                context="For a recommendation system project",
+            )
+        )
+
+        print(f"   Messages for {level} level:")
+        for msg in result.to_messages():
+            if msg.type == "human":
+                # Only show the first 100 chars of content for brevity
+                content = msg.content.strip()[:100] + "..." if len(msg.content) > 100 else msg.content.strip()
+                print(f"   - [{msg.type}]: {content}")
+            else:
+                print(f"   - [{msg.type}]: {msg.content}")
 
     # Example 5: Create a custom prompt template and add it to a larger template
     print_separator("Combining with standard ChatPromptTemplate")

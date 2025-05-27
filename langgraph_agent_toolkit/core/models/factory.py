@@ -87,7 +87,7 @@ class ModelFactory:
         model_name: Optional[str] = None,
         configurable_fields: Optional[Union[Literal["any"], List[str], Tuple[str, ...]]] = None,
         config_prefix: Optional[str] = None,
-        model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,  # Changed to tuple of tuples
+        model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,
         **kwargs: Any,
     ) -> ModelT:
         """Create and return a model instance.

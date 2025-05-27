@@ -1,4 +1,4 @@
-from typing import Any, Literal, NotRequired
+from typing import Any, Dict, Literal, NotRequired
 
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
@@ -92,7 +92,7 @@ class UserInput(BaseModel):
         default={},
         examples=[
             {
-                "memory_saver_params": {"k": 6},
+                "checkpointer_params": {"k": 6},
                 **DEFAULT_MODEL_PARAMETER_VALUES,
             },
         ],
@@ -132,7 +132,7 @@ class ChatMessage(BaseModel):
         description="Role of the message.",
         examples=["human", "ai", "tool", "custom"],
     )
-    content: str = Field(
+    content: str | Dict[str, Any] = Field(
         description="Content of the message.",
         examples=["Hello, world!"],
     )

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain_core.messages import AnyMessage, RemoveMessage

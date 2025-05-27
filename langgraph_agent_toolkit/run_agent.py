@@ -47,7 +47,7 @@ async def main() -> None:
                 "agent_temperature": 0.9,
                 "agent_top_p": 0.75,
                 "agent_max_tokens": 512,
-                "memory_saver_params": {"k": 3},
+                "checkpointer_params": {"k": 3},
             },
             callbacks=[handler],
             recursion_limit=15,

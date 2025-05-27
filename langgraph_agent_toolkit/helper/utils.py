@@ -39,9 +39,9 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMe
     """Create a ChatMessage from a LangChain message."""
     if not isinstance(message, (BaseMessage, AIMessage, HumanMessage, ToolMessage, LangchainChatMessage)):
         if isinstance(message, BaseModel):
-            message = message.model_dump_json()
+            message = message.model_dump()
         elif isinstance(message, dict):
-            message = json.dumps(message["raw"].content)
+            message = message["raw"].content
 
     match message:
         case HumanMessage():
@@ -77,7 +77,7 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMe
                 return custom_message
             else:
                 raise ValueError(f"Unsupported chat message role: {message.role}")
-        case str():
+        case str() | dict():
             return ChatMessage(
                 type="ai",
                 content=message,
