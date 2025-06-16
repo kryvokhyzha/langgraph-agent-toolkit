@@ -37,14 +37,14 @@ dependencies = [
     "langchain-core ~= 0.3.60",
     "langchain-community ~= 0.3.24",
     "langgraph ~= 0.4.5",
-    "langgraph-cli[inmem] ~= 0.2.10",
+    "langgraph-cli[inmem] >= 0.2.10,< 0.4.0",
     "langgraph-checkpoint-sqlite ~= 2.0.7",
     "langgraph-checkpoint-postgres ~= 2.0.21",
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
-    "numpy ~= 2.2.3; python_version >= '3.13'",
+    "numpy >= 2.2.3,< 2.4.0; python_version >= '3.13'",
     "onnxruntime ~= 1.22.0",
-    "pandas ~= 2.2.3",
+    "pandas >= 2.2.3,< 2.4.0",
     "psycopg[binary,pool] ~= 3.2.4",
     "pyarrow >= 19.0.1",
     "pydantic ~= 2.11.1",
@@ -158,16 +158,16 @@ all-llms = [
 
 # Observability tools and platforms
 langfuse = [
-    "langfuse ~= 2.60.3",
+    "langfuse >= 2.60.3,< 3.1.0",
 ]
 
 langsmith = [
-    "langsmith ~= 0.3.31",
+    "langsmith >= 0.3.31,< 0.5.0",
 ]
 
 all-observability = [
-    "langfuse ~= 2.60.3",
-    "langsmith ~= 0.3.31",
+    "langfuse >= 2.60.3,< 3.1.0",
+    "langsmith >= 0.3.31,< 0.5.0",
 ]
 
 [project.urls]
