@@ -86,7 +86,7 @@ class Settings(BaseSettings):
 
     LANGFUSE_SECRET_KEY: SecretStr | None = None
     LANGFUSE_PUBLIC_KEY: SecretStr | None = None
-    LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "http://localhost:3000"
+    LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "https://cloud.langfuse.com"
 
     # Database Configuration
     MEMORY_BACKEND: MemoryBackends = MemoryBackends.SQLITE
@@ -98,9 +98,9 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str | None = None
     POSTGRES_PORT: int | None = None
     POSTGRES_DB: str | None = None
-    POSTGRES_POOL_SIZE: int = Field(default=10, description="Maximum number of connections in the pool")
-    POSTGRES_MIN_SIZE: int = Field(default=3, description="Minimum number of connections in the pool")
-    POSTGRES_MAX_IDLE: int = Field(default=5, description="Maximum number of idle connections")
+    POSTGRES_POOL_SIZE: int = Field(default=200, description="Maximum number of connections in the pool")
+    POSTGRES_MIN_SIZE: int = Field(default=10, description="Minimum number of connections in the pool")
+    POSTGRES_MAX_IDLE: int = Field(default=300, description="Maximum number of idle connections")
 
     # Model configurations dictionary
     MODEL_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)

@@ -237,7 +237,12 @@ class AgentExecutor:
         if agent_config:
             configurable.update(agent_config)
 
-        callback = agent.observability.get_callback_handler(session_id=thread_id, user_id=user_id)
+        callback = agent.observability.get_callback_handler(
+            session_id=thread_id,
+            user_id=user_id,
+            environment=settings.ENV_MODE,
+            tags=[agent.name],
+        )
 
         config = RunnableConfig(
             configurable=configurable,

@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1]
+
+### Fixed
+
+- Agent executor test mock assertion to include additional `environment` and
+  `tags` parameters
+- Async test methods missing `@pytest.mark.asyncio` decorator in prompts tests
+
+### Updated
+
+- Dependencies to latest versions
+- Agent executor `get_callback_handler` method to pass additional parameters:
+  - Added `environment` parameter from settings.ENV_MODE
+  - Added `tags` parameter with agent name for better observability tracking
+
+### Improved
+
+- Langfuse observability prompt hash detection with fallback mechanism:
+  - Enhanced `push_prompt` method to use tags as fallback when commit_message is
+    empty
+  - Added robust `hasattr` checks for both `commit_message` and `tags`
+    attributes
+  - Improved logging to show old vs new hash values for better debugging
+
 ## [0.7.0]
 
 ### Fixed

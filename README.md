@@ -47,6 +47,9 @@ Whether you're building a simple chatbot or complex multi-agent system, this
 toolkit provides the infrastructure to develop, test, and deploy your
 LangGraph-based agents with confidence.
 
+You can use [DeepWiki](https://deepwiki.com/kryvokhyzha/langgraph-agent-toolkit)
+to learn more about this repository.
+
 ## 📑 Contents
 
 - [Introduction](#-introduction)

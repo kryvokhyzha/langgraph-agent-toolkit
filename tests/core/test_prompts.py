@@ -402,6 +402,7 @@ class TestObservabilityChatPromptTemplate:
         template.invoke(input=dict(test_var="test4"))
         assert mock_platform.pull_prompt.call_count == 2
 
+    @pytest.mark.asyncio
     async def test_async_invoke(self):
         """Test asynchronous invocation."""
         template = ObservabilityChatPromptTemplate.from_observability_platform(
@@ -575,6 +576,7 @@ class TestObservabilityChatPromptTemplate:
         assert "Follow-up answer" in messages2[4].content
         assert "Human prompt with human value" in messages2[5].content
 
+    @pytest.mark.asyncio
     async def test_async_message_placeholder(self):
         """Test asynchronous handling of MessagesPlaceholder."""
         # Use the same approach as in test_message_placeholder_handling

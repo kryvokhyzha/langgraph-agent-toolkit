@@ -361,7 +361,7 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
 
     # Verify observability callback was requested with both session_id and user_id
     mock_agent.observability.get_callback_handler.assert_called_once_with(
-        session_id="test-thread-123", user_id="test-user-456"
+        session_id="test-thread-123", user_id="test-user-456", environment="development", tags=["test-agent"]
     )
 
 
