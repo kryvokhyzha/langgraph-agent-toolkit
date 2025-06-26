@@ -67,11 +67,21 @@ class LangfuseObservability(BaseObservabilityPlatform):
             existing_prompt = langfuse.get_prompt(name=name)
 
             # Check if content has changed by comparing hashes
-            if existing_prompt.commit_message and existing_prompt.commit_message == prompt_hash:
+            # First try commit_message, then fall back to tags
+            existing_hash = None
+            if hasattr(existing_prompt, "commit_message") and existing_prompt.commit_message:
+                existing_hash = existing_prompt.commit_message
+            elif hasattr(existing_prompt, "tags") and existing_prompt.tags and len(existing_prompt.tags) > 0:
+                # Use the first tag as the hash (assuming it contains the prompt hash)
+                existing_hash = existing_prompt.tags[0]
+
+            if existing_hash and existing_hash == prompt_hash:
                 content_changed = False
-                logger.debug(f"Prompt '{name}' content unchanged")
+                logger.debug(f"Prompt '{name}' content unchanged (hash: {existing_hash})")
             else:
-                logger.debug(f"Prompt '{name}' content changed from previous version")
+                logger.debug(
+                    f"Prompt '{name}' content changed from previous version (old: {existing_hash}, new: {prompt_hash})"
+                )
         except Exception:
             logger.debug(f"Existing prompt '{name}' not found, will create a new one")
 
@@ -95,6 +105,7 @@ class LangfuseObservability(BaseObservabilityPlatform):
                 prompt=prompt_template,
                 labels=labels,
                 type=type_prompt,
+                tags=[prompt_hash],  # for v2 version
                 commit_message=prompt_hash,  # Store hash in commit_message
             )
             if existing_prompt is None:

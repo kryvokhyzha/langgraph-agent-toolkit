@@ -331,38 +331,41 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
     message_content = "Hello, setup!"
     input_obj = MockInput(message=message_content)
 
-    # Call the setup method directly
-    agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
-        agent_id="test-agent",
-        input=input_obj,
-        thread_id="test-thread-123",
-        user_id="test-user-456",
-        model_name="test-model",
-        agent_config={"temperature": 0.7},
-    )
+    with patch("langgraph_agent_toolkit.agents.agent_executor.settings") as mock_settings:
+        mock_settings.ENV_MODE = "test"
 
-    # Verify agent is correct
-    assert agent is mock_agent
+        # Call the setup method directly
+        agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
+            agent_id="test-agent",
+            input=input_obj,
+            thread_id="test-thread-123",
+            user_id="test-user-456",
+            model_name="test-model",
+            agent_config={"temperature": 0.7},
+        )
 
-    # Verify input is a HumanMessage with expected content
-    assert isinstance(input_data, dict)
-    assert "messages" in input_data
-    assert isinstance(input_data["messages"][0], HumanMessage)
-    assert input_data["messages"][0].content == message_content
+        # Verify agent is correct
+        assert agent is mock_agent
 
-    # Verify config is correct - access as a dictionary, not an object
-    assert config["configurable"]["thread_id"] == "test-thread-123"
-    assert config["configurable"]["user_id"] == "test-user-456"
-    assert config["configurable"]["model_name"] == "test-model"
-    assert config["configurable"]["temperature"] == 0.7
+        # Verify input is a HumanMessage with expected content
+        assert isinstance(input_data, dict)
+        assert "messages" in input_data
+        assert isinstance(input_data["messages"][0], HumanMessage)
+        assert input_data["messages"][0].content == message_content
 
-    # Verify run_id is a UUID
-    assert isinstance(run_id, UUID)
+        # Verify config is correct - access as a dictionary, not an object
+        assert config["configurable"]["thread_id"] == "test-thread-123"
+        assert config["configurable"]["user_id"] == "test-user-456"
+        assert config["configurable"]["model_name"] == "test-model"
+        assert config["configurable"]["temperature"] == 0.7
 
-    # Verify observability callback was requested with both session_id and user_id
-    mock_agent.observability.get_callback_handler.assert_called_once_with(
-        session_id="test-thread-123", user_id="test-user-456"
-    )
+        # Verify run_id is a UUID
+        assert isinstance(run_id, UUID)
+
+        # Verify observability callback was requested with both session_id and user_id
+        mock_agent.observability.get_callback_handler.assert_called_once_with(
+            session_id="test-thread-123", user_id="test-user-456", environment="test", tags=["test-agent"]
+        )
 
 
 @pytest.mark.asyncio
