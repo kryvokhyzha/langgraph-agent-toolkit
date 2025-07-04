@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Updated
 
-- Langfuse Callback import
+- Langfuse Callback import fix
 
 ## [0.7.3]
 
