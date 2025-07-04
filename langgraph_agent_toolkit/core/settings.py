@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import Annotated, Any, Dict, Optional
@@ -104,6 +105,7 @@ class Settings(BaseSettings):
 
     # Model configurations dictionary
     MODEL_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    MODEL_CONFIGS_BASE64: str | None = None
     MODEL_CONFIGS_PATH: str | None = None
 
     def _apply_langgraph_env_overrides(self) -> None:
@@ -152,6 +154,7 @@ class Settings(BaseSettings):
     def _initialize_model_configs(self) -> None:
         """Initialize model configurations from environment variables."""
         model_configs_env = os.environ.get("MODEL_CONFIGS")
+        model_configs_base64_env = os.environ.get("MODEL_CONFIGS_BASE64")
         model_configs_path_env = os.environ.get("MODEL_CONFIGS_PATH")
         if model_configs_env:
             try:
@@ -163,6 +166,17 @@ class Settings(BaseSettings):
                     logger.warning("MODEL_CONFIGS environment variable is not a valid JSON object")
             except json.JSONDecodeError:
                 logger.error("Failed to parse MODEL_CONFIGS environment variable as JSON")
+        elif model_configs_base64_env:
+            try:
+                decoded_configs = base64.b64decode(model_configs_base64_env).decode("utf-8")
+                configs = json.loads(decoded_configs)
+                if isinstance(configs, dict):
+                    self.MODEL_CONFIGS = configs
+                    logger.info(f"Loaded {len(configs)} model configurations from MODEL_CONFIGS_BASE64")
+                else:
+                    logger.warning("MODEL_CONFIGS_BASE64 cannot be parsed as a valid JSON object")
+            except (ValueError, json.JSONDecodeError) as e:
+                logger.error(f"Failed to decode MODEL_CONFIGS_BASE64: {e}")
         elif model_configs_path_env:
             try:
                 with open(model_configs_path_env, "r", encoding="utf-8") as f:
@@ -171,7 +185,7 @@ class Settings(BaseSettings):
                         self.MODEL_CONFIGS = configs
                         logger.info(f"Loaded {len(configs)} model configurations from {model_configs_path_env}")
                     else:
-                        logger.warning("MODEL_CONFIGS_PATH file is not a valid JSON object")
+                        logger.warning("MODEL_CONFIGS_PATH cannot be parsed as a valid JSON object")
             except (FileNotFoundError, json.JSONDecodeError) as e:
                 logger.error(f"Failed to load model configurations from {model_configs_path_env}: {e}")
         else:
