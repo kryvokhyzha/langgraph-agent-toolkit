@@ -13,6 +13,7 @@ from langgraph_agent_toolkit.helper.logging import logger
 try:
     from langfuse.callback import CallbackHandler
 except (ModuleNotFoundError, ImportError):
+    # New langfuse version uses langfuse.langchain.CallbackHandler
     from langfuse.langchain import CallbackHandler
 
 
