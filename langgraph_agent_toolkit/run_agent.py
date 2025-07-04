@@ -5,7 +5,12 @@ from uuid import UUID
 import rootutils
 from dotenv import find_dotenv, load_dotenv
 from langchain_core.runnables import RunnableConfig
-from langfuse.callback import CallbackHandler
+
+
+try:
+    from langfuse.callback import CallbackHandler
+except (ModuleNotFoundError, ImportError):
+    from langfuse.langchain import CallbackHandler
 
 
 _ = rootutils.setup_root(

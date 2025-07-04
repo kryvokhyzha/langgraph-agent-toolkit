@@ -3,12 +3,17 @@ import json
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from langfuse import Langfuse
-from langfuse.callback import CallbackHandler
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
 from langgraph_agent_toolkit.helper.constants import DEFAULT_CACHE_TTL_SECOND
 from langgraph_agent_toolkit.helper.logging import logger
+
+
+try:
+    from langfuse.callback import CallbackHandler
+except (ModuleNotFoundError, ImportError):
+    from langfuse.langchain import CallbackHandler
 
 
 class LangfuseObservability(BaseObservabilityPlatform):
