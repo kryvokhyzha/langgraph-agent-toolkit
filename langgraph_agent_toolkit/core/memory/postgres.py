@@ -61,8 +61,16 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         """
         logger.info(
             f"Creating PostgreSQL connection pool: min_size={settings.POSTGRES_MIN_SIZE}, "
-            f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}"
+            f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}, "
+            f"schema={settings.POSTGRES_SCHEMA}"
         )
+
+        # Prepare connection kwargs with schema setting
+        connection_kwargs = {"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row}
+
+        # Set search_path using options parameter if schema is specified and not default
+        if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
+            connection_kwargs["options"] = f"-c search_path={settings.POSTGRES_SCHEMA}"
 
         # Use AsyncConnectionPool as an async context manager
         async with AsyncConnectionPool(
@@ -70,7 +78,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             min_size=settings.POSTGRES_MIN_SIZE,
             max_size=settings.POSTGRES_POOL_SIZE,
             max_idle=settings.POSTGRES_MAX_IDLE,
-            kwargs=dict(autocommit=True, prepare_threshold=0, row_factory=dict_row),
+            kwargs=connection_kwargs,
         ) as pool:
             logger.info("PostgreSQL connection pool opened successfully")
 

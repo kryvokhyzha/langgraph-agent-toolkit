@@ -25,7 +25,7 @@ def run_service(
             AGENT_PATHS=[
                 "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
                 "langgraph_agent_toolkit.agents.blueprints.react_so.agent:react_agent_so",
-                "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
+                # "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
                 "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
                 "langgraph_agent_toolkit.agents.blueprints.interrupt_agent.agent:interrupt_agent",
             ]
