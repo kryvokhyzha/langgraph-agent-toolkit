@@ -99,6 +99,7 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str | None = None
     POSTGRES_PORT: int | None = None
     POSTGRES_DB: str | None = None
+    POSTGRES_SCHEMA: str = "public"
     POSTGRES_POOL_SIZE: int = Field(default=200, description="Maximum number of connections in the pool")
     POSTGRES_MIN_SIZE: int = Field(default=10, description="Minimum number of connections in the pool")
     POSTGRES_MAX_IDLE: int = Field(default=300, description="Maximum number of idle connections")
