@@ -2,7 +2,7 @@ import asyncio
 import functools
 import importlib
 import os
-import sys
+import traceback
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
@@ -142,10 +142,13 @@ class AgentExecutor:
 
         def _handle_error(e: Exception):
             """Handle and re-raise errors with logging."""
+            # Get detailed traceback
+            tb_str = traceback.format_exc()
+
             if isinstance(e, GraphRecursionError):
-                logger.opt(exception=sys.exc_info()).error(f"GraphRecursionError occurred: {e}")
+                logger.error(f"GraphRecursionError occurred: {e}\n\nFull traceback:\n{tb_str}")
             else:
-                logger.opt(exception=sys.exc_info()).error(f"Error during agent execution: {e}")
+                logger.error(f"Error during agent execution: {e}\n\nFull traceback:\n{tb_str}")
 
             raise e
 
