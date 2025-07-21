@@ -30,13 +30,13 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
-    "fastapi ~= 0.115.5",
+    "fastapi >= 0.115.5,< 0.117.0",
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter ~= 0.10.0",
     "langchain-core ~= 0.3.60",
     "langchain-community ~= 0.3.24",
-    "langgraph ~= 0.4.5",
+    "langgraph >= 0.4.5,< 0.6.0",
     "langgraph-cli[inmem] >= 0.2.10,< 0.4.0",
     "langgraph-checkpoint-sqlite ~= 2.0.7",
     "langgraph-checkpoint-postgres ~= 2.0.21",
@@ -52,7 +52,7 @@ dependencies = [
     "pyowm ~= 3.3.0",
     "python-dotenv ~= 1.1.0",
     "setuptools >= 75.6.0",
-    "streamlit >= 1.45,< 1.47",
+    "streamlit >= 1.45,< 1.48",
     "watchdog ~= 6.0.0",
     "joblib >= 1.4.2",
     "uvicorn ~= 0.34.0",
@@ -81,7 +81,7 @@ client = [
     "httpx ~= 0.28.1",
     "pydantic ~= 2.11.1",
     "python-dotenv ~= 1.1.0",
-    "streamlit >= 1.45,< 1.47",
+    "streamlit >= 1.45,< 1.48",
     "watchdog ~= 6.0.0",
 ]
 
@@ -98,7 +98,7 @@ azure-backend = [
 
 gunicorn-backend = [
     "gunicorn ~= 23.0.0",
-    "uvicorn[standard] ~= 0.34.2",
+    "uvicorn[standard] >= 0.34.2,< 0.36.0",
 ]
 
 uvicorn-backend = [
@@ -158,7 +158,7 @@ all-llms = [
 
 # Observability tools and platforms
 langfuse = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.3.0",
  ]
 
  langsmith = [
@@ -166,7 +166,7 @@ langfuse = [
  ]
 
  all-observability = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.3.0",
     "langsmith >= 0.3.31,< 0.5.0",
  ]
 
