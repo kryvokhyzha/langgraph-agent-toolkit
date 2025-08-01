@@ -9,7 +9,7 @@ from langgraph_agent_toolkit.helper.utils import read_file
 
 
 class PromptManager:
-    """Manages prompt templates for the price plan assistant agent."""
+    """Manages prompt templates for assistant."""
 
     def __init__(
         self,

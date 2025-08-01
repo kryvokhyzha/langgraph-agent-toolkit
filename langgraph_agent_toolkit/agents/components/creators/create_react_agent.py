@@ -31,7 +31,7 @@ from langchain_core.runnables import (
 )
 from langchain_core.tools import BaseTool
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.graph import CompiledGraph
+from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt.chat_agent_executor import (
     AgentState,
     AgentStateWithStructuredResponse,
@@ -92,7 +92,7 @@ def create_react_agent(
     name: Optional[str] = None,
     immediate_step_threshold: int = 5,
     immediate_generation_prompt: Optional[str] = None,
-) -> CompiledGraph:
+) -> CompiledStateGraph:
     """Create a graph that works with a chat model that utilizes tool calling with an additional router.
 
     This implementation extends the original create_react_agent by adding a router node
