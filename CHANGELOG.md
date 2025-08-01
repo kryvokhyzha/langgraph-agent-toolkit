@@ -6,7 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.8]
+## [0.7.10]
+
+### Fixed
+
+- error handling in `message_generator`
+- max_messages type
+
+## [0.7.9]
 
 ### Fixed
 
