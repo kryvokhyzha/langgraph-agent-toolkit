@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [0.7.8]
 
+### Fixed
+
+- type of graph (create_react_agent)
+
+## [0.7.8]
+
 ### Added
 
 - Prompt manager
