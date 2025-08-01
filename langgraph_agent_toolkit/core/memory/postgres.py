@@ -34,6 +34,13 @@ class PostgresMemoryBackend(BaseMemoryBackend):
                 f"Missing required PostgreSQL configuration: {', '.join(missing)}. "
                 "These environment variables must be set to use PostgreSQL persistence."
             )
+
+        if settings.POSTGRES_MIN_SIZE > settings.POSTGRES_POOL_SIZE:
+            raise ValueError(
+                f"POSTGRES_MIN_SIZE ({settings.POSTGRES_MIN_SIZE}) must be less than or equal to "
+                f"POSTGRES_POOL_SIZE ({settings.POSTGRES_POOL_SIZE})"
+            )
+
         return True
 
     @staticmethod
@@ -48,25 +55,35 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     @asynccontextmanager
     async def _get_connection_context(
-        self, factory_func: Callable[[AsyncConnectionPool], T]
+        self,
+        factory_func: Callable[[AsyncConnectionPool], T],
+        app_prefix: str,
     ) -> AsyncGenerator[T, None]:
         """Yield the result of the factory function.
 
         Args:
             factory_func: Function that creates the appropriate object from the connection pool
+            app_prefix: Prefix for the application name in the connection pool
 
         Yields:
             The object created by the factory_func
 
         """
+        application_name = f"{settings.POSTGRES_APPLICATION_NAME}-{app_prefix}"
+
         logger.info(
             f"Creating PostgreSQL connection pool: min_size={settings.POSTGRES_MIN_SIZE}, "
             f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}, "
-            f"schema={settings.POSTGRES_SCHEMA}"
+            f"schema={settings.POSTGRES_SCHEMA}, application_name={application_name}"
         )
 
         # Prepare connection kwargs with schema setting
-        connection_kwargs = {"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row}
+        connection_kwargs = {
+            "autocommit": True,
+            "prepare_threshold": 0,
+            "row_factory": dict_row,
+            "application_name": application_name,
+        }
 
         # Set search_path using options parameter if schema is specified and not default
         if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
@@ -78,6 +95,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             min_size=settings.POSTGRES_MIN_SIZE,
             max_size=settings.POSTGRES_POOL_SIZE,
             max_idle=settings.POSTGRES_MAX_IDLE,
+            check=AsyncConnectionPool.check_connection,
             kwargs=connection_kwargs,
         ) as pool:
             logger.info("PostgreSQL connection pool opened successfully")
@@ -95,7 +113,9 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             AsyncPostgresSaver: The database saver instance
 
         """
-        async with self._get_connection_context(lambda pool: AsyncPostgresSaver(conn=pool)) as saver:
+        async with self._get_connection_context(
+            lambda pool: AsyncPostgresSaver(conn=pool), app_prefix="saver"
+        ) as saver:
             yield saver
 
     @asynccontextmanager
@@ -106,7 +126,9 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             AsyncPostgresStore: The database store instance
 
         """
-        async with self._get_connection_context(lambda pool: AsyncPostgresStore(conn=pool)) as store:
+        async with self._get_connection_context(
+            lambda pool: AsyncPostgresStore(conn=pool, app_prefix="store")
+        ) as store:
             yield store
 
     def get_checkpoint_saver(self) -> AbstractAsyncContextManager[AsyncPostgresSaver]:

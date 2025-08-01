@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     OLLAMA_MODEL_NAME: str | None = None
     OLLAMA_BASE_URL: str | None = None
 
+    # OpenRouter Settings
+    OPENROUTER_API_KEY: str | None = None
+
     # Observability platform
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
 
@@ -94,6 +97,7 @@ class Settings(BaseSettings):
     SQLITE_DB_PATH: str = "checkpoints.db"
 
     # postgresql Configuration
+    POSTGRES_APPLICATION_NAME: str = "langgraph-agent-toolkit"
     POSTGRES_USER: str | None = None
     POSTGRES_PASSWORD: SecretStr | None = None
     POSTGRES_HOST: str | None = None

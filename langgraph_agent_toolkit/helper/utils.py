@@ -1,4 +1,6 @@
 import inspect
+from pathlib import Path
+from typing import Any
 
 from langchain_core.messages import (
     AIMessage,
@@ -100,3 +102,20 @@ def create_ai_message(parts: dict) -> AIMessage:
     valid_keys = set(sig.parameters)
     filtered = {k: v for k, v in parts.items() if k in valid_keys}
     return AIMessage(**filtered)
+
+
+def read_file(file_path: Path | str, mode: str = "r", encoding: str = "utf-8", **kwargs) -> Any:
+    """Read the content of a file and return it as a string.
+
+    Args:
+        file_path (Path | str): The path to the file to read.
+        mode (str): The mode in which to open the file. Default is "r".
+        encoding (str): The encoding to use for reading the file. Default is "utf-8".
+        **kwargs: Additional arguments to pass to the open function.
+
+    Returns:
+        Any: The content of the file as a string.
+
+    """
+    with open(file_path, mode=mode, encoding=encoding, **kwargs) as file:
+        return file.read()
