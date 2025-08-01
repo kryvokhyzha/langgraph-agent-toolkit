@@ -78,6 +78,8 @@ class TestPostgresMemoryBackend(unittest.TestCase):
         mock_settings.POSTGRES_HOST = "localhost"
         mock_settings.POSTGRES_PORT = "5432"
         mock_settings.POSTGRES_DB = "testdb"
+        mock_settings.POSTGRES_MIN_SIZE = 1
+        mock_settings.POSTGRES_POOL_SIZE = 5
 
         self.assertTrue(self.backend.validate_config())
 
@@ -89,6 +91,8 @@ class TestPostgresMemoryBackend(unittest.TestCase):
         mock_settings.POSTGRES_HOST = "localhost"
         mock_settings.POSTGRES_PORT = "5432"
         mock_settings.POSTGRES_DB = "testdb"
+        mock_settings.POSTGRES_MIN_SIZE = 1
+        mock_settings.POSTGRES_POOL_SIZE = 5
 
         with pytest.raises(ValueError, match=r"Missing required PostgreSQL configuration"):
             self.backend.validate_config()
