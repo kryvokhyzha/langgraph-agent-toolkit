@@ -5,7 +5,7 @@ import langsmith
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
-from langgraph.pregel.types import StateSnapshot
+from langgraph.types import StateSnapshot
 
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import ModelProvider
