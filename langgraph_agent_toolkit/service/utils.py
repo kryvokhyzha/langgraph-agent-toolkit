@@ -1,6 +1,7 @@
 import json
 import logging
 import secrets
+import traceback
 import warnings
 from typing import Annotated, Any, AsyncGenerator, Optional
 
@@ -96,7 +97,8 @@ async def message_generator(
                 yield f"data: {json.dumps({'type': 'message', 'content': message.model_dump()})}\n\n"
 
     except Exception as e:
-        logger.error(f"Error in message_generator: {e}")
+        tb_str = traceback.format_exc()
+        logger.error(f"Error in message_generator: {e}\n\nFull traceback:\n{tb_str}")
         yield f"data: {json.dumps({'type': 'error', 'content': f'Internal server error: {e}'})}\n\n"
     finally:
         yield "data: [DONE]\n\n"

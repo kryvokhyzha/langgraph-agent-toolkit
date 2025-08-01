@@ -26,7 +26,7 @@ def pre_model_hook_standard(state: T, config: RunnableConfig):
     updated_messages = trim_messages(
         state["messages"],
         token_counter=len,
-        max_tokens=_max_messages or DEFAULT_MAX_MESSAGE_HISTORY_LENGTH,
+        max_tokens=int(_max_messages or DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),
         strategy="last",
         start_on="human",
         end_on=("human", "tool"),

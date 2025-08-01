@@ -1667,7 +1667,7 @@ wheels = [
 
 [[package]]
 name = "langgraph-agent-toolkit"
-version = "0.7.9"
+version = "0.7.10"
 source = { editable = "." }
 dependencies = [
     { name = "duckduckgo-search" },
