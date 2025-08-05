@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.7.11"
+version = "0.7.12"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }, { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
@@ -30,7 +30,7 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
-    "fastapi ~= 0.115.5",
+    "fastapi ~= 0.116.1",
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter ~= 0.10.0",
@@ -43,7 +43,7 @@ dependencies = [
     "langgraph-checkpoint-postgres <= 2.0.21",
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
-    "numpy >= 2.2.3,< 2.4.0; python_version >= '3.13'",
+    "numpy >= 2.0.0,< 2.4.0; python_version >= '3.13'",
     "onnxruntime >= 1.20.0,< 1.23.0",
     "pandas >= 2.2.3,< 2.4.0",
     "psycopg[binary,pool] ~= 3.2.4",
@@ -56,7 +56,7 @@ dependencies = [
     "streamlit >= 1.45, < 1.48",
     "watchdog ~= 6.0.0",
     "joblib >= 1.4.2",
-    "uvicorn ~= 0.34.0",
+    "uvicorn ~= 0.35.0",
     "loguru ~= 0.7.3",
     "fire ~= 0.7.0",
     "multidict > 6.3.2",
@@ -82,7 +82,7 @@ client = [
     "httpx ~= 0.28.1",
     "pydantic ~= 2.11.1",
     "python-dotenv ~= 1.1.0",
-    "streamlit >= 1.45,< 1.47",
+    "streamlit >= 1.45,< 1.48",
     "watchdog ~= 6.0.0",
 ]
 
@@ -99,18 +99,18 @@ azure-backend = [
 
 gunicorn-backend = [
     "gunicorn ~= 23.0.0",
-    "uvicorn[standard] ~= 0.34.2",
+    "uvicorn[standard] ~= 0.35.0",
 ]
 
 uvicorn-backend = [
-    "uvicorn ~= 0.34.2",
+    "uvicorn ~= 0.35.0",
 ]
 
 all-backends = [
     "mangum ~= 0.19.0",
     "azure-functions ~= 1.23.0", 
     "gunicorn ~= 23.0.0",
-    "uvicorn ~= 0.34.2",
+    "uvicorn ~= 0.35.0",
 ]
 
 # Different LLM providers

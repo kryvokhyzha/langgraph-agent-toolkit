@@ -654,16 +654,16 @@ wheels = [
 
 [[package]]
 name = "fastapi"
-version = "0.115.14"
+version = "0.116.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/53/8c38a874844a8b0fa10dd8adf3836ac154082cf88d3f22b544e9ceea0a15/fastapi-0.115.14.tar.gz", hash = "sha256:b1de15cdc1c499a4da47914db35d0e4ef8f1ce62b624e94e0e5824421df99739", size = 296263, upload-time = "2025-06-26T15:29:08.21Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/d7/6c8b3bfe33eeffa208183ec037fee0cce9f7f024089ab1c5d12ef04bd27c/fastapi-0.116.1.tar.gz", hash = "sha256:ed52cbf946abfd70c5a0dccb24673f0670deeb517a88b3544d03c2a6bf283143", size = 296485, upload-time = "2025-07-11T16:22:32.057Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/50/b1222562c6d270fea83e9c9075b8e8600b8479150a18e4516a6138b980d1/fastapi-0.115.14-py3-none-any.whl", hash = "sha256:6c0c8bf9420bd58f565e585036d971872472b4f7d3f6c73b698e10cffdefb3ca", size = 95514, upload-time = "2025-06-26T15:29:06.49Z" },
+    { url = "https://files.pythonhosted.org/packages/e5/47/d63c60f59a59467fda0f93f46335c9d18526d7071f025cb5b89d5353ea42/fastapi-0.116.1-py3-none-any.whl", hash = "sha256:c46ac7c312df840f0c9e220f7964bada936781bc4e2e6eb71f1c4d7553786565", size = 95631, upload-time = "2025-07-11T16:22:30.485Z" },
 ]
 
 [[package]]
@@ -1667,7 +1667,7 @@ wheels = [
 
 [[package]]
 name = "langgraph-agent-toolkit"
-version = "0.7.11"
+version = "0.7.12"
 source = { editable = "." }
 dependencies = [
     { name = "duckduckgo-search" },
@@ -1793,7 +1793,7 @@ requires-dist = [
     { name = "azure-functions", marker = "extra == 'all-backends'", specifier = "~=1.23.0" },
     { name = "azure-functions", marker = "extra == 'azure-backend'", specifier = "~=1.23.0" },
     { name = "duckduckgo-search", specifier = ">=7.3.0" },
-    { name = "fastapi", specifier = "~=0.115.5" },
+    { name = "fastapi", specifier = "~=0.116.1" },
     { name = "fire", specifier = "~=0.7.0" },
     { name = "grpcio", specifier = ">=1.68.0" },
     { name = "gunicorn", marker = "extra == 'all-backends'", specifier = "~=23.0.0" },
@@ -1834,7 +1834,7 @@ requires-dist = [
     { name = "mangum", marker = "extra == 'aws-backend'", specifier = "~=0.19.0" },
     { name = "multidict", specifier = ">6.3.2" },
     { name = "numpy", marker = "python_full_version < '3.13'", specifier = "~=1.26.4" },
-    { name = "numpy", marker = "python_full_version >= '3.13'", specifier = ">=2.2.3,<2.4.0" },
+    { name = "numpy", marker = "python_full_version >= '3.13'", specifier = ">=2.0.0,<2.4.0" },
     { name = "onnxruntime", specifier = ">=1.20.0,<1.23.0" },
     { name = "pandas", specifier = ">=2.2.3,<2.4.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = "~=3.2.4" },
@@ -1846,10 +1846,10 @@ requires-dist = [
     { name = "rootutils", specifier = ">=1.0.7" },
     { name = "setuptools", specifier = ">=75.6.0" },
     { name = "streamlit", specifier = ">=1.45,<1.48" },
-    { name = "uvicorn", specifier = "~=0.34.0" },
-    { name = "uvicorn", marker = "extra == 'all-backends'", specifier = "~=0.34.2" },
-    { name = "uvicorn", marker = "extra == 'uvicorn-backend'", specifier = "~=0.34.2" },
-    { name = "uvicorn", extras = ["standard"], marker = "extra == 'gunicorn-backend'", specifier = "~=0.34.2" },
+    { name = "uvicorn", specifier = "~=0.35.0" },
+    { name = "uvicorn", marker = "extra == 'all-backends'", specifier = "~=0.35.0" },
+    { name = "uvicorn", marker = "extra == 'uvicorn-backend'", specifier = "~=0.35.0" },
+    { name = "uvicorn", extras = ["standard"], marker = "extra == 'gunicorn-backend'", specifier = "~=0.35.0" },
     { name = "watchdog", specifier = "~=6.0.0" },
 ]
 provides-extras = ["aws-backend", "azure-backend", "gunicorn-backend", "uvicorn-backend", "all-backends", "aws", "anthropic", "google-vertexai", "google-genai", "ollama", "groq", "deepseek", "openai", "all-llms", "langfuse", "langsmith", "all-observability"]
@@ -1859,7 +1859,7 @@ client = [
     { name = "httpx", specifier = "~=0.28.1" },
     { name = "pydantic", specifier = "~=2.11.1" },
     { name = "python-dotenv", specifier = "~=1.1.0" },
-    { name = "streamlit", specifier = ">=1.45,<1.47" },
+    { name = "streamlit", specifier = ">=1.45,<1.48" },
     { name = "watchdog", specifier = "~=6.0.0" },
 ]
 dev = [
@@ -3743,19 +3743,20 @@ wheels = [
 
 [[package]]
 name = "starlette"
-version = "0.46.2"
+version = "0.47.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/20/08dfcd9c983f6a6f4a1000d934b9e6d626cff8d2eeb77a89a68eef20a2b7/starlette-0.46.2.tar.gz", hash = "sha256:7f7361f34eed179294600af672f565727419830b54b7b084efe44bb82d2fccd5", size = 2580846, upload-time = "2025-04-13T13:56:17.942Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/57/d062573f391d062710d4088fa1369428c38d51460ab6fedff920efef932e/starlette-0.47.2.tar.gz", hash = "sha256:6ae9aa5db235e4846decc1e7b79c4f346adf41e9777aebeb49dfd09bbd7023d8", size = 2583948, upload-time = "2025-07-20T17:31:58.522Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/0c/9d30a4ebeb6db2b25a841afbb80f6ef9a854fc3b41be131d249a977b4959/starlette-0.46.2-py3-none-any.whl", hash = "sha256:595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35", size = 72037, upload-time = "2025-04-13T13:56:16.21Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/1f/b876b1f83aef204198a42dc101613fefccb32258e5428b5f9259677864b4/starlette-0.47.2-py3-none-any.whl", hash = "sha256:c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b", size = 72984, upload-time = "2025-07-20T17:31:56.738Z" },
 ]
 
 [[package]]
 name = "streamlit"
-version = "1.46.1"
+version = "1.47.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "altair" },
@@ -3778,9 +3779,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "watchdog", marker = "sys_platform != 'darwin'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bd/7e/c7499c447b7021657fa5c851091072c1c7a26f1dda0369c21c0243fc35e7/streamlit-1.46.1.tar.gz", hash = "sha256:2cc4ad01cfeded9ad953a21829eb879b90aa77af4068c68397411c2d5c8862cf", size = 9651018, upload-time = "2025-06-26T16:03:05.66Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/da/cef67ed4614f04932a00068fe6291455deb884a04fd94f7ad78492b0e91a/streamlit-1.47.1.tar.gz", hash = "sha256:daed79763d1cafeb03cdd800b91aa9c7adc3688c6b2cbf4ecc2ca899aab82a2a", size = 9544057, upload-time = "2025-07-25T15:37:08.482Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/3b/35400175788cdd6a43c90dce1e7f567eb6843a3ba0612508c0f19ee31f5f/streamlit-1.46.1-py3-none-any.whl", hash = "sha256:dffa373230965f87ccc156abaff848d7d731920cf14106f3b99b1ea18076f728", size = 10051346, upload-time = "2025-06-26T16:03:02.934Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/4d/701f5fcf9c0d388dad9d94ba272d333c7efa6231ddee1babc59d26dc14d2/streamlit-1.47.1-py3-none-any.whl", hash = "sha256:c7881549e3ba1daecfb5541f32ee6ff70e549f1c3400c92d045897cb7a29772a", size = 9944872, upload-time = "2025-07-25T15:37:05.758Z" },
 ]
 
 [[package]]
@@ -3994,15 +3995,15 @@ wheels = [
 
 [[package]]
 name = "uvicorn"
-version = "0.34.3"
+version = "0.35.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/ad/713be230bcda622eaa35c28f0d328c3675c371238470abdea52417f17a8e/uvicorn-0.34.3.tar.gz", hash = "sha256:35919a9a979d7a59334b6b10e05d77c1d0d574c50e0fc98b8b1a0f165708b55a", size = 76631, upload-time = "2025-06-01T07:48:17.531Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5e/42/e0e305207bb88c6b8d3061399c6a961ffe5fbb7e2aa63c9234df7259e9cd/uvicorn-0.35.0.tar.gz", hash = "sha256:bc662f087f7cf2ce11a1d7fd70b90c9f98ef2e2831556dd078d131b96cc94a01", size = 78473, upload-time = "2025-06-28T16:15:46.058Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/0d/8adfeaa62945f90d19ddc461c55f4a50c258af7662d34b6a3d5d1f8646f6/uvicorn-0.34.3-py3-none-any.whl", hash = "sha256:16246631db62bdfbf069b0645177d6e8a77ba950cfedbfd093acef9444e4d885", size = 62431, upload-time = "2025-06-01T07:48:15.664Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/e2/dc81b1bd1dcfe91735810265e9d26bc8ec5da45b4c0f6237e286819194c3/uvicorn-0.35.0-py3-none-any.whl", hash = "sha256:197535216b25ff9b785e29a0b79199f55222193d47f820816e7da751e9bc8d4a", size = 66406, upload-time = "2025-06-28T16:15:44.816Z" },
 ]
 
 [package.optional-dependencies]
