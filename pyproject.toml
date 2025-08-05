@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.7.10"
+version = "0.7.11"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }, { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
@@ -44,7 +44,7 @@ dependencies = [
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
     "numpy >= 2.2.3,< 2.4.0; python_version >= '3.13'",
-    "onnxruntime ~= 1.22.0",
+    "onnxruntime >= 1.20.0,< 1.23.0",
     "pandas >= 2.2.3,< 2.4.0",
     "psycopg[binary,pool] ~= 3.2.4",
     "pyarrow >= 19.0.1",
