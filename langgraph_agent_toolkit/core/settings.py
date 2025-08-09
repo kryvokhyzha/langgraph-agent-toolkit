@@ -113,6 +113,11 @@ class Settings(BaseSettings):
     MODEL_CONFIGS_BASE64: str | None = None
     MODEL_CONFIGS_PATH: str | None = None
 
+    # Database configurations dictionary
+    DB_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    DB_CONFIGS_BASE64: str | None = None
+    DB_CONFIGS_PATH: str | None = None
+
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
         for env_name, env_value in os.environ.items():
@@ -156,45 +161,78 @@ class Settings(BaseSettings):
                     except Exception as e:
                         logger.warning(f"Failed to apply environment override for {setting_name}: {e}")
 
+    def _initialize_configs(self, config_type: str) -> Dict[str, Dict[str, Any]]:
+        """Initialize configurations from environment variables.
+
+        Args:
+            config_type: Type of configuration ('MODEL' or 'DB')
+
+        Returns:
+            Dictionary of configurations
+
+        """
+        configs = {}
+
+        # Try direct JSON environment variable
+        configs_env = os.environ.get(f"{config_type}_CONFIGS")
+        if configs_env:
+            try:
+                parsed_configs = json.loads(configs_env)
+                if isinstance(parsed_configs, dict):
+                    configs = parsed_configs
+                    logger.info(
+                        f"Loaded {len(configs)} {config_type.lower()} configurations from {config_type}_CONFIGS"
+                    )
+                else:
+                    logger.warning(f"{config_type}_CONFIGS environment variable is not a valid JSON object")
+            except json.JSONDecodeError:
+                logger.error(f"Failed to parse {config_type}_CONFIGS environment variable as JSON")
+            return configs
+
+        # Try base64 encoded environment variable
+        configs_base64_env = os.environ.get(f"{config_type}_CONFIGS_BASE64")
+        if configs_base64_env:
+            try:
+                decoded_configs = base64.b64decode(configs_base64_env).decode("utf-8")
+                parsed_configs = json.loads(decoded_configs)
+                if isinstance(parsed_configs, dict):
+                    configs = parsed_configs
+                    logger.info(
+                        f"Loaded {len(configs)} {config_type.lower()} configurations from {config_type}_CONFIGS_BASE64"
+                    )
+                else:
+                    logger.warning(f"{config_type}_CONFIGS_BASE64 cannot be parsed as a valid JSON object")
+            except (ValueError, json.JSONDecodeError) as e:
+                logger.error(f"Failed to decode {config_type}_CONFIGS_BASE64: {e}")
+            return configs
+
+        # Try file path
+        configs_path_env = os.environ.get(f"{config_type}_CONFIGS_PATH")
+        if configs_path_env:
+            try:
+                with open(configs_path_env, "r", encoding="utf-8") as f:
+                    parsed_configs = json.load(f)
+                    if isinstance(parsed_configs, dict):
+                        configs = parsed_configs
+                        logger.info(
+                            f"Loaded {len(configs)} {config_type.lower()} configurations from {configs_path_env}"
+                        )
+                    else:
+                        logger.warning(f"{config_type}_CONFIGS_PATH cannot be parsed as a valid JSON object")
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                logger.error(f"Failed to load {config_type.lower()} configurations from {configs_path_env}: {e}")
+            return configs
+
+        logger.info(f"No {config_type}_CONFIGS found in environment variables or file")
+        return configs
+
     def _initialize_model_configs(self) -> None:
         """Initialize model configurations from environment variables."""
-        model_configs_env = os.environ.get("MODEL_CONFIGS")
-        model_configs_base64_env = os.environ.get("MODEL_CONFIGS_BASE64")
-        model_configs_path_env = os.environ.get("MODEL_CONFIGS_PATH")
-        if model_configs_env:
-            try:
-                configs = json.loads(model_configs_env)
-                if isinstance(configs, dict):
-                    self.MODEL_CONFIGS = configs
-                    logger.info(f"Loaded {len(configs)} model configurations from MODEL_CONFIGS")
-                else:
-                    logger.warning("MODEL_CONFIGS environment variable is not a valid JSON object")
-            except json.JSONDecodeError:
-                logger.error("Failed to parse MODEL_CONFIGS environment variable as JSON")
-        elif model_configs_base64_env:
-            try:
-                decoded_configs = base64.b64decode(model_configs_base64_env).decode("utf-8")
-                configs = json.loads(decoded_configs)
-                if isinstance(configs, dict):
-                    self.MODEL_CONFIGS = configs
-                    logger.info(f"Loaded {len(configs)} model configurations from MODEL_CONFIGS_BASE64")
-                else:
-                    logger.warning("MODEL_CONFIGS_BASE64 cannot be parsed as a valid JSON object")
-            except (ValueError, json.JSONDecodeError) as e:
-                logger.error(f"Failed to decode MODEL_CONFIGS_BASE64: {e}")
-        elif model_configs_path_env:
-            try:
-                with open(model_configs_path_env, "r", encoding="utf-8") as f:
-                    configs = json.load(f)
-                    if isinstance(configs, dict):
-                        self.MODEL_CONFIGS = configs
-                        logger.info(f"Loaded {len(configs)} model configurations from {model_configs_path_env}")
-                    else:
-                        logger.warning("MODEL_CONFIGS_PATH cannot be parsed as a valid JSON object")
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logger.error(f"Failed to load model configurations from {model_configs_path_env}: {e}")
-        else:
-            logger.info("No MODEL_CONFIGS found in environment variables or file")
+        self.MODEL_CONFIGS = self._initialize_configs("MODEL")
+
+    def _initialize_db_configs(self) -> None:
+        """Initialize database configurations from environment variables."""
+        self.DB_CONFIGS = self._initialize_configs("DB")
 
     def get_model_config(self, config_key: str) -> Optional[Dict[str, Any]]:
         """Get a model configuration by key.
@@ -208,10 +246,23 @@ class Settings(BaseSettings):
         """
         return self.MODEL_CONFIGS.get(config_key)
 
+    def get_db_config(self, config_key: str) -> Optional[Dict[str, Any]]:
+        """Get a database configuration by key.
+
+        Args:
+            config_key: The key of the database configuration to get
+
+        Returns:
+            The database configuration dict if found, None otherwise
+
+        """
+        return self.DB_CONFIGS.get(config_key)
+
     def setup(self) -> None:
         """Initialize all settings."""
         self._apply_langgraph_env_overrides()
         self._initialize_model_configs()
+        self._initialize_db_configs()
 
     @computed_field
     @property
