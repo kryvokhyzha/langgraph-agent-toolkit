@@ -1,0 +1,4 @@
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.bg_task_agent.task
+   :members:
+   :show-inheritance:
+   :undoc-members:
