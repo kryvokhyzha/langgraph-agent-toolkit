@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.7.12"
+version = "0.7.13"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }, { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
