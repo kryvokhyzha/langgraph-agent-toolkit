@@ -39,7 +39,7 @@ class UserComplexInput(BaseModel):
     """Basic user input for the agent, supporting dynamic fields."""
 
     message: str | None = Field(
-        default="",
+        default=None,
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )

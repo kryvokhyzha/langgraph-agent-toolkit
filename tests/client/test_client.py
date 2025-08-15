@@ -82,9 +82,7 @@ def test_invoke(agent_client):
         assert isinstance(response, ChatMessage)
         # Verify request
         args, kwargs = mock_post.call_args
-        input_payload = kwargs["json"]["input"]
-        if "message" in input_payload:
-            assert input_payload["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -203,9 +201,7 @@ def test_stream(agent_client):
         )
         # Verify request
         args, kwargs = mock_stream.call_args
-        input_payload = kwargs["json"]["input"]
-        if "message" in input_payload:
-            assert input_payload["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -299,9 +295,7 @@ async def test_astream(agent_client):
         stream_call = mock_client_instance.stream.call_args
         kwargs = stream_call[1]
 
-        input_payload = kwargs["json"]["input"]
-        if "message" in input_payload:
-            assert input_payload["message"] == QUESTION
+        assert kwargs["json"]["input"]["message"] == QUESTION
         assert kwargs["json"]["model_name"] == "gpt-4o"
         assert kwargs["json"]["model_provider"] == "openai"
         assert kwargs["json"]["model_config_key"] == "gpt4o"
@@ -568,11 +562,9 @@ def test_add_messages(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["thread_id"] == THREAD_ID
-        # Only check for messages if present
-        if "messages" in kwargs["json"]:
-            assert len(kwargs["json"]["messages"]) == 2
-            assert kwargs["json"]["messages"][0]["type"] == "human"
-            assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
 
     # Test with MessageInput objects
     message_inputs = [MessageInput(type="human", content="Hello!"), MessageInput(type="ai", content="Hi there!")]
@@ -585,10 +577,9 @@ def test_add_messages(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["thread_id"] == THREAD_ID
-        if "messages" in kwargs["json"]:
-            assert len(kwargs["json"]["messages"]) == 2
-            assert kwargs["json"]["messages"][0]["type"] == "human"
-            assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
 
     # Test error when neither thread_id nor user_id is provided
     with pytest.raises(AgentClientError) as exc:
@@ -627,11 +618,9 @@ async def test_aadd_messages(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["thread_id"] == THREAD_ID
-        # Only check for messages if present
-        if "messages" in kwargs["json"]:
-            assert len(kwargs["json"]["messages"]) == 2
-            assert kwargs["json"]["messages"][0]["type"] == "human"
-            assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
 
     # Test with MessageInput objects
     message_inputs = [MessageInput(type="human", content="Hello!"), MessageInput(type="ai", content="Hi there!")]
@@ -644,10 +633,9 @@ async def test_aadd_messages(agent_client):
         # Verify request
         args, kwargs = mock_post.call_args
         assert kwargs["json"]["thread_id"] == THREAD_ID
-        if "messages" in kwargs["json"]:
-            assert len(kwargs["json"]["messages"]) == 2
-            assert kwargs["json"]["messages"][0]["type"] == "human"
-            assert kwargs["json"]["messages"][0]["content"] == "Hello!"
+        assert len(kwargs["json"]["messages"]) == 2
+        assert kwargs["json"]["messages"][0]["type"] == "human"
+        assert kwargs["json"]["messages"][0]["content"] == "Hello!"
 
     # Test error when neither thread_id nor user_id is provided
     with pytest.raises(AgentClientError) as exc:
