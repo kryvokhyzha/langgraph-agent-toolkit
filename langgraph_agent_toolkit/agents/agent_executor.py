@@ -260,12 +260,16 @@ class AgentExecutor:
 
         _input = input.model_dump()
         input_data: Command | dict[str, Any]
+
         if interrupted_tasks:
             # User input is a response to resume agent execution from interrupt
             input_data = Command(resume=_input)
         else:
-            message = _input.pop("message", "")
-            input_data = {"messages": [HumanMessage(content=message)], **_input}
+            if "message" in _input:
+                message = _input.pop("message", "") or ""
+                input_data = {"messages": [HumanMessage(content=message)], **_input}
+            else:
+                input_data = _input
 
         return agent, input_data, config, run_id
 

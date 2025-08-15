@@ -1,6 +1,7 @@
 import warnings
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any, Optional
 
 from fastapi import Depends, FastAPI
 from langchain_core._api import LangChainBetaWarning
@@ -8,7 +9,7 @@ from langchain_core._api import LangChainBetaWarning
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
-from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+from langgraph_agent_toolkit.core.observability.empty import BaseObservabilityPlatform, EmptyObservability
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.core.settings import settings
@@ -28,6 +29,33 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     observability = None
     initialized_agents = []
 
+    def initialize_agents(
+        executor: AgentExecutor,
+        observability: BaseObservabilityPlatform,
+        checkpointer: Optional[Any] = None,
+    ):
+        agents = executor.get_all_agent_info()
+        if not agents:
+            logger.warning("No agents found in the executor.")
+        for a in agents:
+            try:
+                agent = executor.get_agent(a.key)
+
+                if checkpointer and not agent.graph.checkpointer:
+                    agent.graph.checkpointer = checkpointer
+
+                if not agent.observability:
+                    agent.observability = observability
+
+                initialized_agents.append(a.key)
+                logger.info(f"Successfully initialized agent: {a.key}")
+            except Exception as e:
+                logger.error(f"Error setting up agent {a.key}: {e}")
+        if initialized_agents:
+            logger.info(f"Successfully initialized {len(initialized_agents)} agents")
+        else:
+            logger.warning("No agents were successfully initialized")
+
     try:
         # Initialize observability platform
         try:
@@ -39,8 +67,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Initialize memory backend
         try:
-            memory_backend = MemoryFactory.create(settings.MEMORY_BACKEND)
-            logger.info(f"Initialized memory backend: {settings.MEMORY_BACKEND}")
+            memory_backend = MemoryFactory.create(settings.MEMORY_BACKEND) if settings.MEMORY_BACKEND else None
+
+            if memory_backend:
+                logger.info(f"Initialized memory backend: {settings.MEMORY_BACKEND}")
+            else:
+                logger.warning("No memory backend configured.")
         except Exception as e:
             logger.error(f"Failed to initialize memory backend: {e}")
             yield
@@ -50,45 +82,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         try:
             executor = AgentExecutor(*settings.AGENT_PATHS)
             logger.info(f"Initialized AgentExecutor: {settings.AGENT_PATHS}")
-            # Store the executor in app.state for access in routes
             app.state.agent_executor = executor
         except Exception as e:
             logger.error(f"Failed to initialize AgentExecutor: {e}")
             yield
             return
 
-        checkpoint = memory_backend.get_checkpoint_saver()
-        async with checkpoint as saver:
-            try:
-                await saver.setup()
-                agents = executor.get_all_agent_info()
-
-                if not agents:
-                    logger.warning("No agents found in the executor.")
-
-                for a in agents:
-                    try:
-                        agent = executor.get_agent(a.key)
-                        agent.graph.checkpointer = saver
-
-                        # do not set up observability if it's already set
-                        if not agent.observability:
-                            agent.observability = observability
-
-                        initialized_agents.append(a.key)
-                        logger.info(f"Successfully initialized agent: {a.key}")
-                    except Exception as e:
-                        logger.error(f"Error setting up agent {a.key}: {e}")
-
-                if initialized_agents:
-                    logger.info(f"Successfully initialized {len(initialized_agents)} agents")
-                else:
-                    logger.warning("No agents were successfully initialized")
-
-                yield
-            except Exception as e:
-                logger.error(f"Error during database setup: {e}")
-                yield
+        if memory_backend:
+            checkpoint = memory_backend.get_checkpoint_saver()
+            async with checkpoint as saver:
+                try:
+                    if saver is not None:
+                        await saver.setup()
+                    initialize_agents(executor, observability, checkpointer=saver)
+                    yield
+                except Exception as e:
+                    logger.error(f"Error during database setup: {e}")
+                    yield
+        else:
+            initialize_agents(executor, observability)
+            yield
     except Exception as e:
         logger.error(f"Error during initialization: {e}")
         yield
