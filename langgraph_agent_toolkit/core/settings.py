@@ -93,7 +93,7 @@ class Settings(BaseSettings):
     LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "https://cloud.langfuse.com"
 
     # Database Configuration
-    MEMORY_BACKEND: MemoryBackends = MemoryBackends.SQLITE
+    MEMORY_BACKEND: MemoryBackends | None = None
     SQLITE_DB_PATH: str = "checkpoints.db"
 
     # postgresql Configuration

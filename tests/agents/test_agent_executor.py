@@ -349,9 +349,12 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
 
         # Verify input is a HumanMessage with expected content
         assert isinstance(input_data, dict)
-        assert "messages" in input_data
-        assert isinstance(input_data["messages"][0], HumanMessage)
-        assert input_data["messages"][0].content == message_content
+        if "message" in input_obj.model_dump():
+            assert "messages" in input_data
+            assert isinstance(input_data["messages"][0], HumanMessage)
+            assert input_data["messages"][0].content == message_content
+        else:
+            assert "messages" not in input_data
 
         # Verify config is correct - access as a dictionary, not an object
         assert config["configurable"]["thread_id"] == "test-thread-123"

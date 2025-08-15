@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [0.7.13]
 
+### Updated
+
+- Make `message` field optional
+- Default value for `MEMORY_BACKEND`
+- Refactor `lifespan` function
+
+## [0.7.13]
+
 ### Added
 
 - `DB_CONFIGS` initialization
