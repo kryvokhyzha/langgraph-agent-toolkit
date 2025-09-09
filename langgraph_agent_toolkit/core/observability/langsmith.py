@@ -11,14 +11,15 @@ from langgraph_agent_toolkit.helper.logging import logger
 class LangsmithObservability(BaseObservabilityPlatform):
     """Langsmith implementation of observability platform."""
 
-    def __init__(self, prompts_dir: Optional[str] = None):
+    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
         """Initialize LangsmithObservability.
 
         Args:
             prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.
+            remote_first: If True, prioritize remote prompts over local ones.
 
         """
-        super().__init__(prompts_dir)
+        super().__init__(prompts_dir, remote_first)
         # Set required environment variables explicitly
         self.required_vars = ["LANGSMITH_TRACING", "LANGSMITH_API_KEY", "LANGSMITH_PROJECT", "LANGSMITH_ENDPOINT"]
 
@@ -61,6 +62,23 @@ class LangsmithObservability(BaseObservabilityPlatform):
 
         # Convert to proper format
         prompt_obj = self._convert_to_chat_prompt(prompt_template)
+
+        # Check if remote_first is enabled
+        if self.remote_first:
+            # When remote_first=True, prioritize remote prompts
+            try:
+                existing_remote_prompt = client.pull_prompt(name)
+                if existing_remote_prompt:
+                    logger.debug(f"Remote-first mode: Using existing remote prompt '{name}'")
+                    # Store the remote prompt locally as well
+                    full_metadata = metadata.copy() if metadata else {}
+                    full_metadata["langsmith_url"] = getattr(existing_remote_prompt, "url", None)
+                    full_metadata["original_prompt"] = prompt_obj
+                    template_str = self._extract_template_string(prompt_template, prompt_obj)
+                    super().push_prompt(name, template_str, full_metadata, force_create_new_version)
+                    return
+            except Exception:
+                logger.debug(f"Remote-first mode: Remote prompt '{name}' not found, will create new one")
 
         # Handle existing prompt versions
         existing_prompt, existing_url = self._handle_existing_prompt(

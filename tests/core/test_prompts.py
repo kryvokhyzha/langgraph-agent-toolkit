@@ -59,9 +59,9 @@ class TestObservabilityChatPromptTemplate:
 
     def setup_method(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        self.os_platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY, prompts_dir=self.temp_dir.name)
-
-        # Create sample prompts
+        self.os_platform = ObservabilityFactory.create(
+            ObservabilityBackend.EMPTY, prompts_dir=self.temp_dir.name, remote_first=False
+        )  # Create sample prompts
         basic_chat_messages: list[ChatMessageDict] = [
             {"role": "system", "content": "You are an AI assistant specialized in {{ domain }}."},
             {"role": "human", "content": "I need help with {{ question }} related to {{ topic }}."},
@@ -674,3 +674,23 @@ class TestObservabilityChatPromptTemplate:
         assert "Assistant message with value3" in messages[2].content
         assert "Test message" in messages[3].content
         assert "Response message" in messages[4].content
+
+    def test_remote_first_initialization(self):
+        """Test initialization with remote_first flag."""
+        # Create a platform with remote_first=True
+        remote_first_platform = ObservabilityFactory.create(
+            ObservabilityBackend.EMPTY, prompts_dir=self.temp_dir.name, remote_first=True
+        )
+
+        assert remote_first_platform.remote_first is True
+
+        # Create template with this platform
+        template = ObservabilityChatPromptTemplate.from_observability_platform(
+            prompt_name="basic-assistant",
+            observability_platform=remote_first_platform,
+            load_at_runtime=False,
+            template_format="jinja2",
+            input_variables=["domain", "question", "topic"],
+        )
+
+        assert template.observability_platform.remote_first is True

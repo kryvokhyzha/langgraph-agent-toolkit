@@ -1,9 +1,6 @@
 from typing import Optional, Union
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
-from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
-from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
-from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 
 
@@ -12,13 +9,18 @@ class ObservabilityFactory:
 
     @staticmethod
     def create(
-        platform: Union[ObservabilityBackend, str], prompts_dir: Optional[str] = None
+        platform: Union[ObservabilityBackend, str],
+        prompts_dir: Optional[str] = None,
+        remote_first: bool = False,
+        **kwargs,
     ) -> BaseObservabilityPlatform:
         """Create and return an observability platform instance.
 
         Args:
             platform: The observability platform to create
             prompts_dir: Optional directory to store prompts locally
+            remote_first: If True, prioritize remote prompts over local ones
+            **kwargs: Additional arguments to pass to the platform constructor
 
         Returns:
             An instance of the requested observability platform
@@ -31,13 +33,19 @@ class ObservabilityFactory:
 
         match platform:
             case ObservabilityBackend.LANGFUSE:
-                return LangfuseObservability(prompts_dir=prompts_dir)
+                from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
+
+                return LangfuseObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
 
             case ObservabilityBackend.LANGSMITH:
-                return LangsmithObservability(prompts_dir=prompts_dir)
+                from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
+
+                return LangsmithObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
 
             case ObservabilityBackend.EMPTY:
-                return EmptyObservability(prompts_dir=prompts_dir)
+                from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+
+                return EmptyObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
 
             case _:
                 raise ValueError(f"Unsupported ObservabilityBackend: {platform}")

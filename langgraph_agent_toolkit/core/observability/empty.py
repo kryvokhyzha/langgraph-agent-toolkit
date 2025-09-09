@@ -9,14 +9,15 @@ class EmptyObservability(BaseObservabilityPlatform):
 
     __default_required_vars = []
 
-    def __init__(self, prompts_dir: Optional[str] = None):
+    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
         """Initialize EmptyObservability.
 
         Args:
             prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.
+            remote_first: If True, prioritize remote prompts over local ones (ignored in empty implementation).
 
         """
-        super().__init__(prompts_dir)
+        super().__init__(prompts_dir, remote_first)
 
     def get_callback_handler(self, **kwargs) -> None:
         """Get the callback handler for the observability platform."""
