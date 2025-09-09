@@ -575,6 +575,20 @@ wheels = [
 ]
 
 [[package]]
+name = "ddgs"
+version = "9.5.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "lxml" },
+    { name = "primp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/15/ff/a6bb3bb2bf363530c07d4a8b809a051ce2f8fd28f5cafb2c7d3e7832847e/ddgs-9.5.5.tar.gz", hash = "sha256:9a09aa9ba24173d14321137c8c1bc54040ed0bf3bad956cb2f9feeda77968770", size = 33560, upload-time = "2025-09-01T13:25:14.637Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c5/aa/0ca4b396a3940a04120679e0c1d2fce534018ca90d92d8a83115f05f1263/ddgs-9.5.5-py3-none-any.whl", hash = "sha256:01fc8017a653ad16501bd8ac9fedcd29291f6500b1f8a7e92a916cdad7fc2fa2", size = 37922, upload-time = "2025-09-01T13:25:13.337Z" },
+]
+
+[[package]]
 name = "distlib"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1668,9 +1682,10 @@ wheels = [
 
 [[package]]
 name = "langgraph-agent-toolkit"
-version = "0.7.15"
+version = "0.7.16"
 source = { editable = "." }
 dependencies = [
+    { name = "ddgs" },
     { name = "duckduckgo-search" },
     { name = "fastapi" },
     { name = "fire" },
@@ -1793,6 +1808,7 @@ dev = [
 requires-dist = [
     { name = "azure-functions", marker = "extra == 'all-backends'", specifier = "~=1.23.0" },
     { name = "azure-functions", marker = "extra == 'azure-backend'", specifier = "~=1.23.0" },
+    { name = "ddgs", specifier = ">=9.5.0" },
     { name = "duckduckgo-search", specifier = ">=7.3.0" },
     { name = "fastapi", specifier = "~=0.116.1" },
     { name = "fire", specifier = "~=0.7.0" },
