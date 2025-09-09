@@ -36,25 +36,26 @@ def convert_message_content_to_string(content: str | list[str | dict]) -> str:
     return "".join(text)
 
 
-def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMessage:
+def langchain_to_chat_message(message: BaseMessage | dict | BaseModel | list) -> ChatMessage:
     """Create a ChatMessage from a LangChain message."""
     if not isinstance(message, (BaseMessage, AIMessage, HumanMessage, ToolMessage, LangchainChatMessage)):
         if isinstance(message, BaseModel):
             message = message.model_dump()
         elif isinstance(message, dict):
-            message = message["raw"].content
+            if "raw" in message:
+                message = message["raw"].content
 
     match message:
         case HumanMessage():
             human_message = ChatMessage(
                 type="human",
-                content=convert_message_content_to_string(message.content),
+                content=message.content,
             )
             return human_message
         case AIMessage():
             ai_message = ChatMessage(
                 type="ai",
-                content=convert_message_content_to_string(message.content),
+                content=message.content,
             )
             if message.tool_calls:
                 ai_message.tool_calls = message.tool_calls
@@ -64,7 +65,7 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMe
         case ToolMessage():
             tool_message = ChatMessage(
                 type="tool",
-                content=convert_message_content_to_string(message.content),
+                content=message.content,
                 tool_call_id=message.tool_call_id,
             )
             return tool_message
@@ -78,6 +79,11 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel) -> ChatMe
                 return custom_message
             else:
                 raise ValueError(f"Unsupported chat message role: {message.role}")
+        case list():
+            return ChatMessage(
+                type="ai",
+                content=message,
+            )
         case str() | dict():
             return ChatMessage(
                 type="ai",
