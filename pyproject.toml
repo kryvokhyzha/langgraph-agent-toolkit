@@ -38,10 +38,10 @@ dependencies = [
     "langchain-core ~= 0.3.60",
     "langchain-community ~= 0.3.24",
     "langgraph ~= 0.6.2",
-    "langgraph-cli[inmem] >= 0.2.10,< 0.4.0",
+    "langgraph-cli[inmem] >= 0.2.10,< 0.5.0",
     "langgraph-checkpoint-sqlite ~= 2.0.7",
     # "langgraph-checkpoint-postgres (~=2.0.21, !=2.0.22)",
-    "langgraph-checkpoint-postgres <= 2.0.21",
+    "langgraph-checkpoint-postgres <= 2.0.23",
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
     "numpy >= 2.0.0,< 2.4.0; python_version >= '3.13'",
@@ -51,10 +51,10 @@ dependencies = [
     "pyarrow >= 19.0.1",
     "pydantic ~= 2.11.1",
     "pydantic-settings >= 2.9.1,< 2.11.0",
-    "pyowm ~= 3.3.0",
+    "pyowm >= 3.3,< 3.6",
     "python-dotenv ~= 1.1.0",
     "setuptools >= 75.6.0",
-    "streamlit >= 1.45, < 1.48",
+    "streamlit >= 1.45, < 1.50",
     "watchdog ~= 6.0.0",
     "joblib >= 1.4.2",
     "uvicorn ~= 0.35.0",
@@ -160,7 +160,7 @@ all-llms = [
 
 # Observability tools and platforms
 langfuse = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.4.0",
  ]
 
  langsmith = [
@@ -168,7 +168,7 @@ langfuse = [
  ]
 
  all-observability = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.4.0",
     "langsmith >= 0.3.31,< 0.5.0",
  ]
 
