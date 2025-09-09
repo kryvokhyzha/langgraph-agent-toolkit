@@ -20,6 +20,7 @@ class TestBaseObservability:
         obs = EmptyObservability()  # Use a concrete implementation for testing
         assert isinstance(obs.prompts_dir, Path)
         assert obs.prompts_dir.exists()
+        assert obs.remote_first is False
 
     def test_init_custom_dir(self):
         """Test initialization with custom directory."""
@@ -27,6 +28,17 @@ class TestBaseObservability:
             obs = EmptyObservability(prompts_dir=temp_dir)
             assert obs.prompts_dir == Path(temp_dir)
             assert obs.prompts_dir.exists()
+            assert obs.remote_first is False
+
+    def test_init_with_remote_first(self):
+        """Test initialization with remote_first flag."""
+        obs = EmptyObservability(remote_first=True)
+        assert obs.remote_first is True
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            obs_with_dir = EmptyObservability(prompts_dir=temp_dir, remote_first=True)
+            assert obs_with_dir.prompts_dir == Path(temp_dir)
+            assert obs_with_dir.remote_first is True
 
     def test_required_vars(self):
         """Test getting/setting required environment variables."""
@@ -304,6 +316,71 @@ class TestLangsmithObservability:
                 # Assert client was called and local file was deleted
                 mock_client.delete_prompt.assert_called_once_with("to-delete")
                 assert not template_path.exists()
+
+    @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
+    def test_push_prompt_remote_first_existing_remote(self, mock_client_cls):
+        """Test push_prompt with remote_first=True when remote prompt exists."""
+        # Setup mock
+        mock_client = MagicMock()
+        mock_existing_prompt = MagicMock()
+        mock_existing_prompt.url = "https://api.smith.langchain.com/prompts/456"
+        mock_client.pull_prompt.return_value = mock_existing_prompt
+        mock_client_cls.return_value = mock_client
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGSMITH_TRACING": "true",
+                    "LANGSMITH_API_KEY": "test-key",
+                    "LANGSMITH_PROJECT": "test-project",
+                    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+                },
+            ):
+                obs = LangsmithObservability(prompts_dir=temp_dir, remote_first=True)
+                template = "Test remote-first template for {{ topic }}"
+
+                # Push the template - should use existing remote prompt
+                obs.push_prompt("remote-first-test", template)
+
+                # Should check for existing remote prompt first
+                mock_client.pull_prompt.assert_called_once_with("remote-first-test")
+
+                # Should NOT create new prompt since remote exists and remote_first=True
+                mock_client.push_prompt.assert_not_called()
+
+    @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
+    def test_push_prompt_remote_first_no_remote(self, mock_client_cls):
+        """Test push_prompt with remote_first=True when remote prompt doesn't exist."""
+        # Setup mock
+        mock_client = MagicMock()
+        mock_client.pull_prompt.side_effect = Exception("Prompt not found")
+        mock_client.push_prompt.return_value = "https://api.smith.langchain.com/prompts/789"
+        mock_client_cls.return_value = mock_client
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGSMITH_TRACING": "true",
+                    "LANGSMITH_API_KEY": "test-key",
+                    "LANGSMITH_PROJECT": "test-project",
+                    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+                },
+            ):
+                obs = LangsmithObservability(prompts_dir=temp_dir, remote_first=True)
+                template = "Test new remote-first template for {{ topic }}"
+
+                # Push the template - should create new since remote doesn't exist
+                obs.push_prompt("remote-first-new-test", template)
+
+                # Should check for existing remote prompt first - called twice (remote_first + regular logic)
+                assert mock_client.pull_prompt.call_count == 2
+                mock_client.pull_prompt.assert_any_call("remote-first-new-test")
+
+                # Should create new prompt since remote doesn't exist
+                mock_client.push_prompt.assert_called_once()
+                assert mock_client.push_prompt.call_args[0][0] == "remote-first-new-test"
 
 
 class TestLangfuseObservability:
@@ -703,6 +780,92 @@ class TestLangfuseObservability:
                 # Check that we passed the hash in commit_message
                 call_kwargs = mock_langfuse.create_prompt.call_args[1]
                 assert call_kwargs["commit_message"] == expected_hash
+
+    @patch("langgraph_agent_toolkit.core.observability.langfuse.Langfuse")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_remote_first_existing_remote(self, mock_dump, mock_langfuse_cls):
+        """Test push_prompt with remote_first=True when remote prompt exists."""
+        # Setup mock
+        mock_langfuse = MagicMock()
+
+        # Mock existing remote prompt
+        mock_existing_prompt = MagicMock()
+        mock_existing_prompt.id = "remote_prompt_id_789"
+        mock_langfuse.get_prompt.return_value = mock_existing_prompt
+
+        mock_langfuse_cls.return_value = mock_langfuse
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_HOST": "https://cloud.langfuse.com",
+                },
+            ):
+                obs = LangfuseObservability(prompts_dir=temp_dir, remote_first=True)
+
+                messages: list[ChatMessageDict] = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "human", "content": "Help with {{ topic }}"},
+                ]
+
+                # Push the prompt - should use existing remote prompt
+                obs.push_prompt("remote-first-test", messages)
+
+                # Should check for existing remote prompt first
+                mock_langfuse.get_prompt.assert_called_once_with(name="remote-first-test")
+
+                # Should NOT create new prompt since remote exists and remote_first=True
+                mock_langfuse.create_prompt.assert_not_called()
+
+    @patch("langgraph_agent_toolkit.core.observability.langfuse.Langfuse")
+    @patch("langgraph_agent_toolkit.core.observability.base.joblib.dump")
+    def test_push_prompt_remote_first_no_remote(self, mock_dump, mock_langfuse_cls):
+        """Test push_prompt with remote_first=True when remote prompt doesn't exist."""
+        # Setup mock
+        mock_langfuse = MagicMock()
+
+        # Mock that remote prompt doesn't exist
+        mock_langfuse.get_prompt.side_effect = Exception("Prompt not found")
+
+        # Mock new prompt creation
+        mock_new_prompt = MagicMock()
+        mock_new_prompt.id = "new_remote_prompt_id_101"
+        mock_langfuse.create_prompt.return_value = mock_new_prompt
+
+        mock_langfuse_cls.return_value = mock_langfuse
+        mock_dump.return_value = None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.dict(
+                os.environ,
+                {
+                    "LANGFUSE_SECRET_KEY": "secret",
+                    "LANGFUSE_PUBLIC_KEY": "public",
+                    "LANGFUSE_HOST": "https://cloud.langfuse.com",
+                },
+            ):
+                obs = LangfuseObservability(prompts_dir=temp_dir, remote_first=True)
+
+                messages: list[ChatMessageDict] = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "human", "content": "Help with {{ topic }}"},
+                ]
+
+                # Push the prompt - should create new since remote doesn't exist
+                obs.push_prompt("remote-first-new-test", messages)
+
+                # Should check for existing remote prompt first - called twice (remote_first + regular logic)
+                assert mock_langfuse.get_prompt.call_count == 2
+                mock_langfuse.get_prompt.assert_any_call(name="remote-first-new-test")
+
+                # Should create new prompt since remote doesn't exist
+                mock_langfuse.create_prompt.assert_called_once()
+                call_kwargs = mock_langfuse.create_prompt.call_args[1]
+                assert call_kwargs["name"] == "remote-first-new-test"
 
 
 def test_observability_factory():

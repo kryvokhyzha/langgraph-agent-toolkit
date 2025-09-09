@@ -26,6 +26,6 @@ DEFAULT_MODEL_PARAMETER_VALUES = dict(
     top_p=0.7,
     streaming=True,
 )
-DEFAULT_CACHE_TTL_SECOND = 60 * 10  # 10 minutes
+DEFAULT_CACHE_TTL_SECOND = os.getenv("DEFAULT_CACHE_TTL_SECOND", 60 * 10)  # 10 minutes
 
-DEFAULT_STREAMLIT_USER_ID = "streamlit-user"
+DEFAULT_STREAMLIT_USER_ID = os.getenv("DEFAULT_STREAMLIT_USER_ID", "streamlit-user")

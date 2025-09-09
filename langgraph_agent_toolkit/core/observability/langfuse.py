@@ -20,8 +20,8 @@ except (ModuleNotFoundError, ImportError):
 class LangfuseObservability(BaseObservabilityPlatform):
     """Langfuse implementation of observability platform."""
 
-    def __init__(self, prompts_dir: Optional[str] = None):
-        super().__init__(prompts_dir)
+    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
+        super().__init__(prompts_dir, remote_first)
         self.required_vars = ["LANGFUSE_SECRET_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_HOST"]
 
     @BaseObservabilityPlatform.requires_env_vars
@@ -61,6 +61,22 @@ class LangfuseObservability(BaseObservabilityPlatform):
     ) -> None:
         langfuse = Langfuse()
         labels = metadata.get("labels", ["production"]) if metadata else ["production"]
+
+        # Check if remote_first is enabled
+        if self.remote_first:
+            # When remote_first=True, prioritize remote prompts
+            try:
+                existing_remote_prompt = langfuse.get_prompt(name=name)
+                if existing_remote_prompt:
+                    logger.debug(f"Remote-first mode: Using existing remote prompt '{name}'")
+                    # Store the remote prompt locally as well
+                    full_metadata = metadata.copy() if metadata else {}
+                    full_metadata["langfuse_prompt"] = existing_remote_prompt
+                    full_metadata["original_prompt"] = self._convert_to_chat_prompt(prompt_template)
+                    super().push_prompt(name, prompt_template, full_metadata, force_create_new_version)
+                    return
+            except Exception:
+                logger.debug(f"Remote-first mode: Remote prompt '{name}' not found, will create new one")
 
         # Generate hash for the current prompt
         prompt_hash = self._compute_prompt_hash(prompt_template)

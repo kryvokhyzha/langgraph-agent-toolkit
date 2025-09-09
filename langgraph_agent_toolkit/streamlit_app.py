@@ -68,6 +68,9 @@ async def main() -> None:
         await asyncio.sleep(0.1)
         st.rerun()
 
+    # if not st.session_state.get("authenticated", False):
+    #     auth_component()
+
     if "agent_client" not in st.session_state:
         load_dotenv(override=True)
         agent_url = os.getenv("AGENT_URL")
@@ -127,6 +130,7 @@ async def main() -> None:
                 index=agent_idx,
             )
             use_streaming = st.toggle("Stream results", value=True)
+            st.session_state.display_tools_execution = st.toggle("Display tools execution", value=False)
 
         @st.dialog("Architecture")
         def architecture_dialog() -> None:
@@ -295,17 +299,19 @@ async def draw_messages(
                         # status container by ID to ensure results are mapped to the
                         # correct status container.
                         call_results = {}
+
                         for tool_call in msg.tool_calls:
-                            status = st.status(
-                                f"""Tool Call: {tool_call["name"]}""",
-                                state="running" if is_new else "complete",
-                            )
-                            call_results[tool_call["id"]] = status
-                            status.write("Input:")
-                            status.write(tool_call["args"])
+                            if st.session_state.display_tools_execution:
+                                status = st.status(
+                                    f"""Tool Call: {tool_call["name"]}""",
+                                    state="running" if is_new else "complete",
+                                )
+                                call_results[tool_call["id"]] = status
+                                status.write("Input:")
+                                status.write(tool_call["args"])
 
                         # Expect one ToolMessage for each tool call.
-                        for _ in range(len(call_results)):
+                        for _ in range(len(msg.tool_calls)):
                             tool_result: ChatMessage = await anext(messages_agen)
 
                             if tool_result.type != "tool":
@@ -317,11 +323,14 @@ async def draw_messages(
                             # status container with the result
                             if is_new:
                                 st.session_state.messages.append(tool_result)
-                            if tool_result.tool_call_id:
-                                status = call_results[tool_result.tool_call_id]
-                            status.write("Output:")
-                            status.write(tool_result.content)
-                            status.update(state="complete")
+
+                            if st.session_state.display_tools_execution:
+                                if tool_result.tool_call_id:
+                                    status = call_results[tool_result.tool_call_id]
+                                status.write("Output:")
+                                # Write content as plain text, disabling markdown rendering
+                                status.write(f"<pre>{tool_result.content}</pre>", unsafe_allow_html=True)
+                                status.update(state="complete")
 
             case "custom":
                 # CustomData example used by the bg-task-agent
@@ -360,27 +369,33 @@ async def handle_feedback() -> None:
         st.session_state.last_feedback = (None, None)
 
     latest_run_id = st.session_state.messages[-1].run_id
-    feedback = st.feedback("stars", key=latest_run_id)
 
-    # If the feedback value or run ID has changed, send a new feedback record
-    if feedback is not None and (latest_run_id, feedback) != st.session_state.last_feedback:
-        # Normalize the feedback value (an index) to a score between 0 and 1
-        normalized_score = (feedback + 1) / 5.0
+    if latest_run_id:
+        feedback = st.feedback("stars", key=latest_run_id)
 
-        agent_client: AgentClient = st.session_state.agent_client
-        try:
-            await agent_client.acreate_feedback(
-                run_id=latest_run_id,
-                key="human-feedback-stars",
-                score=normalized_score,
-                kwargs={"comment": "In-line human feedback"},
-                user_id=DEFAULT_STREAMLIT_USER_ID,
-            )
-        except AgentClientError as e:
-            st.error(f"Error recording feedback: {e}")
-            st.stop()
-        st.session_state.last_feedback = (latest_run_id, feedback)
-        st.toast("Feedback recorded", icon=":material/reviews:")
+        # If the feedback value or run ID has changed, send a new feedback record
+        if feedback is not None and (latest_run_id, feedback) != st.session_state.last_feedback:
+            # Normalize the feedback value (an index) to a score between 0 and 1
+            normalized_score = (feedback + 1) / 5.0
+
+            agent_client: AgentClient = st.session_state.agent_client
+            try:
+                await agent_client.acreate_feedback(
+                    run_id=latest_run_id,
+                    key="human-feedback-stars",
+                    score=normalized_score,
+                    kwargs={"comment": "In-line human feedback"},
+                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                )
+            except AgentClientError as e:
+                st.error(f"Error recording feedback: {e}")
+                st.stop()
+            st.session_state.last_feedback = (latest_run_id, feedback)
+            st.toast("Feedback recorded", icon=":material/reviews:")
+
+
+def auth_component():
+    pass
 
 
 if __name__ == "__main__":

@@ -29,8 +29,9 @@ class BaseObservabilityPlatform(ABC):
 
     __default_required_vars = []
 
-    def __init__(self, prompts_dir: Optional[str] = None):
+    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
         self._required_vars = self.__default_required_vars.copy()
+        self._remote_first = remote_first
 
         if prompts_dir:
             self._prompts_dir = Path(prompts_dir)
@@ -48,6 +49,10 @@ class BaseObservabilityPlatform(ABC):
     def prompts_dir(self, path: str) -> None:
         self._prompts_dir = Path(path)
         self._prompts_dir.mkdir(exist_ok=True, parents=True)
+
+    @property
+    def remote_first(self) -> bool:
+        return self._remote_first
 
     @property
     def required_vars(self) -> List[str]:
