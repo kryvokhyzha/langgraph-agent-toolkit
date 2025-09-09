@@ -174,7 +174,9 @@ class TestLangchainToChatMessage:
 
     def test_unsupported_message_type(self):
         """Test converting unsupported message type."""
-        with pytest.raises(ValueError, match="Unsupported message type: int"):
+        from langgraph_agent_toolkit.helper.exceptions import UnsupportedMessageTypeError
+
+        with pytest.raises(UnsupportedMessageTypeError, match="Unsupported message type: int"):
             langchain_to_chat_message(123)
 
     def test_empty_list_input(self):

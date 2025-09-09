@@ -13,6 +13,7 @@ from langchain_core.messages import (
 )
 from pydantic import BaseModel, HttpUrl, TypeAdapter
 
+from langgraph_agent_toolkit.helper.exceptions import UnsupportedMessageTypeError
 from langgraph_agent_toolkit.schema import ChatMessage
 
 
@@ -90,7 +91,7 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel | list) ->
                 content=message,
             )
         case _:
-            raise ValueError(f"Unsupported message type: {message.__class__.__name__}")
+            raise UnsupportedMessageTypeError(message_type=message.__class__.__name__)
 
 
 def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]:

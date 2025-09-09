@@ -6,7 +6,6 @@ from langchain_core.runnables import RunnableConfig
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.helper.constants import get_default_agent
-from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.schema import (
     AddMessagesInput,
@@ -90,9 +89,9 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
             agent_config=user_input.agent_config,
             recursion_limit=user_input.recursion_limit,
         )
-    except Exception as e:
-        logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
+    except Exception:
+        # Let the global exception handler deal with all exceptions
+        raise
 
 
 @private_router.post(
@@ -169,11 +168,9 @@ async def feedback(feedback: Feedback, agent_id: str | None = None, request: Req
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(f"An exception occurred while recording feedback: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error recording feedback"
-        )
+    except Exception:
+        # Let the global exception handler deal with all other exceptions
+        raise
 
 
 @private_router.get(
@@ -215,11 +212,10 @@ async def history(
         chat_messages: list[ChatMessage] = [langchain_to_chat_message(m) for m in messages]
         return ChatHistory(messages=chat_messages)
     except ValueError as e:
-        logger.error(f"A validation error occurred: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
+    except Exception:
+        # Let the global exception handler deal with all other exceptions
+        raise
 
 
 @private_router.delete(
@@ -275,9 +271,9 @@ async def clear_history(
             user_id=input.user_id,
             message=f"Cleared {len(messages)} messages from chat history.",
         )
-    except Exception as e:
-        logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
+    except Exception:
+        # Let the global exception handler deal with all exceptions
+        raise
 
 
 @private_router.post(
@@ -323,9 +319,9 @@ async def add_messages(
             user_id=input.user_id,
             message=f"Added {len(input.messages)} messages to chat history.",
         )
-    except Exception as e:
-        logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
+    except Exception:
+        # Let the global exception handler deal with all exceptions
+        raise
 
 
 @public_router.get(
