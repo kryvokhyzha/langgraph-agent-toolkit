@@ -150,6 +150,7 @@ class AgentExecutor:
             else:
                 logger.error(f"Error during agent execution: {e}\n\nFull traceback:\n{tb_str}")
 
+            # Re-raise the original exception to preserve details
             raise e
 
         @functools.wraps(func)

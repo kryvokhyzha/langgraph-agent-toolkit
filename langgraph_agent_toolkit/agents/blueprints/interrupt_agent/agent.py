@@ -105,6 +105,8 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
 
     # If no birthdate found, interrupt
     if response.birthdate is None:
+        # from langgraph_agent_toolkit.helper.exceptions import InputValidationError
+        # raise InputValidationError("No birthdate found in the conversation history.")
         birthdate_input = interrupt(f"{response.reasoning}\nPlease tell me your birthdate?")
         # Re-run extraction with the new input
         state["messages"].append(HumanMessage(birthdate_input["message"]))
