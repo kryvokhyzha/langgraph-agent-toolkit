@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.18]
+
+## Added
+
+- `SKIP_REDIRECTION_LOGGING` environment variable and enhance logging middleware
+
 ## [0.7.17]
 
 ## Fixed
