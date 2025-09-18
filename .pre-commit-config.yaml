@@ -3,7 +3,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: check-json
@@ -16,9 +16,11 @@ repos:
       - id: debug-statements
       - id: check-case-conflict
       - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: detect-aws-credentials
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.4
+    rev: v0.13.0
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -28,10 +30,10 @@ repos:
     rev: 1.9.1
     hooks:
       - id: nbqa-ruff
-        additional_dependencies: [ruff==0.11.4]
+        additional_dependencies: [ruff==0.13.0]
         args: ["--fix", "--show-files"]
       - id: nbqa-ruff-format
-        additional_dependencies: [ruff==0.11.4]
+        additional_dependencies: [ruff==0.13.0]
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
