@@ -22,8 +22,8 @@ DEFAULT_CONFIG_PREFIX = os.getenv("DEFAULT_CONFIG_PREFIX", "agent")
 DEFAULT_CONFIGURABLE_FIELDS = ("temperature", "max_tokens", "top_p", "streaming")
 DEFAULT_MODEL_PARAMETER_VALUES = dict(
     temperature=0.0,
-    max_tokens=1024,
-    top_p=0.7,
+    max_tokens=2048,
+    top_p=0.95,
     streaming=True,
 )
 DEFAULT_CACHE_TTL_SECOND = os.getenv("DEFAULT_CACHE_TTL_SECOND", 60 * 10)  # 10 minutes

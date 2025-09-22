@@ -6,26 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.19]
+
+### Updated
+
+- Enhance model parameter values and improve factory model creation logic
+
 ## [0.7.18]
 
-## Added
+### Added
 
 - `SKIP_REDIRECTION_LOGGING` environment variable and enhance logging middleware
 
 ## [0.7.17]
 
-## Fixed
+### Fixed
 
 - Error handling
 - Tests
 
 ## [0.7.16]
 
-## Fixed
+### Fixed
 
 - Type of `content` field for `ChatMessage` model
 
-## Added
+### Added
 
 - New tests
 
