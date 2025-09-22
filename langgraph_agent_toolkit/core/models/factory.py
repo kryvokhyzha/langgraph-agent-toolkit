@@ -114,6 +114,8 @@ class ModelFactory:
             DEFAULT_MODEL_PARAMETER_VALUES if model_parameter_values is None else dict(model_parameter_values)
         )
 
+        _model_parameter_values.update(kwargs)
+
         match model_provider:
             case ModelProvider.FAKE:
                 return FakeToolModel(responses=["This is a test response from the fake model."])
@@ -127,7 +129,6 @@ class ModelFactory:
                     configurable_fields=_configurable_fields,
                     config_prefix=_config_prefix,
                     **_model_parameter_values,
-                    **kwargs,
                 )
 
     @classmethod
@@ -167,5 +168,8 @@ class ModelFactory:
         # Apply overrides
         params.update(override_params)
 
+        if "model_parameter_values" not in params:
+            params["model_parameter_values"] = ()
+
         # Create and return the model
-        return cls.create(model_provider=provider, model_name=model_name, model_parameter_values=(), **params)
+        return cls.create(model_provider=provider, model_name=model_name, **params)
