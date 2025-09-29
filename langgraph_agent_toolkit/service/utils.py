@@ -125,14 +125,32 @@ def _sse_response_example() -> dict[int, Any]:
 def setup_logging():
     """Configure application logging to use loguru."""
     # Setup logging once - redirect standard library logging to loguru
-    logging.basicConfig(handlers=[InterceptHandler()], level=0)
-    # Reduce noise from uvicorn logs in production
-    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
-    logging.getLogger("uvicorn").handlers = [InterceptHandler()]
+    logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
-    # Additional loggers that should be quieter in production
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
-    logging.getLogger("fastapi").setLevel(logging.WARNING)
+    # Get root logger and ensure it uses our handler
+    root_logger = logging.getLogger()
+    root_logger.handlers = [InterceptHandler()]
+    root_logger.setLevel(logging.NOTSET)
+
+    # Explicitly configure uvicorn and related loggers
+    for logger_name in [
+        "uvicorn",
+        "uvicorn.access",
+        "uvicorn.error",
+        "uvicorn.asgi",
+        "watchfiles",
+        "watchfiles.main",
+    ]:
+        uvicorn_logger = logging.getLogger(logger_name)
+        uvicorn_logger.handlers = [InterceptHandler()]
+        uvicorn_logger.setLevel(logging.INFO)
+        uvicorn_logger.propagate = False
+
+    # Reduce noise from certain loggers in production
+    if not settings.is_dev():
+        logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+        logging.getLogger("asyncio").setLevel(logging.WARNING)
+        logging.getLogger("fastapi").setLevel(logging.WARNING)
 
     # Suppress LangChain beta warnings
     warnings.filterwarnings("ignore", category=LangChainBetaWarning)

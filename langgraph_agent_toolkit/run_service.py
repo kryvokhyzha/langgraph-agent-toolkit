@@ -1,11 +1,6 @@
 import fire
 from dotenv import load_dotenv
 
-from langgraph_agent_toolkit.service.factory import RunnerType, ServiceRunner
-
-
-load_dotenv(override=True)
-
 
 def run_service(
     runner_type: str = "uvicorn",
@@ -18,6 +13,8 @@ def run_service(
         **kwargs: Additional arguments to pass to the service runner.
 
     """
+    from langgraph_agent_toolkit.service.factory import RunnerType, ServiceRunner
+
     runner_type = RunnerType(runner_type)
 
     service = ServiceRunner(
@@ -35,4 +32,10 @@ def run_service(
 
 
 if __name__ == "__main__":
+    load_dotenv(override=True)
+
+    from langgraph_agent_toolkit.service.utils import setup_logging
+
+    setup_logging()
+
     fire.Fire(run_service)
