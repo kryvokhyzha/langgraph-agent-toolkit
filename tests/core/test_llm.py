@@ -9,9 +9,6 @@ from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 def test_get_model_openai_compatible():
-    # Clear the cache to ensure a fresh test
-    ModelFactory.create.cache_clear()
-
     # Fix: Pass the base URL directly in kwargs instead of relying on settings
     model = ModelFactory.create(
         ModelProvider.OPENAI, model_name="gpt-4", openai_api_key="test_key", openai_api_base="http://api.example.com"
@@ -24,9 +21,6 @@ def test_get_model_openai_compatible():
 
 
 def test_get_model_openai_compatible_missing_config():
-    # Clear the cache to ensure a fresh test
-    ModelFactory.create.cache_clear()
-
     # Fix: No need to patch settings here since we're testing a specific condition
     with pytest.raises(ValueError, match="Model name must be provided for non-fake models"):
         ModelFactory.create(ModelProvider.OPENAI)

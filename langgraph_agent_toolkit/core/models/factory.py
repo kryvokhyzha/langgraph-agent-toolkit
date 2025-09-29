@@ -81,7 +81,6 @@ class ModelFactory:
             )
 
     @staticmethod
-    @cache
     def create(
         model_provider: ModelProvider,
         model_name: Optional[str] = None,
