@@ -30,8 +30,6 @@ class ServiceRunner:
             custom_settings: Optional dictionary of settings to override the default settings.
 
         """
-        _ = setup_logging()
-
         # Override global settings if provided
         if custom_settings:
             for key, value in custom_settings.items():
@@ -65,6 +63,13 @@ class ServiceRunner:
         try:
             import uvicorn
 
+            # Ensure uvicorn uses our logging configuration
+            log_config = uvicorn.config.LOGGING_CONFIG.copy()
+            log_config["handlers"] = {}
+            log_config["loggers"]["uvicorn"]["handlers"] = []
+            log_config["loggers"]["uvicorn.access"]["handlers"] = []
+            log_config["loggers"]["uvicorn.error"]["handlers"] = []
+
             # Set Compatible event loop policy on Windows Systems.
             if sys.platform == "win32":
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -81,6 +86,7 @@ class ServiceRunner:
                         port=base_settings.PORT,
                         reload=True,
                         factory=True,
+                        log_config=log_config,
                     )
                     | kwargs
                 )
@@ -93,6 +99,7 @@ class ServiceRunner:
                         host=base_settings.HOST,
                         port=base_settings.PORT,
                         reload=False,
+                        log_config=log_config,
                     )
                     | kwargs
                 )

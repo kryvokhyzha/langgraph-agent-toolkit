@@ -302,7 +302,9 @@ class AgentClient:
                         parsed = self._parse_stream_line(line)
                         if parsed is None:
                             break
-                        yield parsed
+
+                        if parsed != "":
+                            yield parsed
         except httpx.HTTPError as e:
             raise AgentClientError(f"Error: {e}")
 
@@ -375,7 +377,9 @@ class AgentClient:
                                 parsed = self._parse_stream_line(line)
                                 if parsed is None:
                                     break
-                                yield parsed
+
+                                if parsed != "":
+                                    yield parsed
                             except GeneratorExit:
                                 # Handle GeneratorExit properly to close the stream gracefully
                                 break
