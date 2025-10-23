@@ -31,33 +31,33 @@ dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
     "ddgs >= 9.5.0",
-    "fastapi ~= 0.116.1",
+    "fastapi >= 0.116.1,< 0.120.0",
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
-    "jiter ~= 0.10.0",
-    "langchain-core ~= 0.3.60",
-    "langchain-community ~= 0.3.24",
-    "langgraph ~= 0.6.2",
-    "langgraph-cli[inmem] >= 0.2.10,< 0.4.0",
-    "langgraph-checkpoint-sqlite ~= 2.0.7",
+    "jiter >= 0.10,< 0.12",
+    "langchain-core >= 0.3.60,< 1.1.0",
+    "langchain-community >= 0.3.24,< 0.5.0",
+    "langgraph >= 0.6.2,< 1.1.0",
+    "langgraph-cli[inmem] >= 0.2.10,< 0.5.0",
+    "langgraph-checkpoint-sqlite >= 2.0.7,< 3.1.0",
     # "langgraph-checkpoint-postgres (~=2.0.21, !=2.0.22)",
-    "langgraph-checkpoint-postgres <= 2.0.21",
+    "langgraph-checkpoint-postgres <= 3.0.0",
     "langgraph-supervisor ~= 0.0.21",
     "numpy ~= 1.26.4; python_version <= '3.12'",
     "numpy >= 2.0.0,< 2.4.0; python_version >= '3.13'",
-    "onnxruntime >= 1.20.0,< 1.23.0",
+    "onnxruntime >= 1.20.0,< 1.24.0",
     "pandas >= 2.2.3,< 2.4.0",
     "psycopg[binary,pool] ~= 3.2.4",
     "pyarrow >= 19.0.1",
-    "pydantic ~= 2.11.1",
-    "pydantic-settings >= 2.9.1,< 2.11.0",
-    "pyowm ~= 3.3.0",
+    "pydantic >= 2.11.1,< 2.13.0",
+    "pydantic-settings >= 2.9.1,< 2.12.0",
+    "pyowm >= 3.3,< 3.6",
     "python-dotenv ~= 1.1.0",
     "setuptools >= 75.6.0",
-    "streamlit >= 1.45, < 1.48",
+    "streamlit >= 1.45, < 1.51",
     "watchdog ~= 6.0.0",
     "joblib >= 1.4.2",
-    "uvicorn ~= 0.35.0",
+    "uvicorn >= 0.35,< 0.39",
     "loguru ~= 0.7.3",
     "fire ~= 0.7.0",
     "multidict > 6.3.2",
@@ -81,7 +81,7 @@ dev = [
 # To install run: `uv sync --frozen --only-group client`
 client = [
     "httpx ~= 0.28.1",
-    "pydantic ~= 2.11.1",
+    "pydantic >= 2.11.1,< 2.13.0",
     "python-dotenv ~= 1.1.0",
     "streamlit >= 1.45,< 1.48",
     "watchdog ~= 6.0.0",
@@ -95,72 +95,72 @@ aws-backend = [
 ]
 
 azure-backend = [
-    "azure-functions ~= 1.23.0",
+    "azure-functions >= 1.23,< 1.25",
 ]
 
 gunicorn-backend = [
     "gunicorn ~= 23.0.0",
-    "uvicorn[standard] ~= 0.35.0",
+    "uvicorn[standard] >= 0.35,< 0.39",
 ]
 
 uvicorn-backend = [
-    "uvicorn ~= 0.35.0",
+    "uvicorn >= 0.35,< 0.39",
 ]
 
 all-backends = [
     "mangum ~= 0.19.0",
-    "azure-functions ~= 1.23.0", 
+    "azure-functions >= 1.23,< 1.25", 
     "gunicorn ~= 23.0.0",
-    "uvicorn ~= 0.35.0",
+    "uvicorn >= 0.35,< 0.39",
 ]
 
 # Different LLM providers
 aws = [
-    "langchain-aws ~= 0.2.22",
+    "langchain-aws >= 0.2.22,< 1.1.0",
 ]
 
 anthropic = [
-    "langchain-anthropic ~= 0.3.12",
+    "langchain-anthropic >= 0.3.12,< 1.1.0",
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai ~= 2.0.21",
+    "langchain-google-vertexai >= 2.0.21,< 3.1.0",
 ]
 
 google-genai = [
-    "langchain-google-genai ~= 2.1.4",
+    "langchain-google-genai >= 2.1.4,< 3.1.0",
 ]
 
 ollama = [
-    "langchain-ollama ~= 0.3.2",
+    "langchain-ollama >= 0.3.2,< 1.1.0",
 ]
 
 groq = [
-    "langchain-groq ~= 0.3.2",
+    "langchain-groq >= 0.3.2,< 1.1.0",
 ]
 
 deepseek = [
-    "langchain-deepseek ~= 0.1.3",
+    "langchain-deepseek >= 0.1.3,< 1.1.0",
 ]
 
 openai = [
-    "langchain-openai ~= 0.3.16",
+    "langchain-openai >= 0.3.16,< 1.1.0",
 ]
 
 all-llms = [
-    "langchain-aws ~= 0.2.22",
-    "langchain-anthropic ~= 0.3.12",
-    "langchain-google-vertexai ~= 2.0.21",
-    "langchain-google-genai ~= 2.1.4",
-    "langchain-ollama ~= 0.3.2",
-    "langchain-groq ~= 0.3.2",
-    "langchain-deepseek ~= 0.1.3",
-    "langchain-openai ~= 0.3.16",
+    "langchain-aws >= 0.2.22,< 1.1.0",
+    "langchain-anthropic >= 0.3.12,< 1.1.0",
+    "langchain-google-vertexai >= 2.0.21,< 3.1.0",
+    "langchain-google-genai >= 2.1.4,< 3.1.0",
+    "langchain-ollama >= 0.3.2,< 1.1.0",
+    "langchain-groq >= 0.3.2,< 1.1.0",
+    "langchain-deepseek >= 0.1.3,< 1.1.0",
+    "langchain-openai >= 0.3.16,< 1.1.0",
 ]
 
 # Observability tools and platforms
 langfuse = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.9.0",
  ]
 
  langsmith = [
@@ -168,7 +168,7 @@ langfuse = [
  ]
 
  all-observability = [
-    "langfuse >= 2.60.3,< 2.70.0",
+    "langfuse >= 2.60.3,< 3.9.0",
     "langsmith >= 0.3.31,< 0.5.0",
  ]
 
