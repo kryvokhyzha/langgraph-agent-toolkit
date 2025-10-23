@@ -15,6 +15,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.helper.types import EnvironmentMode
 from langgraph_agent_toolkit.helper.utils import check_str_is_http
 
 
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
         extra="ignore",
         validate_default=False,
     )
-    ENV_MODE: str | None = None
+    ENV_MODE: EnvironmentMode = EnvironmentMode.PRODUCTION
 
     HOST: str = "0.0.0.0"
     PORT: int = 8080
@@ -71,7 +72,7 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str | None = None
 
     # OpenRouter Settings
-    OPENROUTER_API_KEY: str | None = None
+    OPENROUTER_API_KEY: SecretStr | None = None
 
     # Observability platform
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
