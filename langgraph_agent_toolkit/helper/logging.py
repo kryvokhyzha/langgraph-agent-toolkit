@@ -27,9 +27,7 @@ class LoggerConfig(metaclass=SingletonMeta):
         self.env = EnvironmentMode(os.environ.get("ENV_MODE", EnvironmentMode.PRODUCTION))
         self.log_level = os.environ.get("LOG_LEVEL", "INFO" if self.env == EnvironmentMode.PRODUCTION else "DEBUG")
         self.json_logs = os.environ.get("JSON_LOGS", "false").lower() == "true"
-        self.colorize = (
-            os.environ.get("COLORIZE", "false" if self.env == EnvironmentMode.PRODUCTION else "true").lower() == "true"
-        )
+        self.colorize = os.environ.get("COLORIZE", "false").lower() == "true"
 
         # Configure logger on initialization
         self._setup_logger()
