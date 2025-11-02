@@ -31,3 +31,8 @@ push_new_tag:
 
 run_langgraph:
 	uv run langgraph dev
+
+rebuild_app:
+	docker compose up -d --no-deps --build frontend-streamlit-app
+rebuild_api:
+	docker compose up -d --no-deps --build backend-agent-service

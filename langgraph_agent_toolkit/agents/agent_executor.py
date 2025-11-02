@@ -241,18 +241,18 @@ class AgentExecutor:
         if agent_config:
             configurable.update(agent_config)
 
-        callback = agent.observability.get_callback_handler(
-            session_id=thread_id,
-            user_id=user_id,
-            environment=settings.ENV_MODE,
-            tags=[agent.name],
-        )
+        callback = agent.observability.get_callback_handler(update_trace=True)
 
         config = RunnableConfig(
             configurable=configurable,
             run_id=run_id,
             callbacks=[callback] if callback else None,
             recursion_limit=recursion_limit,
+            metadata={
+                "langfuse_session_id": thread_id,
+                "langfuse_user_id": user_id,
+                "langfuse_tags": [agent.name],
+            },
         )
 
         # Check if there are any interrupts that need to be resumed
@@ -320,18 +320,23 @@ class AgentExecutor:
         response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
             input=input_data,
             config=config,
-            stream_mode=["updates", "values"],
+            # stream_mode=["updates", "values"],
+            stream_mode=["values"],
         )
 
         response_type, response = response_events[-1]
 
-        if response_type == "values":
+        if response_type == "values" and "__interrupt__" not in response:
             generated_message = response.get("structured_response")
             if not generated_message:
                 generated_message = response["messages"][-1]
 
             # Normal response, the agent completed successfully
             output = langchain_to_chat_message(generated_message)
+        elif response_type == "values" and "__interrupt__" in response:
+            # The last thing to occur was an interrupt
+            # Return the value of the first interrupt as an AIMessage
+            output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
         elif response_type == "updates" and "__interrupt__" in response:
             # The last thing to occur was an interrupt
             # Return the value of the first interrupt as an AIMessage

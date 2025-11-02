@@ -1,14 +1,11 @@
 from langchain.agents import AgentState, create_agent
 from langchain.agents.middleware import (
-    # ClearToolUsesEdit,
-    # ContextEditingMiddleware,
     ModelCallLimitMiddleware,
     SummarizationMiddleware,
     ToolCallLimitMiddleware,
 )
 from langchain_community.tools import DuckDuckGoSearchResults
 from langgraph.checkpoint.memory import MemorySaver
-from pydantic import BaseModel, Field
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.components.tools import add, multiply
@@ -16,15 +13,6 @@ from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import ModelFactory
 from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
 from langgraph_agent_toolkit.schema.models import ModelProvider
-
-
-class ResponseSchema(BaseModel):
-    response: str = Field(
-        description="The response on user query.",
-    )
-    alternative_response: str = Field(
-        description="The alternative response on user query.",
-    )
 
 
 model = ModelFactory.create(
@@ -37,9 +25,9 @@ model = ModelFactory.create(
     openai_api_key=settings.OPENAI_API_KEY,
 )
 
-react_agent_so = Agent(
-    name="react-agent-so",
-    description="A react agent with structured output.",
+react_agent = Agent(
+    name="react-agent-new",
+    description="A new react agent.",
     graph=create_agent(
         model=model,
         tools=[add, multiply, DuckDuckGoSearchResults()],
@@ -49,12 +37,14 @@ react_agent_so = Agent(
                 max_tokens_before_summary=25_000,  # Trigger summarization at 25,000 tokens
                 messages_to_keep=DEFAULT_MAX_MESSAGE_HISTORY_LENGTH,  # Keep last N messages after summary
             ),
-            # ModelCallLimitMiddleware(
-            #     run_limit=5, exit_behavior="end",
-            # ),
-            # ToolCallLimitMiddleware(
-            #     run_limit=10, exit_behavior="end",
-            # ),
+            ModelCallLimitMiddleware(
+                run_limit=5,
+                exit_behavior="end",
+            ),
+            ToolCallLimitMiddleware(
+                run_limit=10,
+                exit_behavior="end",
+            ),
             # ContextEditingMiddleware(
             #     edits=[
             #         ClearToolUsesEdit(trigger=25_000),
@@ -66,8 +56,6 @@ react_agent_so = Agent(
             "You can use the tools provided to help you with your tasks. "
             "You can also ask clarifying questions to the user. "
         ),
-        # pre_model_hook=pre_model_hook_standard,
-        response_format=ResponseSchema,
         state_schema=AgentState,
         checkpointer=MemorySaver(),
     ),

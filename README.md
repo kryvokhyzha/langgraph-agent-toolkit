@@ -210,6 +210,7 @@ and includes:
 - [Building an agent with LangGraph](https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/)
 - [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
 - [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
+- [LangGraph Middleware](https://docs.langchain.com/oss/python/langchain/middleware)
 
 <a name="development-and-contributing"></a>
 

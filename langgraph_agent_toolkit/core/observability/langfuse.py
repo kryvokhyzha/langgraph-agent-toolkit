@@ -1,4 +1,5 @@
 import hashlib
+import inspect
 import json
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
@@ -12,7 +13,8 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 try:
     from langfuse.callback import CallbackHandler
-except (ModuleNotFoundError, ImportError):
+except (ModuleNotFoundError, ImportError) as e:
+    logger.debug(f"Falling back to langfuse.langchain.CallbackHandler due to import error: {e}")
     # New langfuse version uses langfuse.langchain.CallbackHandler
     from langfuse.langchain import CallbackHandler
 
@@ -26,7 +28,14 @@ class LangfuseObservability(BaseObservabilityPlatform):
 
     @BaseObservabilityPlatform.requires_env_vars
     def get_callback_handler(self, **kwargs) -> CallbackHandler:
-        return CallbackHandler(**kwargs)
+        # Get valid parameters for CallbackHandler.__init__
+        valid_params = set(inspect.signature(CallbackHandler.__init__).parameters.keys())
+        valid_params.discard("self")  # Remove 'self' from valid parameters
+
+        # Filter kwargs to only include valid parameters
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+
+        return CallbackHandler(**filtered_kwargs)
 
     def before_shutdown(self) -> None:
         Langfuse().flush()
