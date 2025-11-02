@@ -92,6 +92,7 @@ class Settings(BaseSettings):
     LANGFUSE_SECRET_KEY: SecretStr | None = None
     LANGFUSE_PUBLIC_KEY: SecretStr | None = None
     LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "https://cloud.langfuse.com"
+    LANGFUSE_TRACING_ENVIRONMENT: str | None = None
 
     # Database Configuration
     MEMORY_BACKEND: MemoryBackends | None = None
@@ -264,6 +265,11 @@ class Settings(BaseSettings):
         self._apply_langgraph_env_overrides()
         self._initialize_model_configs()
         self._initialize_db_configs()
+
+        # Set LANGFUSE_TRACING_ENVIRONMENT to ENV_MODE if not explicitly set
+        if self.LANGFUSE_TRACING_ENVIRONMENT is None:
+            self.LANGFUSE_TRACING_ENVIRONMENT = self.ENV_MODE.value
+            os.environ["LANGFUSE_TRACING_ENVIRONMENT"] = self.LANGFUSE_TRACING_ENVIRONMENT
 
     @computed_field
     @property

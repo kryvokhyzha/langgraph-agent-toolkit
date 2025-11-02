@@ -1,10 +1,10 @@
 from typing import Sequence, TypeVar
 
+from langchain.agents import AgentState
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.utils import trim_messages
 from langchain_core.runnables import RunnableConfig
 from langgraph.managed.is_last_step import RemainingSteps
-from langgraph.prebuilt.chat_agent_executor import AgentState, AgentStateWithStructuredResponse
 
 from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
 
@@ -13,10 +13,6 @@ T = TypeVar("T")
 
 
 class AgentStateWithRemainingSteps(AgentState):
-    remaining_steps: RemainingSteps
-
-
-class AgentStateWithStructuredResponseAndRemainingSteps(AgentStateWithStructuredResponse):
     remaining_steps: RemainingSteps
 
 

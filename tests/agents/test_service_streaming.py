@@ -1,5 +1,6 @@
 import pytest
 from langchain_core.messages import AIMessage
+from pydantic_core import ValidationError
 
 from langgraph_agent_toolkit.helper.utils import create_ai_message
 
@@ -42,11 +43,11 @@ def test_create_ai_message_filters_and_passes_through(parts, expected):
 
 def test_create_ai_message_missing_required_content_raises():
     """AIMessage requires 'content'; if missing, _create_ai_message should bubble up the TypeError from the constructor."""  # noqa: E501
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         create_ai_message({"tool_calls": []})
 
 
 def test_create_ai_message_empty_dict_raises():
     """Completely empty parts should also fail to construct an AIMessage."""
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         create_ai_message({})

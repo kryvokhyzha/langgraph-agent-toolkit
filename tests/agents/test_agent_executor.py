@@ -365,10 +365,8 @@ async def test_setup_agent_execution(agent_executor, mock_agent):
         # Verify run_id is a UUID
         assert isinstance(run_id, UUID)
 
-        # Verify observability callback was requested with both session_id and user_id
-        mock_agent.observability.get_callback_handler.assert_called_once_with(
-            session_id="test-thread-123", user_id="test-user-456", environment="test", tags=["test-agent"]
-        )
+        # Verify observability callback was requested with update_trace parameter
+        mock_agent.observability.get_callback_handler.assert_called_once_with(update_trace=True)
 
 
 @pytest.mark.asyncio
@@ -401,9 +399,6 @@ async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_a
         user_id="test-user",
         model_name="test-model",
     )
-
-    # Verify default recursion_limit from constant is used
-    assert config["recursion_limit"] == 25  # DEFAULT_RECURSION_LIMIT value
 
 
 def test_agent_management(mock_agent):

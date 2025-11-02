@@ -36,9 +36,9 @@ jobs:
           cache-dependency-path: "pyproject.toml"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          version: "0.7.2"
+          version: "0.9.5"
 
       - name: Install dependencies with uv
         run: |
