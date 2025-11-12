@@ -1,9 +1,10 @@
 import hashlib
 import inspect
 import json
+from contextlib import contextmanager
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
-from langfuse import Langfuse
+from langfuse import get_client, propagate_attributes
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
@@ -12,11 +13,11 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 
 try:
-    from langfuse.callback import CallbackHandler
-except (ModuleNotFoundError, ImportError) as e:
-    logger.debug(f"Falling back to langfuse.langchain.CallbackHandler due to import error: {e}")
-    # New langfuse version uses langfuse.langchain.CallbackHandler
     from langfuse.langchain import CallbackHandler
+except (ModuleNotFoundError, ImportError) as e:
+    logger.debug(f"Falling back to `langfuse.callback.CallbackHandler` due to import error: {e}")
+    # Old langfuse version
+    from langfuse.callback import CallbackHandler
 
 
 class LangfuseObservability(BaseObservabilityPlatform):
@@ -38,16 +39,29 @@ class LangfuseObservability(BaseObservabilityPlatform):
         return CallbackHandler(**filtered_kwargs)
 
     def before_shutdown(self) -> None:
-        Langfuse().flush()
+        get_client().flush()
 
     @BaseObservabilityPlatform.requires_env_vars
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        Langfuse().score(
-            trace_id=run_id,
-            name=key,
-            value=score,
-            **kwargs,
-        )
+        lf_client = get_client()
+
+        # Get valid parameters for CallbackHandler.__init__
+        valid_params = set(inspect.signature(lf_client.create_score).parameters.keys())
+        valid_params.discard("self")  # Remove 'self' from valid parameters
+
+        # Filter kwargs to only include valid parameters
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+
+        # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
+        trace_id = str(run_id).replace("-", "").lower()
+
+        with propagate_attributes(user_id=kwargs.get("user_id")):
+            lf_client.create_score(
+                name=key,
+                value=score,
+                trace_id=trace_id,
+                **filtered_kwargs,
+            )
 
     def _compute_prompt_hash(self, prompt_template: PromptTemplateType) -> str:
         """Compute a hash of the prompt content to detect changes."""
@@ -68,7 +82,7 @@ class LangfuseObservability(BaseObservabilityPlatform):
         metadata: Optional[Dict[str, Any]] = None,
         force_create_new_version: bool = True,
     ) -> None:
-        langfuse = Langfuse()
+        langfuse = get_client()
         labels = metadata.get("labels", ["production"]) if metadata else ["production"]
 
         # Check if remote_first is enabled
@@ -168,7 +182,7 @@ class LangfuseObservability(BaseObservabilityPlatform):
         **kwargs,
     ) -> Union[PromptReturnType, Tuple[PromptReturnType, Any]]:
         try:
-            langfuse = Langfuse()
+            langfuse = get_client()
             get_prompt_kwargs = {"name": name, "cache_ttl_seconds": cache_ttl_seconds}
 
             if label:
@@ -201,3 +215,48 @@ class LangfuseObservability(BaseObservabilityPlatform):
     def delete_prompt(self, name: str) -> None:
         logger.warning(f"Skipping deletion of prompt '{name}' from Langfuse")
         super().delete_prompt(name)
+
+    @contextmanager
+    @BaseObservabilityPlatform.requires_env_vars
+    def trace_context(self, run_id: str, **kwargs):
+        """Create a Langfuse trace context with predefined trace ID.
+
+        Args:
+            run_id: The run ID to use as trace ID
+            **kwargs: Additional context parameters (user_id, input, agent_name, etc.)
+
+        Yields:
+            The span object
+
+        """
+        langfuse = get_client()
+
+        # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
+        trace_id = str(run_id).replace("-", "").lower()
+
+        # Extract context parameters
+        user_id = kwargs.get("user_id")
+        input_data = kwargs.get("input")
+        agent_name = kwargs.get("agent_name", "agent-execution")
+
+        with langfuse.start_as_current_span(
+            name=agent_name,
+            trace_context={"trace_id": trace_id},
+        ) as span:
+            # Update trace with user context if available
+            update_params = {}
+            if user_id:
+                update_params["user_id"] = user_id
+            if input_data:
+                update_params["input"] = input_data
+
+            if update_params:
+                span.update_trace(**update_params)
+
+            try:
+                yield span
+            finally:
+                # Optionally update with output if provided via kwargs
+                output_data = kwargs.get("output")
+                if output_data:
+                    span.update_trace(output=output_data)
