@@ -2,6 +2,7 @@ import functools
 import os
 import tempfile
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, cast
 
@@ -154,7 +155,9 @@ class BaseObservabilityPlatform(ABC):
             return cast(ChatPromptTemplate, prompt_template)
 
     def _process_messages_from_prompt(
-        self, messages: List[Any], template_format: Literal["f-string", "mustache", "jinja2"] = "f-string"
+        self,
+        messages: List[Any],
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
     ) -> List[Any]:
         MESSAGE_TYPE_MAP = {
             MessageRole.SYSTEM: SystemMessagePromptTemplate,
@@ -208,7 +211,9 @@ class BaseObservabilityPlatform(ABC):
         return processed_messages
 
     def _process_prompt_object(
-        self, prompt_obj: Any, template_format: Literal["f-string", "mustache", "jinja2"] = "f-string"
+        self,
+        prompt_obj: Any,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
     ) -> ChatPromptTemplate:
         if isinstance(prompt_obj, ChatPromptTemplate):
             return prompt_obj
@@ -269,7 +274,10 @@ class BaseObservabilityPlatform(ABC):
         return ChatPromptTemplate.from_template(template_content, template_format=template_format)
 
     def pull_prompt(
-        self, name: str, template_format: Literal["f-string", "mustache", "jinja2"] = "f-string", **kwargs
+        self,
+        name: str,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
+        **kwargs,
     ) -> PromptReturnType:
         """Pull a prompt from the observability platform."""
         # Use the local implementation
@@ -334,3 +342,18 @@ class BaseObservabilityPlatform(ABC):
 
         if json_metadata_path.exists():
             json_metadata_path.unlink()
+
+    @contextmanager
+    def trace_context(self, run_id: str, **kwargs):
+        """Create a trace context for the execution. Override in subclasses for platform-specific implementation.
+
+        Args:
+            run_id: The run ID to use as trace ID
+            **kwargs: Additional context parameters (user_id, input, etc.)
+
+        Yields:
+            None
+
+        """
+        # Default implementation is a no-op context manager
+        yield

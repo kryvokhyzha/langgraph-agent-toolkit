@@ -316,36 +316,43 @@ class AgentExecutor:
             recursion_limit=recursion_limit,
         )
 
-        # Invoke the agent
-        response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
+        # Wrap execution in trace context
+        with agent.observability.trace_context(
+            run_id=run_id,
+            user_id=user_id,
             input=input_data,
-            config=config,
-            # stream_mode=["updates", "values"],
-            stream_mode=["values"],
-        )
+            agent_name=agent.name,
+        ):
+            # Invoke the agent
+            response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
+                input=input_data,
+                config=config,
+                # stream_mode=["updates", "values"],
+                stream_mode=["values"],
+            )
 
-        response_type, response = response_events[-1]
+            response_type, response = response_events[-1]
 
-        if response_type == "values" and "__interrupt__" not in response:
-            generated_message = response.get("structured_response")
-            if not generated_message:
-                generated_message = response["messages"][-1]
+            if response_type == "values" and "__interrupt__" not in response:
+                generated_message = response.get("structured_response")
+                if not generated_message:
+                    generated_message = response["messages"][-1]
 
-            # Normal response, the agent completed successfully
-            output = langchain_to_chat_message(generated_message)
-        elif response_type == "values" and "__interrupt__" in response:
-            # The last thing to occur was an interrupt
-            # Return the value of the first interrupt as an AIMessage
-            output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
-        elif response_type == "updates" and "__interrupt__" in response:
-            # The last thing to occur was an interrupt
-            # Return the value of the first interrupt as an AIMessage
-            output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
-        else:
-            raise ValueError(f"Unexpected response type: {response_type}")
+                # Normal response, the agent completed successfully
+                output = langchain_to_chat_message(generated_message)
+            elif response_type == "values" and "__interrupt__" in response:
+                # The last thing to occur was an interrupt
+                # Return the value of the first interrupt as an AIMessage
+                output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
+            elif response_type == "updates" and "__interrupt__" in response:
+                # The last thing to occur was an interrupt
+                # Return the value of the first interrupt as an AIMessage
+                output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
+            else:
+                raise ValueError(f"Unexpected response type: {response_type}")
 
-        output.run_id = str(run_id)
-        return output
+            output.run_id = str(run_id)
+            return output
 
     @handle_agent_errors
     async def stream(
@@ -391,96 +398,103 @@ class AgentExecutor:
             recursion_limit=recursion_limit,
         )
 
-        # Stream from the agent with appropriate modes
-        stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
+        # Wrap execution in trace context
+        with agent.observability.trace_context(
+            run_id=run_id,
+            user_id=user_id,
+            input=input_data,
+            agent_name=agent.name,
+        ):
+            # Stream from the agent with appropriate modes
+            stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
 
-        async for stream_event in agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode):
-            if not isinstance(stream_event, tuple):
-                continue
+            async for stream_event in agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode):
+                if not isinstance(stream_event, tuple):
+                    continue
 
-            stream_mode, event = stream_event
-            new_messages = []
+                stream_mode, event = stream_event
+                new_messages = []
 
-            if stream_mode == "updates":
-                for node, updates in event.items():
-                    # A simple approach to handle agent interrupts.
-                    # In a more sophisticated implementation, we could add
-                    # some structured ChatMessage type to return the interrupt value.
-                    if node == "__interrupt__":
-                        interrupt: Interrupt
-                        for interrupt in updates:
-                            new_messages.append(AIMessage(content=interrupt.value))
+                if stream_mode == "updates":
+                    for node, updates in event.items():
+                        # A simple approach to handle agent interrupts.
+                        # In a more sophisticated implementation, we could add
+                        # some structured ChatMessage type to return the interrupt value.
+                        if node == "__interrupt__":
+                            interrupt: Interrupt
+                            for interrupt in updates:
+                                new_messages.append(AIMessage(content=interrupt.value))
+                            continue
+
+                        update_messages = (updates or {}).get("messages", [])
+
+                        # Special case for supervisor agent
+                        if node == "supervisor":
+                            # Get only the last AIMessage since supervisor includes all previous messages
+                            ai_messages = [msg for msg in update_messages if isinstance(msg, AIMessage)]
+                            if ai_messages:
+                                update_messages = [ai_messages[-1]]
+
+                        # Special case for expert agents
+                        if node in ("research_expert", "math_expert"):
+                            # Convert to ToolMessage so it displays in the UI as a tool response
+                            if update_messages:
+                                msg = ToolMessage(
+                                    content=update_messages[0].content,
+                                    name=node,
+                                    tool_call_id="",
+                                )
+                                update_messages = [msg]
+                        new_messages.extend(update_messages)
+
+                elif stream_mode == "custom":
+                    new_messages = [event]
+
+                elif stream_mode == "messages" and stream_tokens:
+                    msg, metadata = event
+                    if "skip_stream" in metadata.get("tags", []):
                         continue
-
-                    update_messages = (updates or {}).get("messages", [])
-
-                    # Special case for supervisor agent
-                    if node == "supervisor":
-                        # Get only the last AIMessage since supervisor includes all previous messages
-                        ai_messages = [msg for msg in update_messages if isinstance(msg, AIMessage)]
-                        if ai_messages:
-                            update_messages = [ai_messages[-1]]
-
-                    # Special case for expert agents
-                    if node in ("research_expert", "math_expert"):
-                        # Convert to ToolMessage so it displays in the UI as a tool response
-                        if update_messages:
-                            msg = ToolMessage(
-                                content=update_messages[0].content,
-                                name=node,
-                                tool_call_id="",
-                            )
-                            update_messages = [msg]
-                    new_messages.extend(update_messages)
-
-            elif stream_mode == "custom":
-                new_messages = [event]
-
-            elif stream_mode == "messages" and stream_tokens:
-                msg, metadata = event
-                if "skip_stream" in metadata.get("tags", []):
-                    continue
-                # Skip non-LLM nodes that might send messages
-                if not isinstance(msg, AIMessageChunk):
-                    continue
-                content = remove_tool_calls(msg.content)
-                if content:
-                    # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
-                    yield convert_message_content_to_string(content)
-
-            # LangGraph streaming may emit tuples: (field_name, field_value)
-            # e.g. ('content', <str>), ('tool_calls', [ToolCall,...]), ('additional_kwargs', {...}), etc.
-            # We accumulate only supported fields into `parts` and skip unsupported metadata.
-            # More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/
-            processed_messages = []
-            current_message: dict[str, Any] = {}
-            for msg in new_messages:
-                if isinstance(msg, tuple):
-                    key, value = msg
-                    # Store parts in temporary dict
-                    current_message[key] = value
-                else:
-                    # Add complete message if we have one in progress
-                    if current_message:
-                        processed_messages.append(create_ai_message(current_message))
-                        current_message = {}
-                    processed_messages.append(msg)
-
-            # Add any remaining message parts
-            if current_message:
-                processed_messages.append(create_ai_message(current_message))
-
-            for msg in processed_messages:
-                try:
-                    chat_message = langchain_to_chat_message(msg)
-                    chat_message.run_id = str(run_id)
-                    # Skip the input message if it's repeated by LangGraph
-                    if chat_message.type == "human" and chat_message.content == msg:
+                    # Skip non-LLM nodes that might send messages
+                    if not isinstance(msg, AIMessageChunk):
                         continue
-                    yield chat_message
-                except Exception as e:
-                    logger.error(f"Error parsing message: {e}")
-                    continue
+                    content = remove_tool_calls(msg.content)
+                    if content:
+                        # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
+                        yield convert_message_content_to_string(content)
+
+                # LangGraph streaming may emit tuples: (field_name, field_value)
+                # e.g. ('content', <str>), ('tool_calls', [ToolCall,...]), ('additional_kwargs', {...}), etc.
+                # We accumulate only supported fields into `parts` and skip unsupported metadata.
+                # More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/
+                processed_messages = []
+                current_message: dict[str, Any] = {}
+                for msg in new_messages:
+                    if isinstance(msg, tuple):
+                        key, value = msg
+                        # Store parts in temporary dict
+                        current_message[key] = value
+                    else:
+                        # Add complete message if we have one in progress
+                        if current_message:
+                            processed_messages.append(create_ai_message(current_message))
+                            current_message = {}
+                        processed_messages.append(msg)
+
+                # Add any remaining message parts
+                if current_message:
+                    processed_messages.append(create_ai_message(current_message))
+
+                for msg in processed_messages:
+                    try:
+                        chat_message = langchain_to_chat_message(msg)
+                        chat_message.run_id = str(run_id)
+                        # Skip the input message if it's repeated by LangGraph
+                        if chat_message.type == "human" and chat_message.content == msg:
+                            continue
+                        yield chat_message
+                    except Exception as e:
+                        logger.error(f"Error parsing message: {e}")
+                        continue
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
         """Save agents to disk using joblib.

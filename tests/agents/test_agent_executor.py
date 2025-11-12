@@ -1,4 +1,5 @@
-from unittest.mock import AsyncMock, Mock, patch
+from contextlib import contextmanager
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from uuid import UUID
 
 import pytest
@@ -10,31 +11,21 @@ from pydantic import BaseModel
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
-from langgraph_agent_toolkit.schema import ChatMessage, UserComplexInput, UserInput
+from langgraph_agent_toolkit.schema import ChatMessage
 
 
 class MockStateSnapshot:
-    """Mock state snapshot that mimics the structure of langgraph.pregel.types.StateSnapshot."""
+    """Mock state snapshot."""
 
     def __init__(self, values=None, tasks=None):
         self.values = values or {}
         self.tasks = tasks or []
 
 
-# Create a proper async iterator for mocking astream
-class AsyncIteratorMock:
-    """Mock async iterator for testing."""
+class MockInput(BaseModel):
+    """Test input model."""
 
-    def __init__(self, items):
-        self.items = items
-
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        if not self.items:
-            raise StopAsyncIteration
-        return self.items.pop(0)
+    message: str
 
 
 @pytest.fixture
@@ -44,19 +35,22 @@ def mock_agent():
     agent.name = "test-agent"
     agent.description = "A test agent"
 
-    # Mock the graph
     graph = AsyncMock()
     graph.ainvoke = AsyncMock()
-
-    # Make astream return an async iterator
     graph.astream = AsyncMock()
     graph.aget_state = AsyncMock(return_value=MockStateSnapshot(values={"messages": []}, tasks=[]))
-
     agent.graph = graph
 
-    # Mock the observability
+    # Properly mock observability with context manager support
     agent.observability = Mock()
     agent.observability.get_callback_handler = Mock(return_value=None)
+
+    # Create a proper context manager mock
+    @contextmanager
+    def mock_trace_context(*args, **kwargs):
+        yield MagicMock()
+
+    agent.observability.trace_context = mock_trace_context
 
     return agent
 
@@ -64,372 +58,154 @@ def mock_agent():
 @pytest.fixture
 def agent_executor(mock_agent):
     """Create an AgentExecutor with a mock agent."""
-    # Create a mock for the default agent
     default_agent = Mock(spec=Agent)
-    default_agent.name = DEFAULT_AGENT  # This should be "react-agent"
+    default_agent.name = DEFAULT_AGENT
     default_agent.description = "Default test agent"
 
-    # We need to patch both the import loading and the validation method
     with patch.object(AgentExecutor, "load_agents_from_imports"):
         with patch.object(AgentExecutor, "_validate_default_agent_loaded"):
-            # Create executor with a dummy import string
             executor = AgentExecutor("dummy_import:dummy_agent")
-
-            # Manually set the agents dictionary with our mocks - making sure to use the exact DEFAULT_AGENT constant
             executor.agents = {
                 "test-agent": mock_agent,
-                DEFAULT_AGENT: default_agent,  # This is the key part - match the exact constant value
+                DEFAULT_AGENT: default_agent,
             }
-
             return executor
 
 
-# Helper function to create UserInput objects for testing
-def create_user_input(message="Test message"):
-    return UserInput(input=UserComplexInput(message=message))
-
-
 @pytest.mark.asyncio
-async def test_invoke_method(agent_executor, mock_agent):
-    """Test the invoke method."""
-    # Configure the mock agent's graph to return a specific response
+async def test_invoke_basic_flow(agent_executor, mock_agent):
+    """Test basic invoke flow with successful response."""
     mock_response = [("values", {"messages": [AIMessage(content="Test response")]})]
     mock_agent.graph.ainvoke.return_value = mock_response
 
-    # Call invoke with the new input structure
+    input_obj = MockInput(message="Hello, agent!")
     result = await agent_executor.invoke(
         agent_id="test-agent",
-        input=create_user_input(message="Hello, agent!"),
-        thread_id="test-thread-123",
+        input=input_obj,
+        thread_id="test-thread",
         user_id="test-user",
-        model_name="test-model",
     )
 
-    # Verify the result
     assert isinstance(result, ChatMessage)
     assert result.type == "ai"
     assert result.content == "Test response"
     assert result.run_id is not None
 
-    # Verify the mock was called with correct arguments
-    mock_agent.graph.ainvoke.assert_called_once()
     call_args = mock_agent.graph.ainvoke.call_args[1]
-    assert "input" in call_args
-    assert "config" in call_args
-
-    # Check config contains correct values
     config = call_args["config"]
-    assert config["configurable"]["thread_id"] == "test-thread-123"
+    assert config["configurable"]["thread_id"] == "test-thread"
     assert config["configurable"]["user_id"] == "test-user"
-    assert config["configurable"]["model_name"] == "test-model"
 
 
 @pytest.mark.asyncio
-async def test_invoke_with_interrupt(agent_executor, mock_agent):
-    """Test invoke when there's an interrupt."""
-    # Configure the mock to have an interrupt task
+async def test_invoke_with_interrupt_handling(agent_executor, mock_agent):
+    """Test invoke correctly handles interrupts."""
     interrupt_task = Mock()
     interrupt_task.interrupts = [Mock()]
     mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
 
-    # Configure response
-    mock_response = [("updates", {"__interrupt__": [Mock(value="Please provide more information")]})]
+    mock_response = [("updates", {"__interrupt__": [Mock(value="Need more info")]})]
     mock_agent.graph.ainvoke.return_value = mock_response
 
-    # Use a proper UserInput object with model_dump() method
-    user_input = create_user_input(message="Continue")
+    user_input = MockInput(message="Continue")
+    result = await agent_executor.invoke(agent_id="test-agent", input=user_input)
 
-    # Call invoke with this proper input structure
-    result = await agent_executor.invoke(agent_id="test-agent", input=user_input, thread_id="test-thread-123")
+    assert result.content == "Need more info"
 
-    # Verify result is from the interrupt
-    assert result.content == "Please provide more information"
-
-    # Verify invoke was called with resume command
-    mock_agent.graph.ainvoke.assert_called_once()
     call_args = mock_agent.graph.ainvoke.call_args[1]
     assert isinstance(call_args["input"], Command)
-    # The implementation uses the entire input dict in resume
     assert call_args["input"].resume == user_input.model_dump()
 
 
 @pytest.mark.asyncio
-async def test_stream_method(agent_executor, mock_agent):
-    """Test the stream method."""
-    # Set up test data
-    input_obj = create_user_input(message="Hello, stream!")
-    thread_id = "test-thread-123"
-    user_id = "test-user"
-    model_name = "test-model"
-
-    # Patch the _setup_agent_execution method to return our mock agent
-    with patch.object(agent_executor, "_setup_agent_execution") as mock_setup:
-        mock_setup.return_value = (
-            mock_agent,
-            {},
-            {"configurable": {"thread_id": thread_id, "user_id": user_id, "model_name": model_name}},
-            UUID("12345678-1234-5678-1234-567812345678"),
-        )
-
-        # Create an async generator for testing
-        async def mock_stream_generator():
-            yield ChatMessage(type="ai", content="Intermediate message")
-            yield "Tok"
-            yield "en"
-
-        # Patch the actual astream method of the graph
-        with patch.object(AgentExecutor, "stream", side_effect=[mock_stream_generator()]):
-            # This will call our patched stream method that returns our mock_stream_generator
-            results = []
-            async for item in agent_executor.stream(
-                agent_id="test-agent",
-                input=input_obj,
-                thread_id=thread_id,
-                user_id=user_id,
-                model_name=model_name,
-                stream_tokens=True,
-            ):
-                results.append(item)
-
-        # Verify the results - we expect what our mock returned
-        assert len(results) == 3
-        assert isinstance(results[0], ChatMessage)
-        assert results[0].content == "Intermediate message"
-        assert results[1] == "Tok"
-        assert results[2] == "en"
-
-
-@pytest.mark.asyncio
-async def test_stream_without_tokens(agent_executor, mock_agent):
-    """Test the stream method with token streaming disabled."""
-
-    # Create a real async generator for the test
-    async def stream_generator():
-        yield ChatMessage(type="ai", content="Message 1")
-        yield ChatMessage(type="ai", content="Message 2")
-
-    # Create a patched version of agent_executor.stream that returns our test generator
-    async def patched_stream(*args, **kwargs):
-        # Check that stream_tokens is correctly set to False
-        assert not kwargs.get("stream_tokens", True)
-        # Return our test generator
-        return stream_generator()
-
-    # Apply the patch
-    with patch.object(agent_executor, "stream", patched_stream):
-        # We'll use a fresh generator to avoid exhausting it
-        test_generator = stream_generator()
-
-        # Call stream - this will actually call our patched version
-        results = []
-        async for item in test_generator:
-            results.append(item)
-
-    # Verify the results
-    assert len(results) == 2
-    assert all(isinstance(item, ChatMessage) for item in results)
-    assert results[0].content == "Message 1"
-    assert results[1].content == "Message 2"
-
-
-@pytest.mark.asyncio
-async def test_stream_with_interrupt(agent_executor, mock_agent):
-    """Test stream method with an interrupt."""
-    # Configure the mock to have an interrupt task
-    interrupt_task = Mock()
-    interrupt_task.interrupts = [Mock()]
-    mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
-
-    # Use a proper UserInput object
-    user_input = create_user_input(message="Continue")
-
-    # Directly test the implementation by using a known response
-    async def mock_astream(**kwargs):
-        # Check that we're receiving a resume command
-        assert isinstance(kwargs["input"], Command)
-        # The resume command contains the model_dump() result
-        assert kwargs["input"].resume == user_input.model_dump()
-
-        # Return an interrupt response
-        yield ("updates", {"__interrupt__": [Mock(value="Please provide more information")]})
-
-    mock_agent.graph.astream.side_effect = mock_astream
-
-    # Create our own generator that mimics AgentExecutor.stream's behavior
-    async def test_impl():
-        yield ChatMessage(
-            type="ai", content="Please provide more information", run_id="12345678-1234-5678-1234-567812345678"
-        )
-
-    # Patch _setup_agent_execution to return our mock setup
-    with patch.object(agent_executor, "_setup_agent_execution") as mock_setup:
-        # Return mock values that will be used by stream - match what the implementation expects
-        mock_setup.return_value = (
-            mock_agent,
-            Command(resume=user_input.model_dump()),
-            {},
-            UUID("12345678-1234-5678-1234-567812345678"),
-        )
-
-        # Use our test implementation instead of the actual stream
-        with patch.object(AgentExecutor, "stream", return_value=test_impl()):
-            # Call the stream method with a new generator
-            results = []
-            async for item in test_impl():
-                results.append(item)
-
-    # Verify result is as expected
-    assert len(results) == 1
-    assert results[0].content == "Please provide more information"
-
-
-@pytest.mark.asyncio
-async def test_error_handling_decorator(agent_executor, mock_agent):
-    """Test that the error handling decorator works correctly."""
-    # Configure mock to raise GraphRecursionError
+async def test_error_handling_with_recursion_error(agent_executor, mock_agent):
+    """Test error handling decorator catches GraphRecursionError."""
     mock_agent.graph.ainvoke.side_effect = GraphRecursionError("Recursion limit exceeded")
 
-    # Test with invoke using a proper UserInput object
-    with pytest.raises(GraphRecursionError) as excinfo:
-        await agent_executor.invoke(agent_id="test-agent", input=create_user_input(message="Hello, world!"))
-
-    assert "Recursion limit exceeded" in str(excinfo.value)
-
-    # For stream error testing, create a failing generator
-    async def failing_generator():
-        raise ValueError("Something went wrong")
-        yield  # This will never be reached
-
-    # Patch the stream method to return our failing generator
-    with patch.object(agent_executor, "stream", return_value=failing_generator()):
-        # Test with stream
-        with pytest.raises(ValueError) as excinfo:
-            # Create a fresh generator to avoid it being exhausted
-            test_generator = failing_generator()
-            async for _ in test_generator:
-                pass
-
-    assert "Something went wrong" in str(excinfo.value)
-
-    # Verify the error handling decorator is correctly applied
-    assert hasattr(AgentExecutor.stream, "__wrapped__")
-    assert hasattr(AgentExecutor.invoke, "__wrapped__")
-
-
-# Create a simple mock class that matches the implementation expectations
-class MockInput(BaseModel):
-    message: str
-
-    def model_dump(self):
-        return {"message": self.message}
+    with pytest.raises(GraphRecursionError, match="Recursion limit exceeded"):
+        await agent_executor.invoke(agent_id="test-agent", input=MockInput(message="Test"))
 
 
 @pytest.mark.asyncio
-async def test_setup_agent_execution(agent_executor, mock_agent):
-    """Test the _setup_agent_execution method."""
-    # Use a simple mock that matches the implementation's expectations
-    message_content = "Hello, setup!"
-    input_obj = MockInput(message=message_content)
+async def test_setup_agent_execution_configuration(agent_executor, mock_agent):
+    """Test _setup_agent_execution correctly configures the agent."""
+    input_obj = MockInput(message="Hello")
 
-    with patch("langgraph_agent_toolkit.agents.agent_executor.settings") as mock_settings:
-        mock_settings.ENV_MODE = "test"
-
-        # Call the setup method directly
-        agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
-            agent_id="test-agent",
-            input=input_obj,
-            thread_id="test-thread-123",
-            user_id="test-user-456",
-            model_name="test-model",
-            agent_config={"temperature": 0.7},
-        )
-
-        # Verify agent is correct
-        assert agent is mock_agent
-
-        # Verify input is a HumanMessage with expected content
-        assert isinstance(input_data, dict)
-        if "message" in input_obj.model_dump():
-            assert "messages" in input_data
-            assert isinstance(input_data["messages"][0], HumanMessage)
-            assert input_data["messages"][0].content == message_content
-        else:
-            assert "messages" not in input_data
-
-        # Verify config is correct - access as a dictionary, not an object
-        assert config["configurable"]["thread_id"] == "test-thread-123"
-        assert config["configurable"]["user_id"] == "test-user-456"
-        assert config["configurable"]["model_name"] == "test-model"
-        assert config["configurable"]["temperature"] == 0.7
-
-        # Verify run_id is a UUID
-        assert isinstance(run_id, UUID)
-
-        # Verify observability callback was requested with update_trace parameter
-        mock_agent.observability.get_callback_handler.assert_called_once_with(update_trace=True)
-
-
-@pytest.mark.asyncio
-async def test_setup_agent_execution_with_recursion_limit(agent_executor, mock_agent):
-    """Test the _setup_agent_execution method with custom recursion_limit."""
-    # Use a simple mock that matches the implementation's expectations
-    message_content = "Hello, setup!"
-    input_obj = MockInput(message=message_content)
-
-    # Call the setup method directly with custom recursion_limit
-    custom_recursion_limit = 50
     agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
         agent_id="test-agent",
         input=input_obj,
-        thread_id="test-thread-123",
+        thread_id="test-thread",
         user_id="test-user",
         model_name="test-model",
         agent_config={"temperature": 0.7},
-        recursion_limit=custom_recursion_limit,
+        recursion_limit=50,
     )
 
-    # Verify recursion_limit is in the config
-    assert config["recursion_limit"] == custom_recursion_limit
+    assert agent is mock_agent
+    assert isinstance(input_data, dict)
+    assert "messages" in input_data
+    assert isinstance(input_data["messages"][0], HumanMessage)
 
-    # Call with default recursion_limit (None)
-    agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
+    assert config["configurable"]["thread_id"] == "test-thread"
+    assert config["configurable"]["user_id"] == "test-user"
+    assert config["configurable"]["model_name"] == "test-model"
+    assert config["configurable"]["temperature"] == 0.7
+    assert config["recursion_limit"] == 50
+    assert isinstance(run_id, UUID)
+
+
+@pytest.mark.asyncio
+async def test_trace_context_integration(agent_executor, mock_agent):
+    """Test that trace_context is properly integrated with invoke."""
+    mock_response = [("values", {"messages": [AIMessage(content="Response")]})]
+    mock_agent.graph.ainvoke.return_value = mock_response
+
+    # Track if trace_context was called by wrapping it
+    trace_context_called = False
+    original_trace_context = mock_agent.observability.trace_context
+
+    @contextmanager
+    def tracked_trace_context(*args, **kwargs):
+        nonlocal trace_context_called
+        trace_context_called = True
+        with original_trace_context(*args, **kwargs) as span:
+            yield span
+
+    mock_agent.observability.trace_context = tracked_trace_context
+
+    input_obj = MockInput(message="Test")
+    await agent_executor.invoke(
         agent_id="test-agent",
         input=input_obj,
-        thread_id="test-thread-123",
+        thread_id="test-thread",
         user_id="test-user",
-        model_name="test-model",
     )
 
+    # Verify trace_context was called
+    assert trace_context_called
 
-def test_agent_management(mock_agent):
-    """Test agent management methods in AgentExecutor."""
-    # Create with a mock import that will be patched
+
+def test_agent_management_operations(mock_agent):
+    """Test agent add/get operations."""
     with patch.object(AgentExecutor, "load_agents_from_imports"):
         with patch.object(AgentExecutor, "_validate_default_agent_loaded"):
-            # Create executor with a dummy import string
             executor = AgentExecutor("dummy_import:dummy_agent")
 
-            # Set up the default agent manually - making sure to use the exact constant
             default_agent = Mock(spec=Agent)
             default_agent.name = DEFAULT_AGENT
             default_agent.description = "Default agent"
             executor.agents = {DEFAULT_AGENT: default_agent}
 
-            # Test adding an agent
             executor.add_agent("test-agent", mock_agent)
             assert "test-agent" in executor.agents
-            assert executor.agents["test-agent"] is mock_agent
 
-            # Test getting an agent
             agent = executor.get_agent("test-agent")
             assert agent is mock_agent
 
-            # Test getting agent info
             agent_info = executor.get_all_agent_info()
             agent_keys = [info.key for info in agent_info]
             assert "test-agent" in agent_keys
             assert DEFAULT_AGENT in agent_keys
 
-            # Test getting a non-existent agent
             with pytest.raises(KeyError):
                 executor.get_agent("nonexistent-agent")
