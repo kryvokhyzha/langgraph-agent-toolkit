@@ -35,8 +35,8 @@ dependencies = [
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter >= 0.10, < 0.13",
-    "langchain >= 1.0.0, < 1.0.6",
-    "langchain-core >= 1.0.0, < 1.0.5",
+    "langchain >= 1.0.0, < 1.0.8",
+    "langchain-core >= 1.0.0, < 1.0.6",
     "langchain-community >= 0.4.0, < 0.4.2",
     "langgraph >= 1.0.0, < 1.0.4",
     "langgraph-cli[inmem] >= 0.2.10, < 0.5.0",
@@ -169,7 +169,7 @@ all-llms = [
 # Observability tools and platforms
 langfuse = [
     # "langfuse >= 2.60.3,< 2.70.0",
-    "langfuse >= 2.60.3, < 3.9.2",
+    "langfuse >= 2.60.3, < 3.10.1",
  ]
 
  langsmith = [
@@ -178,7 +178,7 @@ langfuse = [
 
  all-observability = [
     # "langfuse >= 2.60.3,< 2.70.0",
-    "langfuse >= 2.60.3, < 3.9.2",
+    "langfuse >= 2.60.3, < 3.10.1",
     "langsmith >= 0.3.31, < 0.5.0",
  ]
 
