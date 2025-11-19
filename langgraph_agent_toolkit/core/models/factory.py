@@ -11,11 +11,14 @@ from typing import (
 )
 
 from langchain.chat_models.base import _ConfigurableModel, _init_chat_model_helper
+from langchain.embeddings.base import init_embeddings
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
-from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
+from langgraph_agent_toolkit.core.models.chat_openai import ChatOpenAIPatched
+from langgraph_agent_toolkit.core.models.fake import FakeToolModel
 from langgraph_agent_toolkit.helper.constants import (
     DEFAULT_CONFIG_PREFIX,
     DEFAULT_CONFIGURABLE_FIELDS,
@@ -30,13 +33,13 @@ ModelT: TypeAlias = FakeToolModel | _ConfigurableModel | BaseChatModel
 class _ConfigurableModelCustom(_ConfigurableModel):
     def _model(self, config: Optional[RunnableConfig] = None) -> Runnable:
         params = {**self._default_config, **self._model_params(config)}
-        model = ModelFactory._init_chat_model_helper(**params)
+        model = CompletionModelFactory._init_chat_model_helper(**params)
         for name, args, kwargs in self._queued_declarative_operations:
             model = getattr(model, name)(*args, **kwargs)
         return model
 
 
-class ModelFactory:
+class CompletionModelFactory:
     """Factory for creating model instances."""
 
     @staticmethod
@@ -67,7 +70,11 @@ class ModelFactory:
             )
 
         if not configurable_fields:
-            return ModelFactory._init_chat_model_helper(cast(str, model), model_provider=model_provider, **kwargs)
+            return CompletionModelFactory._init_chat_model_helper(
+                cast(str, model),
+                model_provider=model_provider,
+                **kwargs,
+            )
         else:
             if model:
                 kwargs["model"] = model
@@ -121,7 +128,7 @@ class ModelFactory:
                 if model_name is None:
                     raise ValueError("Model name must be provided for non-fake models.")
 
-                return ModelFactory.init_chat_model(
+                return CompletionModelFactory.init_chat_model(
                     model=model_name,
                     model_provider=model_provider,
                     configurable_fields=_configurable_fields,
@@ -142,7 +149,7 @@ class ModelFactory:
 
         Example:
             >>> config = {"provider": "openai", "name": "gpt-4", "temperature": 0.7}
-            >>> model = ModelFactory.get_model_from_config(config)
+            >>> model = CompletionModelFactory.get_model_from_config(config)
 
         """
         if not config:
@@ -162,6 +169,99 @@ class ModelFactory:
         params.pop("provider", None)
         params.pop("name", None)
         params.pop("model_name", None)
+
+        # Apply overrides
+        params.update(override_params)
+
+        if "model_parameter_values" not in params:
+            params["model_parameter_values"] = ()
+
+        # Create and return the model
+        return cls.create(model_provider=provider, model_name=model_name, **params)
+
+
+class EmbeddingModelFactory:
+    """Factory for creating embedding model instances."""
+
+    @staticmethod
+    def create(
+        model_provider: ModelProvider,
+        model_name: Optional[str] = None,
+        model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,
+        **kwargs: Any,
+    ) -> Embeddings:
+        """Create and return an embedding model instance.
+
+        Args:
+            model_provider: The model provider to use. This should be one of the supported model providers.
+            model_name: The name of the model to use. If not provided, an error will be raised.
+            model_parameter_values: The values for the model parameters as a tuple of (key, value) pairs.
+                                    If not provided, empty dict will be used.
+            **kwargs: Additional keyword arguments to pass to the model.
+
+        Returns:
+            An instance of the requested embedding model
+
+        Raises:
+            ValueError: If the requested model is not supported or model_name is not provided
+
+        Examples:
+            >>> model = EmbeddingModelFactory.create(
+            ...     model_provider=ModelProvider.OPENAI,
+            ...     model_name="text-embedding-3-small",
+            ...     openai_api_key="sk-..."
+            ... )
+
+        """
+        if model_name is None:
+            raise ValueError("Model name must be provided for embedding models.")
+
+        _model_parameter_values = {} if model_parameter_values is None else dict(model_parameter_values)
+        _model_parameter_values.update(kwargs)
+
+        # Get provider string from enum if needed
+        provider_str = model_provider.value if isinstance(model_provider, ModelProvider) else str(model_provider)
+
+        return init_embeddings(
+            model=model_name,
+            provider=provider_str,
+            **_model_parameter_values,
+        )
+
+    @classmethod
+    def get_model_from_config(cls, config: Dict[str, Any], **override_params) -> Embeddings:
+        """Create an embedding model from a configuration dictionary.
+
+        Args:
+            config: Model configuration dictionary
+            **override_params: Parameters to override from the configuration
+
+        Returns:
+            An Embeddings instance
+
+        Example:
+            >>> config = {"provider": "openai", "name": "text-embedding-3-small", "api_key": "sk-..."}
+            >>> model = EmbeddingModelFactory.get_model_from_config(config)
+
+        """
+        if not config:
+            raise ValueError("Model configuration cannot be empty")
+
+        # Extract basic parameters
+        provider = config.get("provider", "openai")
+        model_name = config.get("name") or config.get("model_name") or config.get("model")
+
+        if not model_name:
+            raise ValueError("Model name must be specified in the configuration")
+
+        # Copy the config to avoid modifying the original
+        params = dict(config)
+
+        # Remove some keys that are handled separately
+        params.pop("provider", None)
+        params.pop("name", None)
+        params.pop("model_name", None)
+        params.pop("model", None)
 
         # Apply overrides
         params.update(override_params)

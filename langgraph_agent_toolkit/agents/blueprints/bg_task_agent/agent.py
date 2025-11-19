@@ -10,7 +10,7 @@ from langgraph.types import StreamWriter
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.blueprints.bg_task_agent.task import Task
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -36,10 +36,10 @@ async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
     if model_config_key and model_config_key in settings.MODEL_CONFIGS:
         # Create model from configuration
         model_config = settings.MODEL_CONFIGS[model_config_key]
-        m = ModelFactory.get_model_from_config(model_config)
+        m = CompletionModelFactory.get_model_from_config(model_config)
     else:
         # Fall back to traditional approach
-        m = ModelFactory.create(
+        m = CompletionModelFactory.create(
             mmodel_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
             model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
             openai_api_base=settings.OPENAI_API_BASE_URL,

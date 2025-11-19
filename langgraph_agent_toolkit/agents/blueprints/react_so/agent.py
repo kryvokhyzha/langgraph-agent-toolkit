@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
@@ -27,7 +27,7 @@ class ResponseSchema(BaseModel):
     )
 
 
-model = ModelFactory.create(
+model = CompletionModelFactory.create(
     model_provider=ModelProvider.OPENAI,
     model_name=settings.OPENAI_MODEL_NAME,
     config_prefix="",
