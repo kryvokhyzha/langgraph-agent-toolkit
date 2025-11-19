@@ -4,7 +4,7 @@ from langgraph.func import entrypoint
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -27,10 +27,10 @@ async def chatbot(
     if model_config_key and model_config_key in settings.MODEL_CONFIGS:
         # Use the model configuration from settings
         model_config = settings.MODEL_CONFIGS[model_config_key]
-        model = ModelFactory.get_model_from_config(model_config)
+        model = CompletionModelFactory.get_model_from_config(model_config)
     else:
         # Fall back to the traditional approach
-        model = ModelFactory.create(
+        model = CompletionModelFactory.create(
             model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
             model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
             openai_api_base=settings.OPENAI_API_BASE_URL,

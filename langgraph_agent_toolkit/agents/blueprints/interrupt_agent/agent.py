@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core import settings
-from langgraph_agent_toolkit.core.models.factory import ModelFactory
+from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -45,7 +45,7 @@ Don't tell the user what their sign is, you are just demonstrating your knowledg
 
 async def background(state: AgentState, config: RunnableConfig) -> AgentState:
     """Demonstrate doing work before the interrupt."""
-    m = ModelFactory.create(
+    m = CompletionModelFactory.create(
         model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
@@ -80,7 +80,7 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
 
     If no birthdate is found, it will perform an interrupt before proceeding.
     """
-    m = ModelFactory.create(
+    m = CompletionModelFactory.create(
         model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         config_prefix="",
@@ -141,7 +141,7 @@ async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentStat
     if not state.get("birthdate"):
         raise ValueError("No birthdate found in state")
 
-    m = ModelFactory.create(
+    m = CompletionModelFactory.create(
         model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
