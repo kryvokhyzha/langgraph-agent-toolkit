@@ -112,7 +112,7 @@ autosummary_generate = True
 # Intersphinx mappings - update with corrected URLs
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "langgraph": ("https://python.langchain.com/docs/integrations", None),  # Fixed URL
+    "langgraph": ("https://langchain-ai.github.io/langgraph/", None),
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "fastapi": ("https://fastapi.tiangolo.com/", None),
 }

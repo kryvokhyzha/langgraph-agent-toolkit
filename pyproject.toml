@@ -86,6 +86,7 @@ tests = [
 docs = [
     "sphinx",
     "sphinx-pyproject",
+    "sphinx_rtd_theme",
 ]
 
 # Group for the minimal dependencies to run just the client and Streamlit app.
