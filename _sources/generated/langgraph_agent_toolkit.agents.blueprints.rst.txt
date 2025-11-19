@@ -1,0 +1,23 @@
+langgraph\_agent\_toolkit.agents.blueprints package
+===================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.bg_task_agent
+   langgraph_agent_toolkit.agents.blueprints.chatbot
+   langgraph_agent_toolkit.agents.blueprints.command_agent
+   langgraph_agent_toolkit.agents.blueprints.interrupt_agent
+   langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent
+   langgraph_agent_toolkit.agents.blueprints.react
+   langgraph_agent_toolkit.agents.blueprints.react_new
+   langgraph_agent_toolkit.agents.blueprints.react_so
+   langgraph_agent_toolkit.agents.blueprints.supervisor_agent
