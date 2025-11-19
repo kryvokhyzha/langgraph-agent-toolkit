@@ -17,7 +17,8 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
-from langgraph_agent_toolkit.core.models import ChatOpenAIPatched, FakeToolModel
+from langgraph_agent_toolkit.core.models.chat_openai import ChatOpenAIPatched
+from langgraph_agent_toolkit.core.models.fake import FakeToolModel
 from langgraph_agent_toolkit.helper.constants import (
     DEFAULT_CONFIG_PREFIX,
     DEFAULT_CONFIGURABLE_FIELDS,
