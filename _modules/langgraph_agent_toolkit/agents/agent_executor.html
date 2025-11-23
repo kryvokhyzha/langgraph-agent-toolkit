@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.agents.agent_executor &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/agents/agent_executor.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.agents.agent_executor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.agents.agent_executor</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIMessage</span><span class="p">,</span> <span class="n">AIMessageChunk</span><span class="p">,</span> <span class="n">HumanMessage</span><span class="p">,</span> <span class="n">ToolMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.runnables</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphRecursionError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompiledStateGraph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.pregel</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pregel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">Interrupt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_RECURSION_LIMIT</span><span class="p">,</span> <span class="n">get_default_agent</span><span class="p">,</span> <span class="n">set_default_agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_message_content_to_string</span><span class="p">,</span>
+    <span class="n">create_ai_message</span><span class="p">,</span>
+    <span class="n">langchain_to_chat_message</span><span class="p">,</span>
+    <span class="n">remove_tool_calls</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentInfo</span><span class="p">,</span> <span class="n">ChatMessage</span>
+
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AgentExecutor">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentExecutor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles the loading, execution and saving logic for different LangGraph agents.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AgentExecutor.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the AgentExecutor by importing agents.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Variable length strings specifying the agents to import,</span>
+<span class="sd">                  e.g., &quot;langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent&quot;.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If no agents are provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Agent</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one agent must be provided to AgentExecutor.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Load agents from import strings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_agents_from_imports</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_default_agent_loaded</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.load_agents_from_imports">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.load_agents_from_imports">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_agents_from_imports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dynamically imports agents based on the provided import strings.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">import_str</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">module_path</span><span class="p">,</span> <span class="n">object_name</span> <span class="o">=</span> <span class="n">import_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+                <span class="n">agent_obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">object_name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent_obj</span><span class="p">,</span> <span class="p">(</span><span class="n">CompiledStateGraph</span><span class="p">,</span> <span class="n">Pregel</span><span class="p">)):</span>
+                    <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">object_name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Dynamically loaded </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">agent_obj</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent_obj</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent_obj</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object &#39;</span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2">&#39; is neither a graph nor an Agent instance&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading agent from &#39;</span><span class="si">{</span><span class="n">import_str</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_default_agent_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that a default agent is available and set it if needed.</span>
+
+<span class="sd">        If the default agent from constants.py is not available,</span>
+<span class="sd">        use the first loaded agent as the default and update the global value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No agents were loaded. Please check your imports.&quot;</span><span class="p">)</span>
+
+        <span class="n">initial_default</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">initial_default</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="n">new_default</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Default agent &#39;</span><span class="si">{</span><span class="n">initial_default</span><span class="si">}</span><span class="s2">&#39; not found in loaded agents. Using &#39;</span><span class="si">{</span><span class="n">new_default</span><span class="si">}</span><span class="s2">&#39; as default.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">set_default_agent</span><span class="p">(</span><span class="n">new_default</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AgentExecutor.get_agent">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.get_agent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an agent by its ID.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_id: The ID of the agent to retrieve</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The requested Agent instance</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the agent_id is not found</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent &#39;</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.get_all_agent_info">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.get_all_agent_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_agent_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentInfo</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information about all available agents.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of AgentInfo objects containing agent IDs and descriptions</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">AgentInfo</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">agent</span><span class="o">.</span><span class="n">description</span><span class="p">)</span> <span class="k">for</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.add_agent">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.add_agent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a new agent to the executor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_id: The ID to assign to the agent</span>
+<span class="sd">            agent: The Agent instance to add</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.handle_agent_errors">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.handle_agent_errors">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_agent_errors</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle errors occurring during agent execution.</span>
+
+<span class="sd">        Specifically handles GraphRecursionError and other exceptions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: The function to decorate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The decorated function</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_handle_error</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Handle and re-raise errors with logging.&quot;&quot;&quot;</span>
+            <span class="c1"># Get detailed traceback</span>
+            <span class="n">tb_str</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">GraphRecursionError</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GraphRecursionError occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Full traceback:</span><span class="se">\n</span><span class="si">{</span><span class="n">tb_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during agent execution: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Full traceback:</span><span class="se">\n</span><span class="si">{</span><span class="n">tb_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Re-raise the original exception to preserve details</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_handle_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sync_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_handle_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">async_wrapper</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sync_wrapper</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_setup_agent_execution</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">input</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">thread_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_config_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">agent_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">recursion_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Agent</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">UUID</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply common setup for agent execution that both invoke and stream methods share.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_id: ID of the agent to invoke</span>
+<span class="sd">            input: User message to send to the agent</span>
+<span class="sd">            thread_id: Optional thread ID for conversation history</span>
+<span class="sd">            user_id: Optional user ID for the agent</span>
+<span class="sd">            model_name: Optional model name to override the default</span>
+<span class="sd">            model_provider: Optional model provider to override the default</span>
+<span class="sd">            model_config_key: Optional model config key to override the default</span>
+<span class="sd">            agent_config: Optional additional configuration for the agent</span>
+<span class="sd">            recursion_limit: Optional recursion limit for the agent</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple containing:</span>
+<span class="sd">                - agent: The Agent instance</span>
+<span class="sd">                - input_data: The properly formatted input for the agent</span>
+<span class="sd">                - config: The RunnableConfig for the agent</span>
+<span class="sd">                - run_id: The UUID for this run</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
+        <span class="n">agent_graph</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span>
+
+        <span class="n">run_id</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span>
+        <span class="n">thread_id</span> <span class="o">=</span> <span class="n">thread_id</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+
+        <span class="n">recursion_limit</span> <span class="o">=</span> <span class="n">recursion_limit</span> <span class="ow">or</span> <span class="n">DEFAULT_RECURSION_LIMIT</span>
+
+        <span class="n">configurable</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="n">thread_id</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Handle model_config_key if provided (takes precedence over individual model settings)</span>
+        <span class="k">if</span> <span class="n">model_config_key</span> <span class="ow">and</span> <span class="n">model_config_key</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">MODEL_CONFIGS</span><span class="p">:</span>
+            <span class="c1"># Store the model_config_key so agents can use it if needed</span>
+            <span class="n">configurable</span><span class="p">[</span><span class="s2">&quot;model_config_key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_config_key</span>
+
+            <span class="c1"># Extract basic model info for backward compatibility with agents that</span>
+            <span class="c1"># don&#39;t explicitly check for model_config_key</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MODEL_CONFIGS</span><span class="p">[</span><span class="n">model_config_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;provider&quot;</span> <span class="ow">in</span> <span class="n">model_config</span><span class="p">:</span>
+                <span class="n">configurable</span><span class="p">[</span><span class="s2">&quot;model_provider&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s2">&quot;provider&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">model_config</span><span class="p">:</span>
+                <span class="n">configurable</span><span class="p">[</span><span class="s2">&quot;model_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fall back to individual parameters</span>
+            <span class="k">if</span> <span class="n">model_name</span><span class="p">:</span>
+                <span class="n">configurable</span><span class="p">[</span><span class="s2">&quot;model_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_name</span>
+
+            <span class="k">if</span> <span class="n">model_provider</span><span class="p">:</span>
+                <span class="n">configurable</span><span class="p">[</span><span class="s2">&quot;model_provider&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_provider</span>
+
+        <span class="k">if</span> <span class="n">agent_config</span><span class="p">:</span>
+            <span class="n">configurable</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">agent_config</span><span class="p">)</span>
+
+        <span class="n">callback</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">observability</span><span class="o">.</span><span class="n">get_callback_handler</span><span class="p">(</span><span class="n">update_trace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">RunnableConfig</span><span class="p">(</span>
+            <span class="n">configurable</span><span class="o">=</span><span class="n">configurable</span><span class="p">,</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">callback</span><span class="p">]</span> <span class="k">if</span> <span class="n">callback</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">recursion_limit</span><span class="o">=</span><span class="n">recursion_limit</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;langfuse_session_id&quot;</span><span class="p">:</span> <span class="n">thread_id</span><span class="p">,</span>
+                <span class="s2">&quot;langfuse_user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">&quot;langfuse_tags&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check if there are any interrupts that need to be resumed</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent_graph</span><span class="o">.</span><span class="n">aget_state</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">interrupted_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">task</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">tasks</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="s2">&quot;interrupts&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">interrupts</span><span class="p">]</span>
+
+        <span class="n">_input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+        <span class="n">input_data</span><span class="p">:</span> <span class="n">Command</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">interrupted_tasks</span><span class="p">:</span>
+            <span class="c1"># User input is a response to resume agent execution from interrupt</span>
+            <span class="n">input_data</span> <span class="o">=</span> <span class="n">Command</span><span class="p">(</span><span class="n">resume</span><span class="o">=</span><span class="n">_input</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;message&quot;</span> <span class="ow">in</span> <span class="n">_input</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="n">_input</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">message</span><span class="p">)],</span> <span class="o">**</span><span class="n">_input</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_data</span> <span class="o">=</span> <span class="n">_input</span>
+
+        <span class="k">return</span> <span class="n">agent</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">run_id</span>
+
+<div class="viewcode-block" id="AgentExecutor.invoke">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.invoke">[docs]</a>
+    <span class="nd">@handle_agent_errors</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">input</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">thread_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_config_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">agent_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">recursion_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatMessage</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Invoke an agent with a message and return the response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_id: ID of the agent to invoke</span>
+<span class="sd">            input: User message to send to the agent</span>
+<span class="sd">            thread_id: Optional thread ID for conversation history</span>
+<span class="sd">            user_id: Optional user ID for the agent</span>
+<span class="sd">            model_name: Optional model name to override the default</span>
+<span class="sd">            model_provider: Optional model provider to override the default</span>
+<span class="sd">            model_config_key: Optional model config key to override the default</span>
+<span class="sd">            agent_config: Optional additional configuration for the agent</span>
+<span class="sd">            recursion_limit: Optional recursion limit for the agent</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ChatMessage: The agent&#39;s response</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">agent</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">run_id</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_agent_execution</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">model_provider</span><span class="o">=</span><span class="n">model_provider</span><span class="p">,</span>
+            <span class="n">model_config_key</span><span class="o">=</span><span class="n">model_config_key</span><span class="p">,</span>
+            <span class="n">agent_config</span><span class="o">=</span><span class="n">agent_config</span><span class="p">,</span>
+            <span class="n">recursion_limit</span><span class="o">=</span><span class="n">recursion_limit</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Wrap execution in trace context</span>
+        <span class="k">with</span> <span class="n">agent</span><span class="o">.</span><span class="n">observability</span><span class="o">.</span><span class="n">trace_context</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
+            <span class="n">agent_name</span><span class="o">=</span><span class="n">agent</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="c1"># Invoke the agent</span>
+            <span class="n">response_events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                <span class="c1"># stream_mode=[&quot;updates&quot;, &quot;values&quot;],</span>
+                <span class="n">stream_mode</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+
+            <span class="n">response_type</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">response_events</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">response_type</span> <span class="o">==</span> <span class="s2">&quot;values&quot;</span> <span class="ow">and</span> <span class="s2">&quot;__interrupt__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">generated_message</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;structured_response&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">generated_message</span><span class="p">:</span>
+                    <span class="n">generated_message</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># Normal response, the agent completed successfully</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">langchain_to_chat_message</span><span class="p">(</span><span class="n">generated_message</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">response_type</span> <span class="o">==</span> <span class="s2">&quot;values&quot;</span> <span class="ow">and</span> <span class="s2">&quot;__interrupt__&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="c1"># The last thing to occur was an interrupt</span>
+                <span class="c1"># Return the value of the first interrupt as an AIMessage</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">langchain_to_chat_message</span><span class="p">(</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;__interrupt__&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">response_type</span> <span class="o">==</span> <span class="s2">&quot;updates&quot;</span> <span class="ow">and</span> <span class="s2">&quot;__interrupt__&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="c1"># The last thing to occur was an interrupt</span>
+                <span class="c1"># Return the value of the first interrupt as an AIMessage</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">langchain_to_chat_message</span><span class="p">(</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;__interrupt__&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected response type: </span><span class="si">{</span><span class="n">response_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">output</span><span class="o">.</span><span class="n">run_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.stream">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.stream">[docs]</a>
+    <span class="nd">@handle_agent_errors</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="nb">input</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">thread_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_config_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">stream_tokens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">agent_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">recursion_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream an agent&#39;s response to a message, yielding either tokens or messages.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_id: ID of the agent to invoke</span>
+<span class="sd">            input: User message to send to the agent</span>
+<span class="sd">            thread_id: Optional thread ID for conversation history</span>
+<span class="sd">            user_id: Optional user ID for the agent</span>
+<span class="sd">            model_name: Optional model name to override the default</span>
+<span class="sd">            model_provider: Optional model provider to override the default</span>
+<span class="sd">            model_config_key: Optional model config key to override the default</span>
+<span class="sd">            stream_tokens: Whether to stream individual tokens</span>
+<span class="sd">            agent_config: Optional additional configuration for the agent</span>
+<span class="sd">            recursion_limit: Optional recursion limit for the agent</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Either ChatMessage objects for full messages or strings for token chunks</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">agent</span><span class="p">,</span> <span class="n">input_data</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">run_id</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_agent_execution</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">model_provider</span><span class="o">=</span><span class="n">model_provider</span><span class="p">,</span>
+            <span class="n">model_config_key</span><span class="o">=</span><span class="n">model_config_key</span><span class="p">,</span>
+            <span class="n">agent_config</span><span class="o">=</span><span class="n">agent_config</span><span class="p">,</span>
+            <span class="n">recursion_limit</span><span class="o">=</span><span class="n">recursion_limit</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Wrap execution in trace context</span>
+        <span class="k">with</span> <span class="n">agent</span><span class="o">.</span><span class="n">observability</span><span class="o">.</span><span class="n">trace_context</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span>
+            <span class="n">agent_name</span><span class="o">=</span><span class="n">agent</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="c1"># Stream from the agent with appropriate modes</span>
+            <span class="n">stream_mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;updates&quot;</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">stream_tokens</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;updates&quot;</span><span class="p">]</span>
+
+            <span class="k">async</span> <span class="k">for</span> <span class="n">stream_event</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">astream</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">input_data</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">stream_mode</span><span class="o">=</span><span class="n">stream_mode</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream_event</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="n">stream_mode</span><span class="p">,</span> <span class="n">event</span> <span class="o">=</span> <span class="n">stream_event</span>
+                <span class="n">new_messages</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">if</span> <span class="n">stream_mode</span> <span class="o">==</span> <span class="s2">&quot;updates&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">updates</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="c1"># A simple approach to handle agent interrupts.</span>
+                        <span class="c1"># In a more sophisticated implementation, we could add</span>
+                        <span class="c1"># some structured ChatMessage type to return the interrupt value.</span>
+                        <span class="k">if</span> <span class="n">node</span> <span class="o">==</span> <span class="s2">&quot;__interrupt__&quot;</span><span class="p">:</span>
+                            <span class="n">interrupt</span><span class="p">:</span> <span class="n">Interrupt</span>
+                            <span class="k">for</span> <span class="n">interrupt</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
+                                <span class="n">new_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">interrupt</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                            <span class="k">continue</span>
+
+                        <span class="n">update_messages</span> <span class="o">=</span> <span class="p">(</span><span class="n">updates</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+                        <span class="c1"># Special case for supervisor agent</span>
+                        <span class="k">if</span> <span class="n">node</span> <span class="o">==</span> <span class="s2">&quot;supervisor&quot;</span><span class="p">:</span>
+                            <span class="c1"># Get only the last AIMessage since supervisor includes all previous messages</span>
+                            <span class="n">ai_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">update_messages</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">AIMessage</span><span class="p">)]</span>
+                            <span class="k">if</span> <span class="n">ai_messages</span><span class="p">:</span>
+                                <span class="n">update_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">ai_messages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+                        <span class="c1"># Special case for expert agents</span>
+                        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;research_expert&quot;</span><span class="p">,</span> <span class="s2">&quot;math_expert&quot;</span><span class="p">):</span>
+                            <span class="c1"># Convert to ToolMessage so it displays in the UI as a tool response</span>
+                            <span class="k">if</span> <span class="n">update_messages</span><span class="p">:</span>
+                                <span class="n">msg</span> <span class="o">=</span> <span class="n">ToolMessage</span><span class="p">(</span>
+                                    <span class="n">content</span><span class="o">=</span><span class="n">update_messages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="n">node</span><span class="p">,</span>
+                                    <span class="n">tool_call_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                                <span class="p">)</span>
+                                <span class="n">update_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="p">]</span>
+                        <span class="n">new_messages</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">update_messages</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">stream_mode</span> <span class="o">==</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+                    <span class="n">new_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">event</span><span class="p">]</span>
+
+                <span class="k">elif</span> <span class="n">stream_mode</span> <span class="o">==</span> <span class="s2">&quot;messages&quot;</span> <span class="ow">and</span> <span class="n">stream_tokens</span><span class="p">:</span>
+                    <span class="n">msg</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">event</span>
+                    <span class="k">if</span> <span class="s2">&quot;skip_stream&quot;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                        <span class="k">continue</span>
+                    <span class="c1"># Skip non-LLM nodes that might send messages</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">AIMessageChunk</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">remove_tool_calls</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+                        <span class="c1"># Empty content in OpenAI context usually means the model is asking for a tool to be invoked</span>
+                        <span class="k">yield</span> <span class="n">convert_message_content_to_string</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+                <span class="c1"># LangGraph streaming may emit tuples: (field_name, field_value)</span>
+                <span class="c1"># e.g. (&#39;content&#39;, &lt;str&gt;), (&#39;tool_calls&#39;, [ToolCall,...]), (&#39;additional_kwargs&#39;, {...}), etc.</span>
+                <span class="c1"># We accumulate only supported fields into `parts` and skip unsupported metadata.</span>
+                <span class="c1"># More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/</span>
+                <span class="n">processed_messages</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">current_message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">new_messages</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">msg</span>
+                        <span class="c1"># Store parts in temporary dict</span>
+                        <span class="n">current_message</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Add complete message if we have one in progress</span>
+                        <span class="k">if</span> <span class="n">current_message</span><span class="p">:</span>
+                            <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_ai_message</span><span class="p">(</span><span class="n">current_message</span><span class="p">))</span>
+                            <span class="n">current_message</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># Add any remaining message parts</span>
+                <span class="k">if</span> <span class="n">current_message</span><span class="p">:</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_ai_message</span><span class="p">(</span><span class="n">current_message</span><span class="p">))</span>
+
+                <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">processed_messages</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">chat_message</span> <span class="o">=</span> <span class="n">langchain_to_chat_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">chat_message</span><span class="o">.</span><span class="n">run_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+                        <span class="c1"># Skip the input message if it&#39;s repeated by LangGraph</span>
+                        <span class="k">if</span> <span class="n">chat_message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span> <span class="ow">and</span> <span class="n">chat_message</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="n">msg</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="k">yield</span> <span class="n">chat_message</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error parsing message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.save">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save agents to disk using joblib.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: Directory path where to save agents</span>
+<span class="sd">            agent_ids: List of agent IDs to save. If None, saves all agents.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">agents_to_save</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span>
+        <span class="k">if</span> <span class="n">agent_ids</span><span class="p">:</span>
+            <span class="n">agents_to_save</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">agent_ids</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents_to_save</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">joblib</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">.joblib&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AgentExecutor.load_saved_agents">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor.load_saved_agents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_saved_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load saved agents from disk using joblib.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: Directory path from which to load agents</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.joblib&quot;</span><span class="p">):</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_default_agent_loaded</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.observability.langsmith &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/observability/langsmith.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.observability.langsmith</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.observability.langsmith</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langsmith</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span> <span class="k">as</span> <span class="n">LangsmithClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langsmith.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LangSmithConflictError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseObservabilityPlatform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptReturnType</span><span class="p">,</span> <span class="n">PromptTemplateType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="LangsmithObservability">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LangsmithObservability</span><span class="p">(</span><span class="n">BaseObservabilityPlatform</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Langsmith implementation of observability platform.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LangsmithObservability.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">remote_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize LangsmithObservability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.</span>
+<span class="sd">            remote_first: If True, prioritize remote prompts over local ones.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prompts_dir</span><span class="p">,</span> <span class="n">remote_first</span><span class="p">)</span>
+        <span class="c1"># Set required environment variables explicitly</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;LANGSMITH_TRACING&quot;</span><span class="p">,</span> <span class="s2">&quot;LANGSMITH_API_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;LANGSMITH_PROJECT&quot;</span><span class="p">,</span> <span class="s2">&quot;LANGSMITH_ENDPOINT&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.get_callback_handler">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.get_callback_handler">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_callback_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the callback handler for the observability platform.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.before_shutdown">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.before_shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform any necessary cleanup before shutdown.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.record_feedback">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.record_feedback">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record feedback for a run to LangSmith.&quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">LangsmithClient</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;user_id&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;extra&quot;</span><span class="p">][</span><span class="s2">&quot;user_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+
+        <span class="n">client</span><span class="o">.</span><span class="n">create_feedback</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+            <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.push_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.push_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">push_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="p">:</span> <span class="n">PromptTemplateType</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">force_create_new_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Push a prompt to LangSmith.&quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">LangsmithClient</span><span class="p">()</span>
+
+        <span class="c1"># Convert to proper format</span>
+        <span class="n">prompt_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_chat_prompt</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span>
+
+        <span class="c1"># Check if remote_first is enabled</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_first</span><span class="p">:</span>
+            <span class="c1"># When remote_first=True, prioritize remote prompts</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">existing_remote_prompt</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">existing_remote_prompt</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Remote-first mode: Using existing remote prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                    <span class="c1"># Store the remote prompt locally as well</span>
+                    <span class="n">full_metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">metadata</span> <span class="k">else</span> <span class="p">{}</span>
+                    <span class="n">full_metadata</span><span class="p">[</span><span class="s2">&quot;langsmith_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">existing_remote_prompt</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">full_metadata</span><span class="p">[</span><span class="s2">&quot;original_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_obj</span>
+                    <span class="n">template_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_template_string</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="n">prompt_obj</span><span class="p">)</span>
+                    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template_str</span><span class="p">,</span> <span class="n">full_metadata</span><span class="p">,</span> <span class="n">force_create_new_version</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Remote-first mode: Remote prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found, will create new one&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Handle existing prompt versions</span>
+        <span class="n">existing_prompt</span><span class="p">,</span> <span class="n">existing_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_existing_prompt</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">force_create_new_version</span><span class="p">,</span>
+            <span class="n">client</span><span class="p">,</span>
+            <span class="n">client_pull_method</span><span class="o">=</span><span class="s2">&quot;pull_prompt&quot;</span><span class="p">,</span>
+            <span class="n">client_delete_method</span><span class="o">=</span><span class="s2">&quot;delete_prompt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Push to LangSmith if we don&#39;t have an existing prompt</span>
+        <span class="k">if</span> <span class="n">existing_prompt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">metadata</span> <span class="ow">and</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">):</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="n">prompt_obj</span> <span class="o">|</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">chain</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">prompt_obj</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created new prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; in LangSmith&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">LangSmithConflictError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; unchanged, using existing version: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Try to retrieve the existing prompt without modifying it</span>
+                    <span class="n">existing_prompt</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">url</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">existing_prompt</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using existing prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; due to conflict&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">fetch_err</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve existing prompt after conflict: </span><span class="si">{</span><span class="n">fetch_err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Use the existing prompt that was found earlier</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">existing_url</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reusing existing prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; in LangSmith&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update metadata and save locally</span>
+        <span class="n">full_metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">metadata</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">full_metadata</span><span class="p">[</span><span class="s2">&quot;langsmith_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="n">full_metadata</span><span class="p">[</span><span class="s2">&quot;original_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_obj</span>
+
+        <span class="c1"># Extract template for local storage and save</span>
+        <span class="n">template_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_template_string</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="n">prompt_obj</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template_str</span><span class="p">,</span> <span class="n">full_metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.pull_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.pull_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pull_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="s2">&quot;mustache&quot;</span><span class="p">,</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PromptReturnType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pull a prompt from LangSmith.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">LangsmithClient</span><span class="p">()</span>
+            <span class="n">prompt_info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Process the prompt into a standard format</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_prompt_object</span><span class="p">(</span><span class="n">prompt_info</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to pull prompt from remote platform: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Fall back to local storage</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_pull_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangsmithObservability.delete_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability.delete_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a prompt from LangSmith.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the prompt to delete</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">LangsmithClient</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">delete_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># Also delete the local files</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">delete_prompt</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+langgraph\_agent\_toolkit.agents.blueprints.command\_agent package
+==================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.command_agent
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.command_agent.agent

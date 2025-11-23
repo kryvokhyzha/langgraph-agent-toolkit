@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.prompts.prompt_manager &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/prompts/prompt_manager.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.prompts.prompt_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.prompts.prompt_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObservabilityFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessageDict</span><span class="p">,</span> <span class="n">MessageRole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.prompts.chat_prompt_template</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObservabilityChatPromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_file</span>
+
+
+<div class="viewcode-block" id="PromptManager">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PromptManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages prompt templates for assistant.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PromptManager.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">observability_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompts_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">force_create_new_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">,</span>
+        <span class="n">load_at_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the PromptManager with configurable parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            observability_backend: Backend type for observability (defaults to settings.OBSERVABILITY_BACKEND)</span>
+<span class="sd">            prompts_dir: Directory containing prompt templates (defaults to ./prompts)</span>
+<span class="sd">            force_create_new_version: Whether to force creation of new prompt versions</span>
+<span class="sd">            template_format: Format for prompt templates (default: &quot;jinja2&quot;)</span>
+<span class="sd">            load_at_runtime: Whether to load prompts at runtime (default: True)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservabilityChatPromptTemplate</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_observability</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_observability_backend</span> <span class="o">=</span> <span class="n">observability_backend</span> <span class="ow">or</span> <span class="n">settings</span><span class="o">.</span><span class="n">OBSERVABILITY_BACKEND</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompts_dir</span> <span class="o">=</span> <span class="n">prompts_dir</span> <span class="ow">or</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;prompts&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_force_create_new_version</span> <span class="o">=</span> <span class="n">force_create_new_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template_format</span> <span class="o">=</span> <span class="n">template_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_at_runtime</span> <span class="o">=</span> <span class="n">load_at_runtime</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lazy-loaded observability platform.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_observability</span> <span class="o">=</span> <span class="n">ObservabilityFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_observability_backend</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_prompt_template</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">template_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">input_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">has_messages_placeholder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">partial_variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservabilityChatPromptTemplate</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and cache a prompt template from a file.&quot;&quot;&quot;</span>
+        <span class="n">template_content</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="n">template_path</span><span class="p">)</span>
+
+        <span class="c1"># Build prompt template messages</span>
+        <span class="n">prompt_template</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ChatMessageDict</span><span class="p">(</span>
+                <span class="n">role</span><span class="o">=</span><span class="n">MessageRole</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">template_content</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Add messages placeholder if needed</span>
+        <span class="k">if</span> <span class="n">has_messages_placeholder</span><span class="p">:</span>
+            <span class="n">prompt_template</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ChatMessageDict</span><span class="p">(</span>
+                    <span class="n">role</span><span class="o">=</span><span class="n">MessageRole</span><span class="o">.</span><span class="n">PLACEHOLDER</span><span class="p">,</span>
+                    <span class="n">content</span><span class="o">=</span><span class="s2">&quot;messages&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Push to observability platform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observability</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+            <span class="n">prompt_template</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
+            <span class="n">force_create_new_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_force_create_new_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create and cache the prompt</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">ObservabilityChatPromptTemplate</span><span class="o">.</span><span class="n">from_observability_platform</span><span class="p">(</span>
+            <span class="n">prompt_name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+            <span class="n">observability_platform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observability</span><span class="p">,</span>
+            <span class="n">load_at_runtime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_at_runtime</span><span class="p">,</span>
+            <span class="n">template_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_template_format</span><span class="p">,</span>
+            <span class="n">input_variables</span><span class="o">=</span><span class="n">input_variables</span><span class="p">,</span>
+            <span class="n">partial_variables</span><span class="o">=</span><span class="n">partial_variables</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="p">[</span><span class="n">prompt_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+        <span class="k">return</span> <span class="n">prompt</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_or_create_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">template_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">input_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">has_messages_placeholder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">partial_variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservabilityChatPromptTemplate</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get cached prompt or create it if it doesn&#39;t exist.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">prompt_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="p">:</span>
+            <span class="n">template_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompts_dir</span> <span class="o">/</span> <span class="n">template_filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_prompt_template</span><span class="p">(</span>
+                <span class="n">prompt_name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+                <span class="n">template_path</span><span class="o">=</span><span class="n">template_path</span><span class="p">,</span>
+                <span class="n">input_variables</span><span class="o">=</span><span class="n">input_variables</span><span class="p">,</span>
+                <span class="n">has_messages_placeholder</span><span class="o">=</span><span class="n">has_messages_placeholder</span><span class="p">,</span>
+                <span class="n">partial_variables</span><span class="o">=</span><span class="n">partial_variables</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="p">[</span><span class="n">prompt_name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="PromptManager.clear_cache">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager.clear_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear the prompt cache.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptManager.get_cached_prompt_names">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager.get_cached_prompt_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cached_prompt_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get list of cached prompt names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompt_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="PromptManager.set_prompts_directory">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager.set_prompts_directory">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_prompts_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the prompts directory and clear cache.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompts_dir</span> <span class="o">=</span> <span class="n">prompts_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

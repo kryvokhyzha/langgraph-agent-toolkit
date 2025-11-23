@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LangGraph Agent Toolkit Documentation &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/index.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation Options" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="#">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LangGraph Agent Toolkit Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/index.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="langgraph-agent-toolkit-documentation">
+<h1>LangGraph Agent Toolkit Documentation<a class="headerlink" href="#langgraph-agent-toolkit-documentation" title="Link to this heading"></a></h1>
+<p>A comprehensive toolkit for building, deploying, and managing AI agents using
+LangGraph, FastAPI, and Streamlit. It provides a production-ready framework for
+creating conversational AI agents with features like multi-provider LLM support,
+streaming responses, observability, and memory management.</p>
+<section id="what-is-langgraph-agent-toolkit">
+<h2>What is langgraph-agent-toolkit?<a class="headerlink" href="#what-is-langgraph-agent-toolkit" title="Link to this heading"></a></h2>
+<p>The langgraph-agent-toolkit is a full-featured framework for developing and
+deploying AI agent services. Built on the foundation of:</p>
+<ul class="simple">
+<li><p><strong>LangGraph</strong> for agent creation with advanced flows and human-in-the-loop capabilities</p></li>
+<li><p><strong>FastAPI</strong> for robust, high-performance API services with streaming support</p></li>
+<li><p><strong>Streamlit</strong> for intuitive user interfaces</p></li>
+</ul>
+<p>Key components include:</p>
+<ul class="simple">
+<li><p>Data structures and settings built with <strong>Pydantic</strong></p></li>
+<li><p>Multi-provider LLM support</p></li>
+<li><p>Comprehensive memory management and persistence using PostgreSQL/SQLite</p></li>
+<li><p>Advanced observability tooling via Langfuse and Langsmith</p></li>
+<li><p>Modular architecture allowing customization while maintaining a consistent
+application structure</p></li>
+</ul>
+<p>Whether you’re building a simple chatbot or complex multi-agent system, this
+toolkit provides the infrastructure to develop, test, and deploy your
+LangGraph-based agents with confidence.</p>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<a class="reference internal image-reference" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true"><img alt="Architecture Diagram" src="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true" style="width: 800px;" />
+</a>
+</section>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file based on <code class="docutils literal notranslate"><span class="pre">.env.example</span></code></p></li>
+<li><p><strong>Option 1: Run with Python from source</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
+uv<span class="w"> </span>sync<span class="w"> </span>--frozen
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+
+<span class="c1"># Start the service</span>
+python<span class="w"> </span>langgraph_agent_toolkit/run_service.py
+
+<span class="c1"># In another terminal</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+streamlit<span class="w"> </span>run<span class="w"> </span>langgraph_agent_toolkit/streamlit_app.py
+</pre></div>
+</div>
+</li>
+<li><p><strong>Option 2: Run with Python from PyPi repository</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>langgraph-agent-toolkit
+</pre></div>
+</div>
+</li>
+<li><p><strong>Option 3: Run with Docker</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>watch
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="content">
+<h2>Content<a class="headerlink" href="#content" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#basic-installation">Basic Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#available-extras">Available Extras</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#creating-your-env-file">Creating Your <code class="docutils literal notranslate"><span class="pre">.env</span></code> File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#litellm-configuration">LiteLLM Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#setup-and-usage">Setup and Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#building-your-own-agent">Building Your Own Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#docker-setup">Docker Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#using-the-agentclient">Using the AgentClient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#development-with-langgraph-studio">Development with LangGraph Studio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#local-development-without-docker">Local Development Without Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#key-features">Key Features</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

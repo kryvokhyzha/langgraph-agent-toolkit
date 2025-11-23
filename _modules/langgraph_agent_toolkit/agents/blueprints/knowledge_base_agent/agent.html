@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/agents/blueprints/knowledge_base_agent/agent.html" />
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AmazonKnowledgeBasesRetriever</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.language_models.chat_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseChatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIMessage</span><span class="p">,</span> <span class="n">HumanMessage</span><span class="p">,</span> <span class="n">SystemMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.runnables</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableConfig</span><span class="p">,</span> <span class="n">RunnableLambda</span><span class="p">,</span> <span class="n">RunnableSerializable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.runnables.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableSequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.checkpoint.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">MemorySaver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">END</span><span class="p">,</span> <span class="n">MessagesState</span><span class="p">,</span> <span class="n">StateGraph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.managed</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemainingSteps</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.models.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompletionModelFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelProvider</span>
+
+
+<span class="c1"># Define the state</span>
+<div class="viewcode-block" id="AgentState">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.AgentState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentState</span><span class="p">(</span><span class="n">MessagesState</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;State for Knowledge Base agent.&quot;&quot;&quot;</span>
+
+    <span class="n">remaining_steps</span><span class="p">:</span> <span class="n">RemainingSteps</span>
+    <span class="n">retrieved_documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">kb_documents</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<span class="c1"># Create the retriever</span>
+<div class="viewcode-block" id="get_kb_retriever">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.get_kb_retriever">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kb_retriever</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create and return a Knowledge Base retriever instance.&quot;&quot;&quot;</span>
+    <span class="c1"># Get the Knowledge Base ID from environment</span>
+    <span class="n">kb_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AWS_KB_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">kb_id</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AWS_KB_ID environment variable must be set&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create the retriever with the specified Knowledge Base ID</span>
+    <span class="n">retriever</span> <span class="o">=</span> <span class="n">AmazonKnowledgeBasesRetriever</span><span class="p">(</span>
+        <span class="n">knowledge_base_id</span><span class="o">=</span><span class="n">kb_id</span><span class="p">,</span>
+        <span class="n">retrieval_config</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;vectorSearchConfiguration&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;numberOfResults&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">retriever</span></div>
+
+
+
+<div class="viewcode-block" id="wrap_model">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.wrap_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_model</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">BaseChatModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunnableSerializable</span><span class="p">[</span><span class="n">AgentState</span><span class="p">,</span> <span class="n">AIMessage</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap the model with a system prompt for the Knowledge Base agent.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_system_message</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="n">base_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;You are a helpful assistant that provides accurate information based on retrieved documents.</span>
+
+<span class="s2">        You will receive a query along with relevant documents retrieved from a knowledge base.</span>
+<span class="s2">        Use these documents to inform your response.</span>
+
+<span class="s2">        Follow these guidelines:</span>
+<span class="s2">        1. Base your answer primarily on the retrieved documents</span>
+<span class="s2">        2. If the documents contain the answer, provide it clearly and concisely</span>
+<span class="s2">        3. If the documents are insufficient, state that you don&#39;t have enough information</span>
+<span class="s2">        4. Never make up facts or information not present in the documents</span>
+<span class="s2">        5. Always cite the source documents when referring to specific information</span>
+<span class="s2">        6. If the documents contradict each other, acknowledge this and explain the different perspectives</span>
+
+<span class="s2">        Format your response in a clear, conversational manner. Use markdown formatting when appropriate.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if documents were retrieved</span>
+        <span class="k">if</span> <span class="s2">&quot;kb_documents&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="c1"># Append document information to the system prompt</span>
+            <span class="n">document_prompt</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">I&#39;ve retrieved the following documents that may be relevant to the query:&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="si">{</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;kb_documents&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please use these documents to inform your response to the user&#39;s query. &quot;</span>
+                <span class="s2">&quot;Only use information from these documents and clearly indicate when you are unsure.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">SystemMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">base_prompt</span> <span class="o">+</span> <span class="n">document_prompt</span><span class="p">)]</span> <span class="o">+</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># No documents were retrieved</span>
+            <span class="n">no_docs_prompt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">No relevant documents were found in the knowledge base for this query.&quot;</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">SystemMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">base_prompt</span> <span class="o">+</span> <span class="n">no_docs_prompt</span><span class="p">)]</span> <span class="o">+</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+
+    <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">RunnableLambda</span><span class="p">(</span>
+        <span class="n">create_system_message</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;StateModifier&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">RunnableSequence</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="retrieve_documents">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.retrieve_documents">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_documents</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">AgentState</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RunnableConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve relevant documents from the knowledge base.&quot;&quot;&quot;</span>
+    <span class="c1"># Get the last human message</span>
+    <span class="n">human_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">HumanMessage</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">human_messages</span><span class="p">:</span>
+        <span class="c1"># Include messages from original state</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;retrieved_documents&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="c1"># Use the last human message as the query</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">human_messages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Initialize the retriever</span>
+        <span class="n">retriever</span> <span class="o">=</span> <span class="n">get_kb_retriever</span><span class="p">()</span>
+
+        <span class="c1"># Retrieve documents</span>
+        <span class="n">retrieved_docs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">retriever</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="c1"># Create document summaries for the state</span>
+        <span class="n">document_summaries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">retrieved_docs</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">summary</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;doc-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Document </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">page_content</span><span class="p">,</span>
+                <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">document_summaries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retrieved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">document_summaries</span><span class="p">)</span><span class="si">}</span><span class="s2"> documents for query: </span><span class="si">{</span><span class="n">query</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;retrieved_documents&quot;</span><span class="p">:</span> <span class="n">document_summaries</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving documents: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;retrieved_documents&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[]}</span></div>
+
+
+
+<div class="viewcode-block" id="prepare_augmented_prompt">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.prepare_augmented_prompt">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_augmented_prompt</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">AgentState</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RunnableConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare a prompt augmented with retrieved document content.&quot;&quot;&quot;</span>
+    <span class="c1"># Get retrieved documents</span>
+    <span class="n">documents</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;retrieved_documents&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">documents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="c1"># Format retrieved documents for the model</span>
+    <span class="n">formatted_docs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;--- Document </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> ---</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Source: </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Title: </span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Store formatted documents in the state</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;kb_documents&quot;</span><span class="p">:</span> <span class="n">formatted_docs</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[]}</span></div>
+
+
+
+<div class="viewcode-block" id="acall_model">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.html#langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent.acall_model">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">acall_model</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">AgentState</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RunnableConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a response based on the retrieved documents.&quot;&quot;&quot;</span>
+    <span class="c1"># Check if a model_config is specified in agent_config</span>
+    <span class="n">model_config_key</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;configurable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_config&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_config&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">model_config_key</span> <span class="ow">and</span> <span class="n">model_config_key</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">MODEL_CONFIGS</span><span class="p">:</span>
+        <span class="c1"># Use the model configuration from settings</span>
+        <span class="n">model_config</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MODEL_CONFIGS</span><span class="p">[</span><span class="n">model_config_key</span><span class="p">]</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CompletionModelFactory</span><span class="o">.</span><span class="n">get_model_from_config</span><span class="p">(</span><span class="n">model_config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Fall back to the traditional approach</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CompletionModelFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">model_provider</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configurable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_provider&quot;</span><span class="p">,</span> <span class="n">ModelProvider</span><span class="o">.</span><span class="n">OPENAI</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;configurable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_name&quot;</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">OPENAI_MODEL_NAME</span><span class="p">),</span>
+            <span class="n">openai_api_base</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">OPENAI_API_BASE_URL</span><span class="p">,</span>
+            <span class="n">openai_api_key</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">OPENAI_API_KEY</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">model_runnable</span> <span class="o">=</span> <span class="n">wrap_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">model_runnable</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">response</span><span class="p">]}</span></div>
+
+
+
+<span class="c1"># Define the graph</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">AgentState</span><span class="p">)</span>
+
+<span class="c1"># Add nodes</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;retrieve_documents&quot;</span><span class="p">,</span> <span class="n">retrieve_documents</span><span class="p">)</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;prepare_augmented_prompt&quot;</span><span class="p">,</span> <span class="n">prepare_augmented_prompt</span><span class="p">)</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">acall_model</span><span class="p">)</span>
+
+<span class="c1"># Set entry point</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&quot;retrieve_documents&quot;</span><span class="p">)</span>
+
+<span class="c1"># Add edges to define the flow</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;retrieve_documents&quot;</span><span class="p">,</span> <span class="s2">&quot;prepare_augmented_prompt&quot;</span><span class="p">)</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;prepare_augmented_prompt&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
+
+<span class="c1"># Compile the agent</span>
+<span class="n">kb_agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;kb-agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A retrieval-augmented generation agent using Amazon Bedrock Knowledge Base.&quot;</span><span class="p">,</span>
+    <span class="n">graph</span><span class="o">=</span><span class="n">agent</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">checkpointer</span><span class="o">=</span><span class="n">MemorySaver</span><span class="p">()),</span>
+<span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

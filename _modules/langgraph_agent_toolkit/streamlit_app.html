@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.streamlit_app &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/streamlit_app.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.streamlit_app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.streamlit_app</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span><span class="p">,</span> <span class="n">AgentClientError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_STREAMLIT_USER_ID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema.task_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskData</span><span class="p">,</span> <span class="n">TaskDataStatus</span>
+
+
+<span class="c1"># A Streamlit app for interacting with the langgraph agent via a simple chat interface.</span>
+<span class="c1"># The app has three main functions which are all run async:</span>
+
+<span class="c1"># - main() - sets up the streamlit app and high level structure</span>
+<span class="c1"># - draw_messages() - draws a set of chat messages - either replaying existing messages</span>
+<span class="c1">#   or streaming new ones.</span>
+<span class="c1"># - handle_feedback() - Draws a feedback widget and records feedback from the user.</span>
+
+<span class="c1"># The app heavily uses AgentClient to interact with the agent&#39;s FastAPI endpoints.</span>
+
+
+<span class="n">APP_TITLE</span> <span class="o">=</span> <span class="s2">&quot;Agent Service Toolkit&quot;</span>
+<span class="n">APP_ICON</span> <span class="o">=</span> <span class="s2">&quot;🧰&quot;</span>
+
+
+<div class="viewcode-block" id="create_welcome_message">
+<a class="viewcode-back" href="../../generated/langgraph_agent_toolkit.streamlit_app.html#langgraph_agent_toolkit.streamlit_app.create_welcome_message">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_welcome_message</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatMessage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a welcome message based on the current agent.&quot;&quot;&quot;</span>
+    <span class="k">match</span> <span class="n">agent</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">&quot;chatbot&quot;</span><span class="p">:</span>
+            <span class="n">welcome_content</span> <span class="o">=</span> <span class="s2">&quot;Hello! I&#39;m a simple chatbot. Ask me anything!&quot;</span>
+        <span class="k">case</span> <span class="s2">&quot;interrupt-agent&quot;</span><span class="p">:</span>
+            <span class="n">welcome_content</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Hello! I&#39;m an interrupt agent. Tell me your birthday and I will predict your personality!&quot;</span>
+            <span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="n">welcome_content</span> <span class="o">=</span> <span class="s2">&quot;Hello! I&#39;m an AI agent. Ask me anything!&quot;</span>
+    <span class="k">return</span> <span class="n">ChatMessage</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;ai&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">welcome_content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../generated/langgraph_agent_toolkit.streamlit_app.html#langgraph_agent_toolkit.streamlit_app.main">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">set_page_config</span><span class="p">(</span>
+        <span class="n">page_title</span><span class="o">=</span><span class="n">APP_TITLE</span><span class="p">,</span>
+        <span class="n">page_icon</span><span class="o">=</span><span class="n">APP_ICON</span><span class="p">,</span>
+        <span class="n">menu_items</span><span class="o">=</span><span class="p">{},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Hide the streamlit upper-right chrome</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">html</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &lt;style&gt;</span>
+<span class="sd">        [data-testid=&quot;stStatusWidget&quot;] {</span>
+<span class="sd">                visibility: hidden;</span>
+<span class="sd">                height: 0%;</span>
+<span class="sd">                position: fixed;</span>
+<span class="sd">            }</span>
+<span class="sd">        &lt;/style&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s2">&quot;client.toolbarMode&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;client.toolbarMode&quot;</span><span class="p">,</span> <span class="s2">&quot;minimal&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
+
+    <span class="c1"># if not st.session_state.get(&quot;authenticated&quot;, False):</span>
+    <span class="c1">#     auth_component()</span>
+
+    <span class="k">if</span> <span class="s2">&quot;agent_client&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+        <span class="n">load_dotenv</span><span class="p">(</span><span class="n">override</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">agent_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;AGENT_URL&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">agent_url</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOST&quot;</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">)</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
+            <span class="n">agent_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&quot;Connecting to agent service...&quot;</span><span class="p">):</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">agent_client</span> <span class="o">=</span> <span class="n">AgentClient</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="n">agent_url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">AgentClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error connecting to agent service at </span><span class="si">{</span><span class="n">agent_url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&quot;The service might be booting up. Try again in a few seconds.&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    <span class="n">agent_client</span><span class="p">:</span> <span class="n">AgentClient</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">agent_client</span>
+
+    <span class="k">if</span> <span class="s2">&quot;thread_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+        <span class="n">thread_id</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thread_id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">thread_id</span><span class="p">:</span>
+            <span class="n">thread_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Add welcome message to messages when creating a new thread</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_welcome_message</span><span class="p">(</span><span class="n">agent_client</span><span class="o">.</span><span class="n">agent</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">get_history</span><span class="p">(</span>
+                    <span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">DEFAULT_STREAMLIT_USER_ID</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">messages</span>
+            <span class="k">except</span> <span class="n">AgentClientError</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No message history found for this Thread ID.&quot;</span><span class="p">)</span>
+                <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="n">messages</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span> <span class="o">=</span> <span class="n">thread_id</span>
+
+    <span class="c1"># Config options</span>
+    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">APP_ICON</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">APP_TITLE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="s2">&quot;&quot;</span>
+        <span class="s2">&quot;Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit&quot;</span>
+        <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/chat: New Chat&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="c1"># Add welcome message to new chat</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_welcome_message</span><span class="p">(</span><span class="n">agent_client</span><span class="o">.</span><span class="n">agent</span><span class="p">))</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">popover</span><span class="p">(</span><span class="s2">&quot;:material/settings: Settings&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">agent_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">agents</span><span class="p">]</span>
+            <span class="n">agent_idx</span> <span class="o">=</span> <span class="n">agent_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">agent_client</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">default_agent</span><span class="p">)</span>
+            <span class="n">agent_client</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+                <span class="s2">&quot;Agent to use&quot;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="n">agent_list</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">agent_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">use_streaming</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span><span class="s2">&quot;Stream results&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span><span class="s2">&quot;Display tools execution&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="nd">@st</span><span class="o">.</span><span class="n">dialog</span><span class="p">(</span><span class="s2">&quot;Architecture&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">architecture_dialog</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
+                <span class="s2">&quot;https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true&quot;</span>
+            <span class="p">)</span>
+            <span class="s2">&quot;[View full size on Github](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png)&quot;</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">caption</span><span class="p">(</span>
+                <span class="s2">&quot;App hosted on [Streamlit Cloud](https://share.streamlit.io/) with FastAPI service running in [Azure](https://learn.microsoft.com/en-us/azure/app-service/)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/schema: Architecture&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">architecture_dialog</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">popover</span><span class="p">(</span><span class="s2">&quot;:material/policy: Privacy&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="s2">&quot;Prompts, responses and feedback in this app are anonymously recorded and saved to selected &quot;</span>
+                <span class="s2">&quot;observability service for product evaluation and improvement purposes only.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="nd">@st</span><span class="o">.</span><span class="n">dialog</span><span class="p">(</span><span class="s2">&quot;Share/resume chat&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">share_chat_dialog</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span><span class="o">.</span><span class="n">_session_mgr</span><span class="o">.</span><span class="n">list_active_sessions</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlunparse</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">st_base_url</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="c1"># Decode the base URL if it&#39;s in bytes</span>
+                <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+            <span class="c1"># if it&#39;s not localhost, switch to https by default</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;localhost&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st_base_url</span><span class="p">:</span>
+                <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">)</span>
+            <span class="n">chat_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">st_base_url</span><span class="si">}</span><span class="s2">?thread_id=</span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Chat URL:**</span><span class="se">\n</span><span class="s2">```text</span><span class="se">\n</span><span class="si">{</span><span class="n">chat_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">```&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Copy the above URL to share or revisit this chat&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/upload: Share/resume chat&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">share_chat_dialog</span><span class="p">()</span>
+
+        <span class="s2">&quot;[View the source code](https://github.com/kryvokhyzha/langgraph-agent-toolkit)&quot;</span>
+
+    <span class="c1"># Draw existing messages</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span>
+
+    <span class="c1"># draw_messages() expects an async iterator over messages</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">amessage_iter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">m</span>
+
+    <span class="k">await</span> <span class="n">draw_messages</span><span class="p">(</span><span class="n">amessage_iter</span><span class="p">())</span>
+
+    <span class="c1"># Generate new message if the user provided new input</span>
+    <span class="k">if</span> <span class="n">user_input</span> <span class="o">:=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_input</span><span class="p">():</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ChatMessage</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">user_input</span><span class="p">))</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">user_input</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">use_streaming</span><span class="p">:</span>
+                <span class="n">stream</span> <span class="o">=</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">astream</span><span class="p">(</span>
+                    <span class="nb">input</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">user_input</span><span class="p">),</span>
+                    <span class="n">thread_id</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">DEFAULT_STREAMLIT_USER_ID</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">await</span> <span class="n">draw_messages</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">is_new</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span>
+                    <span class="nb">input</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">user_input</span><span class="p">),</span>
+                    <span class="n">thread_id</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">DEFAULT_STREAMLIT_USER_ID</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>  <span class="c1"># Clear stale containers</span>
+        <span class="k">except</span> <span class="n">AgentClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error generating response: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+    <span class="c1"># If messages have been generated, show feedback widget only for AI messages</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">handle_feedback</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="draw_messages">
+<a class="viewcode-back" href="../../generated/langgraph_agent_toolkit.streamlit_app.html#langgraph_agent_toolkit.streamlit_app.draw_messages">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">draw_messages</span><span class="p">(</span>
+    <span class="n">messages_agen</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">ChatMessage</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">is_new</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draws a set of chat messages - either replaying existing messages or streaming new ones.</span>
+
+<span class="sd">    This function has additional logic to handle streaming tokens and tool calls.</span>
+<span class="sd">    - Use a placeholder container to render streaming tokens as they arrive.</span>
+<span class="sd">    - Use a status container to render tool calls. Track the tool inputs and outputs</span>
+<span class="sd">      and update the status container accordingly.</span>
+
+<span class="sd">    The function also needs to track the last message container in session state</span>
+<span class="sd">    since later messages can draw to the same container. This is also used for</span>
+<span class="sd">    drawing the feedback widget in the latest chat message.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages_agen: An async iterator over messages to draw.</span>
+<span class="sd">        is_new: Whether the messages are new or not.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Keep track of the last message container</span>
+    <span class="n">last_message_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Placeholder for intermediate streaming tokens</span>
+    <span class="n">streaming_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Iterate over the messages and draw them</span>
+    <span class="k">while</span> <span class="n">msg</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">messages_agen</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># str message represents an intermediate token being streamed</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># If placeholder is empty, this is the first token of a new message</span>
+            <span class="c1"># being streamed. We need to do setup.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">streaming_placeholder</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;ai&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                    <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+
+            <span class="n">streaming_content</span> <span class="o">+=</span> <span class="n">msg</span>
+            <span class="n">streaming_placeholder</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">streaming_content</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected message type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+        <span class="k">match</span> <span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="c1"># A message from the user, the easiest case</span>
+            <span class="k">case</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
+                <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;human&quot;</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># A message from the agent is the most complex case, since we need to</span>
+            <span class="c1"># handle streaming tokens and tool calls.</span>
+            <span class="k">case</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                <span class="c1"># If we&#39;re rendering new messages, store the message in session state</span>
+                <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># If the last message type was not AI, create a new chat message</span>
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;ai&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                    <span class="c1"># If the message has content, write it out.</span>
+                    <span class="c1"># Reset the streaming variables to prepare for the next message.</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">streaming_placeholder</span><span class="p">:</span>
+                            <span class="n">streaming_placeholder</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                            <span class="n">streaming_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                            <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                        <span class="c1"># Create a status container for each tool call and store the</span>
+                        <span class="c1"># status container by ID to ensure results are mapped to the</span>
+                        <span class="c1"># correct status container.</span>
+                        <span class="n">call_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+                        <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span><span class="p">:</span>
+                                <span class="n">status</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">status</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Tool Call: </span><span class="si">{</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
+                                    <span class="n">state</span><span class="o">=</span><span class="s2">&quot;running&quot;</span> <span class="k">if</span> <span class="n">is_new</span> <span class="k">else</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+                                <span class="p">)</span>
+                                <span class="n">call_results</span><span class="p">[</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">status</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Input:&quot;</span><span class="p">)</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">])</span>
+
+                        <span class="c1"># Expect one ToolMessage for each tool call.</span>
+                        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">)):</span>
+                            <span class="n">tool_result</span><span class="p">:</span> <span class="n">ChatMessage</span> <span class="o">=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">messages_agen</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">tool_result</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected ChatMessage type: </span><span class="si">{</span><span class="n">tool_result</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+                            <span class="c1"># Record the message if it&#39;s new, and update the correct</span>
+                            <span class="c1"># status container with the result</span>
+                            <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">tool_result</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">:</span>
+                                    <span class="n">status</span> <span class="o">=</span> <span class="n">call_results</span><span class="p">[</span><span class="n">tool_result</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">]</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Output:&quot;</span><span class="p">)</span>
+                                <span class="c1"># Write content as plain text, disabling markdown rendering</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;pre&gt;</span><span class="si">{</span><span class="n">tool_result</span><span class="o">.</span><span class="n">content</span><span class="si">}</span><span class="s2">&lt;/pre&gt;&quot;</span><span class="p">,</span> <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+
+            <span class="k">case</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+                <span class="c1"># CustomData example used by the bg-task-agent</span>
+                <span class="c1"># See:</span>
+                <span class="c1"># - langgraph_agent_toolkit/agents/utils.py CustomData</span>
+                <span class="c1"># - langgraph_agent_toolkit/agents/bg_task_agent/task.py</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskData</span> <span class="o">=</span> <span class="n">TaskData</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">custom_data</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected CustomData message received from agent&quot;</span><span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">custom_data</span><span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;task&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;task&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">avatar</span><span class="o">=</span><span class="s2">&quot;:material/manufacturing:&quot;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                        <span class="n">status</span> <span class="o">=</span> <span class="n">TaskDataStatus</span><span class="p">()</span>
+
+                <span class="n">status</span><span class="o">.</span><span class="n">add_and_draw_task_data</span><span class="p">(</span><span class="n">task_data</span><span class="p">)</span>
+
+            <span class="c1"># In case of an unexpected message type, log an error and stop</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected ChatMessage type: </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="handle_feedback">
+<a class="viewcode-back" href="../../generated/langgraph_agent_toolkit.streamlit_app.html#langgraph_agent_toolkit.streamlit_app.handle_feedback">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_feedback</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draws a feedback widget and records feedback from the user.&quot;&quot;&quot;</span>
+    <span class="c1"># Keep track of last feedback sent to avoid sending duplicates</span>
+    <span class="k">if</span> <span class="s2">&quot;last_feedback&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_feedback</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">latest_run_id</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">run_id</span>
+
+    <span class="k">if</span> <span class="n">latest_run_id</span><span class="p">:</span>
+        <span class="n">feedback</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">feedback</span><span class="p">(</span><span class="s2">&quot;stars&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">latest_run_id</span><span class="p">)</span>
+
+        <span class="c1"># If the feedback value or run ID has changed, send a new feedback record</span>
+        <span class="k">if</span> <span class="n">feedback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">latest_run_id</span><span class="p">,</span> <span class="n">feedback</span><span class="p">)</span> <span class="o">!=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_feedback</span><span class="p">:</span>
+            <span class="c1"># Normalize the feedback value (an index) to a score between 0 and 1</span>
+            <span class="n">normalized_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">feedback</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.0</span>
+
+            <span class="n">agent_client</span><span class="p">:</span> <span class="n">AgentClient</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">agent_client</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">acreate_feedback</span><span class="p">(</span>
+                    <span class="n">run_id</span><span class="o">=</span><span class="n">latest_run_id</span><span class="p">,</span>
+                    <span class="n">key</span><span class="o">=</span><span class="s2">&quot;human-feedback-stars&quot;</span><span class="p">,</span>
+                    <span class="n">score</span><span class="o">=</span><span class="n">normalized_score</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;comment&quot;</span><span class="p">:</span> <span class="s2">&quot;In-line human feedback&quot;</span><span class="p">},</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">DEFAULT_STREAMLIT_USER_ID</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">AgentClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error recording feedback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_feedback</span> <span class="o">=</span> <span class="p">(</span><span class="n">latest_run_id</span><span class="p">,</span> <span class="n">feedback</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">toast</span><span class="p">(</span><span class="s2">&quot;Feedback recorded&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;:material/reviews:&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="auth_component">
+<a class="viewcode-back" href="../../generated/langgraph_agent_toolkit.streamlit_app.html#langgraph_agent_toolkit.streamlit_app.auth_component">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">auth_component</span><span class="p">():</span>
+    <span class="k">pass</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Environment Setup &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/environment_setup.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage Guide" href="usage.html" />
+    <link rel="prev" title="Installation Options" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Environment Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-your-env-file">Creating Your <code class="docutils literal notranslate"><span class="pre">.env</span></code> File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#litellm-configuration">LiteLLM Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Environment Setup</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/environment_setup.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="environment-setup">
+<h1>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading"></a></h1>
+<section id="creating-your-env-file">
+<h2>Creating Your <code class="docutils literal notranslate"><span class="pre">.env</span></code> File<a class="headerlink" href="#creating-your-env-file" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Copy the example configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+</pre></div>
+</div>
+</li>
+<li><p>Configure these essential sections:</p>
+<p><strong>LLM API Configuration</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># OpenAI Settings</span>
+<span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-xxxxxxxxxxxxx
+<span class="nv">OPENAI_API_BASE_URL</span><span class="o">=</span>http://litellm:4000/v1<span class="w">      </span><span class="c1"># Can be OpenAI API or LiteLLM proxy</span>
+<span class="nv">OPENAI_API_VERSION</span><span class="o">=</span><span class="m">2025</span>-01-01
+<span class="nv">OPENAI_MODEL_NAME</span><span class="o">=</span>gpt-4o-mini
+
+<span class="c1"># Azure OpenAI Settings (Optional)</span>
+<span class="nv">AZURE_OPENAI_API_KEY</span><span class="o">=</span>
+<span class="nv">AZURE_OPENAI_ENDPOINT</span><span class="o">=</span>
+<span class="nv">AZURE_OPENAI_API_VERSION</span><span class="o">=</span>
+<span class="nv">AZURE_OPENAI_MODEL_NAME</span><span class="o">=</span>
+<span class="nv">AZURE_OPENAI_DEPLOYMENT_NAME</span><span class="o">=</span>
+
+<span class="c1"># Anthropic Settings (Optional)</span>
+<span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span>
+<span class="nv">ANTHROPIC_MODEL_NAME</span><span class="o">=</span>
+</pre></div>
+</div>
+<p><strong>Multi-Provider Model Configuration</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure multiple models from different providers in a single environment variable</span>
+<span class="nv">MODEL_CONFIGS</span><span class="o">={</span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;gpt4o&quot;</span>:<span class="w"> </span><span class="o">{</span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;provider&quot;</span>:<span class="w"> </span><span class="s2">&quot;azure_openai&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;gpt-4o&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;api_key&quot;</span>:<span class="w"> </span><span class="s2">&quot;azure-key-123&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;endpoint&quot;</span>:<span class="w"> </span><span class="s2">&quot;https://your-resource.openai.azure.com/&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;api_version&quot;</span>:<span class="w"> </span><span class="s2">&quot;2023-05-15&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;deployment&quot;</span>:<span class="w"> </span><span class="s2">&quot;gpt4o-deployment&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;temperature&quot;</span>:<span class="w"> </span><span class="m">0</span>.7<span class="se">\</span>
+<span class="w">  </span><span class="o">}</span>,<span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;gpt4o-mini&quot;</span>:<span class="w"> </span><span class="o">{</span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;provider&quot;</span>:<span class="w"> </span><span class="s2">&quot;azure_openai&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;gpt-4o-mini&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;api_key&quot;</span>:<span class="w"> </span><span class="s2">&quot;azure-key-123&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;endpoint&quot;</span>:<span class="w"> </span><span class="s2">&quot;https://your-resource.openai.azure.com/&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;api_version&quot;</span>:<span class="w"> </span><span class="s2">&quot;2023-05-15&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;deployment&quot;</span>:<span class="w"> </span><span class="s2">&quot;gpt4o-mini-deployment&quot;</span><span class="se">\</span>
+<span class="w">  </span><span class="o">}</span>,<span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;gemini&quot;</span>:<span class="w"> </span><span class="o">{</span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;provider&quot;</span>:<span class="w"> </span><span class="s2">&quot;google_genai&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;gemini-pro&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;api_key&quot;</span>:<span class="w"> </span><span class="s2">&quot;google-key-123&quot;</span>,<span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;temperature&quot;</span>:<span class="w"> </span><span class="m">0</span>.7<span class="se">\</span>
+<span class="w">  </span><span class="o">}</span><span class="se">\</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This configuration allows you to:</p>
+<ul class="simple">
+<li><p>Define multiple models with different providers in one place</p></li>
+<li><p>Reference them by logical names in your application</p></li>
+<li><p>Set provider-specific parameters for each model</p></li>
+<li><p>Switch between models without changing code</p></li>
+</ul>
+<p><strong>Database Configuration</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">POSTGRES_HOST</span><span class="o">=</span>postgres
+<span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+<span class="nv">POSTGRES_USER</span><span class="o">=</span>postgres
+<span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>postgres
+<span class="nv">POSTGRES_DB</span><span class="o">=</span>postgres
+<span class="nv">POSTGRES_SCHEMA</span><span class="o">=</span>public
+</pre></div>
+</div>
+<p><strong>Observability Configuration</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Option 1: Langfuse</span>
+<span class="nv">LANGFUSE_HOST</span><span class="o">=</span>http://langfuse-web:3000
+<span class="nv">LANGFUSE_PUBLIC_KEY</span><span class="o">=</span>lf-pk-1234567890
+<span class="nv">LANGFUSE_SECRET_KEY</span><span class="o">=</span>lf-sk-1234567890
+
+<span class="c1"># Option 2: LangSmith</span>
+<span class="nv">LANGSMITH_TRACING</span><span class="o">=</span><span class="nb">true</span>
+<span class="nv">LANGSMITH_API_KEY</span><span class="o">=</span>api-key-xxxxxxxxcxxxxxx
+<span class="nv">LANGSMITH_PROJECT</span><span class="o">=</span>default
+<span class="nv">LANGSMITH_ENDPOINT</span><span class="o">=</span>https://api.smith.langchain.com
+</pre></div>
+</div>
+</li>
+<li><p>Customize other sections as needed (Redis, memory options, logging)</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.env</span></code> file contains sensitive credentials and should never be committed
+to version control. It’s already included in <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>.</p>
+</div>
+</section>
+<section id="litellm-configuration">
+<h2>LiteLLM Configuration<a class="headerlink" href="#litellm-configuration" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Create your configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>configs/litellm/config.example.yaml<span class="w"> </span>configs/litellm/config.yaml
+</pre></div>
+</div>
+</li>
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">configs/litellm/config.yaml</span></code> to include your models and credentials:</p>
+<p><strong>model_list</strong>: Define available models</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model_list</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpt-4o-mini</span><span class="w"> </span><span class="c1"># This name is used when selecting the model in your app</span>
+<span class="w">    </span><span class="nt">litellm_params</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">azure/gpt-4o-mini</span><span class="w"> </span><span class="c1"># Format for the underlying LiteLLM model</span>
+<span class="w">      </span><span class="nt">litellm_credential_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your_azure_credential</span><span class="w"> </span><span class="c1"># References credentials defined below</span>
+<span class="w">      </span><span class="nt">rpm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6</span><span class="w"> </span><span class="c1"># Rate limit (requests per minute)</span>
+</pre></div>
+</div>
+<p><strong>credential_list</strong>: Store API keys and endpoints</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">credential_list</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">credential_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your_azure_credential</span>
+<span class="w">    </span><span class="nt">credential_values</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">api_key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;your-api-key-here&quot;</span><span class="w"> </span><span class="c1"># Best practice: use os.environ/AZURE_API_KEY</span>
+<span class="w">      </span><span class="nt">api_base</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://your-azure-endpoint.openai.azure.com/&quot;</span>
+<span class="w">      </span><span class="nt">api_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-01-preview&quot;</span>
+</pre></div>
+</div>
+<p><strong>router_settings</strong>: Configure routing</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">router_settings</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">routing_strategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simple-shuffle</span>
+<span class="w">  </span><span class="nt">redis_host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redis</span>
+<span class="w">  </span><span class="nt">redis_password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">os.environ/REDIS_AUTH</span>
+</pre></div>
+</div>
+</li>
+<li><p>Setup service environment files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>configs/litellm/.litellm.env.example<span class="w"> </span>configs/litellm/.litellm.env
+cp<span class="w"> </span>configs/redis/.redis.env.example<span class="w"> </span>configs/redis/.redis.env
+cp<span class="w"> </span>configs/postgres/.postgres.env.example<span class="w"> </span>configs/postgres/.postgres.env
+cp<span class="w"> </span>configs/minio/.minio.env.example<span class="w"> </span>configs/minio/.minio.env
+cp<span class="w"> </span>configs/clickhouse/.clickhouse.env.example<span class="w"> </span>configs/clickhouse/.clickhouse.env
+cp<span class="w"> </span>configs/langfuse/.langfuse.env.example<span class="w"> </span>configs/langfuse/.langfuse.env
+</pre></div>
+</div>
+<p>For example, edit LiteLLM environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">LITELLM_MASTER_KEY</span><span class="o">=</span>sk-your-master-key<span class="w">  </span><span class="c1"># Create a strong key here</span>
+<span class="nv">LITELLM_ENVIRONMENT</span><span class="o">=</span>development
+<span class="nv">DATABASE_URL</span><span class="o">=</span><span class="s2">&quot;postgresql://postgres:postgres@postgres:5432/litellm&quot;</span>
+<span class="nv">STORE_MODEL_IN_DB</span><span class="o">=</span>True
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LiteLLM relies on Redis for request caching and rate limiting.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service.routes &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/service/routes.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service.routes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.service.routes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedirectResponse</span><span class="p">,</span> <span class="n">StreamingResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyMessage</span><span class="p">,</span> <span class="n">RemoveMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.runnables</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">langchain_to_chat_message</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AddMessagesInput</span><span class="p">,</span>
+    <span class="n">AddMessagesResponse</span><span class="p">,</span>
+    <span class="n">ChatHistory</span><span class="p">,</span>
+    <span class="n">ChatHistoryInput</span><span class="p">,</span>
+    <span class="n">ChatMessage</span><span class="p">,</span>
+    <span class="n">ClearHistoryInput</span><span class="p">,</span>
+    <span class="n">ClearHistoryResponse</span><span class="p">,</span>
+    <span class="n">Feedback</span><span class="p">,</span>
+    <span class="n">FeedbackResponse</span><span class="p">,</span>
+    <span class="n">HealthCheck</span><span class="p">,</span>
+    <span class="n">ServiceMetadata</span><span class="p">,</span>
+    <span class="n">StreamInput</span><span class="p">,</span>
+    <span class="n">UserInput</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.service.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_sse_response_example</span><span class="p">,</span>
+    <span class="n">_validate_thread_or_user_id</span><span class="p">,</span>
+    <span class="n">get_agent</span><span class="p">,</span>
+    <span class="n">get_agent_executor</span><span class="p">,</span>
+    <span class="n">get_all_agent_info</span><span class="p">,</span>
+    <span class="n">message_generator</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Create separate routers for private and public endpoints</span>
+<span class="n">private_router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+<span class="n">public_router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;public&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="info">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.info">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/info&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get information about available agents&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Returns metadata about the service including available agents and default agent.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServiceMetadata</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">ServiceMetadata</span><span class="p">(</span>
+        <span class="n">agents</span><span class="o">=</span><span class="n">get_all_agent_info</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+        <span class="n">default_agent</span><span class="o">=</span><span class="n">get_default_agent</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="invoke">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.invoke">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/invoke&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Invoke a specific agent to get a response&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Invoke a specified agent with user input to retrieve a final response.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/invoke&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Invoke an agent to get a response&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Invoke an agent with user input to retrieve a final response.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="n">UserInput</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatMessage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Invoke an agent with user input to retrieve a final response.</span>
+
+<span class="sd">    If agent_id is not provided, the default agent will be used.</span>
+<span class="sd">    Use thread_id to persist and continue a multi-turn conversation. run_id kwarg</span>
+<span class="sd">    is also attached to messages for recording feedback.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">get_agent_executor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">model_provider</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">model_provider</span><span class="p">,</span>
+            <span class="n">model_config_key</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">model_config_key</span><span class="p">,</span>
+            <span class="n">agent_config</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">agent_config</span><span class="p">,</span>
+            <span class="n">recursion_limit</span><span class="o">=</span><span class="n">user_input</span><span class="o">.</span><span class="n">recursion_limit</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Let the global exception handler deal with all exceptions</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="stream">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.stream">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/stream&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">response_class</span><span class="o">=</span><span class="n">StreamingResponse</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="n">_sse_response_example</span><span class="p">(),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Stream a specific agent&#39;s response&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Stream a specified agent&#39;s response to a user input, including intermediate messages and tokens.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/stream&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">response_class</span><span class="o">=</span><span class="n">StreamingResponse</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="n">_sse_response_example</span><span class="p">(),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Stream an agent&#39;s response&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Stream an agent&#39;s response to a user input, including intermediate messages and tokens.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="n">StreamInput</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamingResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream an agent&#39;s response to a user input, including intermediate messages and tokens.</span>
+
+<span class="sd">    If agent_id is not provided, the default agent will be used.</span>
+<span class="sd">    Use thread_id to persist and continue a multi-turn conversation. run_id kwarg</span>
+<span class="sd">    is also attached to all messages for recording feedback.</span>
+
+<span class="sd">    Set `stream_tokens=false` to return intermediate messages but not token-by-token.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+        <span class="n">message_generator</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">),</span>
+        <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="feedback">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.feedback">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/feedback&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;feedback&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Record feedback&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Record feedback for a run to the configured observability platform.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/feedback&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;feedback&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Record feedback for a specific agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Record feedback for a run to the configured observability platform for a specific agent.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">:</span> <span class="n">Feedback</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeedbackResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record feedback for a run to the configured observability platform.</span>
+
+<span class="sd">    This routes the feedback to the appropriate platform based on the agent&#39;s configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+        <span class="n">agent</span> <span class="o">=</span> <span class="n">get_agent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">observability</span><span class="o">.</span><span class="n">record_feedback</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">feedback</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="n">feedback</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+            <span class="n">score</span><span class="o">=</span><span class="n">feedback</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">feedback</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">feedback</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">FeedbackResponse</span><span class="p">(</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">feedback</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Feedback &#39;</span><span class="si">{</span><span class="n">feedback</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; recorded successfully for run </span><span class="si">{</span><span class="n">feedback</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Let the global exception handler deal with all other exceptions</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="history">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.history">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/history&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get chat history&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Get chat history for a thread or user.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/history&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get chat history for a specific agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Get chat history for a thread or user with a specific agent.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">history</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">ChatHistoryInput</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(),</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatHistory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get chat history.&quot;&quot;&quot;</span>
+    <span class="n">_validate_thread_or_user_id</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+    <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">=</span> <span class="n">get_agent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">state_snapshot</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">aget_state</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">RunnableConfig</span><span class="p">(</span>
+                <span class="n">configurable</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnyMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+        <span class="n">chat_messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">langchain_to_chat_message</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ChatHistory</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="n">chat_messages</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Let the global exception handler deal with all other exceptions</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="clear_history">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.clear_history">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+    <span class="s2">&quot;/history/clear&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Clear chat history&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear chat history for a thread or user.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/history/clear&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Clear chat history for a specific agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear chat history for a thread or user with a specific agent.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">clear_history</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">ClearHistoryInput</span><span class="p">,</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClearHistoryResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear chat history.&quot;&quot;&quot;</span>
+    <span class="n">_validate_thread_or_user_id</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+    <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">=</span> <span class="n">get_agent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">state_snapshot</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">aget_state</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">RunnableConfig</span><span class="p">(</span>
+                <span class="n">configurable</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnyMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+
+        <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">aupdate_state</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">RunnableConfig</span><span class="p">(</span>
+                <span class="n">configurable</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">RemoveMessage</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">]},</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ClearHistoryResponse</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cleared </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> messages from chat history.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Let the global exception handler deal with all exceptions</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="add_messages">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.add_messages">[docs]</a>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/history/add_messages&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Add messages to chat history&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Add messages to the end of chat history for a thread or user.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@private_router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{agent_id}</span><span class="s2">/history/add_messages&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chat&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Add messages to chat history for a specific agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Add messages to the end of chat history for a thread or user with a specific agent.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_messages</span><span class="p">(</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">AddMessagesInput</span><span class="p">,</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AddMessagesResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add messages to the end of chat history.&quot;&quot;&quot;</span>
+    <span class="n">_validate_thread_or_user_id</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">get_default_agent</span><span class="p">()</span>
+
+    <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">=</span> <span class="n">get_agent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">aupdate_state</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">RunnableConfig</span><span class="p">(</span>
+                <span class="n">configurable</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">content</span><span class="p">}</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">input</span><span class="o">.</span><span class="n">messages</span><span class="p">]},</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">AddMessagesResponse</span><span class="p">(</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="nb">input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span><span class="si">}</span><span class="s2"> messages to chat history.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Let the global exception handler deal with all exceptions</span>
+        <span class="k">raise</span></div>
+
+
+
+<div class="viewcode-block" id="redirect_to_docs">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.redirect_to_docs">[docs]</a>
+<span class="nd">@public_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;API Home&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Redirects to the API documentation.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">redirect_to_docs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RedirectResponse</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">RedirectResponse</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;/docs&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="health_check">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.health_check">[docs]</a>
+<span class="nd">@public_router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/health&quot;</span><span class="p">,</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;healthcheck&quot;</span><span class="p">],</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Health Check&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Perform a health check to verify the service is running correctly.&quot;</span><span class="p">,</span>
+    <span class="n">response_description</span><span class="o">=</span><span class="s2">&quot;Return HTTP Status Code 200 (OK)&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">HealthCheck</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HealthCheck</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Health check endpoint.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">HealthCheck</span><span class="p">(</span>
+        <span class="n">content</span><span class="o">=</span><span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">__version__</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

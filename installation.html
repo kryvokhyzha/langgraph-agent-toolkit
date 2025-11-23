@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation Options &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/installation.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Environment Setup" href="environment_setup.html" />
+    <link rel="prev" title="LangGraph Agent Toolkit Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-installation">Basic Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#available-extras">Available Extras</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#llm-provider-extras">LLM Provider Extras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-provider-options">Additional Provider Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-installation">Full Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-only-installation">Client-Only Installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation Options</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/installation.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-options">
+<h1>Installation Options<a class="headerlink" href="#installation-options" title="Link to this heading"></a></h1>
+<p>The toolkit supports multiple installation options using “extras” to include
+just the dependencies you need.</p>
+<section id="basic-installation">
+<h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>langgraph-agent-toolkit
+</pre></div>
+</div>
+</section>
+<section id="available-extras">
+<h2>Available Extras<a class="headerlink" href="#available-extras" title="Link to this heading"></a></h2>
+<section id="llm-provider-extras">
+<h3>LLM Provider Extras<a class="headerlink" href="#llm-provider-extras" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># OpenAI, Uvicorn backend, and Langfuse observability</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[openai,uvicorn-backend,langfuse]&quot;</span>
+
+<span class="c1"># Anthropic, AWS Lambda backend, and Langsmith observability</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[anthropic,aws-backend,langsmith]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="additional-provider-options">
+<h3>Additional Provider Options<a class="headerlink" href="#additional-provider-options" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">google-vertexai</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">google-genai</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aws</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ollama</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">groq</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deepseek</span></code></p></li>
+</ul>
+</section>
+<section id="full-installation">
+<h3>Full Installation<a class="headerlink" href="#full-installation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># All LLM providers, all backends, and all observability platforms</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[all-llms,all-backends,all-observability]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="client-only-installation">
+<h3>Client-Only Installation<a class="headerlink" href="#client-only-installation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Just the client and Streamlit app</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[client]&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="LangGraph Agent Toolkit Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="environment_setup.html" class="btn btn-neutral float-right" title="Environment Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

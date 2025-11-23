@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.helper.exceptions &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/helper/exceptions.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7f96dc5e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.helper.exceptions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.helper.exceptions</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="AgentToolkitError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError">[docs]</a>
+<span></span><span class="k">class</span><span class="w"> </span><span class="nc">AgentToolkitError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for all LangGraph Agent Toolkit errors.</span>
+
+<span class="sd">    All custom exceptions should inherit from this base class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AgentToolkitError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the base exception.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: Human-readable error message</span>
+<span class="sd">            error_code: Optional error code for programmatic handling</span>
+<span class="sd">            details: Optional dictionary with additional error context</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_code</span> <span class="o">=</span> <span class="n">error_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">details</span> <span class="o">=</span> <span class="n">details</span> <span class="ow">or</span> <span class="p">{}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for agent-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AgentConfigurationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentConfigurationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentConfigurationError</span><span class="p">(</span><span class="n">AgentError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there&#39;s an error in agent configuration.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AgentExecutionError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentExecutionError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentExecutionError</span><span class="p">(</span><span class="n">AgentError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an agent fails to execute properly.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AgentTimeoutError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AgentTimeoutError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentTimeoutError</span><span class="p">(</span><span class="n">AgentError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an agent operation times out.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="MessageError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MessageError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MessageError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for message-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="UnsupportedMessageTypeError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UnsupportedMessageTypeError</span><span class="p">(</span><span class="n">MessageError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when encountering an unsupported message type.</span>
+
+<span class="sd">    This replaces the string-based check for &quot;Unsupported message type&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="UnsupportedMessageTypeError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">supported_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with specific message type information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message_type: The unsupported message type</span>
+<span class="sd">            supported_types: List of supported message types</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supported</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Supported types: </span><span class="si">{</span><span class="n">supported_types</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">supported_types</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unsupported message type: </span><span class="si">{</span><span class="n">message_type</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">supported</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;UNSUPPORTED_MESSAGE_TYPE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_type</span> <span class="o">=</span> <span class="n">message_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supported_types</span> <span class="o">=</span> <span class="n">supported_types</span> <span class="ow">or</span> <span class="p">[]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MessageConversionError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MessageConversionError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MessageConversionError</span><span class="p">(</span><span class="n">MessageError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when message conversion fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ValidationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValidationError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for validation errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="InputValidationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.InputValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InputValidationError</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when input validation fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigurationValidationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ConfigurationValidationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigurationValidationError</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when configuration validation fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ModelError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ModelError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for model-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ModelNotFoundError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelNotFoundError</span><span class="p">(</span><span class="n">ModelError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a requested model is not found.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModelNotFoundError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with model information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_name: Name of the model that wasn&#39;t found</span>
+<span class="sd">            provider: Optional model provider</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">provider_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; from provider &#39;</span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2">&#39;&quot;</span> <span class="k">if</span> <span class="n">provider</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;</span><span class="si">{</span><span class="n">provider_info</span><span class="si">}</span><span class="s2"> not found&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;MODEL_NOT_FOUND&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">provider</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ModelConfigurationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ModelConfigurationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelConfigurationError</span><span class="p">(</span><span class="n">ModelError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there&#39;s an error in model configuration.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ToolError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ToolError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for tool-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ToolNotFoundError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolNotFoundError</span><span class="p">(</span><span class="n">ToolError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a requested tool is not found.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ToolNotFoundError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">available_tools</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with tool information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tool_name: Name of the tool that wasn&#39;t found</span>
+<span class="sd">            available_tools: List of available tools</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">available</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Available tools: </span><span class="si">{</span><span class="n">available_tools</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">available_tools</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; not found.</span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;TOOL_NOT_FOUND&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool_name</span> <span class="o">=</span> <span class="n">tool_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_tools</span> <span class="o">=</span> <span class="n">available_tools</span> <span class="ow">or</span> <span class="p">[]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ToolExecutionError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ToolExecutionError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolExecutionError</span><span class="p">(</span><span class="n">ToolError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when tool execution fails.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ToolExecutionError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ToolExecutionError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">original_error</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with tool execution information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tool_name: Name of the tool that failed</span>
+<span class="sd">            original_error: The original exception that caused the failure</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; execution failed&quot;</span>
+        <span class="k">if</span> <span class="n">original_error</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">original_error</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;TOOL_EXECUTION_FAILED&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool_name</span> <span class="o">=</span> <span class="n">tool_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_error</span> <span class="o">=</span> <span class="n">original_error</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MemoryError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MemoryError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for memory-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="MemoryNotFoundError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryNotFoundError</span><span class="p">(</span><span class="ne">MemoryError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when requested memory/thread is not found.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MemoryNotFoundError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">identifier_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;thread&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with memory identifier information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            identifier: The identifier that wasn&#39;t found</span>
+<span class="sd">            identifier_type: Type of identifier (thread, user, etc.)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">identifier_type</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;MEMORY_NOT_FOUND&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier_type</span> <span class="o">=</span> <span class="n">identifier_type</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MemoryOperationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.MemoryOperationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryOperationError</span><span class="p">(</span><span class="ne">MemoryError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when memory operations fail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ObservabilityError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ObservabilityError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObservabilityError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for observability-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="FeedbackError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.FeedbackError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FeedbackError</span><span class="p">(</span><span class="n">ObservabilityError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when feedback operations fail.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FeedbackError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.FeedbackError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with feedback operation information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            run_id: The run ID associated with the feedback</span>
+<span class="sd">            operation: The feedback operation that failed</span>
+<span class="sd">            reason: Optional reason for the failure</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Feedback </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failed for run </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;FEEDBACK_FAILED&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation</span> <span class="o">=</span> <span class="n">operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AuthenticationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AuthenticationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when authentication fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AuthorizationError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.AuthorizationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthorizationError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when authorization fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.RateLimitError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when rate limits are exceeded.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RateLimitError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.RateLimitError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reset_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with rate limit information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resource: The resource that hit the rate limit</span>
+<span class="sd">            limit: The rate limit that was exceeded</span>
+<span class="sd">            reset_time: Optional time when the limit resets</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Rate limit exceeded for </span><span class="si">{</span><span class="n">resource</span><span class="si">}</span><span class="s2"> (limit: </span><span class="si">{</span><span class="n">limit</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="n">reset_time</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;. Resets at </span><span class="si">{</span><span class="n">reset_time</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;RATE_LIMIT_EXCEEDED&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_time</span> <span class="o">=</span> <span class="n">reset_time</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NetworkError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.NetworkError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NetworkError</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for network-related errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ServiceUnavailableError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServiceUnavailableError</span><span class="p">(</span><span class="n">NetworkError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an external service is unavailable.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ServiceUnavailableError.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.helper.exceptions.html#langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize with service information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service: Name of the unavailable service</span>
+<span class="sd">            details: Optional details about the unavailability</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Service &#39;</span><span class="si">{</span><span class="n">service</span><span class="si">}</span><span class="s2">&#39; is unavailable&quot;</span>
+        <span class="k">if</span> <span class="n">details</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="n">details</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="o">=</span><span class="s2">&quot;SERVICE_UNAVAILABLE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>
