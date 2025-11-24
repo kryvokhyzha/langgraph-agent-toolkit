@@ -31,12 +31,12 @@ dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
     "ddgs >= 9.5.0",
-    "fastapi >= 0.116.1, < 0.122.0",
+    "fastapi >= 0.116.1, < 0.123.0",
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter >= 0.10, < 0.13",
-    "langchain >= 1.0.0, < 1.0.6",
-    "langchain-core >= 1.0.0, < 1.0.5",
+    "langchain >= 1.0.0, < 1.1.1",
+    "langchain-core >= 1.0.0, < 1.1.1",
     "langchain-community >= 0.4.0, < 0.4.2",
     "langgraph >= 1.0.0, < 1.0.4",
     "langgraph-cli[inmem] >= 0.2.10, < 0.5.0",
@@ -129,23 +129,23 @@ all-backends = [
 
 # Different LLM providers
 aws = [
-    "langchain-aws ~= 1.0.0",
+    "langchain-aws >= 1.0,< 1.2",
 ]
 
 anthropic = [
-    "langchain-anthropic ~= 1.0.0",
+    "langchain-anthropic >= 1.0,< 1.3",
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai ~= 3.0.0",
+    "langchain-google-vertexai >= 3.0,< 3.2",
 ]
 
 google-genai = [
-    "langchain-google-genai ~= 3.0.0",
+    "langchain-google-genai >= 3.0,< 3.3",
 ]
 
 groq = [
-    "langchain-groq ~= 1.0.0",
+    "langchain-groq >= 1.0,< 1.2",
 ]
 
 deepseek = [
@@ -153,24 +153,24 @@ deepseek = [
 ]
 
 openai = [
-    "langchain-openai ~= 1.0.0",
+    "langchain-openai >= 1.0,< 1.2",
 ]
 
 all-llms = [
-    "langchain-aws ~= 1.0.0",
-    "langchain-anthropic ~= 1.0.0",
-    "langchain-google-vertexai ~= 3.0.0",
-    "langchain-google-genai ~= 3.0.0",
+    "langchain-aws >= 1.0,< 1.2",
+    "langchain-anthropic >= 1.0,< 1.3",
+    "langchain-google-vertexai >= 3.0,< 3.2",
+    "langchain-google-genai >= 3.0,< 3.3",
     "langchain-ollama ~= 1.0.0",
-    "langchain-groq ~= 1.0.0",
+    "langchain-groq >= 1.0,< 1.2",
     "langchain-deepseek ~= 1.0.0",
-    "langchain-openai ~= 1.0.0",
+    "langchain-openai >= 1.0,< 1.2",
 ]
 
 # Observability tools and platforms
 langfuse = [
     # "langfuse >= 2.60.3,< 2.70.0",
-    "langfuse >= 2.60.3, < 3.9.2",
+    "langfuse >= 2.60.3, < 3.10.2",
  ]
 
  langsmith = [
@@ -179,7 +179,7 @@ langfuse = [
 
  all-observability = [
     # "langfuse >= 2.60.3,< 2.70.0",
-    "langfuse >= 2.60.3, < 3.9.2",
+    "langfuse >= 2.60.3, < 3.10.2",
     "langsmith >= 0.3.31, < 0.5.0",
  ]
 
