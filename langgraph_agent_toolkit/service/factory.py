@@ -2,7 +2,11 @@ import asyncio
 import json
 import os
 import sys
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
+
+
+if TYPE_CHECKING:
+    import azure.functions as func
 
 from fastapi import FastAPI
 
@@ -74,17 +78,22 @@ class ServiceRunner:
             if sys.platform == "win32":
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-            # In development mode with reload=True, we need to use an import string
-            # instead of passing the app instance directly
-            if base_settings.is_dev():
-                logger.info("Starting in development mode with hot reload enabled")
+            # Check if we need to use import string (required for reload or workers > 1)
+            workers = kwargs.get("workers", 1)
+            reload = kwargs.get("reload", base_settings.is_dev())
+            use_import_string = reload or workers > 1
 
-                # union of dict and kwargs
+            if use_import_string:
+                if reload:
+                    logger.info("Starting with hot reload enabled - using import string")
+                if workers > 1:
+                    logger.info(f"Starting with {workers} workers - using import string")
+
                 parameters = (
                     dict(
                         host=base_settings.HOST,
                         port=base_settings.PORT,
-                        reload=True,
+                        reload=reload,
                         factory=True,
                         log_config=log_config,
                     )
@@ -93,7 +102,7 @@ class ServiceRunner:
 
                 uvicorn.run("langgraph_agent_toolkit.service.handler:create_app", **parameters)
             else:
-                # In production mode, use the app instance directly
+                # Single worker, no reload - use the app instance directly
                 parameters = (
                     dict(
                         host=base_settings.HOST,
