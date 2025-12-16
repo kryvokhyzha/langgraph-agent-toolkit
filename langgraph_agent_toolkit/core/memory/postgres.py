@@ -5,7 +5,7 @@ from typing import TypeVar
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.postgres.aio import AsyncPostgresStore
 from psycopg.rows import dict_row
-from psycopg_pool import AsyncConnectionPool
+from psycopg_pool import AsyncConnectionPool, PoolTimeout
 
 from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 from langgraph_agent_toolkit.core.settings import settings
@@ -74,6 +74,11 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         logger.info(
             f"Creating PostgreSQL connection pool: min_size={settings.POSTGRES_MIN_SIZE}, "
             f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}, "
+            f"timeout={settings.POSTGRES_POOL_TIMEOUT}s, reconnect_timeout={settings.POSTGRES_RECONNECT_TIMEOUT}s, "
+            f"max_lifetime={settings.POSTGRES_MAX_LIFETIME}s, "
+            f"statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}ms, "
+            f"lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}ms, "
+            f"idle_in_transaction_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}ms, "
             f"schema={settings.POSTGRES_SCHEMA}, application_name={application_name}"
         )
 
@@ -85,9 +90,37 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             "application_name": application_name,
         }
 
-        # Set search_path using options parameter if schema is specified and not default
+        # Build PostgreSQL options string with timeouts and schema
+        pg_options = []
+
+        # Set search_path if schema is specified and not default
         if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
-            connection_kwargs["options"] = f"-c search_path={settings.POSTGRES_SCHEMA}"
+            pg_options.append(f"-c search_path={settings.POSTGRES_SCHEMA}")
+
+        # Set statement timeout - kills queries running too long
+        if settings.POSTGRES_STATEMENT_TIMEOUT > 0:
+            pg_options.append(f"-c statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}")
+
+        # Set lock timeout - prevents waiting forever for locks
+        if settings.POSTGRES_LOCK_TIMEOUT > 0:
+            pg_options.append(f"-c lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}")
+
+        # Set idle_in_transaction_session_timeout - kills idle transactions
+        if settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT > 0:
+            pg_options.append(
+                f"-c idle_in_transaction_session_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}"
+            )
+
+        if pg_options:
+            connection_kwargs["options"] = " ".join(pg_options)
+
+        # Callback for logging reconnection attempts
+        def on_reconnect_failed(pool: AsyncConnectionPool) -> None:
+            logger.error(
+                f"Failed to reconnect to PostgreSQL. Pool stats: "
+                f"pool_size={pool.get_stats().get('pool_size', 'N/A')}, "
+                f"pool_available={pool.get_stats().get('pool_available', 'N/A')}"
+            )
 
         # Use AsyncConnectionPool as an async context manager
         async with AsyncConnectionPool(
@@ -95,13 +128,42 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             min_size=settings.POSTGRES_MIN_SIZE,
             max_size=settings.POSTGRES_POOL_SIZE,
             max_idle=settings.POSTGRES_MAX_IDLE,
+            timeout=settings.POSTGRES_POOL_TIMEOUT,
+            reconnect_timeout=settings.POSTGRES_RECONNECT_TIMEOUT,
+            # Maximum time a connection can live before being recycled (prevents stale connections)
+            max_lifetime=settings.POSTGRES_MAX_LIFETIME,
+            # Number of background workers for connection maintenance
+            num_workers=settings.POSTGRES_NUM_WORKERS,
+            # Automatically check connection health before returning from pool
             check=AsyncConnectionPool.check_connection,
+            # Callback when reconnection fails
+            reconnect_failed=on_reconnect_failed,
+            # Connection configuration
             kwargs=connection_kwargs,
+            # Don't open immediately, we'll open manually after setup
+            open=False,
         ) as pool:
-            logger.info("PostgreSQL connection pool opened successfully")
+            # Open the pool and wait for min_size connections
+            await pool.open(wait=True, timeout=settings.POSTGRES_POOL_TIMEOUT)
+            logger.info(
+                f"PostgreSQL connection pool opened successfully. "
+                f"Initial stats: pool_size={pool.get_stats().get('pool_size', 'N/A')}, "
+                f"pool_available={pool.get_stats().get('pool_available', 'N/A')}"
+            )
 
             try:
                 yield factory_func(pool)
+            except PoolTimeout:
+                # Log pool statistics for debugging
+                stats = pool.get_stats()
+                logger.error(
+                    f"Pool timeout occurred. Pool stats: "
+                    f"pool_size={stats.get('pool_size', 'N/A')}, "
+                    f"pool_available={stats.get('pool_available', 'N/A')}, "
+                    f"requests_waiting={stats.get('requests_waiting', 'N/A')}, "
+                    f"requests_num={stats.get('requests_num', 'N/A')}"
+                )
+                raise
             finally:
                 logger.info("PostgreSQL connection pool will be closed automatically")
 

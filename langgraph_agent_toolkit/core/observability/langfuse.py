@@ -4,8 +4,6 @@ import json
 from contextlib import contextmanager
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
-from langfuse import get_client, propagate_attributes
-
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
 from langgraph_agent_toolkit.helper.constants import DEFAULT_CACHE_TTL_SECOND
@@ -13,11 +11,17 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 
 try:
+    from langfuse import get_client, propagate_attributes
     from langfuse.langchain import CallbackHandler
+
+    _IS_NEW_LANGFUSE = True
 except (ModuleNotFoundError, ImportError) as e:
     logger.debug(f"Falling back to `langfuse.callback.CallbackHandler` due to import error: {e}")
     # Old langfuse version
+    from langfuse import Langfuse
     from langfuse.callback import CallbackHandler
+
+    _IS_NEW_LANGFUSE = False
 
 
 class LangfuseObservability(BaseObservabilityPlatform):
@@ -39,28 +43,42 @@ class LangfuseObservability(BaseObservabilityPlatform):
         return CallbackHandler(**filtered_kwargs)
 
     def before_shutdown(self) -> None:
-        get_client().flush()
+        if _IS_NEW_LANGFUSE:
+            get_client().flush()
+        else:
+            Langfuse().flush()
 
     @BaseObservabilityPlatform.requires_env_vars
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        lf_client = get_client()
+        if _IS_NEW_LANGFUSE:
+            lf_client = get_client()
+        else:
+            lf_client = Langfuse()
 
-        # Get valid parameters for CallbackHandler.__init__
-        valid_params = set(inspect.signature(lf_client.create_score).parameters.keys())
-        valid_params.discard("self")  # Remove 'self' from valid parameters
+        if _IS_NEW_LANGFUSE:
+            # Get valid parameters for CallbackHandler.__init__
+            valid_params = set(inspect.signature(lf_client.create_score).parameters.keys())
+            valid_params.discard("self")  # Remove 'self' from valid parameters
 
-        # Filter kwargs to only include valid parameters
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+            # Filter kwargs to only include valid parameters
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
 
-        # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
-        trace_id = str(run_id).replace("-", "").lower()
+            # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
+            trace_id = str(run_id).replace("-", "").lower()
 
-        with propagate_attributes(user_id=kwargs.get("user_id")):
-            lf_client.create_score(
+            with propagate_attributes(user_id=kwargs.get("user_id")):
+                lf_client.create_score(
+                    name=key,
+                    value=score,
+                    trace_id=trace_id,
+                    **filtered_kwargs,
+                )
+        else:
+            Langfuse().score(
+                trace_id=run_id,
                 name=key,
                 value=score,
-                trace_id=trace_id,
-                **filtered_kwargs,
+                **kwargs,
             )
 
     def _compute_prompt_hash(self, prompt_template: PromptTemplateType) -> str:
@@ -82,7 +100,10 @@ class LangfuseObservability(BaseObservabilityPlatform):
         metadata: Optional[Dict[str, Any]] = None,
         force_create_new_version: bool = True,
     ) -> None:
-        langfuse = get_client()
+        if _IS_NEW_LANGFUSE:
+            langfuse = get_client()
+        else:
+            langfuse = Langfuse()
         labels = metadata.get("labels", ["production"]) if metadata else ["production"]
 
         # Check if remote_first is enabled
@@ -182,7 +203,10 @@ class LangfuseObservability(BaseObservabilityPlatform):
         **kwargs,
     ) -> Union[PromptReturnType, Tuple[PromptReturnType, Any]]:
         try:
-            langfuse = get_client()
+            if _IS_NEW_LANGFUSE:
+                langfuse = get_client()
+            else:
+                langfuse = Langfuse()
             get_prompt_kwargs = {"name": name, "cache_ttl_seconds": cache_ttl_seconds}
 
             if label:
@@ -229,7 +253,10 @@ class LangfuseObservability(BaseObservabilityPlatform):
             The span object
 
         """
-        langfuse = get_client()
+        if _IS_NEW_LANGFUSE:
+            langfuse = get_client()
+        else:
+            langfuse = Langfuse()
 
         # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
         trace_id = str(run_id).replace("-", "").lower()
