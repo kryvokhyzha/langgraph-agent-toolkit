@@ -317,18 +317,22 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                 if var_name in full_input_dict:
                     messages_value = full_input_dict[var_name]
                     if isinstance(messages_value, list):
-                        return messages_value if all(isinstance(m, BaseMessage) for m in messages_value) else [msg]
-                    return [messages_value] if isinstance(messages_value, BaseMessage) else [msg]
+                        # Filter only BaseMessage instances
+                        return [m for m in messages_value if isinstance(m, BaseMessage)]
+                    return [messages_value] if isinstance(messages_value, BaseMessage) else []
                 return []
 
             if hasattr(msg, "format") and callable(msg.format):
-                return [msg.format(**full_input_dict)]
+                result = msg.format(**full_input_dict)
+                return [result] if isinstance(result, BaseMessage) else []
             elif hasattr(msg, "format_messages") and callable(msg.format_messages):
-                return msg.format_messages(**full_input_dict)
+                results = msg.format_messages(**full_input_dict)
+                return [r for r in results if isinstance(r, BaseMessage)]
         except Exception as e:
             logger.warning(f"Error formatting message: {e}")
 
-        return [msg]
+        # Only return msg if it's a BaseMessage, otherwise return empty list
+        return [msg] if isinstance(msg, BaseMessage) else []
 
     async def _aformat_message_with_input(self, msg: Any, input_dict: Dict[str, Any]) -> List[BaseMessage]:
         """Asynchronously format a message with input."""
@@ -342,22 +346,28 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                 if var_name in full_input_dict:
                     messages_value = full_input_dict[var_name]
                     if isinstance(messages_value, list):
-                        return messages_value if all(isinstance(m, BaseMessage) for m in messages_value) else [msg]
-                    return [messages_value] if isinstance(messages_value, BaseMessage) else [msg]
+                        # Filter only BaseMessage instances
+                        return [m for m in messages_value if isinstance(m, BaseMessage)]
+                    return [messages_value] if isinstance(messages_value, BaseMessage) else []
                 return []
 
             if hasattr(msg, "aformat") and callable(msg.aformat):
-                return [await msg.aformat(**full_input_dict)]
+                result = await msg.aformat(**full_input_dict)
+                return [result] if isinstance(result, BaseMessage) else []
             elif hasattr(msg, "aformat_messages") and callable(msg.aformat_messages):
-                return await msg.aformat_messages(**full_input_dict)
+                results = await msg.aformat_messages(**full_input_dict)
+                return [r for r in results if isinstance(r, BaseMessage)]
             elif hasattr(msg, "format") and callable(msg.format):
-                return [msg.format(**full_input_dict)]
+                result = msg.format(**full_input_dict)
+                return [result] if isinstance(result, BaseMessage) else []
             elif hasattr(msg, "format_messages") and callable(msg.format_messages):
-                return msg.format_messages(**full_input_dict)
+                results = msg.format_messages(**full_input_dict)
+                return [r for r in results if isinstance(r, BaseMessage)]
         except Exception:
             pass
 
-        return [msg]
+        # Only return msg if it's a BaseMessage, otherwise return empty list
+        return [msg] if isinstance(msg, BaseMessage) else []
 
     def _ensure_messages_loaded(self) -> None:
         """Ensure messages are loaded from observability platform if needed."""
