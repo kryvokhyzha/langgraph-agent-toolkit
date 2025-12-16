@@ -130,13 +130,29 @@ class TestPostgresAsyncFunctionality:
         mock_settings.POSTGRES_HOST = "localhost"
         mock_settings.POSTGRES_PORT = "5432"
         mock_settings.POSTGRES_DB = "testdb"
+        mock_settings.POSTGRES_SCHEMA = "public"
+        mock_settings.POSTGRES_APPLICATION_NAME = "test-app"
         mock_settings.POSTGRES_MIN_SIZE = 1
         mock_settings.POSTGRES_POOL_SIZE = 5
         mock_settings.POSTGRES_MAX_IDLE = 10
+        mock_settings.POSTGRES_POOL_TIMEOUT = 30.0
+        mock_settings.POSTGRES_RECONNECT_TIMEOUT = 60.0
+        mock_settings.POSTGRES_MAX_LIFETIME = 600.0
+        mock_settings.POSTGRES_NUM_WORKERS = 3
+        mock_settings.POSTGRES_STATEMENT_TIMEOUT = 300000
+        mock_settings.POSTGRES_LOCK_TIMEOUT = 60000
+        mock_settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT = 300000
 
         # Setup AsyncContextManager mock for connection pool
-        mock_pool_instance = AsyncMock()
-        mock_pool.return_value.__aenter__.return_value = mock_pool_instance
+        mock_pool_instance = MagicMock()
+        mock_pool_instance.get_stats.return_value = {"pool_size": 1, "pool_available": 1}
+        mock_pool_instance.open = AsyncMock()
+
+        # Configure the async context manager properly
+        mock_pool_cm = AsyncMock()
+        mock_pool_cm.__aenter__.return_value = mock_pool_instance
+        mock_pool_cm.__aexit__.return_value = None
+        mock_pool.return_value = mock_pool_cm
 
         # Setup saver mock
         mock_saver_instance = MagicMock()
@@ -153,8 +169,8 @@ class TestPostgresAsyncFunctionality:
         call_args = mock_pool.call_args[0][0]
         assert "postgresql://user:password@localhost:5432/testdb" == call_args
 
-        # Verify that __aexit__ was called (pool closed)
-        mock_pool.return_value.__aexit__.assert_called_once()
+        # Verify that pool.open was called
+        mock_pool_instance.open.assert_called_once()
 
     @patch("langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_saver")
     @patch("langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.validate_config")
