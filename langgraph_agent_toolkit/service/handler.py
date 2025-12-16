@@ -94,6 +94,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 try:
                     if saver is not None:
                         await saver.setup()
+                        # Store pool reference for health monitoring
+                        if hasattr(saver, "conn") and saver.conn is not None:
+                            app.state.db_pool = saver.conn
                     initialize_agents(executor, observability, checkpointer=saver)
                     yield
                 except Exception as e:

@@ -348,3 +348,40 @@ async def health_check() -> HealthCheck:
         content="healthy",
         version=__version__,
     )
+
+
+@private_router.get(
+    "/health/db",
+    tags=["healthcheck"],
+    summary="Database Pool Health",
+    description="Get database connection pool statistics for monitoring and debugging.",
+    response_description="Return database pool statistics",
+    status_code=status.HTTP_200_OK,
+)
+async def db_health_check(request: Request) -> dict:
+    """Database pool health check endpoint."""
+    pool = getattr(request.app.state, "db_pool", None)
+    if pool is None:
+        return {
+            "status": "no_pool",
+            "message": "No database pool configured or memory backend not using PostgreSQL",
+        }
+
+    try:
+        stats = pool.get_stats()
+        return {
+            "status": "healthy" if stats.get("pool_available", 0) > 0 else "exhausted",
+            "pool_size": stats.get("pool_size", 0),
+            "pool_available": stats.get("pool_available", 0),
+            "requests_waiting": stats.get("requests_waiting", 0),
+            "requests_num": stats.get("requests_num", 0),
+            "requests_queued": stats.get("requests_queued", 0),
+            "connections_num": stats.get("connections_num", 0),
+            "pool_min": stats.get("pool_min", 0),
+            "pool_max": stats.get("pool_max", 0),
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e),
+        }
