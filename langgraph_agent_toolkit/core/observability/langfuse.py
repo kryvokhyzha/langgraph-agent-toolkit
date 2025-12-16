@@ -255,35 +255,34 @@ class LangfuseObservability(BaseObservabilityPlatform):
         """
         if _IS_NEW_LANGFUSE:
             langfuse = get_client()
+            # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
+            trace_id = str(run_id).replace("-", "").lower()
+
+            # Extract context parameters
+            user_id = kwargs.get("user_id")
+            input_data = kwargs.get("input")
+            agent_name = kwargs.get("agent_name", "agent-execution")
+
+            with langfuse.start_as_current_span(
+                name=agent_name,
+                trace_context={"trace_id": trace_id},
+            ) as span:
+                # Update trace with user context if available
+                update_params = {}
+                if user_id:
+                    update_params["user_id"] = user_id
+                if input_data:
+                    update_params["input"] = input_data
+
+                if update_params:
+                    span.update_trace(**update_params)
+
+                try:
+                    yield span
+                finally:
+                    # Optionally update with output if provided via kwargs
+                    output_data = kwargs.get("output")
+                    if output_data:
+                        span.update_trace(output=output_data)
         else:
-            langfuse = Langfuse()
-
-        # Convert UUID to valid Langfuse trace ID format (32 lowercase hex chars without hyphens)
-        trace_id = str(run_id).replace("-", "").lower()
-
-        # Extract context parameters
-        user_id = kwargs.get("user_id")
-        input_data = kwargs.get("input")
-        agent_name = kwargs.get("agent_name", "agent-execution")
-
-        with langfuse.start_as_current_span(
-            name=agent_name,
-            trace_context={"trace_id": trace_id},
-        ) as span:
-            # Update trace with user context if available
-            update_params = {}
-            if user_id:
-                update_params["user_id"] = user_id
-            if input_data:
-                update_params["input"] = input_data
-
-            if update_params:
-                span.update_trace(**update_params)
-
-            try:
-                yield span
-            finally:
-                # Optionally update with output if provided via kwargs
-                output_data = kwargs.get("output")
-                if output_data:
-                    span.update_trace(output=output_data)
+            yield None

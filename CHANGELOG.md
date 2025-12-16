@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [0.8.5]
 
+### Fixed
+
+- Fixed bug to support `langfuse < 2.70.0`
+
+## [0.8.5]
+
 ### Updated
 
 - Core Dependencies to support `langchain < 1.0.0`
