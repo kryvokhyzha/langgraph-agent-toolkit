@@ -2,22 +2,26 @@ from typing import Any, Dict, Literal, Optional
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
+from langgraph_agent_toolkit.helper.logging import logger
 
 
 class EmptyObservability(BaseObservabilityPlatform):
-    """Empty implementation of observability platform."""
+    """Empty implementation of observability platform with in-memory prompt storage.
 
-    __default_required_vars = []
+    This implementation stores prompts in memory, allowing the prompt template
+    system to work without a remote observability backend like Langfuse or LangSmith.
+    """
 
-    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
+    def __init__(self, remote_first: bool = False):
         """Initialize EmptyObservability.
 
         Args:
-            prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.
-            remote_first: If True, prioritize remote prompts over local ones (ignored in empty implementation).
+            remote_first: Ignored in empty implementation.
 
         """
-        super().__init__(prompts_dir, remote_first)
+        super().__init__(remote_first)
+        self._prompts: Dict[str, PromptTemplateType] = {}
+        self._metadata: Dict[str, Dict[str, Any]] = {}
 
     def get_callback_handler(self, **kwargs) -> None:
         """Get the callback handler for the observability platform."""
@@ -28,8 +32,8 @@ class EmptyObservability(BaseObservabilityPlatform):
         pass
 
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        """Record feedback for a run with Empty observability platform."""
-        raise ValueError("Cannot record feedback: No observability platform is configured.")
+        """Record feedback - silently ignored without a remote backend."""
+        logger.debug(f"Feedback ignored (no observability backend): run_id={run_id}, key={key}, score={score}")
 
     def push_prompt(
         self,
@@ -38,16 +42,23 @@ class EmptyObservability(BaseObservabilityPlatform):
         metadata: Optional[Dict[str, Any]] = None,
         force_create_new_version: bool = True,
     ) -> None:
-        """Push a prompt using local storage.
+        """Store a prompt in memory.
 
         Args:
             name: Name of the prompt
-            prompt_template: String template, list of message dicts, or prompt object
-            metadata: Additional metadata for the prompt
-            force_create_new_version: If True, overwrite existing prompt with new version
+            prompt_template: The prompt template to store
+            metadata: Optional metadata for the prompt
+            force_create_new_version: If True, overwrite existing prompt
 
         """
-        super().push_prompt(name, prompt_template, metadata, force_create_new_version)
+        if name in self._prompts and not force_create_new_version:
+            logger.debug(f"Prompt '{name}' already exists, skipping (force_create_new_version=False)")
+            return
+
+        self._prompts[name] = prompt_template
+        if metadata:
+            self._metadata[name] = metadata
+        logger.debug(f"Stored prompt '{name}' in memory")
 
     def pull_prompt(
         self,
@@ -55,14 +66,39 @@ class EmptyObservability(BaseObservabilityPlatform):
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
         **kwargs,
     ) -> PromptReturnType:
-        """Pull a prompt from local storage."""
-        return super().pull_prompt(name, template_format=template_format, **kwargs)
+        """Retrieve a prompt from memory.
+
+        Args:
+            name: Name of the prompt to retrieve
+            template_format: Format for the template (used for processing)
+            **kwargs: Additional arguments (ignored)
+
+        Returns:
+            The stored prompt template, processed into a ChatPromptTemplate
+
+        Raises:
+            ValueError: If prompt not found in memory
+
+        """
+        if name not in self._prompts:
+            raise ValueError(
+                f"Prompt '{name}' not found. Use push_prompt() first or configure "
+                "a remote observability backend (langfuse/langsmith)."
+            )
+
+        prompt_template = self._prompts[name]
+
+        # Process the prompt using the base class helper
+        return self._process_prompt_object(prompt_template, template_format=template_format)
 
     def delete_prompt(self, name: str) -> None:
-        """Delete a prompt from local storage.
+        """Delete a prompt from memory.
 
         Args:
             name: Name of the prompt to delete
 
         """
-        super().delete_prompt(name)
+        if name in self._prompts:
+            del self._prompts[name]
+            self._metadata.pop(name, None)
+            logger.debug(f"Deleted prompt '{name}' from memory")

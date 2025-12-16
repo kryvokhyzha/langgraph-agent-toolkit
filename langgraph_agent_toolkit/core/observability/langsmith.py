@@ -11,21 +11,19 @@ from langgraph_agent_toolkit.helper.logging import logger
 class LangsmithObservability(BaseObservabilityPlatform):
     """Langsmith implementation of observability platform."""
 
-    def __init__(self, prompts_dir: Optional[str] = None, remote_first: bool = False):
+    def __init__(self, remote_first: bool = False):
         """Initialize LangsmithObservability.
 
         Args:
-            prompts_dir: Optional directory to store prompts locally. If None, a system temp directory is used.
             remote_first: If True, prioritize remote prompts over local ones.
 
         """
-        super().__init__(prompts_dir, remote_first)
-        # Set required environment variables explicitly
+        super().__init__(remote_first)
         self.required_vars = ["LANGSMITH_TRACING", "LANGSMITH_API_KEY", "LANGSMITH_PROJECT", "LANGSMITH_ENDPOINT"]
 
     @BaseObservabilityPlatform.requires_env_vars
     def get_callback_handler(self, **kwargs) -> None:
-        """Get the callback handler for the observability platform."""
+        """Get the callback handler - LangSmith uses automatic tracing."""
         return None
 
     def before_shutdown(self) -> None:
@@ -39,7 +37,7 @@ class LangsmithObservability(BaseObservabilityPlatform):
 
         if "user_id" in kwargs:
             user_id = kwargs.pop("user_id")
-            kwargs["extra"] = kwargs["extra"] or {}
+            kwargs.setdefault("extra", {})
             kwargs["extra"]["user_id"] = user_id
 
         client.create_feedback(
@@ -57,71 +55,48 @@ class LangsmithObservability(BaseObservabilityPlatform):
         metadata: Optional[Dict[str, Any]] = None,
         force_create_new_version: bool = True,
     ) -> None:
-        """Push a prompt to LangSmith."""
-        client = LangsmithClient()
+        """Push a prompt to LangSmith.
 
-        # Convert to proper format
+        Args:
+            name: Name of the prompt
+            prompt_template: The prompt template (string or list of message dicts)
+            metadata: Optional metadata (can include 'model' to create a chain)
+            force_create_new_version: If True, always create a new version
+
+        """
+        client = LangsmithClient()
         prompt_obj = self._convert_to_chat_prompt(prompt_template)
 
-        # Check if remote_first is enabled
+        # Check if prompt already exists when remote_first is enabled
         if self.remote_first:
-            # When remote_first=True, prioritize remote prompts
             try:
-                existing_remote_prompt = client.pull_prompt(name)
-                if existing_remote_prompt:
-                    logger.debug(f"Remote-first mode: Using existing remote prompt '{name}'")
-                    # Store the remote prompt locally as well
-                    full_metadata = metadata.copy() if metadata else {}
-                    full_metadata["langsmith_url"] = getattr(existing_remote_prompt, "url", None)
-                    full_metadata["original_prompt"] = prompt_obj
-                    template_str = self._extract_template_string(prompt_template, prompt_obj)
-                    super().push_prompt(name, template_str, full_metadata, force_create_new_version)
+                existing = client.pull_prompt(name)
+                if existing:
+                    logger.debug(f"Remote-first: Using existing prompt '{name}'")
                     return
             except Exception:
-                logger.debug(f"Remote-first mode: Remote prompt '{name}' not found, will create new one")
+                logger.debug(f"Remote-first: Prompt '{name}' not found, creating new")
 
-        # Handle existing prompt versions
-        existing_prompt, existing_url = self._handle_existing_prompt(
-            name,
-            force_create_new_version,
-            client,
-            client_pull_method="pull_prompt",
-            client_delete_method="delete_prompt",
-        )
-
-        url = None
-
-        # Push to LangSmith if we don't have an existing prompt
-        if existing_prompt is None:
+        # Check if we should skip creation (prompt exists and force_create=False)
+        if not force_create_new_version:
             try:
-                if metadata and metadata.get("model"):
-                    chain = prompt_obj | metadata["model"]
-                    url = client.push_prompt(name, object=chain)
-                else:
-                    url = client.push_prompt(name, object=prompt_obj)
-                logger.debug(f"Created new prompt '{name}' in LangSmith")
-            except LangSmithConflictError as e:
-                logger.debug(f"Prompt '{name}' unchanged, using existing version: {e}")
-                try:
-                    # Try to retrieve the existing prompt without modifying it
-                    existing_prompt = client.pull_prompt(name)
-                    url = getattr(existing_prompt, "url", None)
-                    logger.debug(f"Using existing prompt '{name}' due to conflict")
-                except Exception as fetch_err:
-                    logger.warning(f"Failed to retrieve existing prompt after conflict: {fetch_err}")
-        else:
-            # Use the existing prompt that was found earlier
-            url = existing_url
-            logger.debug(f"Reusing existing prompt '{name}' in LangSmith")
+                existing = client.pull_prompt(name)
+                if existing:
+                    logger.debug(f"Prompt '{name}' exists, skipping (force_create_new_version=False)")
+                    return
+            except Exception:
+                pass  # Prompt doesn't exist, will create
 
-        # Update metadata and save locally
-        full_metadata = metadata.copy() if metadata else {}
-        full_metadata["langsmith_url"] = url
-        full_metadata["original_prompt"] = prompt_obj
-
-        # Extract template for local storage and save
-        template_str = self._extract_template_string(prompt_template, prompt_obj)
-        super().push_prompt(name, template_str, full_metadata)
+        # Push to LangSmith
+        try:
+            if metadata and metadata.get("model"):
+                chain = prompt_obj | metadata["model"]
+                client.push_prompt(name, object=chain)
+            else:
+                client.push_prompt(name, object=prompt_obj)
+            logger.debug(f"Created prompt '{name}' in LangSmith")
+        except LangSmithConflictError:
+            logger.debug(f"Prompt '{name}' already exists with same content")
 
     @BaseObservabilityPlatform.requires_env_vars
     def pull_prompt(
@@ -130,19 +105,20 @@ class LangsmithObservability(BaseObservabilityPlatform):
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
         **kwargs,
     ) -> PromptReturnType:
-        """Pull a prompt from LangSmith."""
-        try:
-            client = LangsmithClient()
-            prompt_info = client.pull_prompt(name)
+        """Pull a prompt from LangSmith.
 
-            # Process the prompt into a standard format
-            return self._process_prompt_object(prompt_info, template_format=template_format)
+        Args:
+            name: Name of the prompt
+            template_format: Format for the template
+            **kwargs: Additional parameters (e.g., version, label)
 
-        except Exception as e:
-            logger.warning(f"Failed to pull prompt from remote platform: {e}")
+        Returns:
+            ChatPromptTemplate
 
-            # Fall back to local storage
-            return self._local_pull_prompt(name, template_format=template_format, **kwargs)
+        """
+        client = LangsmithClient()
+        prompt_info = client.pull_prompt(name)
+        return self._process_prompt_object(prompt_info, template_format=template_format)
 
     @BaseObservabilityPlatform.requires_env_vars
     def delete_prompt(self, name: str) -> None:
@@ -154,6 +130,4 @@ class LangsmithObservability(BaseObservabilityPlatform):
         """
         client = LangsmithClient()
         client.delete_prompt(name)
-
-        # Also delete the local files
-        super().delete_prompt(name)
+        logger.debug(f"Deleted prompt '{name}' from LangSmith")

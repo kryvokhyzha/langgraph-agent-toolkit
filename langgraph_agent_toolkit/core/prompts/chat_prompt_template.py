@@ -31,6 +31,23 @@ from langgraph_agent_toolkit.helper.logging import logger
 # This is needed because LangChain's default SandboxedEnvironment restricts this
 _JINJA2_ENV = Environment(autoescape=False)
 
+# Map message roles to their corresponding prompt template classes
+_MESSAGE_TYPE_MAP = {
+    MessageRole.SYSTEM: SystemMessagePromptTemplate,
+    MessageRole.HUMAN: HumanMessagePromptTemplate,
+    MessageRole.USER: HumanMessagePromptTemplate,
+    MessageRole.AI: AIMessagePromptTemplate,
+    MessageRole.ASSISTANT: AIMessagePromptTemplate,
+}
+
+# Map string message types to prompt template classes (for BaseMessage.type)
+_STRING_TYPE_MAP = {
+    "system": SystemMessagePromptTemplate,
+    "human": HumanMessagePromptTemplate,
+    "ai": AIMessagePromptTemplate,
+    "assistant": AIMessagePromptTemplate,
+}
+
 
 def _convert_template_format(content: str, target_format: str) -> str:
     """Convert template string between different formats."""
@@ -209,19 +226,12 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         if self._loaded_prompt is None:
             return
 
-        MESSAGE_TYPE_MAP = {
-            "system": SystemMessagePromptTemplate,
-            "human": HumanMessagePromptTemplate,
-            "ai": AIMessagePromptTemplate,
-            "assistant": AIMessagePromptTemplate,
-        }
-
         if hasattr(self._loaded_prompt, "messages"):
             processed_messages = []
             for msg in self._loaded_prompt.messages:
-                if isinstance(msg, BaseMessage) and msg.type in MESSAGE_TYPE_MAP:
+                if isinstance(msg, BaseMessage) and msg.type in _STRING_TYPE_MAP:
                     content = _convert_template_format(msg.content, self.template_format)
-                    template_class = MESSAGE_TYPE_MAP[msg.type]
+                    template_class = _STRING_TYPE_MAP[msg.type]
                     processed_messages.append(
                         template_class.from_template(content, template_format=self.template_format)
                     )
@@ -238,34 +248,26 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
     def _process_messages_from_prompt(self, messages: Any, template_format: str) -> List[MessageLikeRepresentation]:
         """Process messages from a loaded prompt."""
-        MESSAGE_TYPE_MAP = {
-            MessageRole.SYSTEM: SystemMessagePromptTemplate,
-            MessageRole.HUMAN: HumanMessagePromptTemplate,
-            MessageRole.USER: HumanMessagePromptTemplate,
-            MessageRole.AI: AIMessagePromptTemplate,
-            MessageRole.ASSISTANT: AIMessagePromptTemplate,
-        }
-
         processed_messages = []
         for msg in messages:
             if isinstance(msg, MessagesPlaceholder):
                 # Preserve MessagesPlaceholder objects
                 processed_messages.append(msg)
-            elif isinstance(msg, BaseMessage) and msg.type in MESSAGE_TYPE_MAP:
+            elif isinstance(msg, BaseMessage) and msg.type in _STRING_TYPE_MAP:
                 content = _convert_template_format(msg.content, template_format)
-                template_class = MESSAGE_TYPE_MAP[MessageRole(msg.type)]
+                template_class = _STRING_TYPE_MAP[msg.type]
                 processed_messages.append(template_class.from_template(content, template_format=template_format))
             elif isinstance(msg, tuple) and len(msg) == 2:
                 role, content = msg
-                if role in MESSAGE_TYPE_MAP:
+                if role in _MESSAGE_TYPE_MAP:
                     content = _convert_template_format(content, template_format)
-                    template_class = MESSAGE_TYPE_MAP[role]
+                    template_class = _MESSAGE_TYPE_MAP[role]
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
             elif isinstance(msg, dict) and "role" in msg and "content" in msg:
                 role, content = msg["role"], msg["content"]
-                if role in MESSAGE_TYPE_MAP:
+                if role in _MESSAGE_TYPE_MAP:
                     content = _convert_template_format(content, template_format)
-                    template_class = MESSAGE_TYPE_MAP[role]
+                    template_class = _MESSAGE_TYPE_MAP[role]
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
             else:
                 processed_messages.append(msg)
@@ -276,22 +278,14 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         self, prompt_list: List[Any], template_format: str
     ) -> Optional[List[MessageLikeRepresentation]]:
         """Process a list prompt from an observability platform."""
-        MESSAGE_TYPE_MAP = {
-            MessageRole.SYSTEM: SystemMessagePromptTemplate,
-            MessageRole.HUMAN: HumanMessagePromptTemplate,
-            MessageRole.USER: HumanMessagePromptTemplate,
-            MessageRole.AI: AIMessagePromptTemplate,
-            MessageRole.ASSISTANT: AIMessagePromptTemplate,
-        }
-
         processed_messages = []
 
         # Handle list of tuples (role, content)
         if all(isinstance(item, tuple) and len(item) == 2 for item in prompt_list):
             for role, content in prompt_list:
-                if role in MESSAGE_TYPE_MAP:
+                if role in _MESSAGE_TYPE_MAP:
                     content = _convert_template_format(content, template_format)
-                    template_class = MESSAGE_TYPE_MAP[role]
+                    template_class = _MESSAGE_TYPE_MAP[role]
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
             return processed_messages
 
@@ -299,9 +293,9 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         if all(isinstance(item, dict) and "role" in item and "content" in item for item in prompt_list):
             for item in prompt_list:
                 role, content = item["role"], item["content"]
-                if role in MESSAGE_TYPE_MAP:
+                if role in _MESSAGE_TYPE_MAP:
                     content = _convert_template_format(content, template_format)
-                    template_class = MESSAGE_TYPE_MAP[role]
+                    template_class = _MESSAGE_TYPE_MAP[role]
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
                 # Handle MessagesPlaceholder
                 elif role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
@@ -483,12 +477,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                     if isinstance(content, str):
                         template_vars = get_template_variables(content, self.template_format)
                         if template_vars:
-                            template_class = {
-                                MessageRole.SYSTEM: SystemMessagePromptTemplate,
-                                MessageRole.HUMAN: HumanMessagePromptTemplate,
-                                MessageRole.AI: AIMessagePromptTemplate,
-                                MessageRole.ASSISTANT: AIMessagePromptTemplate,
-                            }.get(MessageRole(msg.type))
+                            template_class = _STRING_TYPE_MAP.get(msg.type)
 
                             if template_class:
                                 other_messages.append(

@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
@@ -10,7 +10,6 @@ class ObservabilityFactory:
     @staticmethod
     def create(
         platform: Union[ObservabilityBackend, str],
-        prompts_dir: Optional[str] = None,
         remote_first: bool = False,
         **kwargs,
     ) -> BaseObservabilityPlatform:
@@ -18,7 +17,6 @@ class ObservabilityFactory:
 
         Args:
             platform: The observability platform to create
-            prompts_dir: Optional directory to store prompts locally
             remote_first: If True, prioritize remote prompts over local ones
             **kwargs: Additional arguments to pass to the platform constructor
 
@@ -35,17 +33,17 @@ class ObservabilityFactory:
             case ObservabilityBackend.LANGFUSE:
                 from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
 
-                return LangfuseObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
+                return LangfuseObservability(remote_first=remote_first, **kwargs)
 
             case ObservabilityBackend.LANGSMITH:
                 from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
 
-                return LangsmithObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
+                return LangsmithObservability(remote_first=remote_first, **kwargs)
 
             case ObservabilityBackend.EMPTY:
                 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 
-                return EmptyObservability(prompts_dir=prompts_dir, remote_first=remote_first, **kwargs)
+                return EmptyObservability(remote_first=remote_first, **kwargs)
 
             case _:
                 raise ValueError(f"Unsupported ObservabilityBackend: {platform}")

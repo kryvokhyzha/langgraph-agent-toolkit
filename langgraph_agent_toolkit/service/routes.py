@@ -374,7 +374,6 @@ async def db_health_check(request: Request) -> dict:
             "pool_size": stats.get("pool_size", 0),
             "pool_available": stats.get("pool_available", 0),
             "requests_waiting": stats.get("requests_waiting", 0),
-            "requests_num": stats.get("requests_num", 0),
             "requests_queued": stats.get("requests_queued", 0),
             "connections_num": stats.get("connections_num", 0),
             "pool_min": stats.get("pool_min", 0),
