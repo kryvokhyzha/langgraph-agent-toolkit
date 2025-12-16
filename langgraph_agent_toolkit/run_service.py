@@ -24,8 +24,10 @@ def run_service(
     service = ServiceRunner(
         custom_settings=dict(
             AGENT_PATHS=[
+                "langgraph_agent_toolkit.agents.blueprints.react_old.agent:react_agent",
                 "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
                 "langgraph_agent_toolkit.agents.blueprints.react_so.agent:react_agent_so",
+                "langgraph_agent_toolkit.agents.blueprints.react_so_old.agent:react_agent_so",
                 "langgraph_agent_toolkit.agents.blueprints.react_new.agent:react_agent",
                 # "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
                 "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",

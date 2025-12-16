@@ -694,3 +694,128 @@ class TestObservabilityChatPromptTemplate:
         )
 
         assert template.observability_platform.remote_first is True
+
+
+class TestChatPromptValueValidation:
+    """Tests to ensure ChatPromptValue always receives BaseMessage instances.
+
+    This test class verifies the fix for the validation error:
+    'Input should be a valid dictionary or instance of BaseMessage'
+    which occurred when SystemMessagePromptTemplate was passed to ChatPromptValue
+    instead of properly formatted BaseMessage.
+    """
+
+    def setup_method(self):
+        """Setup for each test method."""  # noqa: D401
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.os_platform = ObservabilityFactory.create(
+            ObservabilityBackend.EMPTY, prompts_dir=self.temp_dir.name, remote_first=False
+        )
+        # Create a test prompt
+        test_messages: list[ChatMessageDict] = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "placeholder", "content": "messages"},
+        ]
+        self.os_platform.push_prompt("test-prompt", test_messages)
+
+    def teardown_method(self):
+        """Teardown for tests."""
+        self.temp_dir.cleanup()
+
+    def test_invoke_returns_only_base_messages(self):
+        """Test that invoke() returns only BaseMessage instances in ChatPromptValue."""
+        from langchain_core.messages import BaseMessage
+        from langchain_core.prompts.chat import SystemMessagePromptTemplate
+
+        template = ObservabilityChatPromptTemplate(
+            messages=[
+                SystemMessagePromptTemplate.from_template("You are a helpful assistant", template_format="jinja2"),
+                MessagesPlaceholder(variable_name="messages"),
+            ],
+            input_variables=["messages"],
+            template_format="jinja2",
+        )
+
+        result = template.invoke(
+            {
+                "messages": [HumanMessage(content="Hello!")],
+            }
+        )
+
+        # Verify all messages in the result are BaseMessage instances
+        for msg in result.messages:
+            assert isinstance(msg, BaseMessage), f"Expected BaseMessage, got {type(msg)}"
+
+    @pytest.mark.asyncio
+    async def test_ainvoke_returns_only_base_messages(self):
+        """Test that ainvoke() returns only BaseMessage instances in ChatPromptValue."""
+        from langchain_core.messages import BaseMessage
+        from langchain_core.prompts.chat import SystemMessagePromptTemplate
+
+        template = ObservabilityChatPromptTemplate(
+            messages=[
+                SystemMessagePromptTemplate.from_template("You are a helpful assistant", template_format="jinja2"),
+                MessagesPlaceholder(variable_name="messages"),
+            ],
+            input_variables=["messages"],
+            template_format="jinja2",
+        )
+
+        result = await template.ainvoke(
+            {
+                "messages": [HumanMessage(content="Hello!")],
+            }
+        )
+
+        # Verify all messages in the result are BaseMessage instances
+        for msg in result.messages:
+            assert isinstance(msg, BaseMessage), f"Expected BaseMessage, got {type(msg)}"
+
+    def test_format_message_filters_non_base_messages(self):
+        """Test that _format_message_with_input filters out non-BaseMessage objects."""
+        from langchain_core.messages import BaseMessage
+        from langchain_core.prompts.chat import SystemMessagePromptTemplate
+
+        template = ObservabilityChatPromptTemplate(
+            messages=[],
+            input_variables=[],
+            template_format="jinja2",
+        )
+
+        # Create a mock message that would cause issues
+        msg = SystemMessagePromptTemplate.from_template("Template with {{ missing_var }}", template_format="jinja2")
+
+        # When formatting fails due to missing variables, it should return empty list
+        # instead of returning the unformatted template
+        result = template._format_message_with_input(msg, {})
+
+        # All items in result should be BaseMessage
+        for item in result:
+            assert isinstance(item, BaseMessage), f"Expected BaseMessage, got {type(item)}"
+
+    def test_messages_placeholder_with_mixed_content(self):
+        """Test that MessagesPlaceholder filters non-BaseMessage items from list."""
+        from langchain_core.messages import BaseMessage
+
+        template = ObservabilityChatPromptTemplate(
+            messages=[MessagesPlaceholder(variable_name="messages")],
+            input_variables=["messages"],
+            template_format="jinja2",
+        )
+
+        # Pass a list with some non-BaseMessage items
+        result = template.invoke(
+            {
+                "messages": [
+                    HumanMessage(content="Valid message"),
+                    "invalid string",  # Should be filtered out
+                    {"role": "user", "content": "invalid dict"},  # Should be filtered out
+                    AIMessage(content="Another valid message"),
+                ],
+            }
+        )
+
+        # Only the valid BaseMessage instances should remain
+        assert len(result.messages) == 2
+        for msg in result.messages:
+            assert isinstance(msg, BaseMessage)
