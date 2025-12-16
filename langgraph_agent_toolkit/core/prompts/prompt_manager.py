@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -44,6 +45,47 @@ class PromptManager:
             self._observability = ObservabilityFactory.create(self._observability_backend)
         return self._observability
 
+    def _build_prompt_template(
+        self,
+        template_content: str,
+        has_messages_placeholder: bool = False,
+    ) -> List[ChatMessageDict]:
+        """Build prompt template messages from template content."""
+        prompt_template = [
+            ChatMessageDict(
+                role=MessageRole.SYSTEM,
+                content=template_content,
+            )
+        ]
+
+        if has_messages_placeholder:
+            prompt_template.append(
+                ChatMessageDict(
+                    role=MessageRole.PLACEHOLDER,
+                    content="messages",
+                )
+            )
+
+        return prompt_template
+
+    def _cache_prompt(
+        self,
+        prompt_name: str,
+        input_variables: List[str],
+        partial_variables: Optional[Dict[str, str]] = None,
+    ) -> ObservabilityChatPromptTemplate:
+        """Create and cache the prompt from observability platform."""
+        prompt = ObservabilityChatPromptTemplate.from_observability_platform(
+            prompt_name=prompt_name,
+            observability_platform=self.observability,
+            load_at_runtime=self._load_at_runtime,
+            template_format=self._template_format,
+            input_variables=input_variables,
+            partial_variables=partial_variables or {},
+        )
+        self._prompt_cache[prompt_name] = prompt
+        return prompt
+
     def _create_prompt_template(
         self,
         prompt_name: str,
@@ -54,43 +96,36 @@ class PromptManager:
     ) -> ObservabilityChatPromptTemplate:
         """Create and cache a prompt template from a file."""
         template_content = read_file(template_path)
+        prompt_template = self._build_prompt_template(template_content, has_messages_placeholder)
 
-        # Build prompt template messages
-        prompt_template = [
-            ChatMessageDict(
-                role=MessageRole.SYSTEM,
-                content=template_content,
-            )
-        ]
-
-        # Add messages placeholder if needed
-        if has_messages_placeholder:
-            prompt_template.append(
-                ChatMessageDict(
-                    role=MessageRole.PLACEHOLDER,
-                    content="messages",
-                )
-            )
-
-        # Push to observability platform
         self.observability.push_prompt(
             name=prompt_name,
             prompt_template=prompt_template,
             force_create_new_version=self._force_create_new_version,
         )
 
-        # Create and cache the prompt
-        prompt = ObservabilityChatPromptTemplate.from_observability_platform(
-            prompt_name=prompt_name,
-            observability_platform=self.observability,
-            load_at_runtime=self._load_at_runtime,
-            template_format=self._template_format,
-            input_variables=input_variables,
-            partial_variables=partial_variables or {},
+        return self._cache_prompt(prompt_name, input_variables, partial_variables)
+
+    async def _acreate_prompt_template(
+        self,
+        prompt_name: str,
+        template_path: Path,
+        input_variables: List[str],
+        has_messages_placeholder: bool = False,
+        partial_variables: Optional[Dict[str, str]] = None,
+    ) -> ObservabilityChatPromptTemplate:
+        """Create and cache a prompt template from a file (async version)."""
+        template_content = await asyncio.to_thread(read_file, template_path)
+        prompt_template = self._build_prompt_template(template_content, has_messages_placeholder)
+
+        await asyncio.to_thread(
+            self.observability.push_prompt,
+            name=prompt_name,
+            prompt_template=prompt_template,
+            force_create_new_version=self._force_create_new_version,
         )
 
-        self._prompt_cache[prompt_name] = prompt
-        return prompt
+        return self._cache_prompt(prompt_name, input_variables, partial_variables)
 
     def _get_or_create_prompt(
         self,
@@ -104,6 +139,26 @@ class PromptManager:
         if prompt_name not in self._prompt_cache:
             template_path = self._prompts_dir / template_filename
             self._create_prompt_template(
+                prompt_name=prompt_name,
+                template_path=template_path,
+                input_variables=input_variables,
+                has_messages_placeholder=has_messages_placeholder,
+                partial_variables=partial_variables,
+            )
+        return self._prompt_cache[prompt_name]
+
+    async def _aget_or_create_prompt(
+        self,
+        prompt_name: str,
+        template_filename: str,
+        input_variables: List[str],
+        has_messages_placeholder: bool = False,
+        partial_variables: Optional[Dict[str, str]] = None,
+    ) -> ObservabilityChatPromptTemplate:
+        """Get cached prompt or create it if it doesn't exist (async version)."""
+        if prompt_name not in self._prompt_cache:
+            template_path = self._prompts_dir / template_filename
+            await self._create_prompt_template_async(
                 prompt_name=prompt_name,
                 template_path=template_path,
                 input_variables=input_variables,

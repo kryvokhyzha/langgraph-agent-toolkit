@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir uv
 COPY langgraph_agent_toolkit/ ./langgraph_agent_toolkit/
 RUN uv sync --frozen --no-install-project --no-dev --extra uvicorn-backend --extra all-observability --extra openai \
     && rm -rf /root/.cache
-CMD ["python", "langgraph_agent_toolkit/run_service.py", "run_service", "--runner_type", "uvicorn"]
+CMD ["python", "langgraph_agent_toolkit/run_service.py", "run_service", "--runner_type", "uvicorn", "--workers", "2"]
 
 # ====================================================
 
