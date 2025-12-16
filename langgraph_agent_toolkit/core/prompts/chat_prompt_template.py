@@ -3,14 +3,15 @@ import re
 import time
 from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
-from langchain_core.prompt_values import PromptValue
+from jinja2 import Environment
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.prompt_values import ChatPromptValue, PromptValue
 from langchain_core.prompts.chat import (
     AIMessagePromptTemplate,
     BaseChatPromptTemplate,
     BaseMessage,
     BaseMessagePromptTemplate,
     ChatPromptTemplate,
-    ChatPromptValue,
     HumanMessagePromptTemplate,
     MessageLikeRepresentation,
     MessagesPlaceholder,
@@ -24,6 +25,11 @@ from langgraph_agent_toolkit.core.observability.factory import ObservabilityFact
 from langgraph_agent_toolkit.core.observability.types import MessageRole, ObservabilityBackend, PromptReturnType
 from langgraph_agent_toolkit.helper.constants import DEFAULT_CACHE_TTL_SECOND
 from langgraph_agent_toolkit.helper.logging import logger
+
+
+# Create a custom Jinja2 environment that allows attribute access on dictionaries
+# This is needed because LangChain's default SandboxedEnvironment restricts this
+_JINJA2_ENV = Environment(autoescape=False)
 
 
 def _convert_template_format(content: str, target_format: str) -> str:
@@ -305,70 +311,6 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
         return processed_messages or None
 
-    def _format_message_with_input(self, msg: Any, input_dict: Dict[str, Any]) -> List[BaseMessage]:
-        """Format a message with input."""
-        full_input_dict = dict(self.partial_variables or {})
-        full_input_dict.update(input_dict)
-
-        try:
-            # Special handling for MessagesPlaceholder
-            if isinstance(msg, MessagesPlaceholder):
-                var_name = msg.variable_name
-                if var_name in full_input_dict:
-                    messages_value = full_input_dict[var_name]
-                    if isinstance(messages_value, list):
-                        # Filter only BaseMessage instances
-                        return [m for m in messages_value if isinstance(m, BaseMessage)]
-                    return [messages_value] if isinstance(messages_value, BaseMessage) else []
-                return []
-
-            if hasattr(msg, "format") and callable(msg.format):
-                result = msg.format(**full_input_dict)
-                return [result] if isinstance(result, BaseMessage) else []
-            elif hasattr(msg, "format_messages") and callable(msg.format_messages):
-                results = msg.format_messages(**full_input_dict)
-                return [r for r in results if isinstance(r, BaseMessage)]
-        except Exception as e:
-            logger.warning(f"Error formatting message: {e}")
-
-        # Only return msg if it's a BaseMessage, otherwise return empty list
-        return [msg] if isinstance(msg, BaseMessage) else []
-
-    async def _aformat_message_with_input(self, msg: Any, input_dict: Dict[str, Any]) -> List[BaseMessage]:
-        """Asynchronously format a message with input."""
-        full_input_dict = dict(self.partial_variables or {})
-        full_input_dict.update(input_dict)
-
-        try:
-            # Special handling for MessagesPlaceholder
-            if isinstance(msg, MessagesPlaceholder):
-                var_name = msg.variable_name
-                if var_name in full_input_dict:
-                    messages_value = full_input_dict[var_name]
-                    if isinstance(messages_value, list):
-                        # Filter only BaseMessage instances
-                        return [m for m in messages_value if isinstance(m, BaseMessage)]
-                    return [messages_value] if isinstance(messages_value, BaseMessage) else []
-                return []
-
-            if hasattr(msg, "aformat") and callable(msg.aformat):
-                result = await msg.aformat(**full_input_dict)
-                return [result] if isinstance(result, BaseMessage) else []
-            elif hasattr(msg, "aformat_messages") and callable(msg.aformat_messages):
-                results = await msg.aformat_messages(**full_input_dict)
-                return [r for r in results if isinstance(r, BaseMessage)]
-            elif hasattr(msg, "format") and callable(msg.format):
-                result = msg.format(**full_input_dict)
-                return [result] if isinstance(result, BaseMessage) else []
-            elif hasattr(msg, "format_messages") and callable(msg.format_messages):
-                results = msg.format_messages(**full_input_dict)
-                return [r for r in results if isinstance(r, BaseMessage)]
-        except Exception:
-            pass
-
-        # Only return msg if it's a BaseMessage, otherwise return empty list
-        return [msg] if isinstance(msg, BaseMessage) else []
-
     def _ensure_messages_loaded(self) -> None:
         """Ensure messages are loaded from observability platform if needed."""
         if not self.load_at_runtime or not self.prompt_name or not self._observability_platform:
@@ -385,28 +327,89 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                 if not self.messages:
                     raise ValueError(f"Failed to load prompt and no fallback available: {e}")
 
+    def _render_jinja2_template(self, template_content: str, variables: Dict[str, Any]) -> str:
+        """Render a Jinja2 template using an unsandboxed environment.
+
+        This allows attribute access on dictionaries (e.g., item.name instead of item['name']).
+        """
+        template = _JINJA2_ENV.from_string(template_content)
+        return template.render(**variables)
+
+    def _format_messages_with_jinja2(self, input_values: Dict[str, Any]) -> List[BaseMessage]:
+        """Format messages using custom Jinja2 environment for unsandboxed rendering."""
+        formatted_messages = []
+
+        for msg in self.messages:
+            if isinstance(msg, MessagesPlaceholder):
+                # Get messages from input
+                placeholder_messages = input_values.get(msg.variable_name, [])
+                if isinstance(placeholder_messages, list):
+                    formatted_messages.extend(placeholder_messages)
+                continue
+
+            if isinstance(msg, BaseMessagePromptTemplate):
+                # Get the template content
+                if hasattr(msg, "prompt") and hasattr(msg.prompt, "template"):
+                    template_content = msg.prompt.template
+                    # Render using custom Jinja2 environment
+                    rendered_content = self._render_jinja2_template(template_content, input_values)
+
+                    # Create the appropriate message type
+                    if isinstance(msg, SystemMessagePromptTemplate):
+                        formatted_messages.append(SystemMessage(content=rendered_content))
+                    elif isinstance(msg, HumanMessagePromptTemplate):
+                        formatted_messages.append(HumanMessage(content=rendered_content))
+                    elif isinstance(msg, AIMessagePromptTemplate):
+                        formatted_messages.append(AIMessage(content=rendered_content))
+                    else:
+                        # Fallback to parent formatting
+                        formatted_messages.append(msg.format(**input_values))
+                else:
+                    # Fallback to parent formatting
+                    formatted_messages.append(msg.format(**input_values))
+            elif isinstance(msg, BaseMessage):
+                formatted_messages.append(msg)
+            else:
+                # Try to format if it has a format method
+                if hasattr(msg, "format"):
+                    formatted_messages.append(msg.format(**input_values))
+                else:
+                    formatted_messages.append(msg)
+
+        return formatted_messages
+
     def invoke(self, input: Any, config: Optional[Dict[str, Any]] = None, **kwargs: Any) -> PromptValue:
         """Invoke the prompt template."""
         self._ensure_messages_loaded()
 
-        if isinstance(input, dict):
-            formatted_messages = []
-            for msg in self.messages:
-                formatted_messages.extend(self._format_message_with_input(msg, input))
+        # For jinja2 templates, use custom rendering to avoid sandbox restrictions
+        if self.template_format == "jinja2":
+            # Merge input with partial variables
+            input_values = {**self.partial_variables, **(input if isinstance(input, dict) else {})}
+
+            # Format messages using custom Jinja2 environment
+            formatted_messages = self._format_messages_with_jinja2(input_values)
+
             return ChatPromptValue(messages=formatted_messages)
 
+        # Delegate to parent class for other formats
         return super().invoke(input=input, config=config, **kwargs)
 
     async def ainvoke(self, input: Any, config: Optional[Dict[str, Any]] = None, **kwargs: Any) -> PromptValue:
         """Asynchronously invoke the prompt template."""
         self._ensure_messages_loaded()
 
-        if isinstance(input, dict):
-            formatted_messages = []
-            for msg in self.messages:
-                formatted_messages.extend(await self._aformat_message_with_input(msg, input))
+        # For jinja2 templates, use custom rendering to avoid sandbox restrictions
+        if self.template_format == "jinja2":
+            # Merge input with partial variables
+            input_values = {**self.partial_variables, **(input if isinstance(input, dict) else {})}
+
+            # Format messages using custom Jinja2 environment
+            formatted_messages = self._format_messages_with_jinja2(input_values)
+
             return ChatPromptValue(messages=formatted_messages)
 
+        # Delegate to parent class for other formats
         return await super().ainvoke(input=input, config=config, **kwargs)
 
     @classmethod
