@@ -106,13 +106,13 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int | None = None
     POSTGRES_DB: str | None = None
     POSTGRES_SCHEMA: str = "public"
-    POSTGRES_POOL_SIZE: int = Field(default=200, description="Maximum number of connections in the pool")
-    POSTGRES_MIN_SIZE: int = Field(default=10, description="Minimum number of connections in the pool")
-    POSTGRES_MAX_IDLE: int = Field(default=300, description="Maximum number of idle connections")
-    POSTGRES_POOL_TIMEOUT: float = Field(default=60.0, description="Timeout in seconds to get a connection from pool")
-    POSTGRES_RECONNECT_TIMEOUT: float = Field(default=300.0, description="Timeout for reconnecting to database")
+    POSTGRES_POOL_SIZE: int = Field(default=100, description="Maximum number of connections in the pool")
+    POSTGRES_MIN_SIZE: int = Field(default=5, description="Minimum number of connections in the pool")
+    POSTGRES_MAX_IDLE: int = Field(default=120, description="Maximum number of idle connections")
+    POSTGRES_POOL_TIMEOUT: float = Field(default=45.0, description="Timeout in seconds to get a connection from pool")
+    POSTGRES_RECONNECT_TIMEOUT: float = Field(default=60.0, description="Timeout for reconnecting to database")
     POSTGRES_MAX_LIFETIME: float = Field(
-        default=600.0,
+        default=300.0,
         description="Maximum lifetime of a connection in seconds. After this time, the connection will be closed "
         "and replaced with a new one. Set to 0 to disable. Helps prevent stale connections.",
     )
@@ -121,17 +121,17 @@ class Settings(BaseSettings):
         description="Number of background workers for pool maintenance (creating/closing connections)",
     )
     POSTGRES_STATEMENT_TIMEOUT: int = Field(
-        default=300000,
+        default=120000,
         description="Maximum time in milliseconds a query can run before being cancelled. "
         "Prevents stuck queries from blocking connections forever. Set to 0 to disable.",
     )
     POSTGRES_LOCK_TIMEOUT: int = Field(
-        default=60000,
+        default=45000,
         description="Maximum time in milliseconds to wait for a lock before giving up. "
         "Prevents deadlocks from blocking connections. Set to 0 to disable.",
     )
     POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: int = Field(
-        default=300000,
+        default=120000,
         description="Maximum time in milliseconds a connection can stay idle in transaction. "
         "Terminates connections that started a transaction but didn't finish. Set to 0 to disable.",
     )
