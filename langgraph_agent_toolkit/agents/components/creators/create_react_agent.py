@@ -48,6 +48,7 @@ from langgraph.utils.runnable import RunnableCallable, RunnableLike
 from pydantic import BaseModel
 
 from langgraph_agent_toolkit.agents.components.utils import default_pre_model_hook
+from langgraph_agent_toolkit.helper.utils import sanitize_chat_history
 
 
 def _get_model(model: LanguageModelLike, config: RunnableConfig) -> BaseChatModel:
@@ -194,6 +195,10 @@ def create_react_agent(
 
         if messages is None:
             raise ValueError(error_msg)
+
+        # Sanitize chat history to remove incomplete tool calls before validation
+        # This handles cases where previous executions were interrupted
+        messages = sanitize_chat_history(messages)
 
         _validate_chat_history(messages)
         # we're passing messages under `messages` key, as this is expected by the prompt
