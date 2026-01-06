@@ -14,7 +14,6 @@ from langgraph_agent_toolkit.core import settings as base_settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.service.handler import create_app
 from langgraph_agent_toolkit.service.types import RunnerType
-from langgraph_agent_toolkit.service.utils import setup_logging
 
 
 class ServiceRunner:

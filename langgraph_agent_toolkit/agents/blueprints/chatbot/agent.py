@@ -3,14 +3,13 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.func import entrypoint
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.components.checkpoint.empty import NoOpSaver
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
-@entrypoint(
-    # checkpointer=MemorySaver(),  # Uncomment if you want to save the state of the agent
-)
+@entrypoint(checkpointer=NoOpSaver())
 async def chatbot(
     inputs: dict[str, list[BaseMessage]],
     *,

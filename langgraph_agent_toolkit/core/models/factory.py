@@ -88,7 +88,7 @@ class CompletionModelFactory:
 
     @staticmethod
     def create(
-        model_provider: ModelProvider,
+        model_provider: ModelProvider | str,
         model_name: Optional[str] = None,
         configurable_fields: Optional[Union[Literal["any"], List[str], Tuple[str, ...]]] = None,
         config_prefix: Optional[str] = None,
@@ -99,6 +99,7 @@ class CompletionModelFactory:
 
         Args:
             model_provider: The model provider to use. This should be one of the supported model providers.
+                Can be either a ModelProvider enum or a string value.
             model_name: The name of the model to use. If not provided, the default model name will be used.
             configurable_fields: The fields that are configurable. If not provided, the default fields will be used.
             config_prefix: The prefix to use for the configuration. If not provided, the default prefix will be used.
@@ -113,6 +114,9 @@ class CompletionModelFactory:
             ValueError: If the requested model is not supported
 
         """  # noqa: E501
+        if isinstance(model_provider, str):
+            model_provider = ModelProvider(model_provider)
+
         _configurable_fields = DEFAULT_CONFIGURABLE_FIELDS if configurable_fields is None else configurable_fields
         _config_prefix = DEFAULT_CONFIG_PREFIX if config_prefix is None else config_prefix
         _model_parameter_values = (
@@ -185,7 +189,7 @@ class EmbeddingModelFactory:
 
     @staticmethod
     def create(
-        model_provider: ModelProvider,
+        model_provider: ModelProvider | str,
         model_name: Optional[str] = None,
         model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,
         **kwargs: Any,
@@ -194,6 +198,7 @@ class EmbeddingModelFactory:
 
         Args:
             model_provider: The model provider to use. This should be one of the supported model providers.
+                Can be either a ModelProvider enum or a string value.
             model_name: The name of the model to use. If not provided, an error will be raised.
             model_parameter_values: The values for the model parameters as a tuple of (key, value) pairs.
                                     If not provided, empty dict will be used.

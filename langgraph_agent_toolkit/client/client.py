@@ -21,6 +21,7 @@ from langgraph_agent_toolkit.schema import (
     UserComplexInput,
     UserInput,
 )
+from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 class AgentClientError(Exception):
@@ -155,7 +156,7 @@ class AgentClient:
         self,
         input: Dict[str, Any],
         model_name: str | None = None,
-        model_provider: str | None = None,
+        model_provider: str | ModelProvider | None = None,
         model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
@@ -167,7 +168,7 @@ class AgentClient:
         Args:
             input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
-            model_provider (str, optional): LLM model provider to use for the agent
+            model_provider (str | ModelProvider, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
@@ -187,7 +188,9 @@ class AgentClient:
         if model_name:
             request.model_name = model_name
         if model_provider:
-            request.model_provider = model_provider
+            request.model_provider = (
+                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
+            )
         if model_config_key:
             request.model_config_key = model_config_key
         if agent_config:
@@ -239,7 +242,7 @@ class AgentClient:
         self,
         input: Dict[str, Any],
         model_name: str | None = None,
-        model_provider: str | None = None,
+        model_provider: str | ModelProvider | None = None,
         model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
@@ -278,7 +281,9 @@ class AgentClient:
         if model_name:
             request.model_name = model_name
         if model_provider:
-            request.model_provider = model_provider
+            request.model_provider = (
+                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
+            )
         if model_config_key:
             request.model_config_key = model_config_key
         if agent_config:
@@ -312,7 +317,7 @@ class AgentClient:
         self,
         input: Dict[str, Any],
         model_name: str | None = None,
-        model_provider: str | None = None,
+        model_provider: str | ModelProvider | None = None,
         model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
@@ -351,7 +356,9 @@ class AgentClient:
         if model_name:
             request.model_name = model_name
         if model_provider:
-            request.model_provider = model_provider
+            request.model_provider = (
+                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
+            )
         if model_config_key:
             request.model_config_key = model_config_key
         if agent_config:

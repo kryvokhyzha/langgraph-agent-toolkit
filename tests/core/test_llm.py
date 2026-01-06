@@ -33,8 +33,6 @@ def test_get_model_fake():
 
 
 def test_get_model_invalid():
-    # Fix: Updated to match the actual error message and type
-    with pytest.raises(ValueError, match="Model name must be provided for non-fake models"):
-        # When calling with a string, it gets converted to an enum but will fail
-        # with the missing model name error first
+    # Invalid provider string raises ValueError when converting to ModelProvider enum
+    with pytest.raises(ValueError, match="is not a valid ModelProvider"):
         CompletionModelFactory.create("invalid_model", model_name=None)  # type: ignore

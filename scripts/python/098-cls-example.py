@@ -5,7 +5,6 @@ from typing import List
 from dotenv import find_dotenv, load_dotenv
 from langchain.chat_models.base import init_chat_model
 from langchain_core.prompts import (
-    AIMessagePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,

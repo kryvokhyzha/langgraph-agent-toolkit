@@ -15,10 +15,14 @@ from langgraph_agent_toolkit.schema import (
     ChatMessage,
     ClearHistoryInput,
     ClearHistoryResponse,
+    DatabaseHealthResponse,
     Feedback,
     FeedbackResponse,
     HealthCheck,
+    LivenessResponse,
+    ReadinessResponse,
     ServiceMetadata,
+    StartupResponse,
     StreamInput,
     UserInput,
 )
@@ -350,37 +354,148 @@ async def health_check() -> HealthCheck:
     )
 
 
-@private_router.get(
+@public_router.get(
+    "/health/live",
+    tags=["healthcheck"],
+    summary="Liveness Probe",
+    description="Kubernetes liveness probe - checks if the process is alive. "
+    "Returns 200 if process is running, use to trigger container restart on failure.",
+    response_description="Return HTTP Status Code 200 (OK) if alive",
+    status_code=status.HTTP_200_OK,
+    response_model=LivenessResponse,
+)
+async def liveness_probe() -> LivenessResponse:
+    """Liveness probe for Kubernetes.
+
+    This probe indicates if the process is alive and should be restarted if it fails.
+    It performs minimal checks - just confirms the process can respond.
+    """
+    return LivenessResponse(
+        status="alive",
+        version=__version__,
+    )
+
+
+@public_router.get(
+    "/health/ready",
+    tags=["healthcheck"],
+    summary="Readiness Probe",
+    description="Kubernetes readiness probe - checks if service is ready to accept traffic. "
+    "Returns 200 only after all agents are initialized. Traffic won't be routed until ready.",
+    response_description="Return HTTP Status Code 200 (OK) if ready, 503 if not ready",
+    status_code=status.HTTP_200_OK,
+    response_model=ReadinessResponse,
+    responses={
+        503: {
+            "description": "Service not ready",
+            "model": ReadinessResponse,
+        }
+    },
+)
+async def readiness_probe(request: Request):
+    """Readiness probe for Kubernetes.
+
+    This probe indicates if the service is ready to accept traffic.
+    It checks that agents have been initialized successfully.
+    Kubernetes will not route traffic to the pod until this returns 200.
+    """
+    from fastapi.responses import JSONResponse
+
+    is_ready = getattr(request.app.state, "ready", False)
+    initialized_agents = getattr(request.app.state, "initialized_agents", [])
+
+    if is_ready and initialized_agents:
+        return ReadinessResponse(
+            status="ready",
+            version=__version__,
+            initialized_agents=initialized_agents,
+            message=f"All {len(initialized_agents)} agents initialized successfully",
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ReadinessResponse(
+                status="not_ready",
+                version=__version__,
+                initialized_agents=initialized_agents,
+                message="Agents not yet initialized" if not initialized_agents else "Service not ready",
+            ).model_dump(),
+        )
+
+
+@public_router.get(
+    "/health/startup",
+    tags=["healthcheck"],
+    summary="Startup Probe",
+    description="Kubernetes startup probe - checks if application has finished starting. "
+    "Use with initialDelaySeconds to give agents time to initialize before checking readiness.",
+    response_description="Return HTTP Status Code 200 (OK) if started, 503 if still starting",
+    status_code=status.HTTP_200_OK,
+    response_model=StartupResponse,
+    responses={
+        503: {
+            "description": "Still starting up",
+            "model": StartupResponse,
+        }
+    },
+)
+async def startup_probe(request: Request):
+    """Startup probe for Kubernetes.
+
+    This probe indicates if the application has finished its initialization.
+    It's designed for slow-starting containers and allows more time than liveness probe.
+    The startup probe is checked before liveness/readiness probes are activated.
+    """
+    from fastapi.responses import JSONResponse
+
+    startup_complete = getattr(request.app.state, "startup_complete", False)
+
+    if startup_complete:
+        return StartupResponse(
+            status="started",
+            version=__version__,
+            message="Application startup complete",
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=StartupResponse(
+                status="starting",
+                version=__version__,
+                message="Application still initializing",
+            ).model_dump(),
+        )
+
+
+@public_router.get(
     "/health/db",
     tags=["healthcheck"],
     summary="Database Pool Health",
     description="Get database connection pool statistics for monitoring and debugging.",
     response_description="Return database pool statistics",
     status_code=status.HTTP_200_OK,
+    response_model=DatabaseHealthResponse,
 )
-async def db_health_check(request: Request) -> dict:
+async def db_health_check(request: Request) -> DatabaseHealthResponse:
     """Database pool health check endpoint."""
     pool = getattr(request.app.state, "db_pool", None)
     if pool is None:
-        return {
-            "status": "no_pool",
-            "message": "No database pool configured or memory backend not using PostgreSQL",
-        }
+        return DatabaseHealthResponse(
+            status="no_pool",
+            message="No database pool configured or memory backend not using PostgreSQL",
+        )
 
     try:
         stats = pool.get_stats()
-        return {
-            "status": "healthy" if stats.get("pool_available", 0) > 0 else "exhausted",
-            "pool_size": stats.get("pool_size", 0),
-            "pool_available": stats.get("pool_available", 0),
-            "requests_waiting": stats.get("requests_waiting", 0),
-            "requests_queued": stats.get("requests_queued", 0),
-            "connections_num": stats.get("connections_num", 0),
-            "pool_min": stats.get("pool_min", 0),
-            "pool_max": stats.get("pool_max", 0),
-        }
+        return DatabaseHealthResponse(
+            status="healthy" if stats.get("pool_available", 0) > 0 else "exhausted",
+            pool_size=stats.get("pool_size", 0),
+            pool_available=stats.get("pool_available", 0),
+            requests_waiting=stats.get("requests_waiting", 0),
+            connections_num=stats.get("connections_num", 0),
+        )
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e),
-        }
+        return DatabaseHealthResponse(
+            status="error",
+            message=str(e),
+        )
