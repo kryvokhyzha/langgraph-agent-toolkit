@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [0.8.11]
 
+### Added
+
+- New API healthchecks
+
+## [0.8.11]
+
 ### Fixed
 
 - Handling AIMessage that has tool calls without ToolMessage

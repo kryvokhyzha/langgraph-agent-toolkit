@@ -191,17 +191,25 @@ services:
           memory: 1G
 
   # === Application Services ===
-  backend-agent-service:
+  lat-agent-backend:
     <<: *service-defaults
     build:
       context: .
-      dockerfile: docker/service/Dockerfile
-    container_name: backend-agent-service
+      dockerfile: docker/api/Dockerfile
+    container_name: lat-agent-backend
     platform: linux/amd64
     ports:
       - "8080:8080"
     env_file:
       - .env
+    healthcheck:
+      <<: *healthcheck-defaults
+      # Use /health/ready to ensure agents are initialized before accepting traffic
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s # Allow time for agent initialization
     depends_on:
       postgres:
         condition: service_healthy
@@ -246,19 +254,19 @@ services:
           action: sync+restart
           target: /app/langgraph_agent_toolkit/run_service.py
 
-  frontend-streamlit-app:
+  lat-agent-frontend:
     <<: *service-defaults
     build:
       context: .
       dockerfile: docker/app/Dockerfile
-    container_name: frontend-streamlit-app
+    container_name: lat-agent-frontend
     ports:
       - "8501:8501"
     depends_on:
-      backend-agent-service:
+      lat-agent-backend:
         condition: service_started
     environment:
-      - AGENT_URL=http://backend-agent-service:8080
+      - AGENT_URL=http://lat-agent-backend:8080
     deploy:
       resources:
         limits:

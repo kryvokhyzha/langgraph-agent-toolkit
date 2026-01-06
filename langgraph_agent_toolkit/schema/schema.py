@@ -345,3 +345,86 @@ class HealthCheck(BaseModel):
         description="Version of the service.",
         examples=["1.0.0"],
     )
+
+
+class LivenessResponse(BaseModel):
+    """Response model for liveness probe - checks if the process is alive."""
+
+    status: Literal["alive", "unhealthy"] = Field(
+        description="Liveness status of the service.",
+        examples=["alive"],
+    )
+    version: str = Field(
+        description="Version of the service.",
+        examples=["1.0.0"],
+    )
+
+
+class ReadinessResponse(BaseModel):
+    """Response model for readiness probe - checks if service can accept traffic."""
+
+    status: Literal["ready", "not_ready"] = Field(
+        description="Readiness status of the service.",
+        examples=["ready"],
+    )
+    version: str = Field(
+        description="Version of the service.",
+        examples=["1.0.0"],
+    )
+    initialized_agents: List[str] = Field(
+        default=[],
+        description="List of successfully initialized agent IDs.",
+        examples=[["react_agent", "chatbot_agent"]],
+    )
+    message: str = Field(
+        default="",
+        description="Additional information about readiness status.",
+        examples=["All agents initialized successfully"],
+    )
+
+
+class StartupResponse(BaseModel):
+    """Response model for startup probe - checks if application has started."""
+
+    status: Literal["started", "starting"] = Field(
+        description="Startup status of the service.",
+        examples=["started"],
+    )
+    version: str = Field(
+        description="Version of the service.",
+        examples=["1.0.0"],
+    )
+    message: str = Field(
+        default="",
+        description="Additional information about startup status.",
+        examples=["Application startup complete"],
+    )
+
+
+class DatabaseHealthResponse(BaseModel):
+    """Response model for database health check."""
+
+    status: Literal["healthy", "exhausted", "no_pool", "error"] = Field(
+        description="Database connection pool status.",
+        examples=["healthy"],
+    )
+    message: str | None = Field(
+        default=None,
+        description="Additional information about the database status.",
+    )
+    pool_size: int | None = Field(
+        default=None,
+        description="Total size of the connection pool.",
+    )
+    pool_available: int | None = Field(
+        default=None,
+        description="Number of available connections in the pool.",
+    )
+    requests_waiting: int | None = Field(
+        default=None,
+        description="Number of requests waiting for a connection.",
+    )
+    connections_num: int | None = Field(
+        default=None,
+        description="Current number of connections.",
+    )

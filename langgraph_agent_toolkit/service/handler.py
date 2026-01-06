@@ -29,6 +29,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     observability = None
     initialized_agents = []
 
+    # Initialize readiness state - service is not ready until agents are loaded
+    app.state.ready = False
+    app.state.startup_complete = False
+    app.state.initialized_agents = []
+
     def initialize_agents(
         executor: AgentExecutor,
         observability: BaseObservabilityPlatform,
@@ -51,8 +56,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 logger.info(f"Successfully initialized agent: {a.key}")
             except Exception as e:
                 logger.error(f"Error setting up agent {a.key}: {e}")
+
+        # Update app state with initialized agents
+        app.state.initialized_agents = initialized_agents.copy()
+
         if initialized_agents:
             logger.info(f"Successfully initialized {len(initialized_agents)} agents")
+            # Mark service as ready only after agents are initialized
+            app.state.ready = True
+            app.state.startup_complete = True
+            logger.info("Service is now ready to accept traffic")
         else:
             logger.warning("No agents were successfully initialized")
 

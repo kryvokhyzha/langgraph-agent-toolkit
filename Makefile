@@ -15,10 +15,6 @@ uv_show_deps_tree:
 uv_build_wheel:
 	uv build --wheel
 
-# Install deployment dependencies (includes core dependencies + specified extras)
-uv_install_deploy_all:
-	uv sync --extras "deploy-all" --no-install-project
-
 pre_commit_install: .pre-commit-config.yaml
 	pre-commit install
 pre_commit_run: .pre-commit-config.yaml
@@ -29,10 +25,7 @@ pre_commit_rm_hooks:
 push_new_tag:
 	sh .github/scripts/tag_from_pyproject.sh
 
-run_langgraph:
-	uv run langgraph dev
-
 rebuild_app:
-	docker compose up -d --no-deps --build frontend-streamlit-app
+	docker compose up -d --no-deps --build lat-agent-frontend
 rebuild_api:
-	docker compose up -d --no-deps --build backend-agent-service
+	docker compose up -d --no-deps --build lat-agent-backend
