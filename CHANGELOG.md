@@ -12,6 +12,10 @@ and this project adheres to
 
 - New API healthchecks
 
+### Update
+
+- Main logger
+
 ## [0.8.11]
 
 ### Fixed

@@ -7,7 +7,10 @@ name = "langgraph-agent-toolkit"
 version = "0.8.12"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
-authors = [{ name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" }, { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" }]
+authors = [
+    { name = "Roman Kryvokhyzha", email = "kriwohizha@gmail.com" },
+    { name = "Joshua Carroll", email = "carroll.joshk@gmail.com" },
+]
 keywords = ["langgraph", "agents", "fastapi", "streamlit", "litellm", "blueprint"]
 license = "mit"
 classifiers = [
@@ -185,6 +188,14 @@ packages = ["langgraph_agent_toolkit"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+exclude=[
+    ".git",
+    "__pycache__",
+    ".ruff_cache",
+    ".github",
+    "build",
+    "dist",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "D"]  # all rules can be found here: https://beta.ruff.rs/docs/rules/
@@ -193,7 +204,6 @@ ignore=[
     "E731",         # do not assign a lambda expression, use a def
     "E741",         # do not use variables named 'l', 'O', or 'I'
     "F403",         # unable to detect undefined names
-    "F401",         # imported but unused
     "D100",         # missing docstring in public module
     "D101",         # missing docstring in public class
     "D102",         # missing docstring in public method
@@ -204,14 +214,6 @@ ignore=[
     "D203",         # incorrect-blank-line-before-class
     "D213",         # multi-line-summary-second-line
 ]
-exclude=[
-    ".git",
-    "__pycache__",
-    ".ruff_cache",
-    ".github",
-    "build",
-    "dist",
-]
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/python/*"=["E402"]
@@ -220,15 +222,6 @@ exclude=[
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
-
-[tool.nbqa.config]
-ruff = "pyproject.toml"
-
-[tool.nbqa.addopts]
-ruff = ["--extend-ignore=E402"]
-
-[tool.nbqa.mutate]
-ruff = 1
 
 [tool.pytest.ini_options]
 pythonpath = ["langgraph_agent_toolkit", "."]
