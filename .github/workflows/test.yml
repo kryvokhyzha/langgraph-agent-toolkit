@@ -28,7 +28,7 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
@@ -75,7 +75,7 @@ jobs:
           --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -103,13 +103,13 @@ jobs:
       - name: Start service container
         run:
           docker run -d --name service-container --network host -e
-          USE_FAKE_MODEL=true -e PORT=80 agent-service-toolkit.service:${{
+          USE_FAKE_MODEL=true -e PORT=8080 agent-service-toolkit.service:${{
           github.sha }}
 
       - name: Confirm service starts correctly
         run: |
           timeout 30 bash -c '
-            while ! curl -s http://0.0.0.0/health; do
+            while ! curl -s http://0.0.0.0:8080/health; do
               echo "Waiting for service to be ready..."
               docker logs service-container
               sleep 2
@@ -119,7 +119,8 @@ jobs:
       - name: Run app container
         run:
           docker run -d --name app-container --network host -e
-          AGENT_URL=http://0.0.0.0 agent-service-toolkit.app:${{ github.sha }}
+          AGENT_URL=http://0.0.0.0:8080 agent-service-toolkit.app:${{ github.sha
+          }}
 
       - name: Confirm app starts correctly
         run: |
@@ -148,7 +149,7 @@ jobs:
         run: |
           uv run pytest tests/integration -v --run-docker
         env:
-          AGENT_URL: http://0.0.0.0
+          AGENT_URL: http://0.0.0.0:8080
           USE_FAKE_MODEL: true
 
       - name: Clean up containers
