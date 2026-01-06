@@ -50,7 +50,7 @@ jobs:
           tags:
             index.docker.io/${{ secrets.DOCKER_USERNAME
             }}/agent-service-toolkit.service:${{ github.sha }}
-          file: docker/service/Dockerfile
+          file: docker/api/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest

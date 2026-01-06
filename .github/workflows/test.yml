@@ -89,7 +89,7 @@ jobs:
           push: false
           load: true
           tags: agent-service-toolkit.service:${{ github.sha }}
-          file: docker/service/Dockerfile
+          file: docker/api/Dockerfile
 
       - name: Build app image
         uses: docker/build-push-action@v6
