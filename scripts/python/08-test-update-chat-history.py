@@ -10,7 +10,6 @@ _ = rootutils.setup_root(
 )
 load_dotenv(find_dotenv(".local.env"), override=True)
 
-from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.func import Pregel
 

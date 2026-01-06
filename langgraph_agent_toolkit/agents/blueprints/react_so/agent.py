@@ -2,9 +2,7 @@ from langchain.agents import AgentState, create_agent
 from langchain.agents.middleware import (
     # ClearToolUsesEdit,
     # ContextEditingMiddleware,
-    ModelCallLimitMiddleware,
     SummarizationMiddleware,
-    ToolCallLimitMiddleware,
 )
 from langchain_community.tools import DuckDuckGoSearchResults
 from langgraph.checkpoint.memory import MemorySaver

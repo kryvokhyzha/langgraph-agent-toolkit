@@ -12,7 +12,6 @@ from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole, ObservabilityBackend
 from langgraph_agent_toolkit.core.prompts.chat_prompt_template import ObservabilityChatPromptTemplate
-from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
