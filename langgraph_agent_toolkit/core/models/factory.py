@@ -17,7 +17,6 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
-from langgraph_agent_toolkit.core.models.chat_openai import ChatOpenAIPatched
 from langgraph_agent_toolkit.core.models.fake import FakeToolModel
 from langgraph_agent_toolkit.helper.constants import (
     DEFAULT_CONFIG_PREFIX,
@@ -45,6 +44,8 @@ class CompletionModelFactory:
     @staticmethod
     def _init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
         if model_provider == "openai":
+            from langgraph_agent_toolkit.core.models.chat_openai import ChatOpenAIPatched
+
             return ChatOpenAIPatched(model_name=model, **kwargs)
         else:
             return _init_chat_model_helper(model, model_provider=model_provider, **kwargs)
