@@ -164,9 +164,6 @@ class Settings(BaseSettings):
     DEFAULT_RECURSION_LIMIT: int = 64
     CHECK_INTERRUPTS: bool = False
 
-    # Streamlit configuration
-    DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"
-
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
         for env_name, env_value in os.environ.items():
