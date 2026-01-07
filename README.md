@@ -78,11 +78,11 @@ to learn more about this repository.
    source .venv/bin/activate
 
    # Start the service
-   python langgraph_agent_toolkit/run_service.py
+   python langgraph_agent_toolkit/run_api.py
 
    # In another terminal
    source .venv/bin/activate
-   streamlit run langgraph_agent_toolkit/streamlit_app.py
+   streamlit run langgraph_agent_toolkit/run_app.py
    ```
 
 3. **Option 2: Run with Python from PyPi repository**
@@ -169,7 +169,7 @@ The repository contains:
 - `langgraph_agent_toolkit/core/`: Core modules (LLM, memory, settings)
 - `langgraph_agent_toolkit/service/service.py`: FastAPI service
 - `langgraph_agent_toolkit/client/client.py`: Service client
-- `langgraph_agent_toolkit/streamlit_app.py`: Chat interface
+- `langgraph_agent_toolkit/run_app.py`: Chat interface
 - `docker/`: Docker configurations
 - `tests/`: Test suite
 

@@ -23,7 +23,7 @@ from pydantic import Field
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import MessageRole, ObservabilityBackend, PromptReturnType
-from langgraph_agent_toolkit.helper.constants import DEFAULT_CACHE_TTL_SECOND
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
 
@@ -71,14 +71,19 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
     prompt_label: Optional[str] = Field(default=None, description="Label of the prompt")
     load_at_runtime: bool = Field(default=False, description="Whether to load prompt at runtime")
     observability_backend: Optional[ObservabilityBackend] = Field(
-        default=None, description="Observability backend to use"
+        default=None,
+        description="Observability backend to use",
     )
-    cache_ttl_seconds: int = Field(default=DEFAULT_CACHE_TTL_SECOND, description="Cache TTL for prompts")
+    cache_ttl_seconds: int = Field(
+        default=settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
+        description="Cache TTL for prompts",
+    )
     template_format: str = Field(default="f-string", description="Format of the template")
 
     _observability_platform: Optional[BaseObservabilityPlatform] = None
     _loaded_prompt: Any = None
     _last_load_time: float = 0
+    _jinja2_template_cache: Dict[str, Any] = {}
 
     model_config = {"extra": "allow"}
 
@@ -92,7 +97,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         load_at_runtime: bool = False,
         observability_platform: Optional[BaseObservabilityPlatform] = None,
         observability_backend: Optional[Union[ObservabilityBackend, str]] = None,
-        cache_ttl_seconds: int = DEFAULT_CACHE_TTL_SECOND,
+        cache_ttl_seconds: int = settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
         input_variables: Optional[List[str]] = None,
         partial_variables: Optional[Dict[str, Any]] = None,
@@ -182,7 +187,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         prompt_name: str,
         prompt_version: Optional[int] = None,
         prompt_label: Optional[str] = None,
-        cache_ttl_seconds: int = DEFAULT_CACHE_TTL_SECOND,
+        cache_ttl_seconds: int = settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
     ) -> PromptReturnType:
         """Load prompt from observability platform."""
@@ -305,28 +310,64 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
         return processed_messages or None
 
+    def _should_reload_prompt(self) -> bool:
+        """Check if prompt should be reloaded based on cache TTL."""
+        if not self.load_at_runtime or not self.prompt_name or not self._observability_platform:
+            return False
+        current_time = time.time()
+        return self._loaded_prompt is None or current_time - self._last_load_time > self.cache_ttl_seconds
+
     def _ensure_messages_loaded(self) -> None:
         """Ensure messages are loaded from observability platform if needed."""
-        if not self.load_at_runtime or not self.prompt_name or not self._observability_platform:
+        if not self._should_reload_prompt():
             return
 
-        current_time = time.time()
-        if self._loaded_prompt is None or current_time - self._last_load_time > self.cache_ttl_seconds:
-            try:
-                self._loaded_prompt = self._load_prompt_from_observability()
-                self._last_load_time = current_time
-                self._update_messages_from_loaded_prompt()
-            except Exception as e:
-                logger.error(f"Failed to load prompt: {e}")
-                if not self.messages:
-                    raise ValueError(f"Failed to load prompt and no fallback available: {e}")
+        try:
+            self._loaded_prompt = self._load_prompt_from_observability()
+            self._last_load_time = time.time()
+            self._update_messages_from_loaded_prompt()
+        except Exception as e:
+            logger.error(f"Failed to load prompt: {e}")
+            if not self.messages:
+                raise ValueError(f"Failed to load prompt and no fallback available: {e}")
+
+    async def _aensure_messages_loaded(self) -> None:
+        """Async version: Ensure messages are loaded from observability platform if needed."""
+        if not self._should_reload_prompt():
+            return
+
+        try:
+            # Use async version to avoid blocking the event loop
+            self._loaded_prompt = await self._observability_platform.apull_prompt(
+                name=self.prompt_name,
+                cache_ttl_seconds=self.cache_ttl_seconds,
+                template_format=self.template_format,
+                version=self.prompt_version,
+                label=self.prompt_label,
+            )
+            self._last_load_time = time.time()
+            self._update_messages_from_loaded_prompt()
+        except Exception as e:
+            logger.error(f"Failed to load prompt: {e}")
+            if not self.messages:
+                raise ValueError(f"Failed to load prompt and no fallback available: {e}")
+
+    def _get_compiled_template(self, template_content: str):
+        """Get or create a compiled Jinja2 template from cache.
+
+        Caches compiled templates to avoid re-parsing on every render.
+        """
+        if template_content not in self._jinja2_template_cache:
+            self._jinja2_template_cache[template_content] = _JINJA2_ENV.from_string(template_content)
+        return self._jinja2_template_cache[template_content]
 
     def _render_jinja2_template(self, template_content: str, variables: Dict[str, Any]) -> str:
         """Render a Jinja2 template using an unsandboxed environment.
 
         This allows attribute access on dictionaries (e.g., item.name instead of item['name']).
+        Uses cached compiled templates for better performance.
         """
-        template = _JINJA2_ENV.from_string(template_content)
+        template = self._get_compiled_template(template_content)
         return template.render(**variables)
 
     def _format_messages_with_jinja2(self, input_values: Dict[str, Any]) -> List[BaseMessage]:
@@ -391,7 +432,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
     async def ainvoke(self, input: Any, config: Optional[Dict[str, Any]] = None, **kwargs: Any) -> PromptValue:
         """Asynchronously invoke the prompt template."""
-        self._ensure_messages_loaded()
+        await self._aensure_messages_loaded()
 
         # For jinja2 templates, use custom rendering to avoid sandbox restrictions
         if self.template_format == "jinja2":

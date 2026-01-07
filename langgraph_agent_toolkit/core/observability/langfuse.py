@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import inspect
 import json
@@ -6,7 +7,7 @@ from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
 from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
-from langgraph_agent_toolkit.helper.constants import DEFAULT_CACHE_TTL_SECOND
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
 
@@ -40,14 +41,21 @@ class LangfuseObservability(BaseObservabilityPlatform):
         """
         super().__init__(remote_first)
         self.required_vars = ["LANGFUSE_SECRET_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_HOST"]
+        self._callback_handler: Optional[CallbackHandler] = None
 
     @BaseObservabilityPlatform.requires_env_vars
     def get_callback_handler(self, **kwargs) -> CallbackHandler:
-        """Get the Langfuse callback handler for LangChain."""
-        valid_params = set(inspect.signature(CallbackHandler.__init__).parameters.keys())
-        valid_params.discard("self")
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
-        return CallbackHandler(**filtered_kwargs)
+        """Get the Langfuse callback handler for LangChain.
+
+        The handler is cached and reused across requests to avoid per-request
+        initialization overhead. The Langfuse SDK handles trace isolation internally.
+        """
+        if self._callback_handler is None:
+            valid_params = set(inspect.signature(CallbackHandler.__init__).parameters.keys())
+            valid_params.discard("self")
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_params}
+            self._callback_handler = CallbackHandler(**filtered_kwargs)
+        return self._callback_handler
 
     def before_shutdown(self) -> None:
         """Flush any pending data before shutdown."""
@@ -171,7 +179,7 @@ class LangfuseObservability(BaseObservabilityPlatform):
         self,
         name: str,
         return_with_prompt_object: bool = False,
-        cache_ttl_seconds: Optional[int] = DEFAULT_CACHE_TTL_SECOND,
+        cache_ttl_seconds: Optional[int] = settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
         label: Optional[str] = None,
         version: Optional[int] = None,
@@ -212,6 +220,28 @@ class LangfuseObservability(BaseObservabilityPlatform):
         prompt = self._process_prompt_object(langfuse_prompt.prompt, template_format=template_format)
 
         return (prompt, langfuse_prompt) if return_with_prompt_object else prompt
+
+    async def apull_prompt(
+        self,
+        name: str,
+        return_with_prompt_object: bool = False,
+        cache_ttl_seconds: Optional[int] = settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
+        label: Optional[str] = None,
+        version: Optional[int] = None,
+        **kwargs,
+    ) -> Union[PromptReturnType, Tuple[PromptReturnType, Any]]:
+        """Async version of pull_prompt. Runs in thread pool to avoid blocking."""
+        return await asyncio.to_thread(
+            self.pull_prompt,
+            name,
+            return_with_prompt_object=return_with_prompt_object,
+            cache_ttl_seconds=cache_ttl_seconds,
+            template_format=template_format,
+            label=label,
+            version=version,
+            **kwargs,
+        )
 
     @BaseObservabilityPlatform.requires_env_vars
     def delete_prompt(self, name: str) -> None:

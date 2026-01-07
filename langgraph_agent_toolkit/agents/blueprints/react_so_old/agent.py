@@ -56,7 +56,7 @@ observability.push_prompt(
 prompt = ObservabilityChatPromptTemplate.from_observability_platform(
     prompt_name=PROMPT_NAME,
     observability_platform=observability,
-    load_at_runtime=True,
+    load_at_runtime=False,
     template_format="jinja2",
     input_variables=["messages"],
 )

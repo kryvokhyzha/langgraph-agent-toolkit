@@ -22,7 +22,7 @@ To customize the agent:
 
 1. Add your agent to ``langgraph_agent_toolkit/agents/blueprints/``
 2. Register it in ``AGENT_PATHS`` list in ``langgraph_agent_toolkit/core/settings.py``
-3. Optionally customize the Streamlit interface in ``streamlit_app.py``
+3. Optionally customize the Streamlit interface in ``run_app.py``
 
 Docker Setup
 -----------
@@ -112,13 +112,13 @@ Local Development Without Docker
 
    .. code-block:: bash
 
-      python langgraph_agent_toolkit/run_service.py
+      python langgraph_agent_toolkit/run_api.py
 
 4. Run the Streamlit app in another terminal:
 
    .. code-block:: bash
 
-      streamlit run langgraph_agent_toolkit/streamlit_app.py
+      streamlit run langgraph_agent_toolkit/run_app.py
 
 5. Access the Streamlit interface (usually at ``http://localhost:8501``)
 

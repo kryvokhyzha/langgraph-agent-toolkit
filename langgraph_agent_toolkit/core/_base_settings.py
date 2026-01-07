@@ -7,7 +7,9 @@ from dotenv import find_dotenv
 from pydantic import (
     BeforeValidator,
     Field,
+    HttpUrl,
     SecretStr,
+    TypeAdapter,
     computed_field,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,7 +18,11 @@ from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
-from langgraph_agent_toolkit.helper.utils import check_str_is_http
+
+
+def check_str_is_http(x: str) -> str:
+    http_url_adapter = TypeAdapter(HttpUrl)
+    return str(http_url_adapter.validate_python(x))
 
 
 class Settings(BaseSettings):
@@ -93,6 +99,12 @@ class Settings(BaseSettings):
     LANGFUSE_PUBLIC_KEY: SecretStr | None = None
     LANGFUSE_HOST: Annotated[str, BeforeValidator(check_str_is_http)] = "https://cloud.langfuse.com"
     LANGFUSE_TRACING_ENVIRONMENT: str | None = None
+    LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS: int = 60 * 60
+    LANGFUSE_FLUSH_AT: int = 512
+    LANGFUSE_FLUSH_INTERVAL: float = 5.0
+    LANGFUSE_TIMEOUT: int = 5
+    LANGFUSE_DEBUG: bool = False
+    LANGFUSE_SAMPLE_RATE: float = 1.0
 
     # Database Configuration
     MEMORY_BACKEND: MemoryBackends | None = None
@@ -145,6 +157,15 @@ class Settings(BaseSettings):
     DB_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     DB_CONFIGS_BASE64: str | None = None
     DB_CONFIGS_PATH: str | None = None
+
+    # Agent configuration
+    DEFAULT_AGENT: str = "react-agent"
+    DEFAULT_MAX_MESSAGE_HISTORY_LENGTH: int = 18
+    DEFAULT_RECURSION_LIMIT: int = 64
+    CHECK_INTERRUPTS: bool = False
+
+    # Streamlit configuration
+    DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"
 
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""

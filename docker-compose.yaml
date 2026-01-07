@@ -224,35 +224,6 @@ services:
         limits:
           cpus: "1"
           memory: 1G
-    develop:
-      watch:
-        - path: langgraph_agent_toolkit/agents/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/agents/
-        - path: langgraph_agent_toolkit/core/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/core/
-        - path: langgraph_agent_toolkit/helper/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/helper/
-        - path: langgraph_agent_toolkit/core/memory/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/memory/
-        - path: langgraph_agent_toolkit/core/observability/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/observability/
-        - path: langgraph_agent_toolkit/core/prompt_manager/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/prompt_manager/
-        - path: langgraph_agent_toolkit/schema/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/schema/
-        - path: langgraph_agent_toolkit/service/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/service/
-        - path: langgraph_agent_toolkit/run_service.py
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/run_service.py
 
   lat-agent-frontend:
     <<: *service-defaults
@@ -272,20 +243,6 @@ services:
         limits:
           cpus: "1"
           memory: 1G
-    develop:
-      watch:
-        - path: langgraph_agent_toolkit/client/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/client/
-        - path: langgraph_agent_toolkit/helper/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/helper/
-        - path: langgraph_agent_toolkit/schema/
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/schema/
-        - path: langgraph_agent_toolkit/streamlit_app.py
-          action: sync+restart
-          target: /app/langgraph_agent_toolkit/streamlit_app.py
 
 volumes:
   postgres_data:

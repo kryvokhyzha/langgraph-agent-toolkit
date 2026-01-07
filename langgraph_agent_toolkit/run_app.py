@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from pydantic import ValidationError
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
-from langgraph_agent_toolkit.helper.constants import DEFAULT_STREAMLIT_USER_ID
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.schema.task_data import TaskData, TaskDataStatus
 
@@ -98,7 +98,7 @@ async def main() -> None:
             try:
                 messages: List[ChatMessage] = agent_client.get_history(
                     thread_id=thread_id,
-                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
                 ).messages
             except AgentClientError:
                 st.error("No message history found for this Thread ID.")
@@ -193,14 +193,14 @@ async def main() -> None:
                 stream = agent_client.astream(
                     input=dict(message=user_input),
                     thread_id=st.session_state.thread_id,
-                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
                 )
                 await draw_messages(stream, is_new=True)
             else:
                 response = await agent_client.ainvoke(
                     input=dict(message=user_input),
                     thread_id=st.session_state.thread_id,
-                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
                 )
                 messages.append(response)
                 st.chat_message("assistant").write(response.content)
@@ -385,7 +385,7 @@ async def handle_feedback() -> None:
                     key="human-feedback-stars",
                     score=normalized_score,
                     kwargs={"comment": "In-line human feedback"},
-                    user_id=DEFAULT_STREAMLIT_USER_ID,
+                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
                 )
             except AgentClientError as e:
                 st.error(f"Error recording feedback: {e}")

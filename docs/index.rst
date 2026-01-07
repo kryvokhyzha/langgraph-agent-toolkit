@@ -56,11 +56,11 @@ Quickstart
       source .venv/bin/activate
 
       # Start the service
-      python langgraph_agent_toolkit/run_service.py
+      python langgraph_agent_toolkit/run_api.py
 
       # In another terminal
       source .venv/bin/activate
-      streamlit run langgraph_agent_toolkit/streamlit_app.py
+      streamlit run langgraph_agent_toolkit/run_app.py
 
 3. **Option 2: Run with Python from PyPi repository**
 

@@ -2,7 +2,7 @@ import fire
 from dotenv import load_dotenv
 
 
-def run_service(
+def run_api(
     runner_type: str = "uvicorn",
     **kwargs,
 ):
@@ -41,4 +41,4 @@ def run_service(
 if __name__ == "__main__":
     load_dotenv(override=True)
 
-    fire.Fire(run_service)
+    fire.Fire(run_api)

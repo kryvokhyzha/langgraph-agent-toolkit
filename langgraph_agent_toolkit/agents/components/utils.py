@@ -5,7 +5,7 @@ from langchain_core.messages.utils import trim_messages
 from langchain_core.runnables import RunnableConfig
 from langgraph.managed.is_last_step import RemainingSteps
 
-from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
+from langgraph_agent_toolkit.core.settings import settings
 
 
 try:
@@ -27,7 +27,7 @@ def pre_model_hook_standard(state: T, config: RunnableConfig):
     updated_messages = trim_messages(
         state["messages"],
         token_counter=len,
-        max_tokens=int(_max_messages or DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),
+        max_tokens=int(_max_messages or settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),
         strategy="last",
         start_on="human",
         end_on=("human", "tool"),
@@ -58,7 +58,7 @@ def trim_messages_wrapper(messages: Sequence[BaseMessage], config: RunnableConfi
 
     default_kwargs = dict(
         token_counter=len,
-        max_tokens=int(_max_messages or DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),
+        max_tokens=int(_max_messages or settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),
         strategy="last",
         start_on="human",
         end_on=("human", "tool"),

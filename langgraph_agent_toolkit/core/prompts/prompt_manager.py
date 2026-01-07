@@ -18,7 +18,7 @@ class PromptManager:
         prompts_dir: Optional[Path] = None,
         force_create_new_version: bool = False,
         template_format: str = "jinja2",
-        load_at_runtime: bool = True,
+        load_at_runtime: bool = False,
     ):
         """Initialize the PromptManager with configurable parameters.
 
@@ -27,7 +27,7 @@ class PromptManager:
             prompts_dir: Directory containing prompt templates (defaults to ./prompts)
             force_create_new_version: Whether to force creation of new prompt versions
             template_format: Format for prompt templates (default: "jinja2")
-            load_at_runtime: Whether to load prompts at runtime (default: True)
+            load_at_runtime: Whether to load prompts at runtime (default: False for better performance)
 
         """
         self._prompt_cache: Dict[str, ObservabilityChatPromptTemplate] = {}
