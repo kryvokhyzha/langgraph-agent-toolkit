@@ -31,5 +31,3 @@ DEFAULT_MODEL_PARAMETER_VALUES = dict(
     top_p=0.95,
     streaming=True,
 )
-
-DEFAULT_STREAMLIT_USER_ID = "streamlit-user"

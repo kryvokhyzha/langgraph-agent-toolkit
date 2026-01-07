@@ -1,7 +1,10 @@
 from typing import Any, Dict, Literal, Optional
 
-from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
-from langgraph_agent_toolkit.core.observability.types import PromptReturnType, PromptTemplateType
+from langgraph_agent_toolkit.core.observability.base import (
+    BaseObservabilityPlatform,
+    PromptReturnType,
+    PromptTemplateType,
+)
 from langgraph_agent_toolkit.helper.logging import logger
 
 
