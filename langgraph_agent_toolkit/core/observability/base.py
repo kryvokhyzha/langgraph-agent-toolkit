@@ -1,8 +1,9 @@
+import asyncio
 import os
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from functools import wraps
-from typing import Any, Callable, Dict, List, Literal, Optional, TypeVar, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, TypeVar, Union, cast
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -14,10 +15,16 @@ from langchain_core.prompts.chat import (
     SystemMessagePromptTemplate,
 )
 
-from langgraph_agent_toolkit.core.observability.types import MessageRole, PromptReturnType, PromptTemplateType
+from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole
 
 
 T = TypeVar("T")
+
+# Type for prompt templates that can be provided to push_prompt
+PromptTemplateType = Union[str, List[ChatMessageDict]]
+
+# Type for the return value of pull_prompt
+PromptReturnType = Union[ChatPromptTemplate, str, dict, None]
 
 
 class BaseObservabilityPlatform(ABC):
@@ -103,6 +110,15 @@ class BaseObservabilityPlatform(ABC):
     ) -> PromptReturnType:
         """Pull a prompt from the observability platform."""
         pass
+
+    async def apull_prompt(
+        self,
+        name: str,
+        template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
+        **kwargs,
+    ) -> PromptReturnType:
+        """Async version of pull_prompt. Runs synchronous version in thread pool."""
+        return await asyncio.to_thread(self.pull_prompt, name, template_format, **kwargs)
 
     @abstractmethod
     def delete_prompt(self, name: str) -> None:

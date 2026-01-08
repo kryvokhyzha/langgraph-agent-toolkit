@@ -12,7 +12,6 @@ from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
-from langgraph_agent_toolkit.helper.constants import DEFAULT_MAX_MESSAGE_HISTORY_LENGTH
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -45,7 +44,7 @@ react_agent_so = Agent(
             SummarizationMiddleware(
                 model=model,
                 max_tokens_before_summary=25_000,  # Trigger summarization at 25,000 tokens
-                messages_to_keep=DEFAULT_MAX_MESSAGE_HISTORY_LENGTH,  # Keep last N messages after summary
+                messages_to_keep=settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH,  # Keep last N messages after summary
             ),
             # ModelCallLimitMiddleware(
             #     run_limit=5, exit_behavior="end",

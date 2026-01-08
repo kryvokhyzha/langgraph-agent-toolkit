@@ -10,7 +10,8 @@ ENV PYTHONPATH="/app"
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install curl for healthchecks
-COPY --from=curlimages/curl:latest /usr/bin/curl /usr/bin/curl
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml uv.lock ./
 
@@ -52,7 +53,7 @@ EXPOSE 8080
 # - If a worker crashes/times out, it's automatically restarted
 # - With preload_app, new worker starts faster (no agent re-initialization)
 #
-CMD ["python", "langgraph_agent_toolkit/run_service.py", "run_service", \
+CMD ["python", "langgraph_agent_toolkit/run_api.py", "run_api", \
     "--runner_type", "gunicorn", \
     "--workers", "1", \
     "--preload_app", \

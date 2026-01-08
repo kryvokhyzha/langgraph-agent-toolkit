@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage
 
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.service.factory import ServiceRunner
 
@@ -30,7 +30,7 @@ def mock_agent_executor():
     """Fixture to create a mock agent executor with the default agent."""
     # Create mock agent
     agent_mock = Mock()
-    agent_mock.name = DEFAULT_AGENT
+    agent_mock.name = settings.DEFAULT_AGENT
     agent_mock.description = "A mock agent for testing"
     agent_mock.graph = Mock()
 
@@ -54,9 +54,11 @@ def mock_agent_executor():
 
     # Create the executor with our agent
     executor = Mock(spec=AgentExecutor)
-    executor.agents = {DEFAULT_AGENT: agent_mock}
+    executor.agents = {settings.DEFAULT_AGENT: agent_mock}
     executor.get_agent = Mock(return_value=agent_mock)
-    executor.get_all_agent_info = Mock(return_value=[{"key": DEFAULT_AGENT, "description": "A mock agent for testing"}])
+    executor.get_all_agent_info = Mock(
+        return_value=[{"key": settings.DEFAULT_AGENT, "description": "A mock agent for testing"}]
+    )
 
     # We'll capture all args that are passed to these methods
     async def mock_invoke(**kwargs):
@@ -76,7 +78,7 @@ def mock_agent_executor():
 @pytest.fixture
 def mock_agent(mock_agent_executor):
     """Fixture to get the mock agent from the executor."""
-    return mock_agent_executor.get_agent(DEFAULT_AGENT)
+    return mock_agent_executor.get_agent(settings.DEFAULT_AGENT)
 
 
 @pytest.fixture
@@ -137,6 +139,7 @@ def mock_settings(monkeypatch):
                     # Set up the mock settings
                     mock_settings.AUTH_SECRET = None
                     mock_settings.MODEL_CONFIGS = {}
+                    mock_settings.DEFAULT_AGENT = "react-agent"
                     yield mock_settings
 
 

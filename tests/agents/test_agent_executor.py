@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.helper.constants import DEFAULT_AGENT
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatMessage
 
 
@@ -59,7 +59,7 @@ def mock_agent():
 def agent_executor(mock_agent):
     """Create an AgentExecutor with a mock agent."""
     default_agent = Mock(spec=Agent)
-    default_agent.name = DEFAULT_AGENT
+    default_agent.name = settings.DEFAULT_AGENT
     default_agent.description = "Default test agent"
 
     with patch.object(AgentExecutor, "load_agents_from_imports"):
@@ -67,7 +67,7 @@ def agent_executor(mock_agent):
             executor = AgentExecutor("dummy_import:dummy_agent")
             executor.agents = {
                 "test-agent": mock_agent,
-                DEFAULT_AGENT: default_agent,
+                settings.DEFAULT_AGENT: default_agent,
             }
             return executor
 
@@ -100,21 +100,24 @@ async def test_invoke_basic_flow(agent_executor, mock_agent):
 @pytest.mark.asyncio
 async def test_invoke_with_interrupt_handling(agent_executor, mock_agent):
     """Test invoke correctly handles interrupts."""
-    interrupt_task = Mock()
-    interrupt_task.interrupts = [Mock()]
-    mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
+    with patch.object(settings, "CHECK_INTERRUPTS", True):
+        mock_agent.graph.checkpointer = Mock()
 
-    mock_response = [("updates", {"__interrupt__": [Mock(value="Need more info")]})]
-    mock_agent.graph.ainvoke.return_value = mock_response
+        interrupt_task = Mock()
+        interrupt_task.interrupts = [Mock()]
+        mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
 
-    user_input = MockInput(message="Continue")
-    result = await agent_executor.invoke(agent_id="test-agent", input=user_input)
+        mock_response = [("updates", {"__interrupt__": [Mock(value="Need more info")]})]
+        mock_agent.graph.ainvoke.return_value = mock_response
 
-    assert result.content == "Need more info"
+        user_input = MockInput(message="Continue")
+        result = await agent_executor.invoke(agent_id="test-agent", input=user_input)
 
-    call_args = mock_agent.graph.ainvoke.call_args[1]
-    assert isinstance(call_args["input"], Command)
-    assert call_args["input"].resume == user_input.model_dump()
+        assert result.content == "Need more info"
+
+        call_args = mock_agent.graph.ainvoke.call_args[1]
+        assert isinstance(call_args["input"], Command)
+        assert call_args["input"].resume == user_input.model_dump()
 
 
 @pytest.mark.asyncio
@@ -192,9 +195,9 @@ def test_agent_management_operations(mock_agent):
             executor = AgentExecutor("dummy_import:dummy_agent")
 
             default_agent = Mock(spec=Agent)
-            default_agent.name = DEFAULT_AGENT
+            default_agent.name = settings.DEFAULT_AGENT
             default_agent.description = "Default agent"
-            executor.agents = {DEFAULT_AGENT: default_agent}
+            executor.agents = {settings.DEFAULT_AGENT: default_agent}
 
             executor.add_agent("test-agent", mock_agent)
             assert "test-agent" in executor.agents
@@ -205,7 +208,7 @@ def test_agent_management_operations(mock_agent):
             agent_info = executor.get_all_agent_info()
             agent_keys = [info.key for info in agent_info]
             assert "test-agent" in agent_keys
-            assert DEFAULT_AGENT in agent_keys
+            assert settings.DEFAULT_AGENT in agent_keys
 
             with pytest.raises(KeyError):
                 executor.get_agent("nonexistent-agent")

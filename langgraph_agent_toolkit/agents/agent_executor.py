@@ -17,7 +17,7 @@ from langgraph.types import Command, Interrupt
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core.settings import settings
-from langgraph_agent_toolkit.helper.constants import DEFAULT_RECURSION_LIMIT, get_default_agent, set_default_agent
+from langgraph_agent_toolkit.helper.constants import get_default_agent, set_default_agent
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import (
     convert_message_content_to_string,
@@ -75,20 +75,28 @@ class AgentExecutor:
     def _validate_default_agent_loaded(self) -> None:
         """Validate that a default agent is available and set it if needed.
 
-        If the default agent from constants.py is not available,
-        use the first loaded agent as the default and update the global value.
+        If the configured default agent (from settings or constants) is not available
+        in the loaded agents, use the first loaded agent as the default.
+
+        This ensures that get_default_agent() always returns an agent that exists.
         """
         if not self.agents:
             raise ValueError("No agents were loaded. Please check your imports.")
 
-        initial_default = get_default_agent()
+        # Get the current default (from settings, runtime override, or constants)
+        configured_default = get_default_agent()
 
-        if initial_default not in self.agents:
-            new_default = list(self.agents.keys())[0]
-            logger.warning(
-                f"Default agent '{initial_default}' not found in loaded agents. Using '{new_default}' as default."
-            )
-            set_default_agent(new_default)
+        # Check if the configured default is actually available
+        if configured_default in self.agents:
+            logger.debug(f"Default agent '{configured_default}' is available in loaded agents.")
+            return
+
+        # Configured default not found - use first available agent
+        new_default = list(self.agents.keys())[0]
+        logger.warning(
+            f"Default agent '{configured_default}' not found in loaded agents. Using '{new_default}' as default."
+        )
+        set_default_agent(new_default)
 
     def get_agent(self, agent_id: str) -> Agent:
         """Get an agent by its ID.
@@ -211,7 +219,7 @@ class AgentExecutor:
         run_id = uuid4()
         thread_id = thread_id or str(uuid4())
 
-        recursion_limit = recursion_limit or DEFAULT_RECURSION_LIMIT
+        recursion_limit = recursion_limit or settings.DEFAULT_RECURSION_LIMIT
 
         configurable = {
             "thread_id": thread_id,
@@ -255,12 +263,17 @@ class AgentExecutor:
             },
         )
 
-        # Check if there are any interrupts that need to be resumed
-        state = await agent_graph.aget_state(config=config)
-        interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
-
         _input = input.model_dump()
         input_data: Command | dict[str, Any]
+
+        # Check if there are any interrupts that need to be resumed
+        interrupted_tasks = []
+        if settings.CHECK_INTERRUPTS and agent_graph.checkpointer is not None:
+            try:
+                state = await agent_graph.aget_state(config=config)
+                interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
+            except Exception:
+                pass
 
         if interrupted_tasks:
             # User input is a response to resume agent execution from interrupt

@@ -31,7 +31,7 @@ def test_service_with_app():
     """
     try:
         # Increase timeout to allow app more time to load
-        at = AppTest.from_file("../../langgraph_agent_toolkit/streamlit_app.py", default_timeout=60).run()
+        at = AppTest.from_file("../../langgraph_agent_toolkit/run_app.py", default_timeout=60).run()
 
         # First check for the welcome message that appears when the app first loads
         assert len(at.chat_message) >= 1, "Expected at least one chat message"

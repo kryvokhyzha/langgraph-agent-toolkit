@@ -11,15 +11,10 @@ from langchain_core.messages import (
 from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
-from pydantic import BaseModel, HttpUrl, TypeAdapter
+from pydantic import BaseModel
 
 from langgraph_agent_toolkit.helper.exceptions import UnsupportedMessageTypeError
 from langgraph_agent_toolkit.schema import ChatMessage
-
-
-def check_str_is_http(x: str) -> str:
-    http_url_adapter = TypeAdapter(HttpUrl)
-    return str(http_url_adapter.validate_python(x))
 
 
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:

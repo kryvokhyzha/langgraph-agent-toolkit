@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Literal, NotRequired
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import (
     DEFAULT_MODEL_PARAMETER_VALUES,
-    DEFAULT_RECURSION_LIMIT,
     get_default_agent,
 )
 
@@ -101,7 +101,7 @@ class UserInput(BaseModel):
     recursion_limit: int | None = Field(
         description="Recursion limit for the agent.",
         default=None,
-        examples=[DEFAULT_RECURSION_LIMIT],
+        examples=[settings.DEFAULT_RECURSION_LIMIT],
     )
 
 

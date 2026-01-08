@@ -115,17 +115,17 @@ class LoggerConfig(metaclass=SingletonMeta):
             loguru_logger.level("WARNONCE", no=self.WARN_ONCE_NO, color="<yellow><bold>")
             loguru_logger.level("DEPRECATED", no=self.DEPRECATED_NO, color="<yellow><bold>")
 
-        loguru_logger.add(
-            sys.stderr,
-            level=self.log_level.upper(),
-            format=formatter.format,
-            filter=lambda r: r["level"].no not in {self.WARN_ONCE_NO, self.DEPRECATED_NO},
-            serialize=self.json_logs,
-            colorize=self.colorize,
-            enqueue=True,
-            backtrace=True,
-            diagnose=True,
-        )
+            loguru_logger.add(
+                sys.stderr,
+                level=self.log_level.upper(),
+                format=formatter.format,
+                filter=lambda r: r["level"].no not in {self.WARN_ONCE_NO, self.DEPRECATED_NO},
+                serialize=self.json_logs,
+                colorize=self.colorize,
+                enqueue=True,
+                backtrace=True,
+                diagnose=True,
+            )
 
         loguru_logger.add(
             sys.stderr,
