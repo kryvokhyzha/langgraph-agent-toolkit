@@ -1948,6 +1948,7 @@ uvicorn-backend = [
 [package.dev-dependencies]
 client = [
     { name = "httpx" },
+    { name = "loguru" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -2048,6 +2049,7 @@ provides-extras = ["aws-backend", "azure-backend", "gunicorn-backend", "uvicorn-
 [package.metadata.requires-dev]
 client = [
     { name = "httpx", specifier = "~=0.28.1" },
+    { name = "loguru", specifier = "~=0.7.3" },
     { name = "pydantic", specifier = ">=2.11.1,<2.13.0" },
     { name = "pydantic-settings", specifier = ">=2.9.1,<2.13.0" },
     { name = "python-dotenv", specifier = ">=1.1,<1.3" },
