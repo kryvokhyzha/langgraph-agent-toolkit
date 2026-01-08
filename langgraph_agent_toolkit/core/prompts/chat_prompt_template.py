@@ -20,9 +20,9 @@ from langchain_core.prompts.chat import (
 from langchain_core.prompts.string import get_template_variables
 from pydantic import Field
 
-from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
+from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform, PromptReturnType
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
-from langgraph_agent_toolkit.core.observability.types import MessageRole, ObservabilityBackend, PromptReturnType
+from langgraph_agent_toolkit.core.observability.types import MessageRole, ObservabilityBackend
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
