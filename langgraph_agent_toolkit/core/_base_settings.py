@@ -167,6 +167,33 @@ class Settings(BaseSettings):
     # Streamlit configuration
     DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"
 
+    # CORS configuration
+    CORS_ENABLED: bool = Field(
+        default=False,
+        description="Enable CORS middleware. Must be explicitly set to True to enable CORS.",
+    )
+    CORS_ORIGINS: list[str] = Field(
+        default_factory=lambda: ["*"],
+        description="List of allowed CORS origins. Use ['*'] to allow all origins.",
+    )
+    CORS_CREDENTIALS: bool = Field(
+        default=False,
+        description="Allow credentials (cookies, authorization headers) in CORS requests. "
+        "Note: Cannot be True when CORS_ORIGINS=['*'] - browsers will reject the response.",
+    )
+    CORS_METHODS: list[str] = Field(
+        default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        description="List of allowed HTTP methods for CORS requests.",
+    )
+    CORS_HEADERS: list[str] = Field(
+        default_factory=lambda: ["*"],
+        description="List of allowed headers for CORS requests. Use ['*'] to allow all headers.",
+    )
+    CORS_MAX_AGE: int = Field(
+        default=600,
+        description="Maximum age (in seconds) for preflight requests to be cached.",
+    )
+
     def _apply_langgraph_env_overrides(self) -> None:
         """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
         for env_name, env_value in os.environ.items():

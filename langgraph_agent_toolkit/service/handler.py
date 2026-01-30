@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from typing import Any, Optional
 
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from langchain_core._api import LangChainBetaWarning
 
 from langgraph_agent_toolkit import __version__
@@ -140,6 +141,22 @@ def create_app() -> FastAPI:
         description="API for interacting with LangGraph agents",
         version=__version__,
     )
+
+    # Add CORS middleware if explicitly enabled
+    if settings.CORS_ENABLED:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.CORS_ORIGINS,
+            allow_credentials=settings.CORS_CREDENTIALS,
+            allow_methods=settings.CORS_METHODS,
+            allow_headers=settings.CORS_HEADERS,
+            max_age=settings.CORS_MAX_AGE,
+        )
+        logger.info(
+            f"CORS enabled with origins: {settings.CORS_ORIGINS}, "
+            f"credentials: {settings.CORS_CREDENTIALS}, "
+            f"methods: {settings.CORS_METHODS}"
+        )
 
     # add middleware
     app.add_middleware(LoggingMiddleware)
