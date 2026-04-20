@@ -344,12 +344,18 @@ class AgentExecutor:
                 stream_mode=["values"],
             )
 
+            if not response_events:
+                raise ValueError("Agent returned no response events")
+
             response_type, response = response_events[-1]
 
             if response_type == "values" and "__interrupt__" not in response:
                 generated_message = response.get("structured_response")
                 if not generated_message:
-                    generated_message = response["messages"][-1]
+                    messages = response.get("messages") or []
+                    if not messages:
+                        raise ValueError("Agent response contains no messages")
+                    generated_message = messages[-1]
 
                 # Normal response, the agent completed successfully
                 output = langchain_to_chat_message(generated_message)

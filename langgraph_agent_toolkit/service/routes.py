@@ -81,21 +81,17 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
     if agent_id is None:
         agent_id = get_default_agent()
 
-    try:
-        return await executor.invoke(
-            agent_id=agent_id,
-            input=user_input.input,
-            thread_id=user_input.thread_id,
-            user_id=user_input.user_id,
-            model_name=user_input.model_name,
-            model_provider=user_input.model_provider,
-            model_config_key=user_input.model_config_key,
-            agent_config=user_input.agent_config,
-            recursion_limit=user_input.recursion_limit,
-        )
-    except Exception:
-        # Let the global exception handler deal with all exceptions
-        raise
+    return await executor.invoke(
+        agent_id=agent_id,
+        input=user_input.input,
+        thread_id=user_input.thread_id,
+        user_id=user_input.user_id,
+        model_name=user_input.model_name,
+        model_provider=user_input.model_provider,
+        model_config_key=user_input.model_config_key,
+        agent_config=user_input.agent_config,
+        recursion_limit=user_input.recursion_limit,
+    )
 
 
 @private_router.post(
@@ -212,7 +208,7 @@ async def history(
                 }
             )
         )
-        messages: list[AnyMessage] = state_snapshot.values["messages"]
+        messages: list[AnyMessage] = state_snapshot.values.get("messages", [])
         chat_messages: list[ChatMessage] = [langchain_to_chat_message(m) for m in messages]
         return ChatHistory(messages=chat_messages)
     except ValueError as e:
@@ -257,7 +253,10 @@ async def clear_history(
                 }
             )
         )
-        messages: list[AnyMessage] = state_snapshot.values["messages"]
+        if not state_snapshot or not state_snapshot.values:
+            identifier = f"thread '{input.thread_id}'" if input.thread_id else f"user '{input.user_id}'"
+            raise HTTPException(status_code=404, detail=f"No history found for {identifier}")
+        messages: list[AnyMessage] = state_snapshot.values.get("messages", [])
 
         await agent.graph.aupdate_state(
             config=RunnableConfig(
@@ -314,7 +313,21 @@ async def add_messages(
                     "user_id": input.user_id,
                 }
             ),
-            values={"messages": [{"type": m.type, "content": m.content} for m in input.messages]},
+            values={
+                "messages": [
+                    {
+                        k: v
+                        for k, v in {
+                            "type": m.type,
+                            "content": m.content,
+                            "tool_call_id": m.tool_call_id,
+                            "tool_calls": m.tool_calls or None,
+                        }.items()
+                        if v is not None
+                    }
+                    for m in input.messages
+                ]
+            },
         )
 
         return AddMessagesResponse(
