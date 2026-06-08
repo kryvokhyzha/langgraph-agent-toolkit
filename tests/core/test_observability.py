@@ -5,9 +5,10 @@ import pytest
 from langchain_core.prompts import ChatPromptTemplate
 
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
 from langgraph_agent_toolkit.core.observability.langsmith import LangsmithObservability
-from langgraph_agent_toolkit.core.observability.types import ChatMessageDict
+from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, ObservabilityBackend
 
 
 class TestBaseObservability:
@@ -69,7 +70,7 @@ class TestBaseObservability:
 
         # Verify prompt exists
         result = obs.pull_prompt("to-delete")
-        assert result is not None
+        assert isinstance(result, ChatPromptTemplate)
 
         obs.delete_prompt("to-delete")
 
@@ -81,32 +82,34 @@ class TestBaseObservability:
 class TestEmptyObservability:
     """Tests for the EmptyObservability class."""
 
-    def test_record_feedback_logs_debug(self):
-        """Test that record_feedback logs debug message instead of raising."""
+    def test_record_feedback_is_noop_and_logs(self):
+        """record_feedback never raises and emits a debug log noting the feedback was ignored."""
         obs = EmptyObservability()
-        # Should not raise, just log
-        obs.record_feedback("run_id", "key", 1.0)
 
-    def test_push_prompt_skip_existing(self):
-        """Test that push_prompt skips existing prompt when force_create_new_version=False."""
+        with patch("langgraph_agent_toolkit.core.observability.empty.logger") as mock_logger:
+            result = obs.record_feedback("run-123", "stars", 1.0)
+
+        assert result is None
+        mock_logger.debug.assert_called_once()
+        assert "run-123" in mock_logger.debug.call_args[0][0]
+
+    def test_push_prompt_skips_when_not_forcing(self):
+        """force_create_new_version=False keeps the ORIGINAL stored prompt (skip branch)."""
         obs = EmptyObservability()
 
         obs.push_prompt("test-prompt", "original content")
         obs.push_prompt("test-prompt", "new content", force_create_new_version=False)
 
-        # Should still have original content
-        result = obs.pull_prompt("test-prompt")
-        assert result is not None
+        assert obs._prompts["test-prompt"] == "original content"
 
-    def test_push_prompt_overwrite_existing(self):
-        """Test that push_prompt overwrites existing prompt when force_create_new_version=True."""
+    def test_push_prompt_overwrites_when_forcing(self):
+        """force_create_new_version=True replaces the stored prompt (overwrite branch)."""
         obs = EmptyObservability()
 
         obs.push_prompt("test-prompt", "original content")
         obs.push_prompt("test-prompt", "new content", force_create_new_version=True)
 
-        result = obs.pull_prompt("test-prompt")
-        assert result is not None
+        assert obs._prompts["test-prompt"] == "new content"
 
     def test_pull_prompt_not_found(self):
         """Test that pull_prompt raises when prompt not found."""
@@ -114,21 +117,6 @@ class TestEmptyObservability:
 
         with pytest.raises(ValueError, match="Prompt 'nonexistent' not found"):
             obs.pull_prompt("nonexistent")
-
-    def test_in_memory_storage(self):
-        """Test that prompts are stored in memory."""
-        obs = EmptyObservability()
-
-        messages: list[ChatMessageDict] = [
-            {"role": "system", "content": "System message"},
-            {"role": "human", "content": "Human message"},
-        ]
-
-        obs.push_prompt("memory-test", messages)
-
-        # Check internal storage
-        assert "memory-test" in obs._prompts
-        assert obs._prompts["memory-test"] == messages
 
 
 class TestLangsmithObservability:
@@ -143,21 +131,14 @@ class TestLangsmithObservability:
                 obs.get_callback_handler()
 
     @patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
-    def test_push_pull_delete_cycle(self, mock_client_cls):
-        """Test the full push-pull-delete cycle with LangSmith."""
+    def test_push_converts_to_chat_prompt_pull_processes_delete_proxies(self, mock_client_cls):
+        """Push converts the raw template to a ChatPromptTemplate; pull processes it back; delete proxies the name."""
         from langchain_core.prompts import ChatPromptTemplate
 
         mock_client = MagicMock()
-        mock_client.push_prompt.return_value = "https://api.smith.langchain.com/prompts/123"
-
-        # Mock pull_prompt to return a ChatPromptTemplate
         mock_client.pull_prompt.return_value = ChatPromptTemplate.from_template(
             "Test template for {{ topic }}", template_format="jinja2"
         )
-
-        # Mock the delete_prompt to not be checked for truthiness
-        mock_client.delete_prompt = MagicMock(return_value=None)
-
         mock_client_cls.return_value = mock_client
 
         with patch.dict(
@@ -170,19 +151,17 @@ class TestLangsmithObservability:
             },
         ):
             obs = LangsmithObservability()
-            template = "Test template for {{ topic }}"
 
-            # Push
-            obs.push_prompt("test-prompt", template)
-            mock_client.push_prompt.assert_called_once()
+            # Push: the raw string template must be converted to a ChatPromptTemplate before sending.
+            obs.push_prompt("test-prompt", "Test template for {{ topic }}")
+            pushed_object = mock_client.push_prompt.call_args.kwargs["object"]
+            assert isinstance(pushed_object, ChatPromptTemplate)
 
-            # Pull
+            # Pull: the client's prompt object is processed back into a ChatPromptTemplate.
             result = obs.pull_prompt("test-prompt")
-            assert result is not None
             assert isinstance(result, ChatPromptTemplate)
 
-            # Delete - reset mock before delete to get clean call count
-            mock_client.delete_prompt.reset_mock()
+            # Delete proxies the name straight through to the client.
             obs.delete_prompt("test-prompt")
             mock_client.delete_prompt.assert_called_once_with("test-prompt")
 
@@ -329,3 +308,23 @@ class TestLangfuseObservability:
             mock_client.reset_mock()
             obs.push_prompt("test-prompt", messages, force_create_new_version=True)
             mock_client.create_prompt.assert_called_once()
+
+
+class TestObservabilityFactory:
+    """Tests for ObservabilityFactory.create dispatch."""
+
+    def test_create_empty_passes_remote_first(self):
+        obs = ObservabilityFactory.create(ObservabilityBackend.EMPTY, remote_first=True)
+        assert isinstance(obs, EmptyObservability)
+        assert obs.remote_first is True
+
+    @pytest.mark.parametrize(
+        "name, cls",
+        [("langsmith", LangsmithObservability), ("langfuse", LangfuseObservability)],
+    )
+    def test_create_dispatches_to_backend(self, name, cls):
+        assert isinstance(ObservabilityFactory.create(name), cls)
+
+    def test_create_unsupported_raises(self):
+        with pytest.raises(ValueError, match="not a valid ObservabilityBackend"):
+            ObservabilityFactory.create("bogus")

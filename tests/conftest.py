@@ -40,3 +40,17 @@ def check_service_available():
             return False
 
     return _check
+
+
+class MockStateSnapshot:
+    """Lightweight stand-in for langgraph StateSnapshot (exposes just .values and .tasks)."""
+
+    def __init__(self, values=None, tasks=None):
+        self.values = values or {}
+        self.tasks = tasks or []
+
+
+@pytest.fixture
+def mock_state_snapshot():
+    """Return the shared MockStateSnapshot class for building state snapshots in tests."""
+    return MockStateSnapshot

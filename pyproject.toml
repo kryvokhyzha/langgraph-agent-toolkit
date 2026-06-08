@@ -227,6 +227,7 @@ lines-after-imports = 2
 
 [tool.pytest.ini_options]
 pythonpath = ["langgraph_agent_toolkit", "."]
+asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.pytest_env]

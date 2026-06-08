@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from uuid import UUID
 
 import pytest
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.types import Command
 from pydantic import BaseModel
@@ -14,14 +14,6 @@ from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatMessage
 
 
-class MockStateSnapshot:
-    """Mock state snapshot."""
-
-    def __init__(self, values=None, tasks=None):
-        self.values = values or {}
-        self.tasks = tasks or []
-
-
 class MockInput(BaseModel):
     """Test input model."""
 
@@ -29,7 +21,7 @@ class MockInput(BaseModel):
 
 
 @pytest.fixture
-def mock_agent():
+def mock_agent(mock_state_snapshot):
     """Create a mock agent for testing."""
     agent = Mock(spec=Agent)
     agent.name = "test-agent"
@@ -38,7 +30,7 @@ def mock_agent():
     graph = AsyncMock()
     graph.ainvoke = AsyncMock()
     graph.astream = AsyncMock()
-    graph.aget_state = AsyncMock(return_value=MockStateSnapshot(values={"messages": []}, tasks=[]))
+    graph.aget_state = AsyncMock(return_value=mock_state_snapshot(values={"messages": []}, tasks=[]))
     agent.graph = graph
 
     # Properly mock observability with context manager support
@@ -98,14 +90,14 @@ async def test_invoke_basic_flow(agent_executor, mock_agent):
 
 
 @pytest.mark.asyncio
-async def test_invoke_with_interrupt_handling(agent_executor, mock_agent):
+async def test_invoke_with_interrupt_handling(agent_executor, mock_agent, mock_state_snapshot):
     """Test invoke correctly handles interrupts."""
     with patch.object(settings, "CHECK_INTERRUPTS", True):
         mock_agent.graph.checkpointer = Mock()
 
         interrupt_task = Mock()
         interrupt_task.interrupts = [Mock()]
-        mock_agent.graph.aget_state.return_value = MockStateSnapshot(values={"messages": []}, tasks=[interrupt_task])
+        mock_agent.graph.aget_state.return_value = mock_state_snapshot(values={"messages": []}, tasks=[interrupt_task])
 
         mock_response = [("updates", {"__interrupt__": [Mock(value="Need more info")]})]
         mock_agent.graph.ainvoke.return_value = mock_response
@@ -212,3 +204,84 @@ def test_agent_management_operations(mock_agent):
 
             with pytest.raises(KeyError):
                 executor.get_agent("nonexistent-agent")
+
+
+def _astream(events):
+    """Build an async-generator stand-in for graph.astream that yields the given (mode, event) tuples."""
+
+    async def _gen(*args, **kwargs):
+        for event in events:
+            yield event
+
+    return _gen
+
+
+async def test_stream_updates_emits_message(agent_executor, mock_agent):
+    """An 'updates' event with messages yields a converted ChatMessage."""
+    mock_agent.graph.astream = _astream([("updates", {"agent": {"messages": [AIMessage(content="hello")]}})])
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert len(out) == 1
+    assert out[0].type == "ai"
+    assert out[0].content == "hello"
+
+
+async def test_stream_supervisor_keeps_only_last_ai_message(agent_executor, mock_agent):
+    """The 'supervisor' node is special-cased to emit only its last AIMessage."""
+    mock_agent.graph.astream = _astream(
+        [("updates", {"supervisor": {"messages": [AIMessage(content="a"), AIMessage(content="b")]}})]
+    )
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert [m.content for m in out] == ["b"]
+
+
+async def test_stream_expert_node_becomes_tool_message(agent_executor, mock_agent):
+    """research_expert/math_expert updates are rewritten as tool messages."""
+    mock_agent.graph.astream = _astream(
+        [("updates", {"research_expert": {"messages": [AIMessage(content="research result")]}})]
+    )
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert len(out) == 1
+    assert out[0].type == "tool"
+    assert out[0].content == "research result"
+
+
+async def test_stream_interrupt_yields_ai_message(agent_executor, mock_agent):
+    """An __interrupt__ update yields its value as an AIMessage."""
+    mock_agent.graph.astream = _astream([("updates", {"__interrupt__": [Mock(value="need input")]})])
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert len(out) == 1
+    assert out[0].content == "need input"
+
+
+async def test_stream_tokens_filters_skip_stream_and_non_chunks(agent_executor, mock_agent):
+    """'messages' mode yields token strings, skipping skip_stream-tagged and non-AIMessageChunk events."""
+    mock_agent.graph.astream = _astream(
+        [
+            ("messages", (AIMessageChunk(content="hi"), {"tags": []})),
+            ("messages", (AIMessageChunk(content="skip"), {"tags": ["skip_stream"]})),
+            ("messages", (HumanMessage(content="ignored"), {"tags": []})),
+        ]
+    )
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert out == ["hi"]
+
+
+async def test_stream_reassembles_tuple_parts_into_message(agent_executor, mock_agent):
+    """Streamed (field, value) tuple parts are reassembled into a single AIMessage."""
+    mock_agent.graph.astream = _astream([("updates", {"agent": {"messages": [("content", "assembled")]}})])
+
+    out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
+
+    assert len(out) == 1
+    assert out[0].type == "ai"
+    assert out[0].content == "assembled"

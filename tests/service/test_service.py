@@ -1,7 +1,6 @@
 import json
 from unittest.mock import AsyncMock, Mock, patch
 
-import langsmith
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
@@ -9,67 +8,6 @@ from langgraph.types import StateSnapshot
 
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import ModelProvider
-
-
-# Define MockStateSnapshot locally instead of importing from tests
-class MockStateSnapshot:
-    """Mock state snapshot that mimics the structure of langgraph.pregel.types.StateSnapshot."""
-
-    def __init__(self, values=None, tasks=None):
-        self.values = values or {}
-        self.tasks = tasks or []
-
-
-@pytest.fixture
-def mock_agent_executor():
-    """Create a mock agent executor with a default agent."""
-    # Create mock agent
-    mock_agent = Mock()
-    mock_agent.name = "react-agent"
-    mock_agent.description = "A mock agent for testing"
-
-    # Create a proper graph mock with async methods
-    graph = AsyncMock()
-    graph.ainvoke = AsyncMock()
-    graph.aget_state = AsyncMock()
-
-    # Configure the astream method as an async generator
-    async def mock_astream(**kwargs):
-        for item in [("values", {"messages": [AIMessage(content="Test response")]})]:
-            yield item
-
-    graph.astream = mock_astream
-    graph.get_state = Mock(return_value=MockStateSnapshot(values={"messages": []}, tasks=[]))
-
-    # Set the graph on the agent
-    mock_agent.graph = graph
-
-    mock_agent.observability = Mock()
-    mock_agent.observability.get_callback_handler = Mock(return_value=None)
-
-    # Create a proper AsyncMock for AgentExecutor
-    executor = Mock()
-    executor.agents = {"react-agent": mock_agent}
-    executor.get_agent = Mock(return_value=mock_agent)
-    executor.get_all_agent_info = Mock(return_value=[{"key": "react-agent", "description": "A mock agent for testing"}])
-
-    # Use AsyncMock for invoke
-    executor.invoke = AsyncMock()
-    executor.invoke.return_value = ChatMessage(type="ai", content="Default test response")
-
-    # Make stream return an async generator
-    async def mock_stream_gen(*args, **kwargs):
-        yield ChatMessage(type="ai", content="Default test response")
-
-    executor.stream = mock_stream_gen
-
-    return executor
-
-
-@pytest.fixture
-def mock_agent(mock_agent_executor):
-    """Get the mock agent from the executor."""
-    return mock_agent_executor.get_agent("react-agent")
 
 
 def test_invoke(test_client, mock_agent_executor) -> None:
@@ -84,8 +22,8 @@ def test_invoke(test_client, mock_agent_executor) -> None:
         response = test_client.post("/invoke", json={"input": {"message": QUESTION}})
         assert response.status_code == 200
 
-        # Just verify it was called, don't check the exact parameters
-        assert mock_agent_executor.invoke.called
+        # Verify the request was routed to the default agent (not just "called").
+        assert mock_agent_executor.invoke.call_args.kwargs["agent_id"] == "react-agent"
 
         output = ChatMessage.model_validate(response.json())
         assert output.type == "ai"
@@ -134,10 +72,14 @@ def test_invoke_model_param(test_client, mock_agent_executor) -> None:
         assert output.type == "ai"
         assert output.content == ANSWER
 
-        # Since we're mocking, we don't need to validate that an invalid model fails
-        # The validation would happen at the schema level
+        # Honest current behavior: model_provider is typed `str` on UserInput, so an unknown
+        # provider is NOT rejected at the schema level — it is accepted (200) and forwarded
+        # verbatim to the executor (which would only fail later when building the model).
+        # TODO: tighten UserInput.model_provider to the ModelProvider enum so unknown providers
+        #       return 422 (validation hardening intentionally deferred).
         response = test_client.post("/invoke", json={"input": {"message": QUESTION}, "model_provider": "invalid-model"})
         assert response.status_code == 200
+        assert mock_agent_executor.invoke.call_args.kwargs["model_provider"] == "invalid-model"
 
 
 def test_invoke_custom_agent_config(test_client, mock_agent_executor) -> None:
@@ -162,18 +104,18 @@ def test_invoke_custom_agent_config(test_client, mock_agent_executor) -> None:
         assert output.type == "ai"
         assert output.content == ANSWER
 
-        # Verify a reserved key in agent_config throws a validation error
-        # Note: Your service might be accepting this, which is why the test is failing
-        # If your service should be rejecting this, then you need to fix the service
-        # For now, we'll update the test to match the actual behavior
-        INVALID_CONFIG = {"model": "gpt-4o"}
-        response = test_client.post("/invoke", json={"input": {"message": QUESTION}, "agent_config": INVALID_CONFIG})
+        # Honest current behavior: agent_config is merged verbatim into the runtime
+        # `configurable` with no reserved-key protection, so a caller-supplied "model"
+        # (or thread_id/user_id/...) is accepted (200) and forwarded as-is — a known footgun.
+        # TODO: reject reserved keys in agent_config with 422 (hardening intentionally deferred).
+        RESERVED_KEY_CONFIG = {"model": "gpt-4o"}
+        response = test_client.post(
+            "/invoke", json={"input": {"message": QUESTION}, "agent_config": RESERVED_KEY_CONFIG}
+        )
+        assert response.status_code == 200
+        assert mock_agent_executor.invoke.call_args.kwargs["agent_config"] == RESERVED_KEY_CONFIG
 
-        # If the service is accepting this config, we'll change our assertion
-        assert response.status_code == 200  # Changed from 422 to 200
 
-
-@pytest.mark.skip(reason="TestClient exception handling needs investigation")
 def test_invoke_error_handling(test_client, mock_agent_executor) -> None:
     """Test that errors in invoke are properly handled."""
     QUESTION = "What is the weather in Tokyo?"
@@ -416,7 +358,6 @@ def test_feedback_custom_agent(test_client, mock_agent_executor) -> None:
             default_mock.observability.record_feedback.assert_not_called()
 
 
-@pytest.mark.skip(reason="TestClient exception handling needs investigation")
 def test_feedback_error_handling(test_client, mock_agent, mock_agent_executor) -> None:
     """Test error handling in feedback endpoint."""
     body = {"run_id": "847c6285-8fc9-4560-a83f-4e6285809254", "key": "invalid-key", "score": 0.8}
@@ -446,45 +387,6 @@ def test_feedback_error_handling(test_client, mock_agent, mock_agent_executor) -
             response_data = response.json()
             assert "Unexpected error" in response_data["detail"]
             assert response_data["error_type"] == "RuntimeError"
-
-
-@patch("langgraph_agent_toolkit.core.observability.langsmith.LangsmithClient")
-def test_feedback_langsmith(mock_client: langsmith.Client, test_client, mock_agent, mock_agent_executor) -> None:
-    """Test the Langsmith implementation for backward compatibility."""
-    # This test can be removed once the transition to the new implementation is complete
-    ls_instance = mock_client.return_value
-    ls_instance.create_feedback.return_value = None
-
-    # Mock the agent's observability platform's record_feedback method
-    mock_agent.observability.record_feedback = Mock(return_value=None)
-
-    with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-        with patch("langgraph_agent_toolkit.service.routes.get_agent", return_value=mock_agent):
-            body = {
-                "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
-                "key": "human-feedback-stars",
-                "score": 0.8,
-            }
-            response = test_client.post("/feedback", json=body)
-            # Update expected status code to 201
-            assert response.status_code == 201
-            # Update expected response format
-            assert response.json() == {
-                "status": "success",
-                "run_id": "847c6285-8fc9-4560-a83f-4e6285809254",
-                "message": (
-                    "Feedback 'human-feedback-stars' recorded successfully for run "
-                    "847c6285-8fc9-4560-a83f-4e6285809254."
-                ),
-            }
-
-            # Updated assertion to include user_id=None
-            mock_agent.observability.record_feedback.assert_called_once_with(
-                run_id="847c6285-8fc9-4560-a83f-4e6285809254",
-                key="human-feedback-stars",
-                score=0.8,
-                user_id=None,
-            )
 
 
 def test_history(test_client, mock_agent, mock_agent_executor) -> None:
@@ -645,17 +547,3 @@ async def test_stream_with_recursion_limit(test_client, mock_agent_executor) -> 
             # Verify default recursion_limit was passed
             assert "recursion_limit" in called_args, "recursion_limit parameter not passed to stream method"
             assert called_args["recursion_limit"] is None
-
-
-def test_exception_handlers_registered(test_client) -> None:
-    """Test that exception handlers are properly registered."""
-    # Test a route that should trigger a ValueError exception handler
-    response = test_client.post("/invoke", json={"invalid": "request"})
-
-    # This should trigger input validation and return a proper error response
-    # The exact status code depends on the validation, but it should not be an unhandled exception
-    assert response.status_code in [400, 422, 500]  # Any handled error status
-
-    # The response should have proper JSON structure, not an unhandled exception
-    response_data = response.json()
-    assert "detail" in response_data

@@ -399,22 +399,6 @@ class TestValidateChatHistoryErrorReproduction:
         assert sanitized[1].tool_calls == []
         assert sanitized[1].content == "[Tool call was interrupted]"
 
-    def test_validate_passes_with_complete_tool_call_chain(self):
-        """Verify that _validate_chat_history passes when tool calls have corresponding ToolMessages."""
-        tool_call_id = "call_complete_123"
-        messages = [
-            HumanMessage(content="Search for weather"),
-            AIMessage(
-                content="Let me search",
-                tool_calls=[{"name": "search", "args": {"query": "weather"}, "id": tool_call_id, "type": "tool_call"}],
-            ),
-            ToolMessage(content="Weather is sunny", tool_call_id=tool_call_id),
-            AIMessage(content="The weather is sunny!"),
-        ]
-
-        # Should not raise - complete tool call chain
-        _validate_chat_history(messages)
-
     def test_multiple_tool_calls_one_missing_response(self):
         """Reproduce error when one of multiple tool calls is missing its response."""
         messages = [

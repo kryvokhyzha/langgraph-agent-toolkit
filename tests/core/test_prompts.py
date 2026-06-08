@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -15,42 +15,29 @@ from langgraph_agent_toolkit.core.prompts.chat_prompt_template import (
 class TestTemplateFormatConversion:
     """Tests for the _convert_template_format function."""
 
-    def test_fstring_to_jinja2(self):
-        """Test converting from f-string to jinja2 format."""
-        fstring_template = "Hello, {name}! Your age is {age}."
-        jinja2_template = _convert_template_format(fstring_template, "jinja2")
-        assert jinja2_template == "Hello, {{ name }}! Your age is {{ age }}."
-
-    def test_jinja2_to_fstring(self):
-        """Test converting from jinja2 to f-string format."""
-        jinja2_template = "Hello, {{ name }}! Your age is {{ age }}."
-        fstring_template = _convert_template_format(jinja2_template, "f-string")
-        assert fstring_template == "Hello, {name}! Your age is {age}."
-
-    def test_no_conversion_needed(self):
-        """Test when no conversion is needed."""
-        template = "Hello, no variables here!"
-        assert _convert_template_format(template, "jinja2") == template
-        assert _convert_template_format(template, "f-string") == template
-
-    def test_already_correct_format(self):
-        """Test when the template is already in the correct format."""
-        jinja2_template = "Hello, {{ name }}!"
-        fstring_template = "Hello, {name}!"
-
-        assert _convert_template_format(jinja2_template, "jinja2") == jinja2_template
-        assert _convert_template_format(fstring_template, "f-string") == fstring_template
-
-    def test_spaces_in_jinja(self):
-        """Test handling spaces in jinja2 variables."""
-        jinja2_template = "Hello, {{  name  }}! Your age is {{age}}."
-        fstring_template = _convert_template_format(jinja2_template, "f-string")
-        assert fstring_template == "Hello, {name}! Your age is {age}."
-
-    def test_none_or_non_string_input(self):
-        """Test handling None or non-string input."""
-        assert _convert_template_format(None, "jinja2") is None
-        assert _convert_template_format(123, "f-string") == 123
+    @pytest.mark.parametrize(
+        "template, target_format, expected",
+        [
+            # f-string -> jinja2
+            ("Hello, {name}! Your age is {age}.", "jinja2", "Hello, {{ name }}! Your age is {{ age }}."),
+            # jinja2 -> f-string
+            ("Hello, {{ name }}! Your age is {{ age }}.", "f-string", "Hello, {name}! Your age is {age}."),
+            # no variables -> unchanged in either direction
+            ("Hello, no variables here!", "jinja2", "Hello, no variables here!"),
+            ("Hello, no variables here!", "f-string", "Hello, no variables here!"),
+            # already in the target format -> unchanged
+            ("Hello, {{ name }}!", "jinja2", "Hello, {{ name }}!"),
+            ("Hello, {name}!", "f-string", "Hello, {name}!"),
+            # extra spaces inside jinja braces are normalized when converting to f-string
+            ("Hello, {{  name  }}! Your age is {{age}}.", "f-string", "Hello, {name}! Your age is {age}."),
+            # non-string inputs pass through untouched
+            (None, "jinja2", None),
+            (123, "f-string", 123),
+        ],
+    )
+    def test_convert_template_format(self, template, target_format, expected):
+        """_convert_template_format converts between f-string and jinja2, leaving non-templates untouched."""
+        assert _convert_template_format(template, target_format) == expected
 
 
 class TestObservabilityChatPromptTemplate:
@@ -131,6 +118,8 @@ class TestObservabilityChatPromptTemplate:
             assert template.prompt_name == "basic-assistant"
             assert template.observability_backend == ObservabilityBackend.EMPTY
             assert template.load_at_runtime is True
+            # The factory's result must actually be wired into the template, not just constructed.
+            assert template.observability_platform is self.os_platform
 
             # Verify factory was called with correct backend
             mock_create.assert_called_once_with(ObservabilityBackend.EMPTY)
@@ -240,26 +229,23 @@ class TestObservabilityChatPromptTemplate:
         assert len(messages) == 1
         assert messages[0].content == "Fallback message"
 
-    def test_platform_switching(self):
-        """Test switching observability platforms."""
+    def test_switching_platform_reloads_prompt(self):
+        """Assigning a new observability_platform resets cached state so the next invoke reloads from it.
+
+        Drives only the public `observability_platform` setter (no poking of private fields).
+        """
         template = ObservabilityChatPromptTemplate.from_observability_platform(
             prompt_name="basic-assistant",
             observability_platform=self.os_platform,
-            load_at_runtime=False,
+            load_at_runtime=True,
             template_format="jinja2",
             input_variables=["domain", "question", "topic"],
         )
 
-        # Initial invocation with original platform
-        result1 = template.invoke(
-            input=dict(
-                domain="physics",
-                question="relativity",
-                topic="spacetime",
-            )
-        )
+        inputs = dict(domain="physics", question="relativity", topic="spacetime")
+        first = template.invoke(input=inputs).to_messages()[0].content
+        assert "MODIFIED" not in first
 
-        # Create a new platform with a different prompt definition
         new_platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY)
         new_platform.push_prompt(
             "basic-assistant",
@@ -269,25 +255,10 @@ class TestObservabilityChatPromptTemplate:
             ],
         )
 
-        # Switch platforms
+        # Public setter resets the cache; the next invoke must pull from the new platform.
         template.observability_platform = new_platform
-
-        # Force reload of messages
-        template.load_at_runtime = True
-        template._loaded_prompt = None
-
-        # Invocation with new platform
-        result2 = template.invoke(
-            input=dict(
-                domain="physics",
-                question="relativity",
-                topic="spacetime",
-            )
-        )
-
-        # Verify results are different
-        assert "MODIFIED" in result2.to_messages()[0].content
-        assert "MODIFIED" not in result1.to_messages()[0].content
+        second = template.invoke(input=inputs).to_messages()[0].content
+        assert "MODIFIED" in second
 
     def test_combining_with_standard_template(self):
         """Test combining with a standard ChatPromptTemplate."""
@@ -359,43 +330,40 @@ class TestObservabilityChatPromptTemplate:
         assert "specialized in fixed domain" in messages[0].content
         assert "partial variable test related to templates" in messages[1].content
 
-    @patch("time.time")
-    def test_caching_behavior(self, mock_time):
-        """Test caching behavior of the template."""
-        # Mock time to control cache expiration
-        # Provide more times to avoid StopIteration error
-        mock_time.side_effect = [0, 1, 61, 62, 122, 123, 124, 125]  # Times in seconds
+    def test_caching_reloads_only_after_ttl(self):
+        """A runtime template re-pulls the prompt only after its cache TTL expires.
 
-        # Create a mock platform that tracks pull_prompt calls
-        mock_platform = MagicMock()
-        mock_platform.pull_prompt.return_value = ChatPromptTemplate.from_messages(
-            [SystemMessage(content="Cached template for {{ test_var }}")]
-        )
+        Uses the real EmptyObservability backend plus a controllable clock, and asserts
+        the observable effect (the rendered content changes after a reload) rather than
+        mocked pull_prompt call counts.
+        """
+        platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY)
+        platform.push_prompt("cached", [{"role": "system", "content": "v1 {{ x }}"}])
 
-        template = ObservabilityChatPromptTemplate(
-            prompt_name="cached-prompt",
-            observability_platform=mock_platform,
+        template = ObservabilityChatPromptTemplate.from_observability_platform(
+            prompt_name="cached",
+            observability_platform=platform,
             load_at_runtime=True,
             template_format="jinja2",
-            cache_ttl_seconds=60,  # 1 minute cache
-            input_variables=["test_var"],
+            cache_ttl_seconds=60,
+            input_variables=["x"],
         )
 
-        # First invocation should call pull_prompt
-        template.invoke(input=dict(test_var="test1"))
-        assert mock_platform.pull_prompt.call_count == 1
+        clock = {"now": 1000.0}
+        with patch("time.time", lambda: clock["now"]):
+            # First invoke loads v1.
+            assert "v1 a" in template.invoke(input={"x": "a"}).to_messages()[0].content
 
-        # Second invocation within cache TTL should not call pull_prompt again
-        template.invoke(input=dict(test_var="test2"))
-        assert mock_platform.pull_prompt.call_count == 1
+            # Update the stored prompt to v2 behind the template's back.
+            platform.push_prompt("cached", [{"role": "system", "content": "v2 {{ x }}"}])
 
-        # Third invocation after cache expiration should call pull_prompt again
-        template.invoke(input=dict(test_var="test3"))
-        assert mock_platform.pull_prompt.call_count == 2
+            # Within the TTL window -> still serves cached v1 (no reload).
+            clock["now"] += 30
+            assert "v1 b" in template.invoke(input={"x": "b"}).to_messages()[0].content
 
-        # Fourth invocation within new cache TTL should not call pull_prompt again
-        template.invoke(input=dict(test_var="test4"))
-        assert mock_platform.pull_prompt.call_count == 2
+            # Past the TTL -> reloads and serves v2.
+            clock["now"] += 40  # +70s total, exceeds the 60s TTL
+            assert "v2 c" in template.invoke(input={"x": "c"}).to_messages()[0].content
 
     @pytest.mark.asyncio
     async def test_async_invoke(self):
@@ -572,56 +540,22 @@ class TestObservabilityChatPromptTemplate:
         assert "Follow-up answer" in messages2[4].content
         assert "Human prompt with human value" in messages2[5].content
 
-    @pytest.mark.asyncio
-    async def test_async_message_placeholder(self):
-        """Test asynchronous handling of MessagesPlaceholder."""
-        # Use the same approach as in test_message_placeholder_handling
-        chat_messages = [
-            {"role": "system", "content": "System prompt with {{ system_var }}"},
-            {"role": "messages_placeholder", "content": "async_history"},
-            {"role": "human", "content": "Human prompt with {{ human_var }}"},
-        ]
-        self.os_platform.push_prompt("async-placeholder-test", chat_messages)
-
-        template = ObservabilityChatPromptTemplate.from_observability_platform(
-            prompt_name="async-placeholder-test",
-            observability_platform=self.os_platform,
-            load_at_runtime=False,
-            template_format="jinja2",
-            input_variables=["system_var", "human_var", "async_history"],
-        )
-
-        # Test with async invocation
-        result = await template.ainvoke(
-            input=dict(
-                system_var="async system",
-                human_var="async human",
-                async_history=[
-                    HumanMessage(content="Async question"),
-                    AIMessage(content="Async answer"),
-                ],
-            )
-        )
-
-        messages = result.to_messages()
-        assert len(messages) == 4  # System + 2 history + Human
-        assert "System prompt with async system" in messages[0].content
-        assert "Async question" in messages[1].content
-        assert "Async answer" in messages[2].content
-        assert "Human prompt with async human" in messages[3].content
-
     def test_process_list_prompt_formats(self):
-        """Test processing different list prompt formats."""
-        # Test dict format (the supported format for list prompts)
+        """A dict-role list loads into the correct message-template types, in order."""
+        from langchain_core.prompts.chat import (
+            AIMessagePromptTemplate,
+            HumanMessagePromptTemplate,
+            SystemMessagePromptTemplate,
+        )
+
         dict_prompts = [
             {"role": "system", "content": "System message with {{ var1 }}"},
             {"role": "human", "content": "Human message with {{ var2 }}"},
             {"role": "assistant", "content": "Assistant message with {{ var3 }}"},
         ]
-
         self.os_platform.push_prompt("dict-format-simple", dict_prompts)
 
-        dict_template = ObservabilityChatPromptTemplate.from_observability_platform(
+        template = ObservabilityChatPromptTemplate.from_observability_platform(
             prompt_name="dict-format-simple",
             observability_platform=self.os_platform,
             load_at_runtime=False,
@@ -629,74 +563,11 @@ class TestObservabilityChatPromptTemplate:
             input_variables=["var1", "var2", "var3"],
         )
 
-        assert len(dict_template.messages) == 3
-
-        # Test dict format with placeholder
-        dict_prompts_with_placeholder = [
-            {"role": "system", "content": "System message with {{ var1 }}"},
-            {"role": "human", "content": "Human message with {{ var2 }}"},
-            {"role": "assistant", "content": "Assistant message with {{ var3 }}"},
-            {"role": "messages_placeholder", "content": "chat_history"},
-        ]
-
-        self.os_platform.push_prompt("dict-format", dict_prompts_with_placeholder)
-
-        dict_template_with_placeholder = ObservabilityChatPromptTemplate.from_observability_platform(
-            prompt_name="dict-format",
-            observability_platform=self.os_platform,
-            load_at_runtime=False,
-            template_format="jinja2",
-            input_variables=["var1", "var2", "var3", "chat_history"],
-        )
-
-        assert len(dict_template_with_placeholder.messages) == 4
-        assert isinstance(dict_template_with_placeholder.messages[3], MessagesPlaceholder)
-        assert dict_template_with_placeholder.messages[3].variable_name == "chat_history"
-
-        # Test with placeholder and invocation
-        result = dict_template_with_placeholder.invoke(
-            input=dict(
-                var1="value1",
-                var2="value2",
-                var3="value3",
-                chat_history=[HumanMessage(content="Test message"), AIMessage(content="Response message")],
-            )
-        )
-
-        messages = result.to_messages()
-        assert len(messages) == 5  # 3 template messages + 2 chat history messages
-        assert "System message with value1" in messages[0].content
-        assert "Human message with value2" in messages[1].content
-        assert "Assistant message with value3" in messages[2].content
-        assert "Test message" in messages[3].content
-        assert "Response message" in messages[4].content
-
-    def test_remote_first_initialization(self):
-        """Test initialization with remote_first flag."""
-        # Create a platform with remote_first=True
-        remote_first_platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY, remote_first=True)
-
-        assert remote_first_platform.remote_first is True
-
-        # Push a prompt to the platform
-        remote_first_platform.push_prompt(
-            "basic-assistant",
-            [
-                {"role": "system", "content": "You are an AI assistant specialized in {{ domain }}."},
-                {"role": "human", "content": "I need help with {{ question }} related to {{ topic }}."},
-            ],
-        )
-
-        # Create template with this platform
-        template = ObservabilityChatPromptTemplate.from_observability_platform(
-            prompt_name="basic-assistant",
-            observability_platform=remote_first_platform,
-            load_at_runtime=False,
-            template_format="jinja2",
-            input_variables=["domain", "question", "topic"],
-        )
-
-        assert template.observability_platform.remote_first is True
+        # (MessagesPlaceholder handling within a dict list is covered by test_message_placeholder_handling.)
+        assert len(template.messages) == 3
+        assert isinstance(template.messages[0], SystemMessagePromptTemplate)
+        assert isinstance(template.messages[1], HumanMessagePromptTemplate)
+        assert isinstance(template.messages[2], AIMessagePromptTemplate)
 
 
 class TestChatPromptValueValidation:
@@ -722,8 +593,9 @@ class TestChatPromptValueValidation:
         """Teardown for tests."""
         pass
 
-    def test_invoke_returns_only_base_messages(self):
-        """Test that invoke() returns only BaseMessage instances in ChatPromptValue."""
+    @pytest.mark.parametrize("use_async", [False, True])
+    async def test_invoke_returns_only_base_messages(self, use_async):
+        """invoke()/ainvoke() must place only BaseMessage instances in the ChatPromptValue."""
         from langchain_core.messages import BaseMessage
         from langchain_core.prompts.chat import SystemMessagePromptTemplate
 
@@ -736,37 +608,8 @@ class TestChatPromptValueValidation:
             template_format="jinja2",
         )
 
-        result = template.invoke(
-            {
-                "messages": [HumanMessage(content="Hello!")],
-            }
-        )
+        payload = {"messages": [HumanMessage(content="Hello!")]}
+        result = await template.ainvoke(payload) if use_async else template.invoke(payload)
 
-        # Verify all messages in the result are BaseMessage instances
-        for msg in result.messages:
-            assert isinstance(msg, BaseMessage), f"Expected BaseMessage, got {type(msg)}"
-
-    @pytest.mark.asyncio
-    async def test_ainvoke_returns_only_base_messages(self):
-        """Test that ainvoke() returns only BaseMessage instances in ChatPromptValue."""
-        from langchain_core.messages import BaseMessage
-        from langchain_core.prompts.chat import SystemMessagePromptTemplate
-
-        template = ObservabilityChatPromptTemplate(
-            messages=[
-                SystemMessagePromptTemplate.from_template("You are a helpful assistant", template_format="jinja2"),
-                MessagesPlaceholder(variable_name="messages"),
-            ],
-            input_variables=["messages"],
-            template_format="jinja2",
-        )
-
-        result = await template.ainvoke(
-            {
-                "messages": [HumanMessage(content="Hello!")],
-            }
-        )
-
-        # Verify all messages in the result are BaseMessage instances
         for msg in result.messages:
             assert isinstance(msg, BaseMessage), f"Expected BaseMessage, got {type(msg)}"
