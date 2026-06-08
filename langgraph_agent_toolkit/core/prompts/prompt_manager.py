@@ -158,7 +158,7 @@ class PromptManager:
         """Get cached prompt or create it if it doesn't exist (async version)."""
         if prompt_name not in self._prompt_cache:
             template_path = self._prompts_dir / template_filename
-            await self._create_prompt_template_async(
+            await self._acreate_prompt_template(
                 prompt_name=prompt_name,
                 template_path=template_path,
                 input_variables=input_variables,

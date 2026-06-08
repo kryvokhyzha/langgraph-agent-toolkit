@@ -209,3 +209,6 @@ temp_*.py
 
 # langgraph
 .langgraph_api
+
+# Claude
+.claude/research

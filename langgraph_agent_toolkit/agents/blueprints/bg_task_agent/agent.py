@@ -40,7 +40,7 @@ async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
     else:
         # Fall back to traditional approach
         m = CompletionModelFactory.create(
-            mmodel_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+            model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
             model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
             openai_api_base=settings.OPENAI_API_BASE_URL,
             openai_api_key=settings.OPENAI_API_KEY,
