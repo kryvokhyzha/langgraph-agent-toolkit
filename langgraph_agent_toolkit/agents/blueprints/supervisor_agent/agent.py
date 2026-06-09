@@ -1,6 +1,6 @@
+from langchain.agents import create_agent
 from langchain_community.tools import DuckDuckGoSearchResults
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.prebuilt import create_react_agent
 from langgraph_supervisor import create_supervisor
 
 from langgraph_agent_toolkit.agents.agent import Agent
@@ -17,18 +17,18 @@ model = CompletionModelFactory.create(
     openai_api_key=settings.OPENAI_API_KEY,
 )
 
-math_agent = create_react_agent(
+math_agent = create_agent(
     model=model,
     tools=[add, multiply],
     name="math_expert",
-    prompt="You are a math expert. Always use one tool at a time.",
+    system_prompt="You are a math expert. Always use one tool at a time.",
 ).with_config(tags=["skip_stream"])
 
-research_agent = create_react_agent(
+research_agent = create_agent(
     model=model,
     tools=[DuckDuckGoSearchResults()],
     name="research_expert",
-    prompt="You are a world class researcher with access to web search. Do not do any math.",
+    system_prompt="You are a world class researcher with access to web search. Do not do any math.",
 ).with_config(tags=["skip_stream"])
 
 # Create supervisor workflow
@@ -41,6 +41,7 @@ workflow = create_supervisor(
         "For math problems, use math_agent."
     ),
     add_handoff_back_messages=False,
+    output_mode="full_history",  # retain sub-agent messages when a conversation is reloaded from history
 )
 
 supervisor_agent = Agent(

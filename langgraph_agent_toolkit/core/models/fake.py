@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, Literal, Optional, Sequence, Union
 
-from langchain_community.chat_models import FakeListChatModel
 from langchain_core.language_models.base import LanguageModelInput
+from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from langchain_core.messages import BaseMessage
 from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool

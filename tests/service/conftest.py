@@ -10,14 +10,6 @@ from langgraph_agent_toolkit.schema.schema import ChatMessage
 from langgraph_agent_toolkit.service.factory import ServiceRunner
 
 
-class MockStateSnapshot:
-    """Mock state snapshot that mimics the structure of langgraph.pregel.types.StateSnapshot."""
-
-    def __init__(self, values=None, tasks=None):
-        self.values = values or {}
-        self.tasks = tasks or []
-
-
 @pytest.fixture
 def app():
     """Fixture to create a FastAPI app for testing."""
@@ -26,33 +18,32 @@ def app():
 
 
 @pytest.fixture
-def mock_agent_executor():
-    """Fixture to create a mock agent executor with the default agent."""
-    # Create mock agent
+def mock_agent_executor(mock_state_snapshot):
+    """Mock AgentExecutor with a single default agent.
+
+    invoke/stream use return_value-style mocks so individual tests can override the
+    response via `mock_agent_executor.invoke.return_value = ...`. (A previous duplicate
+    fixture used side_effect, which silently ignored such overrides.)
+    """
     agent_mock = Mock()
     agent_mock.name = settings.DEFAULT_AGENT
     agent_mock.description = "A mock agent for testing"
-    agent_mock.graph = Mock()
 
-    # Configure async methods with AsyncMock
-    agent_mock.graph.ainvoke = AsyncMock(return_value=[("values", {"messages": [AIMessage(content="Test response")]})])
+    graph = AsyncMock()
+    graph.ainvoke = AsyncMock()
+    graph.aget_state = AsyncMock(return_value=mock_state_snapshot(values={"messages": []}, tasks=[]))
+    graph.get_state = Mock(return_value=mock_state_snapshot(values={"messages": []}, tasks=[]))
 
-    # Create a proper StateSnapshot for aget_state
-    mock_state = MockStateSnapshot(values={"messages": []}, tasks=[])
-    agent_mock.graph.aget_state = AsyncMock(return_value=mock_state)
-
-    # Configure the astream method to work as an async generator
     async def mock_astream(*args, **kwargs):
         for item in [("values", {"messages": [AIMessage(content="Test response")]})]:
             yield item
 
-    agent_mock.graph.astream = mock_astream
-    agent_mock.graph.get_state = Mock(return_value=mock_state)
+    graph.astream = mock_astream
+    agent_mock.graph = graph
 
     agent_mock.observability = Mock()
     agent_mock.observability.get_callback_handler = Mock(return_value=None)
 
-    # Create the executor with our agent
     executor = Mock(spec=AgentExecutor)
     executor.agents = {settings.DEFAULT_AGENT: agent_mock}
     executor.get_agent = Mock(return_value=agent_mock)
@@ -60,16 +51,11 @@ def mock_agent_executor():
         return_value=[{"key": settings.DEFAULT_AGENT, "description": "A mock agent for testing"}]
     )
 
-    # We'll capture all args that are passed to these methods
-    async def mock_invoke(**kwargs):
-        return ChatMessage(type="ai", content="Test response")
+    executor.invoke = AsyncMock(return_value=ChatMessage(type="ai", content="Default test response"))
 
-    executor.invoke = AsyncMock(side_effect=mock_invoke)
+    async def mock_stream_gen(*args, **kwargs):
+        yield ChatMessage(type="ai", content="Default test response")
 
-    async def mock_stream_gen(**kwargs):
-        yield ChatMessage(type="ai", content="Test response")
-
-    # Don't use side_effect here as it complicates working with async generators
     executor.stream = mock_stream_gen
 
     return executor
@@ -116,8 +102,10 @@ def test_client(mock_agent_executor, app):
                         "langgraph_agent_toolkit.service.routes.get_all_agent_info",
                         return_value=mock_agent_executor.get_all_agent_info(),
                     ):
-                        # Create a test client
-                        client = TestClient(app)
+                        # raise_server_exceptions=False so the global exception handler's
+                        # JSON response is returned (and asserted) instead of being re-raised
+                        # into the test — this is what an HTTP client actually observes.
+                        client = TestClient(app, raise_server_exceptions=False)
 
                         # Set up app state with our mock executor
                         app.state.agent_executor = mock_agent_executor

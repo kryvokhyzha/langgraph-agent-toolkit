@@ -52,15 +52,26 @@ class TestSQLiteMemoryBackend(unittest.TestCase):
 
     @patch("langgraph_agent_toolkit.core.memory.sqlite.AsyncSqliteSaver")
     @patch("langgraph_agent_toolkit.core.memory.sqlite.settings")
-    def test_get_checkpoint_saver(self, mock_settings, mock_saver):
-        """Test that get_checkpoint_saver returns a correct saver."""
-        mock_settings.SQLITE_DB_PATH = "sqlite:///test.db"
-        mock_saver.from_conn_string.return_value = MagicMock()
+    def test_get_checkpoint_saver_opens_at_configured_path(self, mock_settings, mock_saver):
+        """get_checkpoint_saver forwards the configured DB path to the saver unchanged."""
+        # The real default is a bare path like "checkpoints.db", NOT a sqlite:// URI.
+        mock_settings.SQLITE_DB_PATH = "checkpoints.db"
 
         saver = self.backend.get_checkpoint_saver()
 
-        mock_saver.from_conn_string.assert_called_once_with("sqlite:///test.db")
-        self.assertEqual(saver, mock_saver.from_conn_string.return_value)
+        mock_saver.from_conn_string.assert_called_once_with("checkpoints.db")
+        self.assertIs(saver, mock_saver.from_conn_string.return_value)
+
+    @patch("langgraph_agent_toolkit.core.memory.sqlite.AsyncSqliteSaver")
+    @patch("langgraph_agent_toolkit.core.memory.sqlite.settings")
+    def test_get_checkpoint_saver_validates_before_opening(self, mock_settings, mock_saver):
+        """A missing SQLITE_DB_PATH raises before any saver is opened."""
+        mock_settings.SQLITE_DB_PATH = None
+
+        with pytest.raises(ValueError, match=r"Missing SQLITE_DB_PATH configuration"):
+            self.backend.get_checkpoint_saver()
+
+        mock_saver.from_conn_string.assert_not_called()
 
 
 class TestPostgresMemoryBackend(unittest.TestCase):
@@ -108,6 +119,20 @@ class TestPostgresMemoryBackend(unittest.TestCase):
 
         expected = "postgresql://user:password@localhost:5432/testdb"
         self.assertEqual(self.backend.get_connection_string(), expected)
+
+    @patch("langgraph_agent_toolkit.core.memory.postgres.settings")
+    def test_validate_config_min_size_exceeds_pool_size(self, mock_settings):
+        """validate_config rejects POSTGRES_MIN_SIZE greater than POSTGRES_POOL_SIZE."""
+        mock_settings.POSTGRES_USER = "user"
+        mock_settings.POSTGRES_PASSWORD = SecretStr("password")
+        mock_settings.POSTGRES_HOST = "localhost"
+        mock_settings.POSTGRES_PORT = "5432"
+        mock_settings.POSTGRES_DB = "testdb"
+        mock_settings.POSTGRES_MIN_SIZE = 10
+        mock_settings.POSTGRES_POOL_SIZE = 5
+
+        with pytest.raises(ValueError, match="must be less than or equal to"):
+            self.backend.validate_config()
 
 
 @pytest.mark.asyncio
@@ -173,14 +198,18 @@ class TestPostgresAsyncFunctionality:
         mock_pool_instance.open.assert_called_once()
 
     @patch("langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_saver")
-    @patch("langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.validate_config")
-    async def test_get_checkpoint_saver(self, mock_validate, mock_get_saver, backend):
-        """Test that get_checkpoint_saver calls validate_config and get_saver."""
-        mock_validate.return_value = True
-        mock_context_manager = MagicMock()
-        mock_get_saver.return_value = mock_context_manager
+    @patch("langgraph_agent_toolkit.core.memory.postgres.settings")
+    async def test_get_checkpoint_saver_raises_on_invalid_config(self, mock_settings, mock_get_saver, backend):
+        """get_checkpoint_saver runs the real validate_config first and raises on missing config."""
+        mock_settings.POSTGRES_USER = "user"
+        mock_settings.POSTGRES_PASSWORD = None  # missing -> validate_config raises before opening a pool
+        mock_settings.POSTGRES_HOST = "localhost"
+        mock_settings.POSTGRES_PORT = "5432"
+        mock_settings.POSTGRES_DB = "testdb"
+        mock_settings.POSTGRES_MIN_SIZE = 1
+        mock_settings.POSTGRES_POOL_SIZE = 5
 
-        result = backend.get_checkpoint_saver()
+        with pytest.raises(ValueError, match=r"Missing required PostgreSQL configuration"):
+            backend.get_checkpoint_saver()
 
-        mock_validate.assert_called_once()
-        assert result == mock_context_manager
+        mock_get_saver.assert_not_called()

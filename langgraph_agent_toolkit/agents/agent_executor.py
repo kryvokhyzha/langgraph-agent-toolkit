@@ -335,7 +335,7 @@ class AgentExecutor:
             user_id=user_id,
             input=input_data,
             agent_name=agent.name,
-        ):
+        ) as trace_span:
             # Invoke the agent
             response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
                 input=input_data,
@@ -371,6 +371,8 @@ class AgentExecutor:
                 raise ValueError(f"Unexpected response type: {response_type}")
 
             output.run_id = str(run_id)
+            # Record the final output on the trace; the Langfuse v4 callback no longer sets it.
+            agent.observability.update_trace(trace_span, output=output.content)
             return output
 
     @handle_agent_errors
@@ -423,9 +425,10 @@ class AgentExecutor:
             user_id=user_id,
             input=input_data,
             agent_name=agent.name,
-        ):
+        ) as trace_span:
             # Stream from the agent with appropriate modes
             stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
+            final_output: str | None = None
 
             async for stream_event in agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode):
                 if not isinstance(stream_event, tuple):
@@ -510,10 +513,17 @@ class AgentExecutor:
                         # Skip the input message if it's repeated by LangGraph
                         if chat_message.type == "human" and chat_message.content == msg:
                             continue
+                        # Track the latest AI message to record as the trace output
+                        if chat_message.type == "ai" and chat_message.content:
+                            final_output = convert_message_content_to_string(chat_message.content)
                         yield chat_message
                     except Exception as e:
                         logger.error(f"Error parsing message: {e}")
                         continue
+
+            # After streaming completes, record the final assistant output on the trace
+            # (the Langfuse v4 callback no longer sets trace-level output as v3's update_trace did).
+            agent.observability.update_trace(trace_span, output=final_output)
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
         """Save agents to disk using joblib.

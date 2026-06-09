@@ -96,7 +96,7 @@ class AgentClient:
         self,
         input: Dict[str, Any],
         model_name: str | None = None,
-        model_provider: str | None = None,
+        model_provider: str | ModelProvider | None = None,
         model_config_key: str | None = None,
         thread_id: str | None = None,
         user_id: str | None = None,
@@ -108,7 +108,7 @@ class AgentClient:
         Args:
             input (Dict[str, Any]): The input to send to the agent
             model_name (str, optional): LLM model to use for the agent
-            model_provider (str, optional): LLM model provider to use for the agent
+            model_provider (str | ModelProvider, optional): LLM model provider to use for the agent
             model_config_key (str, optional): Key for predefined model configuration
             thread_id (str, optional): Thread ID for continuing a conversation
             user_id (str, optional): User ID for identifying the user
@@ -128,7 +128,9 @@ class AgentClient:
         if model_name:
             request.model_name = model_name
         if model_provider:
-            request.model_provider = model_provider
+            request.model_provider = (
+                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
+            )
         if model_config_key:
             request.model_config_key = model_config_key
         if agent_config:
@@ -238,6 +240,63 @@ class AgentClient:
                     return ChatMessage(type="ai", content=error_msg)
         return None
 
+    def _parse_jsonl_line(self, line: str) -> ChatMessage | str | None:
+        """Parse a single JSON Lines (NDJSON) chunk from the /stream/jsonl endpoint.
+
+        Yields the same ``ChatMessage | str`` values as ``_parse_stream_line`` so callers can
+        consume either streaming protocol identically. Unlike SSE there is no ``[DONE]`` sentinel.
+        """
+        line = line.strip()
+        if not line:
+            return None
+        try:
+            parsed = json.loads(line)
+        except Exception as e:
+            raise Exception(f"Error JSON parsing message from server: {e}")
+        match parsed["type"]:
+            case "message":
+                try:
+                    return ChatMessage.model_validate(parsed["content"])
+                except Exception as e:
+                    raise Exception(f"Server returned invalid message: {e}")
+            case "token":
+                return parsed["content"]
+            case "error":
+                return ChatMessage(type="ai", content="Error: " + parsed["content"])
+        return None
+
+    def _build_stream_request(
+        self,
+        input: Dict[str, Any],
+        model_name: str | None,
+        model_provider: str | ModelProvider | None,
+        model_config_key: str | None,
+        thread_id: str | None,
+        user_id: str | None,
+        agent_config: dict[str, Any] | None,
+        recursion_limit: int | None,
+        stream_tokens: bool,
+    ) -> StreamInput:
+        """Build the shared StreamInput body used by both the SSE and JSON Lines stream endpoints."""
+        request = StreamInput(input=UserComplexInput(**input), stream_tokens=stream_tokens)
+        if thread_id:
+            request.thread_id = thread_id
+        if model_name:
+            request.model_name = model_name
+        if model_provider:
+            request.model_provider = (
+                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
+            )
+        if model_config_key:
+            request.model_config_key = model_config_key
+        if agent_config:
+            request.agent_config = agent_config
+        if user_id:
+            request.user_id = user_id
+        if recursion_limit is not None:
+            request.recursion_limit = recursion_limit
+        return request
+
     def stream(
         self,
         input: Dict[str, Any],
@@ -275,23 +334,17 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = StreamInput(input=UserComplexInput(**input), stream_tokens=stream_tokens)
-        if thread_id:
-            request.thread_id = thread_id
-        if model_name:
-            request.model_name = model_name
-        if model_provider:
-            request.model_provider = (
-                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
-            )
-        if model_config_key:
-            request.model_config_key = model_config_key
-        if agent_config:
-            request.agent_config = agent_config
-        if user_id:
-            request.user_id = user_id
-        if recursion_limit is not None:
-            request.recursion_limit = recursion_limit
+        request = self._build_stream_request(
+            input,
+            model_name,
+            model_provider,
+            model_config_key,
+            thread_id,
+            user_id,
+            agent_config,
+            recursion_limit,
+            stream_tokens,
+        )
 
         try:
             with httpx.stream(
@@ -310,6 +363,54 @@ class AgentClient:
 
                         if parsed != "":
                             yield parsed
+        except httpx.HTTPError as e:
+            raise AgentClientError(f"Error: {e}")
+
+    def stream_jsonl(
+        self,
+        input: Dict[str, Any],
+        model_name: str | None = None,
+        model_provider: str | ModelProvider | None = None,
+        model_config_key: str | None = None,
+        thread_id: str | None = None,
+        user_id: str | None = None,
+        agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
+        stream_tokens: bool = True,
+    ) -> Generator[ChatMessage | str, None, None]:
+        """Stream the agent's response synchronously via the JSON Lines (NDJSON) endpoint.
+
+        Behaves like :meth:`stream` (yielding the same ``ChatMessage | str`` values) but uses the
+        ``/stream/jsonl`` endpoint (media type ``application/jsonl``) instead of Server-Sent Events.
+        """
+        if not self.agent:
+            raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
+        request = self._build_stream_request(
+            input,
+            model_name,
+            model_provider,
+            model_config_key,
+            thread_id,
+            user_id,
+            agent_config,
+            recursion_limit,
+            stream_tokens,
+        )
+
+        try:
+            with httpx.stream(
+                "POST",
+                f"{self.base_url}/{self.agent}/stream/jsonl",
+                json=request.model_dump(),
+                headers=self._headers,
+                timeout=self.timeout,
+            ) as response:
+                response.raise_for_status()
+                for line in response.iter_lines():
+                    parsed = self._parse_jsonl_line(line)
+                    if parsed is not None and parsed != "":
+                        yield parsed
         except httpx.HTTPError as e:
             raise AgentClientError(f"Error: {e}")
 
@@ -350,23 +451,17 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
 
-        request = StreamInput(input=UserComplexInput(**input), stream_tokens=stream_tokens)
-        if thread_id:
-            request.thread_id = thread_id
-        if model_name:
-            request.model_name = model_name
-        if model_provider:
-            request.model_provider = (
-                model_provider.value if isinstance(model_provider, ModelProvider) else model_provider
-            )
-        if model_config_key:
-            request.model_config_key = model_config_key
-        if agent_config:
-            request.agent_config = agent_config
-        if user_id:
-            request.user_id = user_id
-        if recursion_limit is not None:
-            request.recursion_limit = recursion_limit
+        request = self._build_stream_request(
+            input,
+            model_name,
+            model_provider,
+            model_config_key,
+            thread_id,
+            user_id,
+            agent_config,
+            recursion_limit,
+            stream_tokens,
+        )
 
         async with httpx.AsyncClient() as client:
             try:
@@ -390,6 +485,54 @@ class AgentClient:
                             except GeneratorExit:
                                 # Handle GeneratorExit properly to close the stream gracefully
                                 break
+            except httpx.HTTPError as e:
+                raise AgentClientError(f"Error: {e}")
+
+    async def astream_jsonl(
+        self,
+        input: Dict[str, Any],
+        model_name: str | None = None,
+        model_provider: str | ModelProvider | None = None,
+        model_config_key: str | None = None,
+        thread_id: str | None = None,
+        user_id: str | None = None,
+        agent_config: dict[str, Any] | None = None,
+        recursion_limit: int | None = None,
+        stream_tokens: bool = True,
+    ) -> AsyncGenerator[ChatMessage | str, None]:
+        """Async JSON Lines (NDJSON) streaming; the async twin of :meth:`stream_jsonl`."""
+        if not self.agent:
+            raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
+
+        request = self._build_stream_request(
+            input,
+            model_name,
+            model_provider,
+            model_config_key,
+            thread_id,
+            user_id,
+            agent_config,
+            recursion_limit,
+            stream_tokens,
+        )
+
+        async with httpx.AsyncClient() as client:
+            try:
+                async with client.stream(
+                    "POST",
+                    f"{self.base_url}/{self.agent}/stream/jsonl",
+                    json=request.model_dump(),
+                    headers=self._headers,
+                    timeout=self.timeout,
+                ) as response:
+                    response.raise_for_status()
+                    async for line in response.aiter_lines():
+                        try:
+                            parsed = self._parse_jsonl_line(line)
+                            if parsed is not None and parsed != "":
+                                yield parsed
+                        except GeneratorExit:
+                            break
             except httpx.HTTPError as e:
                 raise AgentClientError(f"Error: {e}")
 

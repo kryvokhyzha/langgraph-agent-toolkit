@@ -19,7 +19,7 @@ class TestServiceRunner:
             service_runner = ServiceRunner()
 
             mock_create_app.assert_called_once()
-            assert service_runner.app is not None
+            assert service_runner.app is mock_create_app.return_value
 
     def test_run_uvicorn_dev_mode(self):
         """Test running with Uvicorn in development mode."""

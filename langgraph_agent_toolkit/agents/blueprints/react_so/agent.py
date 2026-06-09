@@ -43,8 +43,8 @@ react_agent_so = Agent(
         middleware=[
             SummarizationMiddleware(
                 model=model,
-                max_tokens_before_summary=25_000,  # Trigger summarization at 25,000 tokens
-                messages_to_keep=settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH,  # Keep last N messages after summary
+                trigger=("tokens", 25_000),  # Trigger summarization at 25,000 tokens
+                keep=("messages", settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH),  # Keep last N messages after summary
             ),
             # ModelCallLimitMiddleware(
             #     run_limit=5, exit_behavior="end",

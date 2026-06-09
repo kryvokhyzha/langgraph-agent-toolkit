@@ -5,6 +5,7 @@ from typing import Any, Optional
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIRoute
 from langchain_core._api import LangChainBetaWarning
 
 from langgraph_agent_toolkit import __version__
@@ -17,7 +18,7 @@ from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
 from langgraph_agent_toolkit.service.middleware import LoggingMiddleware
-from langgraph_agent_toolkit.service.routes import private_router, public_router
+from langgraph_agent_toolkit.service.routes import COMMON_ERROR_RESPONSES, private_router, public_router
 from langgraph_agent_toolkit.service.utils import verify_bearer
 
 
@@ -65,10 +66,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             logger.info(f"Successfully initialized {len(initialized_agents)} agents")
             # Mark service as ready only after agents are initialized
             app.state.ready = True
-            app.state.startup_complete = True
             logger.info("Service is now ready to accept traffic")
         else:
             logger.warning("No agents were successfully initialized")
+
+        # Startup has completed (ready or degraded) so the k8s startup probe can pass and hand off
+        # to the liveness probe even when the service came up degraded.
+        app.state.startup_complete = True
 
     try:
         # Initialize observability platform
@@ -89,6 +93,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 logger.warning("No memory backend configured.")
         except Exception as e:
             logger.error(f"Failed to initialize memory backend: {e}")
+            app.state.startup_complete = True
             yield
             return
 
@@ -99,6 +104,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             app.state.agent_executor = executor
         except Exception as e:
             logger.error(f"Failed to initialize AgentExecutor: {e}")
+            app.state.startup_complete = True
             yield
             return
 
@@ -115,20 +121,36 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     yield
                 except Exception as e:
                     logger.error(f"Error during database setup: {e}")
+                    app.state.startup_complete = True
                     yield
         else:
             initialize_agents(executor, observability)
             yield
     except Exception as e:
         logger.error(f"Error during initialization: {e}")
+        app.state.startup_complete = True
         yield
     finally:
+        # On shutdown: mark not-ready and drop the (now-closed) pool reference. The pool itself is
+        # closed when the `async with checkpoint` block exits, which happens before this finally runs.
+        app.state.ready = False
+        app.state.db_pool = None
         if observability:
             try:
                 logger.info("Closing observability platform...")
                 observability.before_shutdown()
             except Exception as e:
                 logger.error(f"Error closing observability: {e}")
+
+
+def custom_generate_unique_id(route: APIRoute) -> str:
+    """Use the route's function name as its OpenAPI operationId.
+
+    Yields idiomatic operationIds for client codegen (e.g. ``invoke`` instead of FastAPI's default
+    ``invoke_invoke_post``). Routes that share a function (the ``/{agent_id}/...`` variant and its
+    default alias) set an explicit ``operation_id`` on the ``/{agent_id}/...`` decorator to stay unique.
+    """
+    return route.name
 
 
 def create_app() -> FastAPI:
@@ -140,6 +162,15 @@ def create_app() -> FastAPI:
         title="LangGraph Agent API",
         description="API for interacting with LangGraph agents",
         version=__version__,
+        generate_unique_id_function=custom_generate_unique_id,
+        openapi_tags=[
+            {"name": "agent", "description": "Invoke and stream agent responses (SSE and JSON Lines)."},
+            {"name": "info", "description": "Service and agent metadata."},
+            {"name": "history", "description": "Conversation history management."},
+            {"name": "feedback", "description": "Record feedback to the configured observability platform."},
+            {"name": "healthcheck", "description": "Liveness, readiness, startup, and database-pool probes."},
+            {"name": "public", "description": "Unauthenticated endpoints (home / docs redirect)."},
+        ],
     )
 
     # Add CORS middleware if explicitly enabled
@@ -167,7 +198,7 @@ def create_app() -> FastAPI:
     # Include public router without authentication
     app.include_router(public_router)
 
-    # Include private router with authentication
-    app.include_router(private_router, dependencies=[Depends(verify_bearer)])
+    # Include private router with authentication; document shared error responses in OpenAPI.
+    app.include_router(private_router, dependencies=[Depends(verify_bearer)], responses=COMMON_ERROR_RESPONSES)
 
     return app

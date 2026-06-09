@@ -1,18 +1,18 @@
 Installation Options
-===================
+====================
 
 The toolkit supports multiple installation options using "extras" to include
 just the dependencies you need.
 
 Basic Installation
------------------
+------------------
 
 .. code-block:: bash
 
    pip install langgraph-agent-toolkit
 
 Available Extras
----------------
+----------------
 
 LLM Provider Extras
 ^^^^^^^^^^^^^^^^^^^
@@ -26,7 +26,7 @@ LLM Provider Extras
    pip install "langgraph-agent-toolkit[anthropic,aws-backend,langsmith]"              
 
 Additional Provider Options
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``google-vertexai``
 - ``google-genai``
@@ -36,7 +36,7 @@ Additional Provider Options
 - ``deepseek``
 
 Full Installation
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -44,7 +44,7 @@ Full Installation
    pip install "langgraph-agent-toolkit[all-llms,all-backends,all-observability]"      
 
 Client-Only Installation
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 

@@ -174,6 +174,27 @@ class ChatMessage(BaseModel):
         print(self.pretty_repr())  # noqa: T201
 
 
+class StreamChunk(BaseModel):
+    """A single chunk of a JSON Lines (NDJSON) agent stream.
+
+    One StreamChunk is emitted per line by the ``/stream/jsonl`` endpoint:
+
+    - ``type="token"``   -> ``content`` is an incremental token string.
+    - ``type="message"`` -> ``content`` is a complete :class:`ChatMessage`.
+    - ``type="error"``   -> ``content`` is an error description string.
+    """
+
+    type: Literal["token", "message", "error"] = Field(description="The kind of chunk.")
+    content: str | ChatMessage = Field(description="Token text, a full ChatMessage, or an error string.")
+
+
+class ErrorResponse(BaseModel):
+    """Standard error response body returned by the service's exception handlers."""
+
+    detail: str = Field(description="Human-readable error message.")
+    error_code: str | None = Field(default=None, description="Stable machine-readable error code, when present.")
+
+
 class Feedback(BaseModel):
     """Feedback for a run, to record to LangSmith."""
 

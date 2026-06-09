@@ -22,7 +22,6 @@ class Task:
         if self.result:
             task_data.result = self.result
         task_custom_data = CustomData(
-            type=self.name,
             data=task_data.model_dump(),
         )
         if writer:

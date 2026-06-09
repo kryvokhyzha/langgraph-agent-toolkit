@@ -122,13 +122,14 @@ For detailed installation instructions and available extras, see the
 
 1. **LangGraph Integration**
 
-   - Latest LangGraph v0.3 features
+   - Latest LangGraph v1.x features
    - Human-in-the-loop with `interrupt()`
    - Flow control with `Command` and `langgraph-supervisor`
 
 2. **API Service**
 
    - FastAPI with streaming and non-streaming endpoints
+   - Streaming over Server-Sent Events (SSE) or JSON Lines (NDJSON)
    - Support for both token-based and message-based streaming
    - Multiple agent support with URL path routing
    - Available agents and models listed at `/info` endpoint

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 LangGraph Agent Toolkit Documentation
-====================================
+=====================================
 
 A comprehensive toolkit for building, deploying, and managing AI agents using
 LangGraph, FastAPI, and Streamlit. It provides a production-ready framework for
@@ -35,7 +35,7 @@ toolkit provides the infrastructure to develop, test, and deploy your
 LangGraph-based agents with confidence.
 
 Architecture
------------
+------------
 
 .. image:: https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true
    :width: 800
@@ -98,7 +98,7 @@ Content
    contributing
 
 Indices and tables
-=================
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
