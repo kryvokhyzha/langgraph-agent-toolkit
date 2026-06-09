@@ -41,7 +41,7 @@ dependencies = [
     "langchain >= 0.3.20, < 1.3.5",
     # "langfuse >= 2.60.3,< 2.70.0",
     # "langchain == 0.3.27",
-    "langchain-core >= 0.3.40, < 1.4.3",
+    "langchain-core >= 0.3.40, < 1.4.4",
     "langchain-community >= 0.3.20, < 0.4.3",
     "langgraph >= 0.4.2, < 1.2.5",
     "langgraph-cli[inmem] >= 0.2.10, < 0.5.0",
@@ -54,9 +54,9 @@ dependencies = [
     "langgraph-supervisor ~= 0.0.31",
     "numpy >= 1.26.4, < 2.4.0; python_version == '3.11'",
     "numpy >= 2.0.0, < 2.4.0; python_version >= '3.12'",
-    "onnxruntime >= 1.20.0,< 1.24.0",
-    "pandas >= 2.2.3,< 2.4.0",
-    "psycopg[binary,pool] ~= 3.2.4",
+    "onnxruntime >= 1.20.0,< 1.27.0",
+    "pandas >= 2.2.3,< 3.1.0",
+    "psycopg[binary,pool] >= 3.2.4,< 3.4.0",
     "pyarrow >= 19.0.1",
     "pydantic >= 2.11.1, < 2.13.5",
     "pydantic-settings >= 2.9.1, < 2.14.2",
@@ -112,7 +112,7 @@ client = [
 
 # Service runner backends
 aws-backend = [
-    "mangum ~= 0.19.0",
+    "mangum >= 0.19,< 0.22",
 ]
 
 azure-backend = [
@@ -129,7 +129,7 @@ uvicorn-backend = [
 ]
 
 all-backends = [
-    "mangum ~= 0.19.0",
+    "mangum >= 0.19,< 0.22",
     "azure-functions >= 1.23, < 1.25",
     "gunicorn ~= 26.0.0",
     "uvicorn >= 0.35, < 0.50",
@@ -145,7 +145,7 @@ anthropic = [
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai >= 2.0.0, < 3.2.4",
+    "langchain-google-vertexai >= 2.0.0, < 3.2.5",
 ]
 
 google-genai = [
@@ -153,15 +153,15 @@ google-genai = [
 ]
 
 openai = [
-    "langchain-openai >= 0.3.15, < 1.2.3",
+    "langchain-openai >= 0.3.15, < 1.3.1",
 ]
 
 all-llms = [
     "langchain-aws >= 0.2.20, < 1.5.2",
     "langchain-anthropic >= 0.3.10, < 1.4.5",
-    "langchain-google-vertexai >= 2.0.0, < 3.2.4",
+    "langchain-google-vertexai >= 2.0.0, < 3.2.5",
     "langchain-google-genai >= 2.0.0, < 4.2.5",
-    "langchain-openai >= 0.3.15, < 1.2.3",
+    "langchain-openai >= 0.3.15, < 1.3.1",
 ]
 
 # Observability tools and platforms
@@ -172,7 +172,7 @@ langfuse = [
  ]
 
  langsmith = [
-    "langsmith >= 0.3.31, < 0.5.0",
+    "langsmith >= 0.3.31, < 0.9.0",
  ]
 
  all-observability = [
