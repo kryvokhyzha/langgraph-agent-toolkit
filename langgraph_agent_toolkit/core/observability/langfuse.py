@@ -301,3 +301,14 @@ class LangfuseObservability(BaseObservabilityPlatform):
                 yield span
             finally:
                 _set_trace_io(span, output=kwargs.get("output"))
+
+    def update_trace(self, trace, **attributes) -> None:
+        """Set trace-level input/output on the span yielded by trace_context (Langfuse v3/v4).
+
+        The executor calls this after the run completes to record the final output. Langfuse v4
+        removed the CallbackHandler ``update_trace`` flag that used to populate trace-level output,
+        so it must be set explicitly on the root span here.
+        """
+        if trace is None or not _IS_NEW_LANGFUSE:
+            return
+        _set_trace_io(trace, **attributes)

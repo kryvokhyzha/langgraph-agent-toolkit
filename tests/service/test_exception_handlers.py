@@ -1,11 +1,12 @@
-import os
 from unittest.mock import patch
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper import exceptions as exc
+from langgraph_agent_toolkit.helper.types import EnvironmentMode
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
 
 
@@ -56,26 +57,49 @@ def test_base_error_includes_error_type():
     assert resp.json()["error_type"] == "AgentToolkitError"
 
 
-def test_plain_value_error_maps_to_400():
-    resp = _client_raising(ValueError("just a value error")).get("/boom")
+@pytest.mark.parametrize("env_mode, expose", [(EnvironmentMode.DEVELOPMENT, True), (EnvironmentMode.PRODUCTION, False)])
+def test_value_error_detail_gated_by_env_mode(env_mode, expose):
+    """Raw ValueError -> 400; its message reaches the client only outside production (no leak in prod)."""
+    with patch.object(settings, "ENV_MODE", env_mode):
+        resp = _client_raising(ValueError("secret=topsecret")).get("/boom")
+
     assert resp.status_code == 400
-    assert "just a value error" in resp.json()["detail"]
+    body = resp.json()
+    if expose:
+        assert "secret=topsecret" in body["detail"]
+        assert "traceback" in body
+    else:
+        assert body["detail"] == "Invalid request"
+        assert "secret=topsecret" not in str(body)
+        assert "traceback" not in body
 
 
-def test_unexpected_exception_maps_to_500_with_type():
-    resp = _client_raising(RuntimeError("kaboom")).get("/boom")
+@pytest.mark.parametrize("env_mode, expose", [(EnvironmentMode.DEVELOPMENT, True), (EnvironmentMode.PRODUCTION, False)])
+def test_unexpected_exception_detail_gated_by_env_mode(env_mode, expose):
+    """Unexpected exception -> 500; the internal type/message reaches the client only outside production."""
+    with patch.object(settings, "ENV_MODE", env_mode):
+        resp = _client_raising(RuntimeError("password=hunter2 host=internal-db")).get("/boom")
+
     assert resp.status_code == 500
     body = resp.json()
-    assert body["error_type"] == "RuntimeError"
-    assert "kaboom" in body["detail"]
+    if expose:
+        assert body["error_type"] == "RuntimeError"
+        assert "password=hunter2" in body["detail"]
+        assert "traceback" in body
+    else:
+        assert body == {"detail": "Internal server error"}
+        assert "password=hunter2" not in str(body)
 
 
-@pytest.mark.parametrize("env_mode, expect_traceback", [("development", True), ("production", False)])
-def test_traceback_gated_by_env_mode(env_mode, expect_traceback):
-    """Tracebacks are included only when ENV_MODE != production (read at registration time)."""
-    with patch.dict(os.environ, {"ENV_MODE": env_mode}):
-        client = _client_raising(exc.ToolExecutionError("hammer"))
-        resp = client.get("/boom")
+@pytest.mark.parametrize(
+    "env_mode, expect_traceback", [(EnvironmentMode.DEVELOPMENT, True), (EnvironmentMode.PRODUCTION, False)]
+)
+def test_toolkit_exception_traceback_gated_by_env_mode(env_mode, expect_traceback):
+    """Toolkit exceptions expose their (intentional) detail; only the traceback is gated by env mode."""
+    with patch.object(settings, "ENV_MODE", env_mode):
+        resp = _client_raising(exc.ToolExecutionError("hammer")).get("/boom")
 
     assert resp.status_code == 500
-    assert ("traceback" in resp.json()) is expect_traceback
+    body = resp.json()
+    assert "detail" in body  # toolkit detail is intentional and always present
+    assert ("traceback" in body) is expect_traceback

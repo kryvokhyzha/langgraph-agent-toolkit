@@ -141,6 +141,15 @@ class BaseObservabilityPlatform(ABC):
         """
         yield
 
+    def update_trace(self, trace: Any, **attributes: Any) -> None:
+        """Set trace-level attributes (e.g. the final output) on a trace yielded by trace_context.
+
+        ``trace_context`` is entered before the run's output is known, so the caller invokes this
+        afterwards to record the output on the trace. No-op for platforms without a trace object;
+        override per platform.
+        """
+        pass
+
     def _convert_to_chat_prompt(self, prompt_template: PromptTemplateType) -> ChatPromptTemplate:
         if isinstance(prompt_template, str):
             return ChatPromptTemplate.from_template(prompt_template)

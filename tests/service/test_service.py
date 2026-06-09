@@ -279,6 +279,53 @@ def test_stream_error_handling(test_client, mock_agent_executor) -> None:
                 assert "Something went wrong" in messages[0]["content"]
 
 
+def test_stream_jsonl(test_client, mock_agent_executor) -> None:
+    """The JSON Lines endpoint emits one typed StreamChunk per line (tokens + final message)."""
+    QUESTION = "What is the weather in Tokyo?"
+    TOKENS = ["The", " weather", " is", " sunny", "."]
+    FINAL_ANSWER = "The weather is sunny."
+
+    async def custom_mock_stream(*args, **kwargs):
+        for token in TOKENS:
+            yield token
+        yield ChatMessage(type="ai", content=FINAL_ANSWER)
+
+    with patch.object(mock_agent_executor, "stream", side_effect=[custom_mock_stream()]):
+        with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
+            response = test_client.post("/stream/jsonl", json={"input": {"message": QUESTION}, "stream_tokens": True})
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/jsonl")
+
+    chunks = [json.loads(line) for line in response.text.splitlines() if line.strip()]
+    assert [c["content"] for c in chunks if c["type"] == "token"] == TOKENS
+
+    message_chunks = [c for c in chunks if c["type"] == "message"]
+    assert len(message_chunks) == 1
+    assert message_chunks[0]["content"]["type"] == "ai"
+    assert message_chunks[0]["content"]["content"] == FINAL_ANSWER
+
+    # JSON Lines has no [DONE] sentinel (unlike SSE).
+    assert "[DONE]" not in response.text
+
+
+def test_stream_jsonl_error(test_client, mock_agent_executor) -> None:
+    """A mid-stream failure is surfaced as a trailing error StreamChunk, not an unhandled raise."""
+
+    async def failing_stream(*args, **kwargs):
+        raise GraphRecursionError("Recursion limit exceeded")
+        yield  # pragma: no cover - never reached
+
+    with patch.object(mock_agent_executor, "stream", side_effect=[failing_stream()]):
+        with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
+            response = test_client.post("/stream/jsonl", json={"input": {"message": "hi"}})
+
+    assert response.status_code == 200
+    chunks = [json.loads(line) for line in response.text.splitlines() if line.strip()]
+    assert chunks[-1]["type"] == "error"
+    assert "Recursion limit exceeded" in chunks[-1]["content"]
+
+
 def test_feedback(test_client, mock_agent, mock_agent_executor) -> None:
     """Test successful feedback submission to the default agent."""
     mock_agent.observability.record_feedback = Mock(return_value=None)

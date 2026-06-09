@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterable
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, StreamingResponse
 from langchain_core.messages import AnyMessage, RemoveMessage
@@ -16,6 +18,7 @@ from langgraph_agent_toolkit.schema import (
     ClearHistoryInput,
     ClearHistoryResponse,
     DatabaseHealthResponse,
+    ErrorResponse,
     Feedback,
     FeedbackResponse,
     HealthCheck,
@@ -23,6 +26,7 @@ from langgraph_agent_toolkit.schema import (
     ReadinessResponse,
     ServiceMetadata,
     StartupResponse,
+    StreamChunk,
     StreamInput,
     UserInput,
 )
@@ -32,13 +36,24 @@ from langgraph_agent_toolkit.service.utils import (
     get_agent,
     get_agent_executor,
     get_all_agent_info,
+    jsonl_message_generator,
     message_generator,
 )
 
 
 # Create separate routers for private and public endpoints
 private_router = APIRouter()
-public_router = APIRouter(tags=["public"])
+public_router = APIRouter()
+
+# Error responses shared (in OpenAPI) by all authenticated endpoints; applied at include_router time.
+COMMON_ERROR_RESPONSES = {
+    status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse, "description": "Missing or invalid bearer token"},
+    status.HTTP_404_NOT_FOUND: {"model": ErrorResponse, "description": "Agent or resource not found"},
+    status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": ErrorResponse, "description": "Request validation error"},
+    status.HTTP_429_TOO_MANY_REQUESTS: {"model": ErrorResponse, "description": "Rate limit exceeded"},
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse, "description": "Internal server error"},
+    status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorResponse, "description": "Service unavailable"},
+}
 
 
 @private_router.get(
@@ -57,6 +72,7 @@ async def info(request: Request) -> ServiceMetadata:
 
 @private_router.post(
     "/{agent_id}/invoke",
+    operation_id="invoke_with_agent_id",
     status_code=status.HTTP_200_OK,
     tags=["agent"],
     summary="Invoke a specific agent to get a response",
@@ -96,6 +112,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
 
 @private_router.post(
     "/{agent_id}/stream",
+    operation_id="stream_with_agent_id",
     status_code=status.HTTP_200_OK,
     response_class=StreamingResponse,
     responses=_sse_response_example(),
@@ -131,6 +148,56 @@ async def stream(user_input: StreamInput, agent_id: str | None = None, request: 
 
 
 @private_router.post(
+    "/{agent_id}/stream/jsonl",
+    operation_id="stream_jsonl_with_agent_id",
+    status_code=status.HTTP_200_OK,
+    tags=["agent"],
+    summary="Stream a specific agent's response as JSON Lines (NDJSON)",
+    description=(
+        "JSON Lines (application/jsonl) alternative to the SSE `/{agent_id}/stream` endpoint: one "
+        "typed StreamChunk per line (type=token|message|error). Useful for non-browser clients."
+    ),
+    responses={
+        status.HTTP_200_OK: {
+            "model": StreamChunk,
+            "description": "A JSON Lines (application/jsonl) stream — one StreamChunk object per line.",
+        }
+    },
+)
+@private_router.post(
+    "/stream/jsonl",
+    status_code=status.HTTP_200_OK,
+    tags=["agent"],
+    summary="Stream an agent's response as JSON Lines (NDJSON)",
+    description=(
+        "JSON Lines (application/jsonl) alternative to the SSE `/stream` endpoint: one typed "
+        "StreamChunk per line (type=token|message|error). The SSE `/stream` endpoint is unchanged."
+    ),
+    responses={
+        status.HTTP_200_OK: {
+            "model": StreamChunk,
+            "description": "A JSON Lines (application/jsonl) stream — one StreamChunk object per line.",
+        }
+    },
+)
+async def stream_jsonl(
+    user_input: StreamInput, agent_id: str | None = None, request: Request = None
+) -> AsyncIterable[StreamChunk]:
+    """Stream an agent's response as JSON Lines: one StreamChunk per line (media type application/jsonl).
+
+    A typed, OpenAPI-documented alternative to the SSE `/stream` endpoint for clients that prefer
+    NDJSON over Server-Sent Events. Mirrors `/stream` behaviour: token chunks (when stream_tokens is
+    true), full message chunks, and a trailing error chunk on failure. There is no `[DONE]` sentinel —
+    the end of the response body terminates the stream.
+    """
+    if agent_id is None:
+        agent_id = get_default_agent()
+
+    async for chunk in jsonl_message_generator(user_input, request, agent_id):
+        yield chunk
+
+
+@private_router.post(
     "/feedback",
     status_code=status.HTTP_201_CREATED,
     tags=["feedback"],
@@ -139,6 +206,7 @@ async def stream(user_input: StreamInput, agent_id: str | None = None, request: 
 )
 @private_router.post(
     "/{agent_id}/feedback",
+    operation_id="feedback_with_agent_id",
     status_code=status.HTTP_201_CREATED,
     tags=["feedback"],
     summary="Record feedback for a specific agent",
@@ -176,14 +244,15 @@ async def feedback(feedback: Feedback, agent_id: str | None = None, request: Req
 @private_router.get(
     "/history",
     status_code=status.HTTP_200_OK,
-    tags=["chat"],
+    tags=["history"],
     summary="Get chat history",
     description="Get chat history for a thread or user.",
 )
 @private_router.get(
     "/{agent_id}/history",
+    operation_id="history_with_agent_id",
     status_code=status.HTTP_200_OK,
-    tags=["chat"],
+    tags=["history"],
     summary="Get chat history for a specific agent",
     description="Get chat history for a thread or user with a specific agent.",
 )
@@ -221,14 +290,15 @@ async def history(
 @private_router.delete(
     "/history/clear",
     status_code=status.HTTP_200_OK,
-    tags=["chat"],
+    tags=["history"],
     summary="Clear chat history",
     description="Clear chat history for a thread or user.",
 )
 @private_router.delete(
     "/{agent_id}/history/clear",
+    operation_id="clear_history_with_agent_id",
     status_code=status.HTTP_200_OK,
-    tags=["chat"],
+    tags=["history"],
     summary="Clear chat history for a specific agent",
     description="Clear chat history for a thread or user with a specific agent.",
 )
@@ -282,14 +352,15 @@ async def clear_history(
 @private_router.post(
     "/history/add_messages",
     status_code=status.HTTP_201_CREATED,
-    tags=["chat"],
+    tags=["history"],
     summary="Add messages to chat history",
     description="Add messages to the end of chat history for a thread or user.",
 )
 @private_router.post(
     "/{agent_id}/history/add_messages",
+    operation_id="add_messages_with_agent_id",
     status_code=status.HTTP_201_CREATED,
-    tags=["chat"],
+    tags=["history"],
     summary="Add messages to chat history for a specific agent",
     description="Add messages to the end of chat history for a thread or user with a specific agent.",
 )
@@ -343,6 +414,7 @@ async def add_messages(
 
 @public_router.get(
     "/",
+    tags=["public"],
     summary="API Home",
     description="Redirects to the API documentation.",
 )
@@ -496,6 +568,13 @@ async def db_health_check(request: Request) -> DatabaseHealthResponse:
         return DatabaseHealthResponse(
             status="no_pool",
             message="No database pool configured or memory backend not using PostgreSQL",
+        )
+
+    if not hasattr(pool, "get_stats"):
+        # e.g. the SQLite saver exposes a raw connection, not a pool with statistics.
+        return DatabaseHealthResponse(
+            status="no_pool",
+            message="Connection pool statistics are only available for the PostgreSQL backend",
         )
 
     try:

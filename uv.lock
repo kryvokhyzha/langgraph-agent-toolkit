@@ -2042,7 +2042,7 @@ requires-dist = [
     { name = "azure-functions", marker = "extra == 'azure-backend'", specifier = ">=1.23,<1.25" },
     { name = "ddgs", specifier = ">=9.5.0" },
     { name = "duckduckgo-search", specifier = ">=7.3.0" },
-    { name = "fastapi", specifier = ">=0.116.1,<0.136.4" },
+    { name = "fastapi", specifier = ">=0.134.0,<0.136.4" },
     { name = "fire", specifier = "~=0.7.0" },
     { name = "grpcio", specifier = ">=1.68.0" },
     { name = "gunicorn", marker = "extra == 'all-backends'", specifier = "~=26.0.0" },

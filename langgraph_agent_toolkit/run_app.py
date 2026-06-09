@@ -130,6 +130,15 @@ async def main() -> None:
                 index=agent_idx,
             )
             use_streaming = st.toggle("Stream results", value=True)
+            stream_protocol = st.radio(
+                "Streaming protocol",
+                options=["SSE", "JSON Lines"],
+                index=0,
+                horizontal=True,
+                disabled=not use_streaming,
+                help="Transport for streamed responses: Server-Sent Events or JSON Lines (NDJSON). "
+                "Both deliver identical messages.",
+            )
             st.session_state.display_tools_execution = st.toggle("Display tools execution", value=False)
 
         @st.dialog("Architecture")
@@ -190,7 +199,10 @@ async def main() -> None:
         st.chat_message("user").write(user_input)
         try:
             if use_streaming:
-                stream = agent_client.astream(
+                # astream (SSE) and astream_jsonl (NDJSON) share a signature and yield the same
+                # ChatMessage | str, so draw_messages handles either protocol unchanged.
+                astream_fn = agent_client.astream_jsonl if stream_protocol == "JSON Lines" else agent_client.astream
+                stream = astream_fn(
                     input=dict(message=user_input),
                     thread_id=st.session_state.thread_id,
                     user_id=settings.DEFAULT_STREAMLIT_USER_ID,

@@ -41,6 +41,7 @@ workflow = create_supervisor(
         "For math problems, use math_agent."
     ),
     add_handoff_back_messages=False,
+    output_mode="full_history",  # retain sub-agent messages when a conversation is reloaded from history
 )
 
 supervisor_agent = Agent(

@@ -34,12 +34,32 @@ def test_lifespan_marks_ready_after_initializing_agents():
             with TestClient(app) as client:  # entering the context runs the lifespan
                 ready = client.get("/health/ready")
                 startup = client.get("/health/startup")
+                # Readiness/startup flags are set while the lifespan is active (serving).
+                assert app.state.ready is True
+                assert app.state.startup_complete is True
 
     assert ready.status_code == 200
     assert startup.status_code == 200
     assert ready.json()["status"] == "ready"
-    assert app.state.ready is True
     assert "react-agent" in app.state.initialized_agents
+    # Shutdown (context exit) resets readiness and drops the now-closed pool reference.
+    assert app.state.ready is False
+    assert app.state.db_pool is None
+
+
+def test_lifespan_degraded_boot_completes_startup_but_not_ready():
+    """If executor init fails, startup still completes (probe passes -> no CrashLoop) but stays not-ready."""
+    with patch("langgraph_agent_toolkit.service.handler.AgentExecutor", side_effect=RuntimeError("boom")):
+        with patch.object(settings, "MEMORY_BACKEND", None):
+            app = create_app()
+            with TestClient(app) as client:  # lifespan runs the degraded path
+                ready = client.get("/health/ready")
+                startup = client.get("/health/startup")
+                assert app.state.startup_complete is True
+                assert app.state.ready is False
+
+    assert startup.status_code == 200  # startup probe passes so liveness can take over
+    assert ready.status_code == 503  # but the service is not ready for traffic
 
 
 def test_health_db_pool_states():
@@ -61,3 +81,7 @@ def test_health_db_pool_states():
 
     pool.get_stats.side_effect = RuntimeError("boom")
     assert client.get("/health/db").json()["status"] == "error"
+
+    # A raw connection without get_stats (e.g. the SQLite saver) is reported as no_pool, not error.
+    app.state.db_pool = object()
+    assert client.get("/health/db").json()["status"] == "no_pool"

@@ -34,7 +34,7 @@ dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
     "ddgs >= 9.5.0",
-    "fastapi >= 0.116.1, < 0.136.4",
+    "fastapi >= 0.134.0, < 0.136.4",  # >=0.134 for native JSON Lines (NDJSON) streaming responses
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
     "jiter >= 0.10, < 0.16",
@@ -235,3 +235,6 @@ asyncio_default_fixture_loop_scope = "function"
 
 [tool.pytest_env]
 OPENAI_API_KEY = "sk-xxxxx-fake-openai-key"
+# Deterministic env mode for tests (independent of any local .env). Error-detail gating is
+# verified for both modes by overriding settings.ENV_MODE in the relevant tests.
+ENV_MODE = "development"

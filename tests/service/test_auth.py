@@ -48,14 +48,16 @@ def test_auth_secret_incorrect(mock_agent_executor, test_client):
     """When AUTH_SECRET is set, a wrong or missing bearer token is rejected with 401."""
     with patch.object(service_utils.settings, "AUTH_SECRET", SecretStr("test-secret")):
         with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
-            # Wrong token -> 401
+            # Wrong token -> 401 with a WWW-Authenticate challenge header
             resp = test_client.post(
                 "/invoke",
                 json={"input": {"message": "test"}},
                 headers={"Authorization": "Bearer wrong-secret"},
             )
             assert resp.status_code == 401
+            assert resp.headers.get("WWW-Authenticate") == "Bearer"
 
             # Missing Authorization header -> 401
             resp = test_client.post("/invoke", json={"input": {"message": "test"}})
             assert resp.status_code == 401
+            assert resp.headers.get("WWW-Authenticate") == "Bearer"

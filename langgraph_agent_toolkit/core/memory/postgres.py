@@ -122,7 +122,10 @@ class PostgresMemoryBackend(BaseMemoryBackend):
                 f"pool_available={pool.get_stats().get('pool_available', 'N/A')}"
             )
 
-        # Use AsyncConnectionPool as an async context manager
+        # Use AsyncConnectionPool as an async context manager.
+        # NOTE: each gunicorn/uvicorn worker process runs its own lifespan and therefore its own
+        # pool. Total connections to Postgres are roughly (num_workers x POSTGRES_POOL_SIZE), so size
+        # POSTGRES_POOL_SIZE with the worker count in mind to stay under the server's max_connections.
         async with AsyncConnectionPool(
             self.get_connection_string(),
             min_size=settings.POSTGRES_MIN_SIZE,
@@ -189,7 +192,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
         """
         async with self._get_connection_context(
-            lambda pool: AsyncPostgresStore(conn=pool, app_prefix="store")
+            lambda pool: AsyncPostgresStore(conn=pool), app_prefix="store"
         ) as store:
             yield store
 

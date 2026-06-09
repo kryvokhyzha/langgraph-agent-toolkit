@@ -13,7 +13,19 @@ from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.helper.logging import InterceptHandler, logger
-from langgraph_agent_toolkit.schema import ChatMessage, StreamInput
+from langgraph_agent_toolkit.helper.types import EnvironmentMode
+from langgraph_agent_toolkit.schema import ChatMessage, StreamChunk, StreamInput
+
+
+def _safe_stream_error(exc: Exception) -> str:
+    """Client-facing text for a mid-stream failure.
+
+    Full detail outside production (to aid debugging); a generic message in production so internal
+    exception text cannot leak to clients. The full error is always logged server-side by the caller.
+    """
+    if settings.ENV_MODE != EnvironmentMode.PRODUCTION:
+        return f"Internal server error: {exc}"
+    return "Internal server error"
 
 
 def verify_bearer(
@@ -27,7 +39,10 @@ def verify_bearer(
 
     auth_secret = settings.AUTH_SECRET.get_secret_value()
     if not http_auth or not secrets.compare_digest(http_auth.credentials, auth_secret):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def get_agent_executor(request: Request) -> AgentExecutor:
@@ -99,9 +114,48 @@ async def message_generator(
     except Exception as e:
         tb_str = traceback.format_exc()
         logger.error(f"Error in message_generator: {e}\n\nFull traceback:\n{tb_str}")
-        yield f"data: {json.dumps({'type': 'error', 'content': f'Internal server error: {e}'})}\n\n"
+        yield f"data: {json.dumps({'type': 'error', 'content': _safe_stream_error(e)})}\n\n"
     finally:
         yield "data: [DONE]\n\n"
+
+
+async def jsonl_message_generator(
+    stream_input: StreamInput,
+    request: Request,
+    agent_id: str,
+) -> AsyncGenerator[StreamChunk, None]:
+    """Yield typed StreamChunk objects for a JSON Lines (NDJSON) agent stream.
+
+    The JSON Lines twin of `message_generator`: instead of formatting SSE frames, it emits
+    typed `StreamChunk` objects that FastAPI serializes as one JSON object per line. There is
+    no `[DONE]` sentinel — for NDJSON the end of the response body terminates the stream.
+    Mid-stream failures are surfaced as a final `type="error"` chunk (never an unhandled raise,
+    which would corrupt an already-started response).
+    """
+    executor = get_agent_executor(request)
+
+    try:
+        async for message in executor.stream(
+            agent_id=agent_id,
+            input=stream_input.input,
+            thread_id=stream_input.thread_id,
+            user_id=stream_input.user_id,
+            model_name=stream_input.model_name,
+            model_provider=stream_input.model_provider,
+            model_config_key=stream_input.model_config_key,
+            stream_tokens=stream_input.stream_tokens,
+            agent_config=stream_input.agent_config,
+            recursion_limit=stream_input.recursion_limit,
+        ):
+            if isinstance(message, str):
+                yield StreamChunk(type="token", content=message)
+            elif isinstance(message, ChatMessage):
+                yield StreamChunk(type="message", content=message)
+
+    except Exception as e:
+        tb_str = traceback.format_exc()
+        logger.error(f"Error in jsonl_message_generator: {e}\n\nFull traceback:\n{tb_str}")
+        yield StreamChunk(type="error", content=_safe_stream_error(e))
 
 
 def _sse_response_example() -> dict[int, Any]:

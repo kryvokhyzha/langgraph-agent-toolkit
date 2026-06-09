@@ -276,6 +276,70 @@ async def test_astream(agent_client):
         assert "500 Internal Server Error" in str(exc.value)
 
 
+def test_stream_jsonl(agent_client):
+    """stream_jsonl parses bare NDJSON lines (no `data:` prefix, no `[DONE]`) and hits /stream/jsonl."""
+    TOKENS = ["The", " weather", " is", " sunny", "."]
+    FINAL_ANSWER = "The weather is sunny."
+
+    events = [json.dumps({"type": "token", "content": t}) for t in TOKENS] + [
+        json.dumps({"type": "message", "content": {"type": "ai", "content": FINAL_ANSWER}})
+    ]
+
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.iter_lines.return_value = events
+    mock_response.request = Request("POST", "http://test/stream/jsonl")
+    mock_response.__enter__ = Mock(return_value=mock_response)
+    mock_response.__exit__ = Mock(return_value=None)
+
+    with patch("httpx.stream", return_value=mock_response) as mock_stream:
+        responses = list(agent_client.stream_jsonl({"message": "hi"}))
+
+    # Hit the JSON Lines endpoint, not the SSE one.
+    assert mock_stream.call_args.args[1].endswith("/stream/jsonl")
+    # Same ChatMessage | str contract as the SSE stream.
+    assert responses[: len(TOKENS)] == TOKENS
+    final = responses[-1]
+    assert isinstance(final, ChatMessage)
+    assert final.type == "ai"
+    assert final.content == FINAL_ANSWER
+
+
+async def test_astream_jsonl(agent_client):
+    """astream_jsonl parses NDJSON asynchronously and hits /stream/jsonl."""
+    TOKENS = ["The", " weather", " is", " sunny", "."]
+    FINAL_ANSWER = "The weather is sunny."
+
+    events = [json.dumps({"type": "token", "content": t}) for t in TOKENS] + [
+        json.dumps({"type": "message", "content": {"type": "ai", "content": FINAL_ANSWER}})
+    ]
+
+    async def async_events():
+        for event in events:
+            yield event
+
+    mock_response = AsyncMock()
+    mock_response.status_code = 200
+    mock_response.request = Request("POST", "http://test/stream/jsonl")
+    mock_response.aiter_lines = Mock(return_value=async_events())
+    mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+    mock_response.__aexit__ = AsyncMock(return_value=None)
+    mock_response.raise_for_status = Mock()
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value = mock_client
+    mock_client.stream = Mock(return_value=mock_response)
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        responses = [r async for r in agent_client.astream_jsonl({"message": "hi"})]
+
+    assert mock_client.stream.call_args.args[1].endswith("/stream/jsonl")
+    assert responses[: len(TOKENS)] == TOKENS
+    final = responses[-1]
+    assert isinstance(final, ChatMessage)
+    assert final.content == FINAL_ANSWER
+
+
 @pytest.mark.parametrize("mode", ["sync", "async"])
 async def test_create_feedback(agent_client, mode):
     """create_feedback()/acreate_feedback(): forward run_id/key/score/kwargs, raise on 5xx.

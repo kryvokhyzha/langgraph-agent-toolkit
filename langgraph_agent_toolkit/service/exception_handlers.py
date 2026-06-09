@@ -1,10 +1,10 @@
-import os
 import sys
 import traceback
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.exceptions import (
     AgentToolkitError,
     AuthenticationError,
@@ -24,10 +24,19 @@ from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
 
 
+def _expose_error_detail() -> bool:
+    """Whether internal error details may be returned to clients.
+
+    True only outside production. In production a generic message is returned and the full error is
+    logged server-side, so internal details (e.g. connection strings) are never leaked to clients.
+    Evaluated per request from ``settings.ENV_MODE`` (not captured at registration) so it stays
+    consistent with the rest of the service and is testable.
+    """
+    return settings.ENV_MODE != EnvironmentMode.PRODUCTION
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     """Register all exception handlers to the FastAPI app using decorators."""
-    env_mode = EnvironmentMode(os.environ.get("ENV_MODE", EnvironmentMode.PRODUCTION))
-    include_traceback = env_mode != EnvironmentMode.PRODUCTION
 
     @app.exception_handler(AuthenticationError)
     async def authentication_error_handler(request: Request, exc: AuthenticationError) -> JSONResponse:
@@ -72,18 +81,18 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(UnsupportedMessageTypeError)
     async def unsupported_message_type_handler(request: Request, exc: UnsupportedMessageTypeError) -> JSONResponse:
         """Handle unsupported message type errors."""
-        logger.error(f"Unsupported message type: {exc}")
+        logger.warning(f"Unsupported message type: {exc}")
         content = {"detail": str(exc), "message_type": exc.message_type, "supported_types": exc.supported_types}
         if exc.error_code:
             content["error_code"] = exc.error_code
-        if include_traceback:
+        if _expose_error_detail():
             content["traceback"] = traceback.format_exc()
         return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content=content)
 
     @app.exception_handler(ModelNotFoundError)
     async def model_not_found_handler(request: Request, exc: ModelNotFoundError) -> JSONResponse:
         """Handle model not found errors."""
-        logger.error(f"Model not found: {exc}")
+        logger.warning(f"Model not found: {exc}")
         content = {"detail": str(exc), "model_name": exc.model_name}
         if exc.error_code:
             content["error_code"] = exc.error_code
@@ -94,20 +103,20 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ModelConfigurationError)
     async def model_configuration_error_handler(request: Request, exc: ModelConfigurationError) -> JSONResponse:
         """Handle model configuration errors."""
-        logger.error(f"Model configuration error: {exc}")
+        logger.warning(f"Model configuration error: {exc}")
         content = {"detail": str(exc)}
         if exc.error_code:
             content["error_code"] = exc.error_code
         if exc.details:
             content["details"] = exc.details
-        if include_traceback:
+        if _expose_error_detail():
             content["traceback"] = traceback.format_exc()
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=content)
 
     @app.exception_handler(ToolNotFoundError)
     async def tool_not_found_handler(request: Request, exc: ToolNotFoundError) -> JSONResponse:
         """Handle tool not found errors."""
-        logger.error(f"Tool not found: {exc}")
+        logger.warning(f"Tool not found: {exc}")
         content = {"detail": str(exc), "tool_name": exc.tool_name, "available_tools": exc.available_tools}
         if exc.error_code:
             content["error_code"] = exc.error_code
@@ -120,7 +129,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         content = {"detail": str(exc), "tool_name": exc.tool_name}
         if exc.error_code:
             content["error_code"] = exc.error_code
-        if include_traceback:
+        if _expose_error_detail():
             content["traceback"] = traceback.format_exc()
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
 
@@ -153,7 +162,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content["error_code"] = exc.error_code
         if exc.reason:
             content["reason"] = exc.reason
-        if include_traceback:
+        if _expose_error_detail():
             content["traceback"] = traceback.format_exc()
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
 
@@ -166,7 +175,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content["error_code"] = exc.error_code
         if exc.details:
             content["details"] = exc.details
-        if include_traceback:
+        if _expose_error_detail():
             content["traceback"] = traceback.format_exc()
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=content)
 
@@ -185,12 +194,18 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(ValueError)
     async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
-        """Handle ValueError exceptions."""
+        """Handle ValueError exceptions.
+
+        Raw ``ValueError`` reaching this handler is treated as unexpected (intentional client-facing
+        validation should raise the typed Input/ValidationError exceptions). The full message is
+        logged server-side; clients only receive it outside production to avoid info disclosure.
+        """
         logger.opt(exception=sys.exc_info()).error(f"ValueError: {exc}")
 
-        content = {"detail": str(exc)}
-        if include_traceback:
-            content["traceback"] = traceback.format_exc()
+        if _expose_error_detail():
+            content = {"detail": str(exc), "traceback": traceback.format_exc()}
+        else:
+            content = {"detail": "Invalid request"}
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -199,15 +214,19 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-        """Handle all other unexpected exceptions."""
-        # For all other exceptions, preserve the original error details
+        """Handle all other unexpected exceptions.
+
+        The full exception (type + message + traceback) is logged server-side. The client-facing
+        body is gated: outside production it includes the message and type to aid debugging; in
+        production it is a generic message so internal details (e.g. connection strings) cannot leak.
+        """
         error_detail = f"{exc.__class__.__name__}: {exc}"
         logger.opt(exception=sys.exc_info()).error(f"Agent error: {error_detail}")
 
-        # Use the original exception message instead of generic "Unexpected error"
-        content = {"detail": str(exc), "error_type": exc.__class__.__name__}
-        if include_traceback:
-            content["traceback"] = traceback.format_exc()
+        if _expose_error_detail():
+            content = {"detail": str(exc), "error_type": exc.__class__.__name__, "traceback": traceback.format_exc()}
+        else:
+            content = {"detail": "Internal server error"}
 
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

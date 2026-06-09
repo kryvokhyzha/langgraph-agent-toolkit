@@ -184,6 +184,18 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
     ports:
       - "3000:3000"
+    healthcheck:
+      <<: *healthcheck-defaults
+      # Gate the backend on Langfuse being ready (blueprints push/pull prompts at import time).
+      # NB: langfuse's Next.js server binds to $$HOSTNAME (the container id), NOT localhost, so the
+      # check must target the container's own hostname ($$(hostname)); /api/public/health = web serving.
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 -O /dev/null
+          http://$$(hostname):3000/api/public/health || exit 1",
+        ]
+      start_period: 120s # langfuse-web runs DB migrations on first boot
     deploy:
       resources:
         limits:
@@ -216,7 +228,7 @@ services:
       langfuse-worker:
         condition: service_started
       langfuse-web:
-        condition: service_started
+        condition: service_healthy
       litellm:
         condition: service_started
     deploy:

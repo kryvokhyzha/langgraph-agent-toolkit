@@ -244,6 +244,31 @@ class TestLangfuseObservability:
             # user_id is propagated to the trace (v4 replaces span.update_trace(user_id=...)).
             mock_propagate.assert_called_once_with(user_id="user123")
 
+    def test_update_trace_records_output(self):
+        """update_trace records the final output on the root span (v4: span.update; v3: update_trace)."""
+        with patch.dict(
+            os.environ,
+            {
+                "LANGFUSE_SECRET_KEY": "secret",
+                "LANGFUSE_PUBLIC_KEY": "public",
+                "LANGFUSE_HOST": "https://cloud.langfuse.com",
+            },
+        ):
+            obs = LangfuseObservability()
+
+            # Langfuse v4 span: no update_trace -> output set via span.update(...)
+            v4_span = MagicMock(spec=["update"])
+            obs.update_trace(v4_span, output="the answer")
+            v4_span.update.assert_called_once_with(output="the answer")
+
+            # Langfuse v3 span: has update_trace -> output set via span.update_trace(...)
+            v3_span = MagicMock(spec=["update_trace"])
+            obs.update_trace(v3_span, output="the answer")
+            v3_span.update_trace.assert_called_once_with(output="the answer")
+
+            # No span (non-Langfuse / disabled) is a safe no-op
+            obs.update_trace(None, output="ignored")
+
     @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
     def test_compute_prompt_hash_consistency(self, mock_get_client):
         """Test that hash computation is consistent for same content."""
