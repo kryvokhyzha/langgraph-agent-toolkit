@@ -5,7 +5,15 @@ from langchain_core.messages import HumanMessage
 from langgraph.pregel import Pregel
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.core.settings import settings
 
+
+# These blueprints build an OpenAI model at import time, so they can only be smoke-tested when a
+# model name is configured (e.g. via .env). In CI without OPENAI_MODEL_NAME they are skipped.
+_needs_openai_model = pytest.mark.skipif(
+    not settings.OPENAI_MODEL_NAME,
+    reason="set OPENAI_MODEL_NAME to smoke-test blueprints that build an OpenAI model at import",
+)
 
 # The 3 react* variants that hard-pin Langfuse push a prompt at import time and need
 # LANGFUSE_* credentials, so they are not import-smoke-testable here (a known cleanup candidate).
@@ -14,10 +22,10 @@ IMPORTABLE_BLUEPRINTS = [
     "command_agent",
     "interrupt_agent",
     "bg_task_agent",
-    "supervisor_agent",
-    "react_new",
-    "react_so",
     "knowledge_base_agent",
+    pytest.param("supervisor_agent", marks=_needs_openai_model),
+    pytest.param("react_new", marks=_needs_openai_model),
+    pytest.param("react_so", marks=_needs_openai_model),
 ]
 
 
