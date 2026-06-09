@@ -1,8 +1,8 @@
 Usage Guide
-==========
+===========
 
 Setup and Usage
---------------
+---------------
 
 1. Clone the repository:
 
@@ -16,7 +16,7 @@ Setup and Usage
 3. Run the service (with Python or Docker)
 
 Building Your Own Agent
-----------------------
+-----------------------
 
 To customize the agent:
 
@@ -25,7 +25,7 @@ To customize the agent:
 3. Optionally customize the Streamlit interface in ``run_app.py``
 
 Docker Setup
------------
+------------
 
 The ``docker-compose.yaml`` defines these services with enhanced security:
 
@@ -67,7 +67,7 @@ Using docker compose watch enables live reloading:
    ``docker compose up --build``
 
 Using the AgentClient
---------------------
+---------------------
 
 The toolkit includes ``AgentClient`` for interacting with the agent service:
 
@@ -83,10 +83,18 @@ The toolkit includes ``AgentClient`` for interacting with the agent service:
    # A man walked into a library and asked the librarian, "Do you have any books on Pavlov's dogs and Schrödinger's cat?"
    # The librarian replied, "It rings a bell, but I'm not sure if it's here or not."
 
+   # Stream the response over Server-Sent Events (SSE)...
+   for chunk in client.stream({"message": "Tell me a brief joke?"}):
+       print(chunk)
+
+   # ...or as JSON Lines (NDJSON)
+   for chunk in client.stream_jsonl({"message": "Tell me a brief joke?"}):
+       print(chunk)
+
 See ``langgraph_agent_toolkit/run_client.py`` for more examples.
 
 Development with LangGraph Studio
--------------------------------
+---------------------------------
 
 The project works with LangGraph Studio:
 
@@ -96,7 +104,7 @@ The project works with LangGraph Studio:
 4. Customize ``langgraph.json`` as needed
 
 Local Development Without Docker
--------------------------------
+--------------------------------
 
 1. Set up a Python environment:
 
@@ -123,17 +131,18 @@ Local Development Without Docker
 5. Access the Streamlit interface (usually at ``http://localhost:8501``)
 
 Key Features
-----------
+------------
 
 **LangGraph Integration**
 
-- Latest LangGraph v0.3 features
+- Latest LangGraph v1.x features
 - Human-in-the-loop with ``interrupt()``
 - Flow control with ``Command`` and ``langgraph-supervisor``
 
 **API Service**
 
 - FastAPI with streaming and non-streaming endpoints
+- Streaming over Server-Sent Events (SSE) or JSON Lines (NDJSON)
 - Support for both token-based and message-based streaming
 - Multiple agent support with URL path routing
 - Available agents and models listed at ``/info`` endpoint

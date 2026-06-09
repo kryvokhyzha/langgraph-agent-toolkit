@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0]
+
+### Added
+
+- JSON Lines (NDJSON) streaming endpoint `/stream/jsonl` (and
+  `/{agent_id}/stream/jsonl`) as a typed alternative to SSE, with a
+  `StreamChunk` response schema
+- `AgentClient.stream_jsonl` / `astream_jsonl` SDK methods
+- Streamlit option to choose the streaming protocol (SSE or JSON Lines)
+- Idiomatic OpenAPI operation IDs, documented error responses
+  (401/404/422/429/500/503) with an `ErrorResponse` schema, and grouped
+  `openapi_tags`
+
+### Changed
+
+- Migrated the Langfuse integration to the v4 SDK (still v3-compatible)
+- Upgraded to LangChain 1.x / LangGraph 1.x APIs (`create_agent`,
+  `context_schema`, the new `SummarizationMiddleware` and supervisor APIs)
+- Error responses no longer expose internal exception details in production
+  (gated by `ENV_MODE`)
+- Supervisor blueprint uses `output_mode="full_history"` so sub-agent messages
+  survive history reloads
+- `docker-compose`: the backend now waits for Langfuse to be healthy before
+  starting
+
+### Fixed
+
+- Trace-level output is now recorded in Langfuse (regression introduced by the
+  v4 callback change)
+- Kubernetes degraded boot: the startup probe now passes (no CrashLoop) and the
+  DB pool / readiness flags are cleared on shutdown
+- `/health/db` no longer errors when using the SQLite backend
+- `401` responses include a `WWW-Authenticate: Bearer` header
+- `PostgresMemoryBackend.get_store` `app_prefix` TypeError
+- Various LangGraph / Starlette deprecation warnings
+
 ## [0.8.15]
 
 ### Fixed

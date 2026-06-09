@@ -1,8 +1,8 @@
 Environment Setup
-===============
+=================
 
 Creating Your ``.env`` File
---------------------------
+---------------------------
 
 1. Copy the example configuration:
 
@@ -104,7 +104,7 @@ Creating Your ``.env`` File
    to version control. It's already included in ``.gitignore``.
 
 LiteLLM Configuration
---------------------
+---------------------
 
 1. Create your configuration:
 
