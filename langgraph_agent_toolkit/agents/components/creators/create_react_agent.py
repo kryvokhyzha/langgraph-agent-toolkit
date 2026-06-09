@@ -352,19 +352,19 @@ def create_react_agent(
 
     if not tool_calling_enabled:
         # Define a new graph
-        workflow = StateGraph(state_schema, config_schema=config_schema)
+        workflow = StateGraph(state_schema, context_schema=config_schema)
 
         # Add nodes for agent and immediate generation
         workflow.add_node(
             "agent",
             RunnableCallable(call_model, acall_model),
-            input=input_schema,
+            input_schema=input_schema,
         )
 
         workflow.add_node(
             "immediate_generation",
             RunnableCallable(immediate_generation, aimmediate_generation),
-            input=input_schema,
+            input_schema=input_schema,
         )
 
         # Always add pre_model_hook
@@ -418,12 +418,12 @@ def create_react_agent(
                 return [Send("tools", [tool_call]) for tool_call in tool_calls]
 
     # Define a new graph
-    workflow = StateGraph(state_schema, config_schema=config_schema)
+    workflow = StateGraph(state_schema, context_schema=config_schema)
 
     # Define the nodes
-    workflow.add_node("agent", RunnableCallable(call_model, acall_model), input=input_schema)
+    workflow.add_node("agent", RunnableCallable(call_model, acall_model), input_schema=input_schema)
     workflow.add_node(
-        "immediate_generation", RunnableCallable(immediate_generation, aimmediate_generation), input=input_schema
+        "immediate_generation", RunnableCallable(immediate_generation, aimmediate_generation), input_schema=input_schema
     )
     workflow.add_node("tools", tool_node)
 

@@ -67,7 +67,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content["error_code"] = exc.error_code
         if exc.details:
             content["details"] = exc.details
-        return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=content)
+        return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content=content)
 
     @app.exception_handler(UnsupportedMessageTypeError)
     async def unsupported_message_type_handler(request: Request, exc: UnsupportedMessageTypeError) -> JSONResponse:
@@ -78,7 +78,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content["error_code"] = exc.error_code
         if include_traceback:
             content["traceback"] = traceback.format_exc()
-        return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=content)
+        return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content=content)
 
     @app.exception_handler(ModelNotFoundError)
     async def model_not_found_handler(request: Request, exc: ModelNotFoundError) -> JSONResponse:

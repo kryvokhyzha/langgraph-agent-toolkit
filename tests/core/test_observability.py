@@ -207,13 +207,14 @@ class TestLangfuseObservability:
             assert call_kwargs["name"] == "accuracy"
             assert call_kwargs["value"] == 0.95
 
+    @patch("langgraph_agent_toolkit.core.observability.langfuse.propagate_attributes")
     @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
-    def test_trace_context_converts_uuid(self, mock_get_client):
-        """Test that trace_context converts UUID to valid Langfuse format."""
+    def test_trace_context_converts_uuid(self, mock_get_client, mock_propagate):
+        """trace_context converts the UUID to a Langfuse trace_id and opens an observation (v4 API)."""
         mock_client = MagicMock()
         mock_span = MagicMock()
-        mock_client.start_as_current_span.return_value.__enter__ = MagicMock(return_value=mock_span)
-        mock_client.start_as_current_span.return_value.__exit__ = MagicMock(return_value=False)
+        mock_client.start_as_current_observation.return_value.__enter__ = MagicMock(return_value=mock_span)
+        mock_client.start_as_current_observation.return_value.__exit__ = MagicMock(return_value=False)
         mock_get_client.return_value = mock_client
 
         with patch.dict(
@@ -233,12 +234,15 @@ class TestLangfuseObservability:
             ):
                 pass
 
-            # Verify start_as_current_span was called with converted trace_id
-            mock_client.start_as_current_span.assert_called_once()
-            call_kwargs = mock_client.start_as_current_span.call_args[1]
+            # Verify start_as_current_observation was called with the converted trace_id and name.
+            mock_client.start_as_current_observation.assert_called_once()
+            call_kwargs = mock_client.start_as_current_observation.call_args[1]
 
             expected_trace_id = "ab9bae0ac6ec41d28e81c3a56e357d9d"
             assert call_kwargs["trace_context"]["trace_id"] == expected_trace_id
+            assert call_kwargs["name"] == "test-agent"
+            # user_id is propagated to the trace (v4 replaces span.update_trace(user_id=...)).
+            mock_propagate.assert_called_once_with(user_id="user123")
 
     @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
     def test_compute_prompt_hash_consistency(self, mock_get_client):

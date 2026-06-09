@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from langchain.chat_models.base import _ConfigurableModel
-from langchain_community.chat_models import FakeListChatModel
+from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI
 

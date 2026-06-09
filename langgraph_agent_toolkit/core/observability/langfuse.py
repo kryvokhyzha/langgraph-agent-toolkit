@@ -2,7 +2,7 @@ import asyncio
 import hashlib
 import inspect
 import json
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 from langgraph_agent_toolkit.core.observability.base import (
@@ -30,6 +30,21 @@ except (ModuleNotFoundError, ImportError) as e:
 def _get_langfuse_client():
     """Get the appropriate Langfuse client based on SDK version."""
     return get_client() if _IS_NEW_LANGFUSE else Langfuse()
+
+
+def _set_trace_io(span: Any, **io: Any) -> None:
+    """Attach input/output to a span, tolerating Langfuse v3 vs v4.
+
+    Langfuse v4 removed ``span.update_trace``; trace input/output is now set on the
+    observation itself via ``span.update``.
+    """
+    io = {k: v for k, v in io.items() if v is not None}
+    if not io:
+        return
+    if hasattr(span, "update_trace"):  # Langfuse v3
+        span.update_trace(**io)
+    else:  # Langfuse v4+
+        span.update(**io)
 
 
 class LangfuseObservability(BaseObservabilityPlatform):
@@ -271,23 +286,18 @@ class LangfuseObservability(BaseObservabilityPlatform):
         client = get_client()
         trace_id = str(run_id).replace("-", "").lower()
         agent_name = kwargs.get("agent_name", "agent-execution")
+        user_id = kwargs.get("user_id")
 
-        with client.start_as_current_span(
-            name=agent_name,
-            trace_context={"trace_id": trace_id},
-        ) as span:
-            # Update trace with context if available
-            update_params = {}
-            if kwargs.get("user_id"):
-                update_params["user_id"] = kwargs["user_id"]
-            if kwargs.get("input"):
-                update_params["input"] = kwargs["input"]
+        # Langfuse v4 renamed start_as_current_span -> start_as_current_observation.
+        start_observation = getattr(client, "start_as_current_observation", None) or client.start_as_current_span
 
-            if update_params:
-                span.update_trace(**update_params)
+        # Trace-level user_id is set via propagate_attributes (works on both v3 and v4);
+        # v3 previously set it through span.update_trace.
+        attrs_cm = propagate_attributes(user_id=user_id) if user_id else nullcontext()
 
+        with attrs_cm, start_observation(name=agent_name, trace_context={"trace_id": trace_id}) as span:
+            _set_trace_io(span, input=kwargs.get("input"))
             try:
                 yield span
             finally:
-                if kwargs.get("output"):
-                    span.update_trace(output=kwargs["output"])
+                _set_trace_io(span, output=kwargs.get("output"))
