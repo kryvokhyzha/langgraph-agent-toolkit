@@ -164,3 +164,16 @@ venv
 
 # langgraph
 .langgraph_api
+
+# Build context trimming — the images only COPY pyproject.toml, uv.lock and
+# langgraph_agent_toolkit/, so exclude everything else from the build context.
+tests/
+docs/
+scripts/
+configs/
+.github/
+data/
+*.md
+Makefile
+docker-compose*.yaml
+.pre-commit-config.yaml

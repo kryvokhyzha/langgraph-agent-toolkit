@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.errors import GraphRecursionError
 from langgraph.types import StateSnapshot
 
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatHistory, ChatMessage, ServiceMetadata
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
@@ -23,7 +24,7 @@ def test_invoke(test_client, mock_agent_executor) -> None:
         assert response.status_code == 200
 
         # Verify the request was routed to the default agent (not just "called").
-        assert mock_agent_executor.invoke.call_args.kwargs["agent_id"] == "react-agent"
+        assert mock_agent_executor.invoke.call_args.kwargs["agent_id"] == settings.DEFAULT_AGENT
 
         output = ChatMessage.model_validate(response.json())
         assert output.type == "ai"

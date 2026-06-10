@@ -15,8 +15,8 @@ _needs_openai_model = pytest.mark.skipif(
     reason="set OPENAI_MODEL_NAME to smoke-test blueprints that build an OpenAI model at import",
 )
 
-# The 3 react* variants that hard-pin Langfuse push a prompt at import time and need
-# LANGFUSE_* credentials, so they are not import-smoke-testable here (a known cleanup candidate).
+# The `react` blueprint hard-pins Langfuse and pushes a prompt at import time (needs LANGFUSE_*
+# credentials), so it is not import-smoke-testable here.
 IMPORTABLE_BLUEPRINTS = [
     "chatbot",
     "command_agent",
@@ -24,8 +24,9 @@ IMPORTABLE_BLUEPRINTS = [
     "bg_task_agent",
     "knowledge_base_agent",
     pytest.param("supervisor_agent", marks=_needs_openai_model),
-    pytest.param("react_new", marks=_needs_openai_model),
-    pytest.param("react_so", marks=_needs_openai_model),
+    pytest.param("create_agent", marks=_needs_openai_model),
+    pytest.param("create_agent_structured", marks=_needs_openai_model),
+    pytest.param("hitl_agent", marks=_needs_openai_model),
 ]
 
 

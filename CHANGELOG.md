@@ -10,6 +10,24 @@ and this project adheres to
 
 ### Added
 
+- Reusable `create_agent` middleware that brings the custom `create_react_agent`
+  history features to native LangChain `create_agent`, using only public API:
+  `ImmediateGenerationMiddleware` (graceful model-call budget — on the last
+  allowed call it strips tools and asks the model to synthesize a direct answer
+  instead of stalling), `SanitizeHistoryMiddleware` (repair broken
+  tool-call/result pairing before the model call), and
+  `ClearIntermediateToolCallsMiddleware` (token reduction — keep only the most
+  recent result(s) per tool from earlier turns; configurable via constructor or
+  `CLEAR_INTERMEDIATE_TOOL_CALLS*` settings, with a safe `name_args` dedup key
+  that collapses only identical repeat calls by default), and
+  `TrimMessagesMiddleware` (view-only window bound — trims the model's input to
+  the last `DEFAULT_MAX_MESSAGE_HISTORY_LENGTH` messages while keeping full
+  state). Demonstrated in the `create_agent` blueprint
+- `hitl_agent` blueprint: human-in-the-loop tool approval on native
+  `create_agent` via `HumanInTheLoopMiddleware`. The executor bridges the resume
+  (`build_resume_command`): replying `approve` / `reject: <reason>` / free text
+  maps to the middleware's decision format, with custom `interrupt()` blueprints
+  unchanged
 - Multimodal input: `UserComplexInput.message` accepts LangChain content blocks
   (text / image / file / audio / video, via URL or base64), with a configurable
   per-message attachment cap (`MULTIMODAL_MAX_ATTACHMENTS`), and the Streamlit
@@ -17,6 +35,18 @@ and this project adheres to
 
 ### Changed
 
+- Dockerfiles (`docker/api`, `docker/app`) are now multi-stage with uv cache
+  mounts and dependency-before-source layering: faster rebuilds (a code change
+  no longer reinstalls dependencies), smaller images, and a trimmed build
+  context
+- Renamed and de-duplicated the ReAct example blueprints: `react_new` →
+  `create_agent`, `react_so` → `create_agent_structured`; removed `react_old` (a
+  duplicate of `react`) and `react_so_old`. Examples are now grouped by builder
+  (toolkit `create_react_agent` vs native `create_agent`)
+- `sanitize_chat_history` is now bidirectional: in addition to stripping
+  unanswered tool calls, it drops orphaned ToolMessages (a tool result whose
+  requesting tool call is gone, e.g. after trimming/summarization). Both the
+  custom `create_react_agent` and `SanitizeHistoryMiddleware` benefit
 - Refactored the Streamlit UI from a single `run_app.py` into a `ui/` package
   (`main_page`, `components/`, `utils/`); `run_app.py` is now a thin entry point
 

@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any, Dict, Literal, Optional
 
 from dotenv import find_dotenv
 from pydantic import (
@@ -87,7 +87,8 @@ class Settings(BaseSettings):
     AGENT_PATHS: list[str] = [
         "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
         "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
-        "langgraph_agent_toolkit.agents.blueprints.react_so.agent:react_agent_so",
+        "langgraph_agent_toolkit.agents.blueprints.create_agent.agent:react_agent",
+        "langgraph_agent_toolkit.agents.blueprints.create_agent_structured.agent:react_agent_so",
     ]
 
     LANGCHAIN_TRACING_V2: bool = False
@@ -159,7 +160,7 @@ class Settings(BaseSettings):
     DB_CONFIGS_PATH: str | None = None
 
     # Agent configuration
-    DEFAULT_AGENT: str = "react-agent"
+    DEFAULT_AGENT: str = "create-agent"
     DEFAULT_MAX_MESSAGE_HISTORY_LENGTH: int = 18
     DEFAULT_RECURSION_LIMIT: int = 64
     MULTIMODAL_MAX_ATTACHMENTS: int | None = Field(
@@ -172,6 +173,28 @@ class Settings(BaseSettings):
     # Detect an interrupted run and resume it (Command(resume=...)) on the next request. Requires one
     # extra checkpointer read per request; set False to skip it if no agent uses interrupt().
     CHECK_INTERRUPTS: bool = True
+
+    # Defaults for ClearIntermediateToolCallsMiddleware (opt-in; added to an agent's middleware list).
+    # These tune it globally; constructor arguments override them per agent.
+    CLEAR_INTERMEDIATE_TOOL_CALLS: bool = Field(
+        default=True,
+        description=(
+            "Global kill switch for ClearIntermediateToolCallsMiddleware. When False the middleware "
+            "is a no-op even if added to an agent."
+        ),
+    )
+    CLEAR_INTERMEDIATE_TOOL_CALLS_BY: Literal["name_args", "name"] = Field(
+        default="name_args",
+        description=(
+            "Dedup key for intermediate tool calls. 'name_args' (safe) collapses only identical "
+            "repeat calls; 'name' (aggressive) collapses all repeats of a tool regardless of args."
+        ),
+    )
+    CLEAR_INTERMEDIATE_TOOL_CALLS_KEEP_LAST_N: int = Field(
+        default=1,
+        ge=1,
+        description="How many most-recent results to keep per dedup key in previous turns.",
+    )
 
     # Streamlit configuration
     DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"

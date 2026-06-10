@@ -24,14 +24,13 @@ def run_api(
     service = ServiceRunner(
         custom_settings=dict(
             AGENT_PATHS=[
-                "langgraph_agent_toolkit.agents.blueprints.react_old.agent:react_agent",
                 "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
-                "langgraph_agent_toolkit.agents.blueprints.react_so.agent:react_agent_so",
-                "langgraph_agent_toolkit.agents.blueprints.react_so_old.agent:react_agent_so",
-                "langgraph_agent_toolkit.agents.blueprints.react_new.agent:react_agent",
+                "langgraph_agent_toolkit.agents.blueprints.create_agent.agent:react_agent",
+                "langgraph_agent_toolkit.agents.blueprints.create_agent_structured.agent:react_agent_so",
                 # "langgraph_agent_toolkit.agents.blueprints.supervisor_agent.agent:supervisor_agent",
                 "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
                 "langgraph_agent_toolkit.agents.blueprints.interrupt_agent.agent:interrupt_agent",
+                "langgraph_agent_toolkit.agents.blueprints.hitl_agent.agent:hitl_agent",
             ]
         ),
     )

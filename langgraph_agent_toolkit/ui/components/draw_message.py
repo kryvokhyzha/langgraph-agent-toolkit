@@ -106,14 +106,21 @@ async def draw_messages(
                                 status.write("Input:")
                                 status.write(tool_call["args"])
 
-                        # Expect one ToolMessage for each tool call.
+                        # Expect one ToolMessage for each tool call — unless the run pauses first.
                         for _ in range(len(msg.tool_calls)):
-                            tool_result: ChatMessage = await anext(messages_agen)
+                            tool_result: ChatMessage | None = await anext(messages_agen, None)
 
-                            if tool_result.type != "tool":
-                                st.error(f"Unexpected ChatMessage type: {tool_result.type}")
-                                st.write(tool_result)
-                                st.stop()
+                            # Human-in-the-loop: the run can interrupt for approval before a tool
+                            # executes. Then the next message is the interrupt prompt (an "ai"
+                            # message), not a ToolMessage — or the stream ends. Render it and stop
+                            # waiting for results; the tool calls stay pending until the user replies.
+                            if tool_result is None or tool_result.type != "tool":
+                                if tool_result is not None:
+                                    if is_new:
+                                        st.session_state.messages.append(tool_result)
+                                    if tool_result.content:
+                                        st.warning(tool_result.content)
+                                break
 
                             # Record the message if it's new, and update the correct
                             # status container with the result
