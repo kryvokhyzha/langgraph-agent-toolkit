@@ -22,7 +22,8 @@ To customize the agent:
 
 1. Add your agent to ``langgraph_agent_toolkit/agents/blueprints/``
 2. Register it in ``AGENT_PATHS`` list in ``langgraph_agent_toolkit/core/settings.py``
-3. Optionally customize the Streamlit interface in ``run_app.py``
+3. Optionally customize the Streamlit interface under ``langgraph_agent_toolkit/ui/``
+   (``main_page.py``, ``components/``, ``utils/``); ``run_app.py`` is just the entry point
 
 Docker Setup
 ------------
@@ -91,6 +92,14 @@ The toolkit includes ``AgentClient`` for interacting with the agent service:
    for chunk in client.stream_jsonl({"message": "Tell me a brief joke?"}):
        print(chunk)
 
+   # Multimodal input: ``message`` can be a list of LangChain content blocks
+   # (text / image / file / audio / video, by URL or base64). The chosen model must
+   # support the modality; LangChain translates blocks to the provider's format.
+   client.invoke({"message": [
+       {"type": "text", "text": "Describe this image."},
+       {"type": "image", "url": "https://example.com/image.jpg"},
+   ]})
+
 See ``langgraph_agent_toolkit/run_client.py`` for more examples.
 
 Development with LangGraph Studio
@@ -143,6 +152,7 @@ Key Features
 
 - FastAPI with streaming and non-streaming endpoints
 - Streaming over Server-Sent Events (SSE) or JSON Lines (NDJSON)
+- Multimodal input (images, files/PDF, audio, video) via LangChain content blocks
 - Support for both token-based and message-based streaming
 - Multiple agent support with URL path routing
 - Available agents and models listed at ``/info`` endpoint

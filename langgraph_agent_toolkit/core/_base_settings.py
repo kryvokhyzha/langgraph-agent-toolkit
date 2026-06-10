@@ -162,7 +162,16 @@ class Settings(BaseSettings):
     DEFAULT_AGENT: str = "react-agent"
     DEFAULT_MAX_MESSAGE_HISTORY_LENGTH: int = 18
     DEFAULT_RECURSION_LIMIT: int = 64
-    CHECK_INTERRUPTS: bool = False
+    MULTIMODAL_MAX_ATTACHMENTS: int | None = Field(
+        default=None,
+        description=(
+            "Max number of non-text attachments (image/file/audio/video) allowed per message. "
+            "None = no toolkit limit (the model provider still enforces its own per-model caps)."
+        ),
+    )
+    # Detect an interrupted run and resume it (Command(resume=...)) on the next request. Requires one
+    # extra checkpointer read per request; set False to skip it if no agent uses interrupt().
+    CHECK_INTERRUPTS: bool = True
 
     # Streamlit configuration
     DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"

@@ -153,6 +153,7 @@ def create_ai_message(parts: dict) -> AIMessage:
     sig = inspect.signature(AIMessage)
     valid_keys = set(sig.parameters)
     filtered = {k: v for k, v in parts.items() if k in valid_keys}
+    filtered.setdefault("content", "")  # AIMessage requires content; avoid a crash on field-only parts
     return AIMessage(**filtered)
 
 

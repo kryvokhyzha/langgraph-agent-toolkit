@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1]
+
+### Added
+
+- Multimodal input: `UserComplexInput.message` accepts LangChain content blocks
+  (text / image / file / audio / video, via URL or base64), with a configurable
+  per-message attachment cap (`MULTIMODAL_MAX_ATTACHMENTS`), and the Streamlit
+  chat supports file/image uploads
+
+### Changed
+
+- Refactored the Streamlit UI from a single `run_app.py` into a `ui/` package
+  (`main_page`, `components/`, `utils/`); `run_app.py` is now a thin entry point
+
+### Fixed
+
+- Human-in-the-loop interrupts now resume by default (`CHECK_INTERRUPTS`
+  defaults to `True`); previously the resume was silently skipped
+- Streaming now surfaces an agent's `structured_response` (`response_format`),
+  matching `invoke`
+
 ## [0.9.0]
 
 ### Added

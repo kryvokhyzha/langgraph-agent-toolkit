@@ -130,6 +130,8 @@ For detailed installation instructions and available extras, see the
 
    - FastAPI with streaming and non-streaming endpoints
    - Streaming over Server-Sent Events (SSE) or JSON Lines (NDJSON)
+   - Multimodal input (images, files/PDF, audio, video) via LangChain content
+     blocks
    - Support for both token-based and message-based streaming
    - Multiple agent support with URL path routing
    - Available agents and models listed at `/info` endpoint

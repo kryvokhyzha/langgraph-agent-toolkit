@@ -77,7 +77,7 @@ scripts/
   python/                     # 01–09 runnable usage examples (proxy, prompts, history)
 tests/                        # pytest suite (unit / in-process e2e / docker e2e)
 docs/                         # Sphinx docs (published to GitHub Pages)
-.github/workflows/            # CI/CD: test.yml, release.yml, deploy.yml, sphinx.yml
+.github/workflows/            # CI/CD: test.yml, release.yml, sphinx.yml
 pyproject.toml                # Project + tool config (ruff, pytest, extras)
 Makefile                      # uv / pre-commit / docker shortcuts
 langgraph.json                # LangGraph CLI deploy config

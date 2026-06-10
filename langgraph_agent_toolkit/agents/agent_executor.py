@@ -276,7 +276,9 @@ class AgentExecutor:
                 pass
 
         if interrupted_tasks:
-            # User input is a response to resume agent execution from interrupt
+            # User input resumes an interrupted run. The resume value is the full input dict, so a
+            # graph's interrupt(...) call receives e.g. {"message": "<reply>", ...} and should read
+            # the field it needs (the blueprints use resume_value["message"]).
             input_data = Command(resume=_input)
         else:
             if "message" in _input:
@@ -360,12 +362,8 @@ class AgentExecutor:
                 # Normal response, the agent completed successfully
                 output = langchain_to_chat_message(generated_message)
             elif response_type == "values" and "__interrupt__" in response:
-                # The last thing to occur was an interrupt
-                # Return the value of the first interrupt as an AIMessage
-                output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
-            elif response_type == "updates" and "__interrupt__" in response:
-                # The last thing to occur was an interrupt
-                # Return the value of the first interrupt as an AIMessage
+                # The agent paused on an interrupt. ainvoke(stream_mode=["values"]) surfaces it in the
+                # final values event; return the first interrupt's value as an AIMessage.
                 output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
             else:
                 raise ValueError(f"Unexpected response type: {response_type}")
@@ -469,6 +467,12 @@ class AgentExecutor:
                                 update_messages = [msg]
                         new_messages.extend(update_messages)
 
+                        # Surface structured output (response_format) so streaming matches invoke,
+                        # which returns structured_response. Yielded as a ChatMessage with dict content.
+                        structured_response = (updates or {}).get("structured_response")
+                        if structured_response is not None:
+                            new_messages.append(structured_response)
+
                 elif stream_mode == "custom":
                     new_messages = [event]
 
@@ -515,7 +519,14 @@ class AgentExecutor:
                             continue
                         # Track the latest AI message to record as the trace output
                         if chat_message.type == "ai" and chat_message.content:
-                            final_output = convert_message_content_to_string(chat_message.content)
+                            _content = chat_message.content
+                            final_output = (
+                                _content
+                                if isinstance(_content, str)
+                                else convert_message_content_to_string(_content)
+                                if isinstance(_content, list)
+                                else str(_content)  # structured-output dict, etc.
+                            )
                         yield chat_message
                     except Exception as e:
                         logger.error(f"Error parsing message: {e}")
