@@ -128,11 +128,15 @@ async def draw_messages(
                                 st.session_state.messages.append(tool_result)
 
                             if st.session_state.display_tools_execution:
-                                if tool_result.tool_call_id:
-                                    status = call_results[tool_result.tool_call_id]
+                                # Resilient to a missing/empty tool_call_id (e.g. expert-agent tool
+                                # messages) — fall back to a standalone status instead of KeyError.
+                                status = call_results.get(tool_result.tool_call_id)
+                                if status is None:
+                                    status = st.status("Tool Result", state="complete")
                                 status.write("Output:")
-                                # Write content as plain text, disabling markdown rendering
-                                status.write(f"<pre>{tool_result.content}</pre>", unsafe_allow_html=True)
+                                # Render as a code block (plain text, no markdown/HTML) so tool output
+                                # can't inject HTML.
+                                status.code(str(tool_result.content))
                                 status.update(state="complete")
 
             case "custom":

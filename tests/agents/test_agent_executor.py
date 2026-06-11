@@ -265,9 +265,18 @@ def test_user_complex_input_accepts_and_validates_content_blocks():
     # text (back-compat) and valid blocks both accepted
     assert UserComplexInput(message="hi").message == "hi"
     assert len(UserComplexInput(message=[{"type": "image", "url": "https://x/y.jpg"}]).message) == 1
+    # alternative valid content sources must NOT be rejected (permissive — LangChain validates deeply)
+    assert UserComplexInput(message=[{"type": "image", "file_id": "file-abc"}]).message
+    assert UserComplexInput(message=[{"type": "text", "text": "hello"}]).message
 
     # malformed blocks rejected
-    for bad in ([{"type": "hologram"}], [{"text": "no type"}], ["not-a-dict"]):
+    for bad in (
+        [{"type": "hologram"}],  # unsupported type
+        [{"text": "no type"}],  # missing type
+        ["not-a-dict"],  # not a dict
+        [{"type": "image"}],  # media block with no content source
+        [{"type": "text"}],  # text block with no 'text' field
+    ):
         with pytest.raises(ValidationError):
             UserComplexInput(message=bad)
 

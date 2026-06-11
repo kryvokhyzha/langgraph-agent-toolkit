@@ -151,7 +151,7 @@ loaded from the nearest `.env`.
   points `load_dotenv()` the `.env` so those vars are present at runtime.
 - Notable defaults: `ENV_MODE=production`, `HOST/PORT=0.0.0.0/8080`,
   `MEMORY_BACKEND` unset (→ no persistence), `OBSERVABILITY_BACKEND` unset (→
-  `EMPTY` at runtime), `DEFAULT_AGENT=react-agent`, `CHECK_INTERRUPTS=True`,
+  `EMPTY` at runtime), `DEFAULT_AGENT=create-agent`, `CHECK_INTERRUPTS=True`,
   `CORS_ENABLED=False`, `AUTH_SECRET=None` (→ auth disabled).
 
 ## Architecture & core patterns
@@ -189,8 +189,7 @@ a tool-calling ReAct agent, shown side by side:
 - **`react`** — built with the toolkit's **custom `create_react_agent`**
   (`components/creators/`), a fork of LangGraph's prebuilt agent that adds an
   `immediate_generation` router, `sanitize_chat_history`, and an always-on
-  `pre_model_hook`. It pushes a Langfuse prompt at import (needs `LANGFUSE_*`),
-  and `DEFAULT_AGENT=react-agent` points here.
+  `pre_model_hook`. It pushes a Langfuse prompt at import (needs `LANGFUSE_*`).
 - **`create_agent`** (flagship) and **`create_agent_structured`** — built with
   **LangChain's native `create_agent`** composed with middleware. The toolkit's
   `components/middlewares/` reproduce the custom-agent features on the supported
@@ -201,7 +200,8 @@ a tool-calling ReAct agent, shown side by side:
   (view-only window bound, reuses `DEFAULT_MAX_MESSAGE_HISTORY_LENGTH`). The
   flagship stack also uses the built-in `ContextEditingMiddleware` (window) and
   `ToolRetryMiddleware` (resilience). `create_agent_structured` adds a
-  `response_format`. **This is the recommended pattern for new agents.**
+  `response_format`. **This is the recommended pattern for new agents, and
+  `create-agent` is the default (`DEFAULT_AGENT=create-agent`).**
 - **`hitl_agent`** — human-in-the-loop tool approval on `create_agent` via
   `HumanInTheLoopMiddleware`. Its resume goes through
   `agent_executor. build_resume_command`, which maps a `approve` /

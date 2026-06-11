@@ -70,16 +70,27 @@ class UserComplexInput(BaseModel):
         if not isinstance(value, list):
             return value
         allowed = {"text", "image", "file", "audio", "video"}
+        # Any recognized content source. Kept permissive on purpose so valid alternative forms
+        # (file_id, id, source_type, ...) are not rejected — only blocks that carry no content
+        # reference at all (e.g. {"type": "image"}) fail here; LangChain does the deep validation.
+        content_keys = {"url", "base64", "data", "file_id", "id", "source_type", "source", "path"}
         media_count = 0
         for i, block in enumerate(value):
             if not isinstance(block, dict) or "type" not in block:
                 raise ValueError(f"content block {i} must be a dict with a 'type' field")
-            if block["type"] not in allowed:
-                raise ValueError(
-                    f"content block {i} has unsupported type {block['type']!r}; expected one of {sorted(allowed)}"
-                )
-            if block["type"] != "text":
+            btype = block["type"]
+            if btype not in allowed:
+                raise ValueError(f"content block {i} has unsupported type {btype!r}; expected one of {sorted(allowed)}")
+            if btype == "text":
+                if not isinstance(block.get("text"), str):
+                    raise ValueError(f"content block {i} of type 'text' must include a string 'text' field")
+            else:
                 media_count += 1
+                if not any(block.get(k) for k in content_keys):
+                    raise ValueError(
+                        f"content block {i} of type {btype!r} must include a content source "
+                        "(e.g. a 'url', or 'base64' + 'mime_type')"
+                    )
         max_attachments = settings.MULTIMODAL_MAX_ATTACHMENTS
         if max_attachments is not None and media_count > max_attachments:
             raise ValueError(
