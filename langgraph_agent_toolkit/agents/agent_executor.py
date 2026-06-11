@@ -28,6 +28,64 @@ from langgraph_agent_toolkit.helper.utils import (
 from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
 
 
+_HITL_APPROVE = {"approve", "yes", "y", "ok", "accept", "approved"}
+_HITL_REJECT = {"reject", "no", "n", "deny", "rejected"}
+
+
+def interrupt_value_to_content(value: Any) -> Any:
+    """Render an interrupt payload as valid ``AIMessage`` content (a string).
+
+    Custom ``interrupt()`` blueprints pass a string (used as-is). ``HumanInTheLoopMiddleware`` passes
+    a request dict (``{"action_requests": [...]}``); its per-action ``description`` already holds a
+    readable approval prompt, so join those and append a hint on how to reply. This keeps the dict
+    out of ``AIMessage(content=...)``, which only accepts a string or content-block list.
+    """
+    if isinstance(value, (str, list)):
+        return value
+    if isinstance(value, dict) and value.get("action_requests"):
+        lines = []
+        for req in value["action_requests"]:
+            description = req.get("description")
+            lines.append(
+                str(description) if description else f"Approve `{req.get('name')}` with args {req.get('args')}?"
+            )
+        lines.append("\nReply 'approve' to proceed, 'reject: <reason>' to decline, or send other instructions.")
+        return "\n".join(lines)
+    return str(value)
+
+
+def build_resume_command(interrupted_tasks: list, user_input: Dict[str, Any]) -> Command:
+    """Build the ``Command(resume=...)`` for an interrupted run.
+
+    ``HumanInTheLoopMiddleware`` expects ``{"decisions": [...]}``; other interrupts (custom
+    ``interrupt()`` blueprints) read the raw input dict (e.g. ``resume_value["message"]``). When the
+    pending interrupt is a HITL tool-approval request, translate the user's reply into one decision
+    per pending tool call: ``approve``/``yes`` -> approve, ``reject[: reason]``/``no`` -> reject, any
+    other text -> respond (sent to the model). Otherwise resume with the raw input unchanged.
+    """
+    interrupt_value = None
+    try:
+        interrupt_value = interrupted_tasks[0].interrupts[0].value
+    except (IndexError, AttributeError, TypeError):
+        pass
+
+    if isinstance(interrupt_value, dict) and interrupt_value.get("action_requests"):
+        count = len(interrupt_value["action_requests"]) or 1
+        raw = user_input.get("message")
+        message = raw.strip() if isinstance(raw, str) else ""
+        lowered = message.lower()
+        if lowered in _HITL_APPROVE:
+            decision: Dict[str, Any] = {"type": "approve"}
+        elif lowered in _HITL_REJECT or lowered.startswith("reject"):
+            reason = message.split(":", 1)[1].strip() if ":" in message else "User rejected the action."
+            decision = {"type": "reject", "message": reason}
+        else:
+            decision = {"type": "respond", "message": message}
+        return Command(resume={"decisions": [decision] * count})
+
+    return Command(resume=user_input)
+
+
 T = TypeVar("T")
 
 
@@ -276,8 +334,10 @@ class AgentExecutor:
                 pass
 
         if interrupted_tasks:
-            # User input is a response to resume agent execution from interrupt
-            input_data = Command(resume=_input)
+            # User input resumes an interrupted run. For HumanInTheLoopMiddleware the reply is mapped
+            # to a decision; custom interrupt() blueprints receive the raw input dict and read the
+            # field they need (e.g. resume_value["message"]).
+            input_data = build_resume_command(interrupted_tasks, _input)
         else:
             if "message" in _input:
                 message = _input.pop("message", "") or ""
@@ -360,13 +420,11 @@ class AgentExecutor:
                 # Normal response, the agent completed successfully
                 output = langchain_to_chat_message(generated_message)
             elif response_type == "values" and "__interrupt__" in response:
-                # The last thing to occur was an interrupt
-                # Return the value of the first interrupt as an AIMessage
-                output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
-            elif response_type == "updates" and "__interrupt__" in response:
-                # The last thing to occur was an interrupt
-                # Return the value of the first interrupt as an AIMessage
-                output = langchain_to_chat_message(AIMessage(content=response["__interrupt__"][0].value))
+                # The agent paused on an interrupt. ainvoke(stream_mode=["values"]) surfaces it in the
+                # final values event; return the first interrupt's value as an AIMessage.
+                output = langchain_to_chat_message(
+                    AIMessage(content=interrupt_value_to_content(response["__interrupt__"][0].value))
+                )
             else:
                 raise ValueError(f"Unexpected response type: {response_type}")
 
@@ -445,7 +503,7 @@ class AgentExecutor:
                         if node == "__interrupt__":
                             interrupt: Interrupt
                             for interrupt in updates:
-                                new_messages.append(AIMessage(content=interrupt.value))
+                                new_messages.append(AIMessage(content=interrupt_value_to_content(interrupt.value)))
                             continue
 
                         update_messages = (updates or {}).get("messages", [])
@@ -468,6 +526,12 @@ class AgentExecutor:
                                 )
                                 update_messages = [msg]
                         new_messages.extend(update_messages)
+
+                        # Surface structured output (response_format) so streaming matches invoke,
+                        # which returns structured_response. Yielded as a ChatMessage with dict content.
+                        structured_response = (updates or {}).get("structured_response")
+                        if structured_response is not None:
+                            new_messages.append(structured_response)
 
                 elif stream_mode == "custom":
                     new_messages = [event]
@@ -510,12 +574,21 @@ class AgentExecutor:
                     try:
                         chat_message = langchain_to_chat_message(msg)
                         chat_message.run_id = str(run_id)
-                        # Skip the input message if it's repeated by LangGraph
-                        if chat_message.type == "human" and chat_message.content == msg:
+                        # Don't echo human messages back in the response stream: the client already
+                        # has its input, and LangGraph can re-surface it. (The previous
+                        # `content == msg` check compared a str to a message object and never matched.)
+                        if chat_message.type == "human":
                             continue
                         # Track the latest AI message to record as the trace output
                         if chat_message.type == "ai" and chat_message.content:
-                            final_output = convert_message_content_to_string(chat_message.content)
+                            _content = chat_message.content
+                            final_output = (
+                                _content
+                                if isinstance(_content, str)
+                                else convert_message_content_to_string(_content)
+                                if isinstance(_content, list)
+                                else str(_content)  # structured-output dict, etc.
+                            )
                         yield chat_message
                     except Exception as e:
                         logger.error(f"Error parsing message: {e}")

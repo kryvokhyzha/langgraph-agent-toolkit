@@ -99,7 +99,8 @@ async def test_invoke_with_interrupt_handling(agent_executor, mock_agent, mock_s
         interrupt_task.interrupts = [Mock()]
         mock_agent.graph.aget_state.return_value = mock_state_snapshot(values={"messages": []}, tasks=[interrupt_task])
 
-        mock_response = [("updates", {"__interrupt__": [Mock(value="Need more info")]})]
+        # ainvoke(stream_mode=["values"]) surfaces the interrupt in the final "values" event.
+        mock_response = [("values", {"__interrupt__": [Mock(value="Need more info")]})]
         mock_agent.graph.ainvoke.return_value = mock_response
 
         user_input = MockInput(message="Continue")
@@ -110,6 +111,86 @@ async def test_invoke_with_interrupt_handling(agent_executor, mock_agent, mock_s
         call_args = mock_agent.graph.ainvoke.call_args[1]
         assert isinstance(call_args["input"], Command)
         assert call_args["input"].resume == user_input.model_dump()
+
+
+def _real_executor(agents: dict) -> AgentExecutor:
+    """Build an AgentExecutor with the given real agents (bypassing import-based loading)."""
+    with (
+        patch.object(AgentExecutor, "load_agents_from_imports"),
+        patch.object(AgentExecutor, "_validate_default_agent_loaded"),
+    ):
+        ex = AgentExecutor("dummy:dummy")
+    ex.agents = agents
+    return ex
+
+
+def _real_agent(name: str, graph):
+    from langgraph_agent_toolkit.agents.agent import Agent
+    from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
+
+    agent = Agent(name=name, description="d", graph=graph)
+    agent.observability = EmptyObservability()
+    return agent
+
+
+@pytest.mark.asyncio
+async def test_invoke_interrupt_then_resume_real_graph():
+    """A real interrupting graph surfaces the interrupt, then resumes on the next invoke."""
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.graph import END, START, MessagesState, StateGraph
+    from langgraph.types import interrupt
+
+    from langgraph_agent_toolkit.schema.schema import UserComplexInput
+
+    def ask(state):
+        reply = interrupt("What is your birthdate?")
+        return {"messages": [AIMessage(f"Got it: {reply['message']}")]}
+
+    g = StateGraph(MessagesState)
+    g.add_node("ask", ask)
+    g.add_edge(START, "ask")
+    g.add_edge("ask", END)
+    ex = _real_executor({"int": _real_agent("int", g.compile(checkpointer=MemorySaver()))})
+
+    with patch.object(settings, "CHECK_INTERRUPTS", True):
+        r1 = await ex.invoke(agent_id="int", input=UserComplexInput(message="my sign?"), thread_id="th")
+        assert r1.content == "What is your birthdate?"  # interrupt surfaced
+        r2 = await ex.invoke(agent_id="int", input=UserComplexInput(message="1990-05-15"), thread_id="th")
+        assert r2.content == "Got it: 1990-05-15"  # resumed with the reply
+
+
+@pytest.mark.asyncio
+async def test_stream_surfaces_structured_response():
+    """Streaming a response_format graph yields structured_response (parity with invoke)."""
+    from typing import Annotated, TypedDict
+
+    from langgraph.graph import END, START, StateGraph
+    from langgraph.graph.message import add_messages
+
+    from langgraph_agent_toolkit.schema.schema import UserComplexInput
+
+    class SO(BaseModel):
+        answer: str
+
+    class SOState(TypedDict):
+        messages: Annotated[list, add_messages]
+        structured_response: SO
+
+    def node(state):
+        return {"messages": [AIMessage("text")], "structured_response": SO(answer="42")}
+
+    g = StateGraph(SOState)
+    g.add_node("n", node)
+    g.add_edge(START, "n")
+    g.add_edge("n", END)
+    ex = _real_executor({"so": _real_agent("so", g.compile())})
+
+    out = [
+        m
+        async for m in ex.stream(agent_id="so", input=UserComplexInput(message="q"), thread_id="t", stream_tokens=False)
+    ]
+    contents = [m.content for m in out]
+    assert any(isinstance(c, dict) and c.get("answer") == "42" for c in contents), contents
 
 
 @pytest.mark.asyncio
@@ -147,6 +228,74 @@ async def test_setup_agent_execution_configuration(agent_executor, mock_agent):
     assert config["configurable"]["temperature"] == 0.7
     assert config["recursion_limit"] == 50
     assert isinstance(run_id, UUID)
+
+
+@pytest.mark.asyncio
+async def test_setup_agent_execution_multimodal_message(agent_executor, mock_agent):
+    """A list-of-content-blocks message becomes a HumanMessage with list content (multimodal input)."""
+    from langgraph_agent_toolkit.schema.schema import UserComplexInput
+
+    blocks = [
+        {"type": "text", "text": "Describe this image."},
+        {"type": "image", "url": "https://example.com/cat.jpg"},
+        {"type": "file", "base64": "QUJD", "mime_type": "application/pdf"},
+    ]
+    _, input_data, _, _ = await agent_executor._setup_agent_execution(
+        agent_id="test-agent",
+        input=UserComplexInput(message=blocks),
+        thread_id="t",
+        user_id="u",
+        model_name="m",
+        agent_config={},
+        recursion_limit=50,
+    )
+
+    human = input_data["messages"][0]
+    assert isinstance(human, HumanMessage)
+    assert isinstance(human.content, list)
+    assert [b["type"] for b in human.content_blocks] == ["text", "image", "file"]
+
+
+def test_user_complex_input_accepts_and_validates_content_blocks():
+    """UserComplexInput accepts text or content blocks, and rejects malformed blocks."""
+    from pydantic import ValidationError
+
+    from langgraph_agent_toolkit.schema.schema import UserComplexInput
+
+    # text (back-compat) and valid blocks both accepted
+    assert UserComplexInput(message="hi").message == "hi"
+    assert len(UserComplexInput(message=[{"type": "image", "url": "https://x/y.jpg"}]).message) == 1
+    # alternative valid content sources must NOT be rejected (permissive — LangChain validates deeply)
+    assert UserComplexInput(message=[{"type": "image", "file_id": "file-abc"}]).message
+    assert UserComplexInput(message=[{"type": "text", "text": "hello"}]).message
+    assert UserComplexInput(message=[{"type": "file", "base64": "QUJD", "mime_type": "application/pdf"}]).message
+
+    # malformed blocks rejected
+    for bad in (
+        [{"type": "hologram"}],  # unsupported type
+        [{"text": "no type"}],  # missing type
+        ["not-a-dict"],  # not a dict
+        [{"type": "image"}],  # media block with no content source
+        [{"type": "text"}],  # text block with no 'text' field
+        [{"type": "image", "base64": "QUJD"}],  # base64 without a mime_type
+    ):
+        with pytest.raises(ValidationError):
+            UserComplexInput(message=bad)
+
+
+def test_user_complex_input_enforces_attachment_limit():
+    """When MULTIMODAL_MAX_ATTACHMENTS is set, too many attachments are rejected (text doesn't count)."""
+    from pydantic import ValidationError
+
+    from langgraph_agent_toolkit.schema.schema import UserComplexInput
+
+    three_images = [{"type": "text", "text": "look"}]
+    three_images += [{"type": "image", "url": f"https://x/{i}.jpg"} for i in range(3)]
+    with patch.object(settings, "MULTIMODAL_MAX_ATTACHMENTS", 2):
+        with pytest.raises(ValidationError):
+            UserComplexInput(message=three_images)
+    with patch.object(settings, "MULTIMODAL_MAX_ATTACHMENTS", 5):
+        assert len(UserComplexInput(message=three_images).message) == 4  # 1 text + 3 images
 
 
 @pytest.mark.asyncio

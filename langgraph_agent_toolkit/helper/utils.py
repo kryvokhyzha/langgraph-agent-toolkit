@@ -100,48 +100,64 @@ def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]
 
 
 def sanitize_chat_history(messages: list[BaseMessage]) -> list[BaseMessage]:
-    """Sanitize chat history by removing AIMessages with tool_calls that don't have corresponding ToolMessages.
+    """Sanitize chat history so tool calls and tool results are consistently paired.
+
+    Fixes both directions of broken pairing, which providers reject:
+    - AIMessages whose ``tool_calls`` have no corresponding ToolMessage (the call was never
+      answered) — the dangling tool calls are stripped.
+    - ToolMessages whose ``tool_call_id`` has no requesting AIMessage tool call (the result is
+      orphaned) — the ToolMessage is dropped.
 
     This is useful when:
     - A previous execution was interrupted before tool responses were added
-    - Chat history was corrupted
-    - Connection was lost during tool execution
+    - Trimming or summarization removed an AIMessage but kept its ToolMessage (or vice versa)
+    - Chat history was corrupted or a connection was lost during tool execution
 
     Args:
         messages: List of messages to sanitize
 
     Returns:
-        Sanitized list of messages where all AIMessages with tool_calls have corresponding ToolMessages
+        Sanitized list of messages where every remaining AIMessage tool call has a ToolMessage and
+        every remaining ToolMessage has a requesting AIMessage tool call
 
     """
     if not messages:
         return messages
 
-    # Collect all tool_call_ids that have corresponding ToolMessages
-    tool_message_ids: set[str] = set()
-    for msg in messages:
-        if isinstance(msg, ToolMessage) and msg.tool_call_id:
-            tool_message_ids.add(msg.tool_call_id)
+    # tool_call_ids that actually have a ToolMessage response
+    tool_message_ids: set[str] = {
+        msg.tool_call_id for msg in messages if isinstance(msg, ToolMessage) and msg.tool_call_id
+    }
+    # tool_call_ids that some AIMessage requested
+    ai_tool_call_ids: set[str] = {
+        call.get("id")
+        for msg in messages
+        if isinstance(msg, AIMessage) and msg.tool_calls
+        for call in msg.tool_calls
+        if call.get("id")
+    }
 
-    # Process messages and fix incomplete tool calls
     sanitized_messages: list[BaseMessage] = []
     for msg in messages:
         if isinstance(msg, AIMessage) and msg.tool_calls:
-            # Check if all tool_calls have corresponding ToolMessages
+            # Drop tool calls that never got a ToolMessage response
             incomplete_calls = [call for call in msg.tool_calls if call.get("id") not in tool_message_ids]
             if incomplete_calls:
-                # Create a new AIMessage without the incomplete tool_calls
                 complete_calls = [call for call in msg.tool_calls if call.get("id") in tool_message_ids]
-                # If no complete calls remain, remove tool_calls entirely
-                new_msg = AIMessage(
-                    content=msg.content or "[Tool call was interrupted]",
-                    id=msg.id,
-                    name=msg.name,
-                    tool_calls=complete_calls if complete_calls else [],
-                    response_metadata=msg.response_metadata,
+                sanitized_messages.append(
+                    AIMessage(
+                        content=msg.content or "[Tool call was interrupted]",
+                        id=msg.id,
+                        name=msg.name,
+                        tool_calls=complete_calls,
+                        response_metadata=msg.response_metadata,
+                    )
                 )
-                sanitized_messages.append(new_msg)
             else:
+                sanitized_messages.append(msg)
+        elif isinstance(msg, ToolMessage):
+            # Drop orphaned tool results whose requesting tool call is gone (e.g. after trimming)
+            if msg.tool_call_id and msg.tool_call_id in ai_tool_call_ids:
                 sanitized_messages.append(msg)
         else:
             sanitized_messages.append(msg)
@@ -153,6 +169,7 @@ def create_ai_message(parts: dict) -> AIMessage:
     sig = inspect.signature(AIMessage)
     valid_keys = set(sig.parameters)
     filtered = {k: v for k, v in parts.items() if k in valid_keys}
+    filtered.setdefault("content", "")  # AIMessage requires content; avoid a crash on field-only parts
     return AIMessage(**filtered)
 
 

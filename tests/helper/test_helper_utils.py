@@ -338,6 +338,41 @@ class TestSanitizeChatHistory:
         assert result[0].response_metadata == {"model": "gpt-4"}
         assert result[0].tool_calls == []
 
+    def test_orphaned_tool_message_dropped(self):
+        """A ToolMessage with no requesting AIMessage tool call is dropped."""
+        messages = [
+            HumanMessage(content="Hello"),
+            ToolMessage(content="stale result", tool_call_id="ghost", name="search"),
+            AIMessage(content="Hi!"),
+        ]
+        result = sanitize_chat_history(messages)
+
+        assert [type(m).__name__ for m in result] == ["HumanMessage", "AIMessage"]
+
+    def test_orphaned_tool_message_after_trimming_passes_validation(self):
+        """History whose leading AIMessage was trimmed (leaving an orphan ToolMessage) is repaired."""
+        messages = [
+            ToolMessage(content="result for a trimmed call", tool_call_id="trimmed", name="search"),
+            HumanMessage(content="continue"),
+        ]
+        sanitized = sanitize_chat_history(messages)
+
+        assert all(not isinstance(m, ToolMessage) for m in sanitized)
+        _validate_chat_history(sanitized)  # no exception
+
+    def test_valid_tool_message_kept(self):
+        """A ToolMessage with a matching AIMessage tool call is preserved (regression guard)."""
+        messages = [
+            HumanMessage(content="Search"),
+            AIMessage(content="", tool_calls=[{"name": "search", "args": {}, "id": "c1", "type": "tool_call"}]),
+            ToolMessage(content="result", tool_call_id="c1", name="search"),
+            AIMessage(content="done"),
+        ]
+        result = sanitize_chat_history(messages)
+
+        assert len(result) == 4
+        assert isinstance(result[2], ToolMessage)
+
 
 class TestValidateChatHistoryErrorReproduction:
     """Tests demonstrating the original error and how sanitize_chat_history fixes it."""

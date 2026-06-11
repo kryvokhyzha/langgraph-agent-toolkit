@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, NotRequired
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.core.settings import settings
@@ -38,15 +38,70 @@ class ServiceMetadata(BaseModel):
 class UserComplexInput(BaseModel):
     """Basic user input for the agent, supporting dynamic fields."""
 
-    message: str | None = Field(
+    message: str | list[dict[str, Any]] | None = Field(
         default=None,
-        description="User input to the agent.",
-        examples=["What is the weather in Tokyo?"],
+        description=(
+            "User input to the agent: either plain text, or a list of LangChain content blocks for "
+            "multimodal input. Each block is {'type': 'text'|'image'|'file'|'audio'|'video', ...} with "
+            "'text', a 'url', or 'base64'+'mime_type'. LangChain translates blocks to the provider's "
+            "native format, so the chosen model must support the modality."
+        ),
+        examples=[
+            "What is the weather in Tokyo?",
+            [
+                {"type": "text", "text": "Describe this image."},
+                {"type": "image", "url": "https://example.com/image.jpg"},
+            ],
+            [
+                {"type": "text", "text": "Summarize this document."},
+                {"type": "file", "base64": "<base64-bytes>", "mime_type": "application/pdf"},
+            ],
+        ],
     )
 
     model_config = {
         "extra": "allow"  # allow unknown fields
     }
+
+    @field_validator("message")
+    @classmethod
+    def _validate_content_blocks(cls, value: "str | list[dict[str, Any]] | None"):
+        """Lightly validate multimodal content blocks; LangChain does the deep validation downstream."""
+        if not isinstance(value, list):
+            return value
+        allowed = {"text", "image", "file", "audio", "video"}
+        # Any recognized content source. Kept permissive on purpose so valid alternative forms
+        # (file_id, id, source_type, ...) are not rejected — only blocks that carry no content
+        # reference at all (e.g. {"type": "image"}) fail here; LangChain does the deep validation.
+        content_keys = {"url", "base64", "data", "file_id", "id", "source_type", "source", "path"}
+        media_count = 0
+        for i, block in enumerate(value):
+            if not isinstance(block, dict) or "type" not in block:
+                raise ValueError(f"content block {i} must be a dict with a 'type' field")
+            btype = block["type"]
+            if btype not in allowed:
+                raise ValueError(f"content block {i} has unsupported type {btype!r}; expected one of {sorted(allowed)}")
+            if btype == "text":
+                if not isinstance(block.get("text"), str):
+                    raise ValueError(f"content block {i} of type 'text' must include a string 'text' field")
+            else:
+                media_count += 1
+                if block.get("base64") and not isinstance(block.get("mime_type"), str):
+                    raise ValueError(
+                        f"content block {i} of type {btype!r} must include a string 'mime_type' when using 'base64'"
+                    )
+                if not any(block.get(k) for k in content_keys):
+                    raise ValueError(
+                        f"content block {i} of type {btype!r} must include a content source "
+                        "(e.g. a 'url', or 'base64' + 'mime_type')"
+                    )
+        max_attachments = settings.MULTIMODAL_MAX_ATTACHMENTS
+        if max_attachments is not None and media_count > max_attachments:
+            raise ValueError(
+                f"too many attachments: {media_count} (max {max_attachments}); "
+                f"adjust MULTIMODAL_MAX_ATTACHMENTS to change the limit"
+            )
+        return value
 
 
 class UserInput(BaseModel):

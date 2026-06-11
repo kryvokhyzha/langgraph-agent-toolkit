@@ -60,8 +60,8 @@ langgraph_agent_toolkit/      # The package (all importable code)
   agents/
     agent.py                  # Agent dataclass (wraps a compiled LangGraph Pregel)
     agent_executor.py         # Loads agents from "module:obj" strings; invoke/stream
-    components/               # checkpoint/, creators/ (custom create_react_agent), tools, utils
-    blueprints/               # Example agent graphs: chatbot, react*, supervisor, etc.
+    components/               # checkpoint/, creators/ (custom create_react_agent), middlewares/, tools, utils
+    blueprints/               # Example agent graphs: react, create_agent*, chatbot, supervisor, etc.
   service/                    # FastAPI HTTP layer (factory, routes, handler, middleware, auth)
   client/client.py            # AgentClient SDK (httpx; sync + async)
   core/                       # Cross-cutting factories + settings
@@ -77,7 +77,7 @@ scripts/
   python/                     # 01–09 runnable usage examples (proxy, prompts, history)
 tests/                        # pytest suite (unit / in-process e2e / docker e2e)
 docs/                         # Sphinx docs (published to GitHub Pages)
-.github/workflows/            # CI/CD: test.yml, release.yml, deploy.yml, sphinx.yml
+.github/workflows/            # CI/CD: test.yml, release.yml, sphinx.yml
 pyproject.toml                # Project + tool config (ruff, pytest, extras)
 Makefile                      # uv / pre-commit / docker shortcuts
 langgraph.json                # LangGraph CLI deploy config
@@ -151,7 +151,7 @@ loaded from the nearest `.env`.
   points `load_dotenv()` the `.env` so those vars are present at runtime.
 - Notable defaults: `ENV_MODE=production`, `HOST/PORT=0.0.0.0/8080`,
   `MEMORY_BACKEND` unset (→ no persistence), `OBSERVABILITY_BACKEND` unset (→
-  `EMPTY` at runtime), `DEFAULT_AGENT=react-agent`, `CHECK_INTERRUPTS=False`,
+  `EMPTY` at runtime), `DEFAULT_AGENT=create-agent`, `CHECK_INTERRUPTS=True`,
   `CORS_ENABLED=False`, `AUTH_SECRET=None` (→ auth disabled).
 
 ## Architecture & core patterns
@@ -181,9 +181,33 @@ create `agents/blueprints/<name>/agent.py` exposing a compiled graph or `Agent`,
 then register its path in `AGENT_PATHS` (default list in `_base_settings.py`).
 ⚠️ `run_api.py` **hard-codes its own `AGENT_PATHS`** list, overriding the
 settings default — update it there too if the service entry point must load your
-agent. Several `react*` blueprints (`react_old`, `react_so_old`) are legacy
-near-duplicates of `react` / `react_so`; confirm which variant is actually wired
-before editing one.
+agent.
+
+**ReAct example blueprints — two builders.** The toolkit ships two ways to build
+a tool-calling ReAct agent, shown side by side:
+
+- **`react`** — built with the toolkit's **custom `create_react_agent`**
+  (`components/creators/`), a fork of LangGraph's prebuilt agent that adds an
+  `immediate_generation` router, `sanitize_chat_history`, and an always-on
+  `pre_model_hook`. It pushes a Langfuse prompt at import (needs `LANGFUSE_*`).
+- **`create_agent`** (flagship) and **`create_agent_structured`** — built with
+  **LangChain's native `create_agent`** composed with middleware. The toolkit's
+  `components/middlewares/` reproduce the custom-agent features on the supported
+  path (all view-only `wrap_model_call`, so the full history stays in state):
+  `ImmediateGenerationMiddleware`, `SanitizeHistoryMiddleware`,
+  `ClearIntermediateToolCallsMiddleware` (token reduction, tunable via
+  `CLEAR_INTERMEDIATE_TOOL_CALLS*` settings), and `TrimMessagesMiddleware`
+  (view-only window bound, reuses `DEFAULT_MAX_MESSAGE_HISTORY_LENGTH`). The
+  flagship stack also uses the built-in `ContextEditingMiddleware` (window) and
+  `ToolRetryMiddleware` (resilience). `create_agent_structured` adds a
+  `response_format`. **This is the recommended pattern for new agents, and
+  `create-agent` is the default (`DEFAULT_AGENT=create-agent`).**
+- **`hitl_agent`** — human-in-the-loop tool approval on `create_agent` via
+  `HumanInTheLoopMiddleware`. Its resume goes through
+  `agent_executor.build_resume_command`, which maps an `approve` /
+  `reject: <reason>` / free-text reply to the middleware's decision format; raw
+  `interrupt()` blueprints (`interrupt_agent`) are unaffected (they still get
+  `Command(resume=<input>)`).
 
 **Service.** `service/handler.py:create_app()` is the FastAPI factory; an async
 `lifespan` boots observability + memory checkpointer + `AgentExecutor` onto
