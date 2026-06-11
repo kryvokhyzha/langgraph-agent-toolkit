@@ -38,8 +38,12 @@ async def draw_messages(
     streaming_content = ""
     streaming_placeholder = None
 
-    # Iterate over the messages and draw them
-    while msg := await anext(messages_agen, None):
+    # Iterate over the messages and draw them. Use an explicit None sentinel (not truthiness) so an
+    # empty-string token chunk ("") doesn't prematurely terminate the stream.
+    while True:
+        msg = await anext(messages_agen, None)
+        if msg is None:
+            break
         # str message represents an intermediate token being streamed
         if isinstance(msg, str):
             # If placeholder is empty, this is the first token of a new message

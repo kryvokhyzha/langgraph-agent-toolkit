@@ -574,8 +574,10 @@ class AgentExecutor:
                     try:
                         chat_message = langchain_to_chat_message(msg)
                         chat_message.run_id = str(run_id)
-                        # Skip the input message if it's repeated by LangGraph
-                        if chat_message.type == "human" and chat_message.content == msg:
+                        # Don't echo human messages back in the response stream: the client already
+                        # has its input, and LangGraph can re-surface it. (The previous
+                        # `content == msg` check compared a str to a message object and never matched.)
+                        if chat_message.type == "human":
                             continue
                         # Track the latest AI message to record as the trace output
                         if chat_message.type == "ai" and chat_message.content:
