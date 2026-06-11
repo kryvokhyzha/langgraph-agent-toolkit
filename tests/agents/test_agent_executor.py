@@ -268,6 +268,7 @@ def test_user_complex_input_accepts_and_validates_content_blocks():
     # alternative valid content sources must NOT be rejected (permissive — LangChain validates deeply)
     assert UserComplexInput(message=[{"type": "image", "file_id": "file-abc"}]).message
     assert UserComplexInput(message=[{"type": "text", "text": "hello"}]).message
+    assert UserComplexInput(message=[{"type": "file", "base64": "QUJD", "mime_type": "application/pdf"}]).message
 
     # malformed blocks rejected
     for bad in (
@@ -276,6 +277,7 @@ def test_user_complex_input_accepts_and_validates_content_blocks():
         ["not-a-dict"],  # not a dict
         [{"type": "image"}],  # media block with no content source
         [{"type": "text"}],  # text block with no 'text' field
+        [{"type": "image", "base64": "QUJD"}],  # base64 without a mime_type
     ):
         with pytest.raises(ValidationError):
             UserComplexInput(message=bad)

@@ -204,7 +204,7 @@ a tool-calling ReAct agent, shown side by side:
   `create-agent` is the default (`DEFAULT_AGENT=create-agent`).**
 - **`hitl_agent`** — human-in-the-loop tool approval on `create_agent` via
   `HumanInTheLoopMiddleware`. Its resume goes through
-  `agent_executor. build_resume_command`, which maps a `approve` /
+  `agent_executor.build_resume_command`, which maps an `approve` /
   `reject: <reason>` / free-text reply to the middleware's decision format; raw
   `interrupt()` blueprints (`interrupt_agent`) are unaffected (they still get
   `Command(resume=<input>)`).

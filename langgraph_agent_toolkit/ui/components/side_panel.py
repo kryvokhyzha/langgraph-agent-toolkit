@@ -51,7 +51,7 @@ def side_panel_component(agent_client: AgentClient) -> tuple[bool, str]:
             st.image(
                 "https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true"
             )
-            "[View full size on Github](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png)"
+            "[View full size on GitHub](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png)"
             st.caption(
                 "App hosted on [Streamlit Cloud](https://share.streamlit.io/) with FastAPI service running in "
                 "[Azure](https://learn.microsoft.com/en-us/azure/app-service/)"

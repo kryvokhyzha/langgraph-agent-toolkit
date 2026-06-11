@@ -86,6 +86,10 @@ class UserComplexInput(BaseModel):
                     raise ValueError(f"content block {i} of type 'text' must include a string 'text' field")
             else:
                 media_count += 1
+                if block.get("base64") and not isinstance(block.get("mime_type"), str):
+                    raise ValueError(
+                        f"content block {i} of type {btype!r} must include a string 'mime_type' when using 'base64'"
+                    )
                 if not any(block.get(k) for k in content_keys):
                     raise ValueError(
                         f"content block {i} of type {btype!r} must include a content source "

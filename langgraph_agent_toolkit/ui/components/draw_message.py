@@ -112,18 +112,24 @@ async def draw_messages(
 
                         # Expect one ToolMessage for each tool call — unless the run pauses first.
                         for _ in range(len(msg.tool_calls)):
-                            tool_result: ChatMessage | None = await anext(messages_agen, None)
+                            tool_result: ChatMessage | str | None = await anext(messages_agen, None)
 
+                            # Anything other than a ToolMessage means we stop waiting for results.
                             # Human-in-the-loop: the run can interrupt for approval before a tool
-                            # executes. Then the next message is the interrupt prompt (an "ai"
-                            # message), not a ToolMessage — or the stream ends. Render it and stop
-                            # waiting for results; the tool calls stay pending until the user replies.
-                            if tool_result is None or tool_result.type != "tool":
-                                if tool_result is not None:
+                            # executes, so the next message is the interrupt prompt (an "ai"
+                            # ChatMessage) — render it. The stream may also end (None). A bare token
+                            # chunk (str) here is unexpected, so fail fast instead of AttributeError.
+                            if not isinstance(tool_result, ChatMessage) or tool_result.type != "tool":
+                                if isinstance(tool_result, ChatMessage):
                                     if is_new:
                                         st.session_state.messages.append(tool_result)
                                     if tool_result.content:
                                         st.warning(tool_result.content)
+                                elif tool_result is not None:
+                                    st.error(
+                                        f"Unexpected stream chunk while waiting for a tool result: {type(tool_result)}"
+                                    )
+                                    st.stop()
                                 break
 
                             # Record the message if it's new, and update the correct
