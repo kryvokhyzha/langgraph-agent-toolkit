@@ -61,7 +61,11 @@ def render_human_message(content: str | list) -> None:
         elif btype == "image" and block.get("url"):
             st.image(block["url"])
         elif btype == "image" and block.get("base64"):
-            st.image(base64.b64decode(block["base64"]))
+            # A malformed base64 payload (e.g. replayed from history) must not crash the app.
+            try:
+                st.image(base64.b64decode(block["base64"]))
+            except Exception:
+                st.caption(f"📎 {block.get('mime_type') or btype} attachment (invalid base64)")
         else:
             st.caption(f"📎 {block.get('mime_type') or btype} attachment")
 
