@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.ui.components.draw_message &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/ui/components/draw_message.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=aa3b121e"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.ui.components.draw_message</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.ui.components.draw_message</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Render chat messages — replay existing history or stream new tokens, tool calls, and task data.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema.task_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskData</span><span class="p">,</span> <span class="n">TaskDataStatus</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.ui.utils.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_human_message</span>
+
+
+<div class="viewcode-block" id="draw_messages">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.ui.components.draw_message.html#langgraph_agent_toolkit.ui.components.draw_message.draw_messages">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">draw_messages</span><span class="p">(</span>
+    <span class="n">messages_agen</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">ChatMessage</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+    <span class="n">is_new</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a set of chat messages - either replaying existing messages or streaming new ones.</span>
+
+<span class="sd">    This function has additional logic to handle streaming tokens and tool calls.</span>
+<span class="sd">    - Use a placeholder container to render streaming tokens as they arrive.</span>
+<span class="sd">    - Use a status container to render tool calls. Track the tool inputs and outputs</span>
+<span class="sd">      and update the status container accordingly.</span>
+
+<span class="sd">    The function also needs to track the last message container in session state</span>
+<span class="sd">    since later messages can draw to the same container. This is also used for</span>
+<span class="sd">    drawing the feedback widget in the latest chat message.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages_agen: An async iterator over messages to draw.</span>
+<span class="sd">        is_new: Whether the messages are new or not.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Keep track of the last message container</span>
+    <span class="n">last_message_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Placeholder for intermediate streaming tokens</span>
+    <span class="n">streaming_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Iterate over the messages and draw them. Use an explicit None sentinel (not truthiness) so an</span>
+    <span class="c1"># empty-string token chunk (&quot;&quot;) doesn&#39;t prematurely terminate the stream.</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">messages_agen</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="c1"># str message represents an intermediate token being streamed</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># If placeholder is empty, this is the first token of a new message</span>
+            <span class="c1"># being streamed. We need to do setup.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">streaming_placeholder</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;ai&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                    <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+
+            <span class="n">streaming_content</span> <span class="o">+=</span> <span class="n">msg</span>
+            <span class="n">streaming_placeholder</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">streaming_content</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected message type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+        <span class="k">match</span> <span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="c1"># A message from the user, the easiest case</span>
+            <span class="k">case</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
+                <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;human&quot;</span>
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">):</span>
+                    <span class="n">render_human_message</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+            <span class="c1"># A message from the agent is the most complex case, since we need to</span>
+            <span class="c1"># handle streaming tokens and tool calls.</span>
+            <span class="k">case</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                <span class="c1"># If we&#39;re rendering new messages, store the message in session state</span>
+                <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c1"># If the last message type was not AI, create a new chat message</span>
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;ai&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="s2">&quot;assistant&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                    <span class="c1"># If the message has content, write it out.</span>
+                    <span class="c1"># Reset the streaming variables to prepare for the next message.</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">streaming_placeholder</span><span class="p">:</span>
+                            <span class="n">streaming_placeholder</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                            <span class="n">streaming_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                            <span class="n">streaming_placeholder</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                        <span class="c1"># Create a status container for each tool call and store the</span>
+                        <span class="c1"># status container by ID to ensure results are mapped to the</span>
+                        <span class="c1"># correct status container.</span>
+                        <span class="n">call_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+                        <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span><span class="p">:</span>
+                                <span class="n">status</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">status</span><span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Tool Call: </span><span class="si">{</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">,</span>
+                                    <span class="n">state</span><span class="o">=</span><span class="s2">&quot;running&quot;</span> <span class="k">if</span> <span class="n">is_new</span> <span class="k">else</span> <span class="s2">&quot;complete&quot;</span><span class="p">,</span>
+                                <span class="p">)</span>
+                                <span class="n">call_results</span><span class="p">[</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">status</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Input:&quot;</span><span class="p">)</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">])</span>
+
+                        <span class="c1"># Expect one ToolMessage for each tool call — unless the run pauses first.</span>
+                        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">)):</span>
+                            <span class="n">tool_result</span><span class="p">:</span> <span class="n">ChatMessage</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">messages_agen</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                            <span class="c1"># Anything other than a ToolMessage means we stop waiting for results.</span>
+                            <span class="c1"># Human-in-the-loop: the run can interrupt for approval before a tool</span>
+                            <span class="c1"># executes, so the next message is the interrupt prompt (an &quot;ai&quot;</span>
+                            <span class="c1"># ChatMessage) — render it. The stream may also end (None). A bare token</span>
+                            <span class="c1"># chunk (str) here is unexpected, so fail fast instead of AttributeError.</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool_result</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tool_result</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool_result</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">):</span>
+                                    <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                                        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="n">tool_result</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+                                        <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">tool_result</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                                <span class="k">elif</span> <span class="n">tool_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                    <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                                        <span class="sa">f</span><span class="s2">&quot;Unexpected stream chunk while waiting for a tool result: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="p">)</span>
+                                    <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                                <span class="k">break</span>
+
+                            <span class="c1"># Record the message if it&#39;s new, and update the correct</span>
+                            <span class="c1"># status container with the result</span>
+                            <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span><span class="p">:</span>
+                                <span class="c1"># Resilient to a missing/empty tool_call_id (e.g. expert-agent tool</span>
+                                <span class="c1"># messages) — fall back to a standalone status instead of KeyError.</span>
+                                <span class="n">status</span> <span class="o">=</span> <span class="n">call_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tool_result</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                    <span class="n">status</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="s2">&quot;Tool Result&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Output:&quot;</span><span class="p">)</span>
+                                <span class="c1"># Render as a code block (plain text, no markdown/HTML) so tool output</span>
+                                <span class="c1"># can&#39;t inject HTML.</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tool_result</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+                                <span class="n">status</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s2">&quot;complete&quot;</span><span class="p">)</span>
+
+            <span class="k">case</span> <span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+                <span class="c1"># CustomData example used by the bg-task-agent</span>
+                <span class="c1"># See:</span>
+                <span class="c1"># - langgraph_agent_toolkit/agents/components/utils.py CustomData</span>
+                <span class="c1"># - langgraph_agent_toolkit/agents/blueprints/bg_task_agent/task.py</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">task_data</span><span class="p">:</span> <span class="n">TaskData</span> <span class="o">=</span> <span class="n">TaskData</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">custom_data</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected CustomData message received from agent&quot;</span><span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">custom_data</span><span class="p">)</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">is_new</span><span class="p">:</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">last_message_type</span> <span class="o">!=</span> <span class="s2">&quot;task&quot;</span><span class="p">:</span>
+                    <span class="n">last_message_type</span> <span class="o">=</span> <span class="s2">&quot;task&quot;</span>
+                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">chat_message</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">avatar</span><span class="o">=</span><span class="s2">&quot;:material/manufacturing:&quot;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">last_message</span><span class="p">:</span>
+                        <span class="n">status</span> <span class="o">=</span> <span class="n">TaskDataStatus</span><span class="p">()</span>
+
+                <span class="n">status</span><span class="o">.</span><span class="n">add_and_draw_task_data</span><span class="p">(</span><span class="n">task_data</span><span class="p">)</span>
+
+            <span class="c1"># In case of an unexpected message type, log an error and stop</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected ChatMessage type: </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

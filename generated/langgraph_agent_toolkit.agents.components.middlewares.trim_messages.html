@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.agents.components.middlewares.trim_messages.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=aa3b121e"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.agents.components.middlewares.trim_messages.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p id="module-langgraph_agent_toolkit.agents.components.middlewares.trim_messages">Middleware that trims the model’s input to a bounded number of recent messages (view-only).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.agents.components.middlewares.trim_messages.</span></span><span class="sig-name descname"><span class="pre">TrimMessagesMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.html#TrimMessagesMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.py#L14-L62"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AgentMiddleware</span></code></p>
+<p>Bound the model’s input to the last <code class="docutils literal notranslate"><span class="pre">max_messages</span></code> messages, non-destructively.</p>
+<p>Ports the custom <code class="docutils literal notranslate"><span class="pre">create_react_agent</span></code>’s <code class="docutils literal notranslate"><span class="pre">pre_model_hook</span></code> trimming to native <code class="docutils literal notranslate"><span class="pre">create_agent</span></code>:
+each model call sees at most <code class="docutils literal notranslate"><span class="pre">max_messages</span></code> recent messages (trimmed to start on a human turn
+and to keep the system prompt), while the full history stays in state. Use it to bound <em>text</em>
+growth in long conversations — <code class="docutils literal notranslate"><span class="pre">ContextEditingMiddleware</span></code> only bounds tool output.</p>
+<p><code class="docutils literal notranslate"><span class="pre">max_messages</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">settings.DEFAULT_MAX_MESSAGE_HISTORY_LENGTH</span></code> and can be overridden
+per agent. It counts messages (not tokens). Best for conversational / text-heavy agents; for a
+single turn that makes very many tool calls, prefer a larger value (or compose with
+<code class="docutils literal notranslate"><span class="pre">SanitizeHistoryMiddleware</span></code>) so the current turn’s tool results are not cut.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_messages</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.html#TrimMessagesMiddleware.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.py#L28-L33"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_messages</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.wrap_model_call">
+<span class="sig-name descname"><span class="pre">wrap_model_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.html#TrimMessagesMiddleware.wrap_model_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.py#L50-L55"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.wrap_model_call" title="Link to this definition"></a></dt>
+<dd><p>Intercept and control model execution via handler callback.</p>
+<p>Async version is <cite>awrap_model_call</cite></p>
+<p>The handler callback executes the model request and returns a <cite>ModelResponse</cite>.
+Middleware can call the handler multiple times for retry logic, skip calling
+it to short-circuit, or modify the request/response. Multiple middleware
+compose with first in list as outermost layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>ModelRequest</em>) – Model request to execute (includes state and runtime).</p></li>
+<li><p><strong>handler</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><em>ModelRequest</em><em>]</em><em>, </em><em>ModelResponse</em><em>]</em>) – <p>Callback that executes the model request and returns
+<cite>ModelResponse</cite>.</p>
+<p>Call this to execute the model.</p>
+<p>Can be called multiple times for retry logic.</p>
+<p>Can skip calling it to short-circuit.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The model call result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ModelResponse</em></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>!!! example “Retry on error”</p>
+<blockquote>
+<div><p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+def wrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>for attempt in range(3):</dt><dd><dl class="simple">
+<dt>try:</dt><dd><p>return handler(request)</p>
+</dd>
+<dt>except Exception:</dt><dd><dl class="simple">
+<dt>if attempt == 2:</dt><dd><p>raise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Rewrite response”</p>
+<blockquote>
+<div><p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a>python
+def wrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><p>response = handler(request)
+ai_msg = response.result[0]
+return ModelResponse(</p>
+<blockquote>
+<div><p>result=[AIMessage(content=f”[{ai_msg.content}]”)],
+structured_response=response.structured_response,</p>
+</div></blockquote>
+<p>)</p>
+</div></blockquote>
+<p><a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Error to fallback”</p>
+<blockquote>
+<div><p><a href="#id17"><span class="problematic" id="id18">``</span></a><a href="#id19"><span class="problematic" id="id20">`</span></a>python
+def wrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>try:</dt><dd><p>return handler(request)</p>
+</dd>
+<dt>except Exception:</dt><dd><p>return ModelResponse(result=[AIMessage(content=”Service unavailable”)])</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id21"><span class="problematic" id="id22">``</span></a><a href="#id23"><span class="problematic" id="id24">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Cache/short-circuit”</p>
+<blockquote>
+<div><p><a href="#id25"><span class="problematic" id="id26">``</span></a><a href="#id27"><span class="problematic" id="id28">`</span></a>python
+def wrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if cached := get_cache(request):</dt><dd><p>return cached  # Short-circuit with cached result</p>
+</dd>
+</dl>
+<p>response = handler(request)
+save_cache(request, response)
+return response</p>
+</div></blockquote>
+<p><a href="#id29"><span class="problematic" id="id30">``</span></a><a href="#id31"><span class="problematic" id="id32">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Simple <cite>AIMessage</cite> return (converted automatically)”</p>
+<blockquote>
+<div><p><a href="#id33"><span class="problematic" id="id34">``</span></a><a href="#id35"><span class="problematic" id="id36">`</span></a>python
+def wrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><p>response = handler(request)
+# Can return AIMessage directly for simple cases
+return AIMessage(content=”Simplified response”)</p>
+</div></blockquote>
+<p><a href="#id37"><span class="problematic" id="id38">``</span></a><a href="#id39"><span class="problematic" id="id40">`</span></a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.awrap_model_call">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">awrap_model_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.html#TrimMessagesMiddleware.awrap_model_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/middlewares/trim_messages.py#L57-L62"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.awrap_model_call" title="Link to this definition"></a></dt>
+<dd><p>Intercept and control async model execution via handler callback.</p>
+<p>The handler callback executes the model request and returns a <cite>ModelResponse</cite>.</p>
+<p>Middleware can call the handler multiple times for retry logic, skip calling
+it to short-circuit, or modify the request/response. Multiple middleware
+compose with first in list as outermost layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>ModelRequest</em>) – Model request to execute (includes state and runtime).</p></li>
+<li><p><strong>handler</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><em>ModelRequest</em><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" title="(in Python v3.14)"><em>Awaitable</em></a><em>[</em><em>ModelResponse</em><em>]</em><em>]</em>) – <p>Async callback that executes the model request and returns
+<cite>ModelResponse</cite>.</p>
+<p>Call this to execute the model.</p>
+<p>Can be called multiple times for retry logic.</p>
+<p>Can skip calling it to short-circuit.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The model call result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>ModelResponse</em></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>!!! example “Retry on error”</p>
+<blockquote>
+<div><p><a href="#id41"><span class="problematic" id="id42">``</span></a><a href="#id43"><span class="problematic" id="id44">`</span></a>python
+async def awrap_model_call(self, request, handler):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>for attempt in range(3):</dt><dd><dl class="simple">
+<dt>try:</dt><dd><p>return await handler(request)</p>
+</dd>
+<dt>except Exception:</dt><dd><dl class="simple">
+<dt>if attempt == 2:</dt><dd><p>raise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id45"><span class="problematic" id="id46">``</span></a><a href="#id47"><span class="problematic" id="id48">`</span></a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.aafter_agent">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aafter_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L649-L660"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.aafter_agent" title="Link to this definition"></a></dt>
+<dd><p>Async logic to run after the agent execution completes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply after agent execution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.aafter_model">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aafter_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L478-L489"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.aafter_model" title="Link to this definition"></a></dt>
+<dd><p>Async logic to run after the model is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply after model call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.abefore_agent">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">abefore_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L430-L441"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.abefore_agent" title="Link to this definition"></a></dt>
+<dd><p>Async logic to run before the agent execution starts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply before agent execution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.abefore_model">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">abefore_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L454-L465"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.abefore_model" title="Link to this definition"></a></dt>
+<dd><p>Async logic to run before the model is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply before model call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.after_agent">
+<span class="sig-name descname"><span class="pre">after_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L638-L647"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.after_agent" title="Link to this definition"></a></dt>
+<dd><p>Logic to run after the agent execution completes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply after agent execution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.after_model">
+<span class="sig-name descname"><span class="pre">after_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L467-L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.after_model" title="Link to this definition"></a></dt>
+<dd><p>Logic to run after the model is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply after model call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.awrap_tool_call">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">awrap_tool_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L744-L811"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.awrap_tool_call" title="Link to this definition"></a></dt>
+<dd><p>Intercept and control async tool execution via handler callback.</p>
+<p>The handler callback executes the tool call and returns a <cite>ToolMessage</cite> or
+<cite>Command</cite>. Middleware can call the handler multiple times for retry logic, skip
+calling it to short-circuit, or modify the request/response. Multiple middleware
+compose with first in list as outermost layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>ToolCallRequest</em>) – <p>Tool call request with call <cite>dict</cite>, <cite>BaseTool</cite>, state, and runtime.</p>
+<p>Access state via <cite>request.state</cite> and runtime via <cite>request.runtime</cite>.</p>
+</p></li>
+<li><p><strong>handler</strong> (<em>Callable</em><em>[</em><em>[</em><em>ToolCallRequest</em><em>]</em><em>, </em><em>Awaitable</em><em>[</em><em>ToolMessage</em><em> | </em><em>Command</em><em>[</em><em>Any</em><em>]</em><em>]</em><em>]</em>) – <p>Async callable to execute the tool and returns <cite>ToolMessage</cite> or
+<cite>Command</cite>.</p>
+<p>Call this to execute the tool.</p>
+<p>Can be called multiple times for retry logic.</p>
+<p>Can skip calling it to short-circuit.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>ToolMessage</cite> or <cite>Command</cite> (the final result).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ToolMessage | Command[Any]</p>
+</dd>
+</dl>
+<p>The handler <cite>Callable</cite> can be invoked multiple times for retry logic.</p>
+<p>Each call to handler is independent and stateless.</p>
+<p class="rubric">Examples</p>
+<p>!!! example “Async retry on error”</p>
+<blockquote>
+<div><p><a href="#id49"><span class="problematic" id="id50">``</span></a><a href="#id51"><span class="problematic" id="id52">`</span></a>python
+async def awrap_tool_call(self, request, handler):</p>
+<blockquote>
+<div><dl>
+<dt>for attempt in range(3):</dt><dd><dl>
+<dt>try:</dt><dd><p>result = await handler(request)
+if is_valid(result):</p>
+<blockquote>
+<div><p>return result</p>
+</div></blockquote>
+</dd>
+<dt>except Exception:</dt><dd><dl class="simple">
+<dt>if attempt == 2:</dt><dd><p>raise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>return result</p>
+</div></blockquote>
+<p><a href="#id53"><span class="problematic" id="id54">``</span></a><a href="#id55"><span class="problematic" id="id56">`</span></a></p>
+<p><a href="#id57"><span class="problematic" id="id58">``</span></a><a href="#id59"><span class="problematic" id="id60">`</span></a>python
+async def awrap_tool_call(self, request, handler):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if cached := await get_cache_async(request):</dt><dd><p>return ToolMessage(content=cached, tool_call_id=request.tool_call[“id”])</p>
+</dd>
+</dl>
+<p>result = await handler(request)
+await save_cache_async(request, result)
+return result</p>
+</div></blockquote>
+<p><a href="#id61"><span class="problematic" id="id62">``</span></a><a href="#id63"><span class="problematic" id="id64">`</span></a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.before_agent">
+<span class="sig-name descname"><span class="pre">before_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L419-L428"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.before_agent" title="Link to this definition"></a></dt>
+<dd><p>Logic to run before the agent execution starts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply before agent execution.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.before_model">
+<span class="sig-name descname"><span class="pre">before_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L443-L452"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.before_model" title="Link to this definition"></a></dt>
+<dd><p>Logic to run before the model is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>StateT</em>) – The current agent state.</p></li>
+<li><p><strong>runtime</strong> (<em>Runtime</em><em>[</em><em>ContextT</em><em>]</em>) – The runtime context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Agent state updates to apply before model call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Any] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.name">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.name" title="Link to this definition"></a></dt>
+<dd><p>The name of the middleware instance.</p>
+<p>Defaults to the class name, but can be overridden for custom naming.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.state_schema">
+<span class="sig-name descname"><span class="pre">state_schema</span></span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L379-L380"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.state_schema" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">_DefaultAgentState</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.transformers">
+<span class="sig-name descname"><span class="pre">transformers</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></span><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.transformers" title="Link to this definition"></a></dt>
+<dd><p>Stream transformer factories registered by the middleware.</p>
+<p>Each entry is a scope-aware factory invoked as <cite>factory(scope)</cite> so every
+invocation receives a fresh instance. Factories are merged with the
+<cite>transformers</cite> argument of [<cite>create_agent</cite>][langchain.agents.create_agent]
+at graph compile time, after the <cite>ToolCallTransformer</cite> and before any
+user-supplied entries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.wrap_tool_call">
+<span class="sig-name descname"><span class="pre">wrap_tool_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langchain/agents/middleware/types.py#L662-L742"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.wrap_tool_call" title="Link to this definition"></a></dt>
+<dd><p>Intercept tool execution for retries, monitoring, or modification.</p>
+<p>Async version is <cite>awrap_tool_call</cite></p>
+<p>Multiple middleware compose automatically (first defined = outermost).</p>
+<p>Exceptions propagate unless <cite>handle_tool_errors</cite> is configured on <cite>ToolNode</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>ToolCallRequest</em>) – <p>Tool call request with call <cite>dict</cite>, <cite>BaseTool</cite>, state, and runtime.</p>
+<p>Access state via <cite>request.state</cite> and runtime via <cite>request.runtime</cite>.</p>
+</p></li>
+<li><p><strong>handler</strong> (<em>Callable</em><em>[</em><em>[</em><em>ToolCallRequest</em><em>]</em><em>, </em><em>ToolMessage</em><em> | </em><em>Command</em><em>[</em><em>Any</em><em>]</em><em>]</em>) – <cite>Callable</cite> to execute the tool (can be called multiple times).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>ToolMessage</cite> or <cite>Command</cite> (the final result).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ToolMessage | Command[Any]</p>
+</dd>
+</dl>
+<p>The handler <cite>Callable</cite> can be invoked multiple times for retry logic.</p>
+<p>Each call to handler is independent and stateless.</p>
+<p class="rubric">Examples</p>
+<p>!!! example “Modify request before execution”</p>
+<blockquote>
+<div><p><a href="#id65"><span class="problematic" id="id66">``</span></a><a href="#id67"><span class="problematic" id="id68">`</span></a>python
+def wrap_tool_call(self, request, handler):</p>
+<blockquote>
+<div><dl>
+<dt>modified_call = {</dt><dd><p><a href="#id69"><span class="problematic" id="id70">**</span></a>request.tool_call,
+“args”: {</p>
+<blockquote>
+<div><p><a href="#id71"><span class="problematic" id="id72">**</span></a>request.tool_call[“args”],
+“value”: request.tool_call[“args”][“value”] * 2,</p>
+</div></blockquote>
+<p>},</p>
+</dd>
+</dl>
+<p>}
+request = request.override(tool_call=modified_call)
+return handler(request)</p>
+</div></blockquote>
+<p><a href="#id73"><span class="problematic" id="id74">``</span></a><a href="#id75"><span class="problematic" id="id76">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Retry on error (call handler multiple times)”</p>
+<blockquote>
+<div><p><a href="#id77"><span class="problematic" id="id78">``</span></a><a href="#id79"><span class="problematic" id="id80">`</span></a>python
+def wrap_tool_call(self, request, handler):</p>
+<blockquote>
+<div><dl>
+<dt>for attempt in range(3):</dt><dd><dl>
+<dt>try:</dt><dd><p>result = handler(request)
+if is_valid(result):</p>
+<blockquote>
+<div><p>return result</p>
+</div></blockquote>
+</dd>
+<dt>except Exception:</dt><dd><dl class="simple">
+<dt>if attempt == 2:</dt><dd><p>raise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>return result</p>
+</div></blockquote>
+<p><a href="#id81"><span class="problematic" id="id82">``</span></a><a href="#id83"><span class="problematic" id="id84">`</span></a></p>
+</div></blockquote>
+<p>!!! example “Conditional retry based on response”</p>
+<blockquote>
+<div><p><a href="#id85"><span class="problematic" id="id86">``</span></a><a href="#id87"><span class="problematic" id="id88">`</span></a>python
+def wrap_tool_call(self, request, handler):</p>
+<blockquote>
+<div><dl>
+<dt>for attempt in range(3):</dt><dd><p>result = handler(request)
+if isinstance(result, ToolMessage) and result.status != “error”:</p>
+<blockquote>
+<div><p>return result</p>
+</div></blockquote>
+<dl class="simple">
+<dt>if attempt &lt; 2:</dt><dd><p>continue</p>
+</dd>
+</dl>
+<p>return result</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id89"><span class="problematic" id="id90">``</span></a><a href="#id91"><span class="problematic" id="id92">`</span></a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.tools">
+<span class="sig-name descname"><span class="pre">tools</span></span><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.middlewares.trim_messages.TrimMessagesMiddleware.tools" title="Link to this definition"></a></dt>
+<dd><p>Additional tools registered by the middleware.</p>
+</dd></dl>
+
+</dd></dl>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

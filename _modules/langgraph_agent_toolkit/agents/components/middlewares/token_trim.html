@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.agents.components.middlewares.token_trim &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/agents/components/middlewares/token_trim.html" />
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=aa3b121e"></script>
+      <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.agents.components.middlewares.token_trim</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.agents.components.middlewares.token_trim</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Middleware that trims the model&#39;s input to a bounded token budget (view-only).&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents.middleware.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelRequest</span><span class="p">,</span> <span class="n">ModelResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.language_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLanguageModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">count_tokens_approximately</span><span class="p">,</span> <span class="n">trim_messages</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.components.middlewares._history</span><span class="w"> </span><span class="kn">import</span> <span class="n">keep_latest_turn_if_emptied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+
+<div class="viewcode-block" id="TokenTrimMiddleware">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.components.middlewares.token_trim.html#langgraph_agent_toolkit.agents.components.middlewares.TokenTrimMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenTrimMiddleware</span><span class="p">(</span><span class="n">AgentMiddleware</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bound the model&#39;s input to a token budget, non-destructively.</span>
+
+<span class="sd">    The token-counting companion to ``TrimMessagesMiddleware`` (which bounds by *message* count). Each</span>
+<span class="sd">    model call sees at most ``max_tokens`` tokens of recent history (trimmed to start on a human turn</span>
+<span class="sd">    and to keep the system prompt), while the full history stays in state. Compose the two to cap both</span>
+<span class="sd">    message count and token size, as the custom ``create_react_agent``&#39;s ``pre_model_hook`` did.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        max_tokens: Token budget for the model&#39;s message view. Defaults to</span>
+<span class="sd">            ``settings.DEFAULT_MAX_TOKENS_HISTORY_LENGTH``. ``None`` (the toolkit default) disables</span>
+<span class="sd">            trimming — set it, or pass ``max_tokens``, to a budget appropriate for your model.</span>
+<span class="sd">        token_counter: How to count tokens — a per-message or per-list callable, or a chat model.</span>
+<span class="sd">            Defaults to ``count_tokens_approximately`` (fast, model-agnostic, no extra dependency).</span>
+<span class="sd">            Pass a ``tiktoken``-backed counter (or the model itself) for an exact count.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        On ``create_agent`` the system prompt is never part of ``request.messages`` (it lives on</span>
+<span class="sd">        ``request.system_message`` and is prepended at call time), so it is always preserved</span>
+<span class="sd">        regardless of the budget.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TokenTrimMiddleware.__init__">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.components.middlewares.token_trim.html#langgraph_agent_toolkit.agents.components.middlewares.TokenTrimMiddleware.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">token_counter</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">BaseMessage</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="n">BaseLanguageModel</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">count_tokens_approximately</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="n">max_tokens</span> <span class="k">if</span> <span class="n">max_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_MAX_TOKENS_HISTORY_LENGTH</span>
+        <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">resolved</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_tokens must be &gt;= 1 (or None to disable)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span> <span class="o">=</span> <span class="n">resolved</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_counter</span> <span class="o">=</span> <span class="n">token_counter</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">messages</span>
+        <span class="n">trimmed</span> <span class="o">=</span> <span class="n">trim_messages</span><span class="p">(</span>
+            <span class="n">messages</span><span class="p">,</span>
+            <span class="n">token_counter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">token_counter</span><span class="p">,</span>
+            <span class="n">max_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_tokens</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;last&quot;</span><span class="p">,</span>
+            <span class="n">start_on</span><span class="o">=</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+            <span class="n">end_on</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">),</span>
+            <span class="n">include_system</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">allow_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># A latest turn larger than the budget collapses to []; keep that turn (over budget but</span>
+        <span class="c1"># answerable) instead of invoking the model with no user content.</span>
+        <span class="k">return</span> <span class="n">keep_latest_turn_if_emptied</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">trimmed</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TokenTrimMiddleware.wrap_model_call">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.components.middlewares.token_trim.html#langgraph_agent_toolkit.agents.components.middlewares.TokenTrimMiddleware.wrap_model_call">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap_model_call</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">ModelRequest</span><span class="p">,</span>
+        <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ModelRequest</span><span class="p">],</span> <span class="n">ModelResponse</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">handler</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">override</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_trim</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="TokenTrimMiddleware.awrap_model_call">
+<a class="viewcode-back" href="../../../../../generated/langgraph_agent_toolkit.agents.components.middlewares.token_trim.html#langgraph_agent_toolkit.agents.components.middlewares.TokenTrimMiddleware.awrap_model_call">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">awrap_model_call</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">ModelRequest</span><span class="p">,</span>
+        <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ModelRequest</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">ModelResponse</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">override</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_trim</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">)))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.ui.components.side_panel &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/ui/components/side_panel.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=aa3b121e"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.ui.components.side_panel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.ui.components.side_panel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Sidebar: chat controls (new chat, architecture, privacy, share) and the settings popover.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.ui.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.ui.utils.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_welcome_message</span>
+
+
+<div class="viewcode-block" id="side_panel_component">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.ui.components.side_panel.html#langgraph_agent_toolkit.ui.components.side_panel.side_panel_component">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">side_panel_component</span><span class="p">(</span><span class="n">agent_client</span><span class="p">:</span> <span class="n">AgentClient</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the sidebar and return the chosen (use_streaming, stream_protocol) settings.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constants</span><span class="o">.</span><span class="n">APP_ICON</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">constants</span><span class="o">.</span><span class="n">APP_TITLE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="s2">&quot;&quot;</span>
+        <span class="s2">&quot;Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit&quot;</span>
+        <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/chat: New Chat&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="c1"># Add welcome message to new chat</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_welcome_message</span><span class="p">(</span><span class="n">agent_client</span><span class="o">.</span><span class="n">agent</span><span class="p">))</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">rerun</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">popover</span><span class="p">(</span><span class="s2">&quot;:material/settings: Settings&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">agent_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">agent_client</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">agents</span><span class="p">]</span>
+            <span class="n">agent_idx</span> <span class="o">=</span> <span class="n">agent_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">agent_client</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">default_agent</span><span class="p">)</span>
+            <span class="n">agent_client</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+                <span class="s2">&quot;Agent to use&quot;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="n">agent_list</span><span class="p">,</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">agent_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">use_streaming</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span><span class="s2">&quot;Stream results&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">stream_protocol</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">radio</span><span class="p">(</span>
+                <span class="s2">&quot;Streaming protocol&quot;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;SSE&quot;</span><span class="p">,</span> <span class="s2">&quot;JSON Lines&quot;</span><span class="p">],</span>
+                <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">disabled</span><span class="o">=</span><span class="ow">not</span> <span class="n">use_streaming</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Transport for streamed responses: Server-Sent Events or JSON Lines (NDJSON). &quot;</span>
+                <span class="s2">&quot;Both deliver identical messages.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">display_tools_execution</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">toggle</span><span class="p">(</span><span class="s2">&quot;Display tools execution&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="nd">@st</span><span class="o">.</span><span class="n">dialog</span><span class="p">(</span><span class="s2">&quot;Architecture&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">architecture_dialog</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">image</span><span class="p">(</span>
+                <span class="s2">&quot;https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png?raw=true&quot;</span>
+            <span class="p">)</span>
+            <span class="s2">&quot;[View full size on GitHub](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/media/agent_architecture.png)&quot;</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">caption</span><span class="p">(</span>
+                <span class="s2">&quot;App hosted on [Streamlit Cloud](https://share.streamlit.io/) with FastAPI service running in &quot;</span>
+                <span class="s2">&quot;[Azure](https://learn.microsoft.com/en-us/azure/app-service/)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/schema: Architecture&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">architecture_dialog</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">popover</span><span class="p">(</span><span class="s2">&quot;:material/policy: Privacy&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="s2">&quot;Prompts, responses and feedback in this app are anonymously recorded and saved to selected &quot;</span>
+                <span class="s2">&quot;observability service for product evaluation and improvement purposes only.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="nd">@st</span><span class="o">.</span><span class="n">dialog</span><span class="p">(</span><span class="s2">&quot;Share/resume chat&quot;</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">share_chat_dialog</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="n">get_instance</span><span class="p">()</span><span class="o">.</span><span class="n">_session_mgr</span><span class="o">.</span><span class="n">list_active_sessions</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlunparse</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">st_base_url</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="c1"># Decode the base URL if it&#39;s in bytes</span>
+                <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+            <span class="c1"># if it&#39;s not localhost, switch to https by default</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;localhost&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st_base_url</span><span class="p">:</span>
+                <span class="n">st_base_url</span> <span class="o">=</span> <span class="n">st_base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">)</span>
+            <span class="n">chat_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">st_base_url</span><span class="si">}</span><span class="s2">?thread_id=</span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">thread_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**Chat URL:**</span><span class="se">\n</span><span class="s2">```text</span><span class="se">\n</span><span class="si">{</span><span class="n">chat_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">```&quot;</span><span class="p">)</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Copy the above URL to share or revisit this chat&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;:material/upload: Share/resume chat&quot;</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">share_chat_dialog</span><span class="p">()</span>
+
+        <span class="s2">&quot;[View the source code](https://github.com/kryvokhyzha/langgraph-agent-toolkit)&quot;</span>
+
+    <span class="k">return</span> <span class="n">use_streaming</span><span class="p">,</span> <span class="n">stream_protocol</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

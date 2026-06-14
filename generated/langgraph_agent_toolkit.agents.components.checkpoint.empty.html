@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.agents.components.checkpoint.empty.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=aa3b121e"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.agents.components.checkpoint.empty.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <dl class="py class" id="module-langgraph_agent_toolkit.agents.components.checkpoint.empty">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.agents.components.checkpoint.empty.</span></span><span class="sig-name descname"><span class="pre">NoOpSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L15-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCheckpointSaver</span></code></p>
+<p>A fake checkpointer that implements the BaseCheckpointSaver interface but doesn’t actually persist anything.</p>
+<p>All operations are no-ops.
+This is useful for:
+- Testing without persistence
+- Running graphs without memory between executions
+- Situations where you want the graph structure but no state saving</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serde</strong> (<em>SerializerProtocol</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L25-L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serde</strong> (<em>SerializerProtocol</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L28-L30"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get" title="Link to this definition"></a></dt>
+<dd><p>Return None - no checkpoint exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Checkpoint</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_tuple">
+<span class="sig-name descname"><span class="pre">get_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.get_tuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L32-L34"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_tuple" title="Link to this definition"></a></dt>
+<dd><p>Return None - no checkpoint tuple exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>CheckpointTuple</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L36-L45"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.list" title="Link to this definition"></a></dt>
+<dd><p>Return an empty iterator - no checkpoints exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>before</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterator" title="(in Python v3.14)"><em>Iterator</em></a>[<em>CheckpointTuple</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_versions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L47-L69"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put" title="Link to this definition"></a></dt>
+<dd><p>Pretend to save but not actually persist anything.</p>
+<p>Return a config with a fake checkpoint_id to satisfy the interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>checkpoint</strong> (<em>Checkpoint</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>CheckpointMetadata</em>)</p></li>
+<li><p><strong>new_versions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>RunnableConfig</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put_writes">
+<span class="sig-name descname"><span class="pre">put_writes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.put_writes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L71-L79"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put_writes" title="Link to this definition"></a></dt>
+<dd><p>Do nothing - no writes are persisted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>writes</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>task_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>task_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L82-L84"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget" title="Link to this definition"></a></dt>
+<dd><p>Async version - always return None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Checkpoint</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_tuple">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aget_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aget_tuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L86-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_tuple" title="Link to this definition"></a></dt>
+<dd><p>Async version - always return None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>CheckpointTuple</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.alist">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">alist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.alist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L90-L100"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.alist" title="Link to this definition"></a></dt>
+<dd><p>Async version - always return an empty iterator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>before</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterator" title="(in Python v3.14)"><em>Iterator</em></a>[<em>CheckpointTuple</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_versions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L102-L110"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput" title="Link to this definition"></a></dt>
+<dd><p>Async version - pretend to save but not persist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>checkpoint</strong> (<em>Checkpoint</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>CheckpointMetadata</em>)</p></li>
+<li><p><strong>new_versions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>RunnableConfig</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput_writes">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aput_writes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aput_writes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L112-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput_writes" title="Link to this definition"></a></dt>
+<dd><p>Async version - do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>writes</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>task_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>task_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.acopy_thread">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">acopy_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_thread_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_thread_id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L540-L558"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.acopy_thread" title="Link to this definition"></a></dt>
+<dd><p>Asynchronously copy all checkpoints and writes from one thread to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID to copy from.</p></li>
+<li><p><strong>target_thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID to copy to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>See <cite>copy_thread</cite> — the copy must carry the complete parent
+chain (or at least back to a <cite>_DeltaSnapshot</cite> ancestor for every
+<cite>DeltaChannel</cite>) so the target thread can reconstruct delta
+state.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.adelete_for_runs">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">adelete_for_runs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_ids</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L522-L538"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.adelete_for_runs" title="Link to this definition"></a></dt>
+<dd><p>Asynchronously delete all checkpoints and writes for the given run IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – The run IDs whose checkpoints should be deleted.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>See <cite>delete_for_runs</cite> — deleting rows a still-live thread’s
+<cite>DeltaChannel</cite> reconstruction depends on (writes between the
+head and its nearest <cite>_DeltaSnapshot</cite> ancestor) will silently
+corrupt that channel’s state.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.adelete_thread">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">adelete_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L511-L520"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.adelete_thread" title="Link to this definition"></a></dt>
+<dd><p>Delete all checkpoints and writes associated with a specific thread ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID whose checkpoints should be deleted.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_delta_channel_history">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aget_delta_channel_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L651-L690"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_delta_channel_history" title="Link to this definition"></a></dt>
+<dd><p>Async version of <cite>get_delta_channel_history</cite>.</p>
+<p>!!! warning “Beta”</p>
+<blockquote>
+<div><p>This method is part of the <cite>DeltaChannel</cite> support surface and is
+in beta. See <cite>get_delta_channel_history</cite> for caveats.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.14)"><em>Mapping</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <em>DeltaChannelHistory</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aprune">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aprune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_ids</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keep_latest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L560-L580"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aprune" title="Link to this definition"></a></dt>
+<dd><p>Asynchronously prune checkpoints for the given threads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – The thread IDs to prune.</p></li>
+<li><p><strong>strategy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The pruning strategy. <cite>“keep_latest”</cite> retains only the most
+recent checkpoint per namespace. <cite>“delete”</cite> removes all checkpoints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>See <cite>prune</cite> for the full <cite>DeltaChannel</cite> caveat. In short:
+<cite>“keep_latest”</cite> must not drop ancestor checkpoints / writes that
+sit between the kept checkpoint and the nearest <cite>_DeltaSnapshot</cite>
+ancestor, or delta channels will silently reconstruct as empty.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.config_specs">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config_specs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a></span><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.config_specs" title="Link to this definition"></a></dt>
+<dd><p>Define the configuration options for the checkpoint saver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of configuration field specs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.copy_thread">
+<span class="sig-name descname"><span class="pre">copy_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_thread_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_thread_id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L350-L372"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.copy_thread" title="Link to this definition"></a></dt>
+<dd><p>Copy all checkpoints and writes from one thread to another.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID to copy from.</p></li>
+<li><p><strong>target_thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID to copy to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>Implementations must copy the <strong>complete</strong> parent chain (all
+ancestor checkpoints and their <cite>checkpoint_writes</cite>) — copying
+only the head checkpoint will leave the target thread with
+<cite>DeltaChannel</cite> state that cannot be reconstructed (no path back
+to a <cite>_DeltaSnapshot</cite> ancestor). Equivalently, the copy must
+include enough ancestors that every <cite>DeltaChannel</cite>-backed key
+has either a <cite>_DeltaSnapshot</cite> in <cite>channel_values</cite> somewhere in
+the chain, or a complete write history back to the chain root.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.delete_for_runs">
+<span class="sig-name descname"><span class="pre">delete_for_runs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_ids</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L331-L348"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.delete_for_runs" title="Link to this definition"></a></dt>
+<dd><p>Delete all checkpoints and writes associated with the given run IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>run_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – The run IDs whose checkpoints should be deleted.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>Deleting a run that produced ancestor <cite>checkpoint_writes</cite> — or
+the only <cite>_DeltaSnapshot</cite> blob — for a still-live thread will
+break reconstruction of any <cite>DeltaChannel</cite> whose history
+depended on those rows. See the <cite>DeltaChannel</cite> note on <cite>prune</cite>
+for safe-recovery strategies.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.delete_thread">
+<span class="sig-name descname"><span class="pre">delete_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L320-L329"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.delete_thread" title="Link to this definition"></a></dt>
+<dd><p>Delete all checkpoints and writes associated with a specific thread ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>thread_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The thread ID whose checkpoints should be deleted.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_delta_channel_history">
+<span class="sig-name descname"><span class="pre">get_delta_channel_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L582-L649"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_delta_channel_history" title="Link to this definition"></a></dt>
+<dd><p>Walk the parent chain returning per-channel writes + seed.</p>
+<p>!!! warning “Beta”</p>
+<blockquote>
+<div><p>This method is part of the <cite>DeltaChannel</cite> support surface and is
+in beta. The signature, return shape (<cite>DeltaChannelHistory</cite>), and
+interaction with <cite>_DeltaSnapshot</cite> blobs may change. Override at
+your own risk; the default implementation will continue to work
+against the public <cite>BaseCheckpointSaver</cite> contract.</p>
+</div></blockquote>
+<p>For each requested channel, walks ancestors of the checkpoint
+identified by <cite>config</cite> (following <cite>parent_config</cite>) and accumulates
+<cite>pending_writes</cite> for that channel. The walk terminates per-channel
+at the nearest ancestor whose <cite>channel_values[ch]</cite> is populated;
+that value is returned as <cite>seed</cite>. If the walk reaches the root
+without finding a stored value, <cite>seed</cite> is omitted from that
+channel’s entry — the consumer treats the absence as “start
+empty.”</p>
+<p>Walks the <strong>parent chain</strong> (not <cite>list(before=…)</cite>): for forked
+threads, only on-path ancestors contribute.</p>
+<p>The default implementation walks <cite>get_tuple</cite> + <cite>parent_config</cite>
+once for all channels — each ancestor visited once, not once per
+channel. Savers with direct storage access (<cite>InMemorySaver</cite>,
+<cite>PostgresSaver</cite>) override for performance; the return contract is
+fixed here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>) – Configuration identifying the target checkpoint.</p></li>
+<li><p><strong>channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Channel names to walk for. Empty → empty mapping.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Per-channel <cite>DeltaChannelHistory</cite> for every name in <cite>channels</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.14)"><em>Mapping</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <em>DeltaChannelHistory</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_next_version">
+<span class="sig-name descname"><span class="pre">get_next_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L692-L711"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_next_version" title="Link to this definition"></a></dt>
+<dd><p>Generate the next version ID for a channel.</p>
+<p>Default is to use integer versions, incrementing by <cite>1</cite>.</p>
+<p>If you override, you can use <cite>str</cite>/<cite>int</cite>/<cite>float</cite> versions, as long as they are monotonically increasing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current</strong> (<em>V</em><em> | </em><em>None</em>) – The current version identifier (<cite>int</cite>, <cite>float</cite>, or <cite>str</cite>).</p></li>
+<li><p><strong>channel</strong> (<em>None</em>) – Deprecated argument, kept for backwards compatibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The next version identifier, which must be increasing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>V</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.prune">
+<span class="sig-name descname"><span class="pre">prune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_ids</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keep_latest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L374-L415"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.prune" title="Link to this definition"></a></dt>
+<dd><p>Prune checkpoints for the given threads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – The thread IDs to prune.</p></li>
+<li><p><strong>strategy</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The pruning strategy. <cite>“keep_latest”</cite> retains only the most
+recent checkpoint per namespace. <cite>“delete”</cite> removes all checkpoints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>!!! warning “DeltaChannel”</p>
+<blockquote>
+<div><p>Custom implementations must be <cite>DeltaChannel</cite>-aware. <cite>DeltaChannel</cite>
+stores only a sentinel in <cite>channel_values</cite> for non-snapshot steps;
+reconstruction walks the parent chain via
+<cite>get_delta_channel_history</cite>, accumulating rows from
+<cite>checkpoint_writes</cite> until it reaches an ancestor whose
+<cite>channel_values</cite> contains a <cite>_DeltaSnapshot</cite> blob (written every
+<cite>snapshot_frequency</cite> updates).</p>
+<p>A naive <cite>“keep_latest”</cite> that drops intermediate checkpoints and
+their writes can sever that chain: the surviving “latest”
+checkpoint is rarely a snapshot point itself, so its delta
+channels would silently reconstruct as empty (no error raised —
+<cite>get_delta_channel_history</cite> simply returns no <cite>seed</cite>). Safe
+options when the graph uses <cite>DeltaChannel</cite>:</p>
+<ul class="simple">
+<li><p>Walk back from each kept checkpoint and preserve every
+ancestor (plus its <cite>checkpoint_writes</cite>) up to the nearest one
+whose <cite>channel_values</cite> already contains a <cite>_DeltaSnapshot</cite> for
+every <cite>DeltaChannel</cite>-backed key.</p></li>
+<li><p>Force a fresh snapshot on the kept checkpoint before deleting
+ancestors — rewrite <cite>channel_values[k] = _DeltaSnapshot(value)</cite>
+for each delta channel <cite>k</cite> (resolving <cite>value</cite> via the existing
+ancestor walk first), then prune.</p></li>
+<li><p>Skip pruning threads whose graph uses <cite>DeltaChannel</cite> until one
+of the above is implemented.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.serde">
+<span class="sig-name descname"><span class="pre">serde</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SerializerProtocol</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;langgraph.checkpoint.serde.jsonplus.JsonPlusSerializer</span> <span class="pre">object&gt;</span></span><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.serde" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.with_allowlist">
+<span class="sig-name descname"><span class="pre">with_allowlist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra_allowlist</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/../../../../../opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/langgraph/checkpoint/base/__init__.py#L713-L722"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.with_allowlist" title="Link to this definition"></a></dt>
+<dd><p>Return a shallow clone with a derived msgpack allowlist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>extra_allowlist</strong> (<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Collection" title="(in Python v3.14)"><em>Collection</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>...</em><em>]</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>BaseCheckpointSaver</em>[<em>V</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2025, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

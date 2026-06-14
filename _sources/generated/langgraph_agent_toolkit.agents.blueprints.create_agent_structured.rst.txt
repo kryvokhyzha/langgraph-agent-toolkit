@@ -1,0 +1,15 @@
+langgraph\_agent\_toolkit.agents.blueprints.create\_agent\_structured package
+=============================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.create_agent_structured
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.create_agent_structured.agent
