@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2]
+
+### Fixed
+
+- `TrimMessagesMiddleware` / `TokenTrimMiddleware` no longer silently destroy
+  the model's view when the **latest turn does not fit the budget**.
+  `trim_messages` (`strategy="last"`, `start_on="human"`) returns `[]` whenever
+  the current turn exceeds the budget — e.g. a single user message larger than
+  the token budget, or a turn with more tool calls than the message budget —
+  which invoked the model with the system prompt only and made it answer with
+  the user's question dropped. Both middlewares now floor to the latest turn
+  (kept verbatim, over budget but answerable) rather than emptying it.
+  Regression tests cover an oversize user message, an oversize tool result, and
+  a 6+ tool-call burst.
+
+### Added
+
+- `TokenTrimMiddleware` — bounds the model's message view by a **token** budget
+  (the token-counting companion to `TrimMessagesMiddleware`, which bounds by
+  message count). View-only, so the full history stays in state and the system
+  prompt is preserved. The token counter is configurable (`token_counter`,
+  default `count_tokens_approximately` — no extra dependency; pass a
+  `tiktoken`-backed counter or the model for an exact count), and the budget
+  defaults to the new `DEFAULT_MAX_TOKENS_HISTORY_LENGTH` setting (unset by
+  default, since a sensible budget is model-specific). Compose it after
+  `TrimMessagesMiddleware` to cap both message count and token size.
+
 ## [0.9.1]
 
 ### Added

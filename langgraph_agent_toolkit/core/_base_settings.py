@@ -162,6 +162,9 @@ class Settings(BaseSettings):
     # Agent configuration
     DEFAULT_AGENT: str = "create-agent"
     DEFAULT_MAX_MESSAGE_HISTORY_LENGTH: int = 18
+    # Token budget for the model's message view (TokenTrimMiddleware). None disables it (opt-in,
+    # since a sensible budget is model-specific); set a value to bound history by tokens.
+    DEFAULT_MAX_TOKENS_HISTORY_LENGTH: int | None = None
     DEFAULT_RECURSION_LIMIT: int = 64
     MULTIMODAL_MAX_ATTACHMENTS: int | None = Field(
         default=None,
