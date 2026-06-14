@@ -5,6 +5,7 @@ from langgraph_agent_toolkit.agents.components.middlewares.clear_intermediate_to
 )
 from langgraph_agent_toolkit.agents.components.middlewares.immediate_generation import ImmediateGenerationMiddleware
 from langgraph_agent_toolkit.agents.components.middlewares.sanitize_history import SanitizeHistoryMiddleware
+from langgraph_agent_toolkit.agents.components.middlewares.token_trim import TokenTrimMiddleware
 from langgraph_agent_toolkit.agents.components.middlewares.trim_messages import TrimMessagesMiddleware
 
 
@@ -12,5 +13,6 @@ __all__ = [
     "ClearIntermediateToolCallsMiddleware",
     "ImmediateGenerationMiddleware",
     "SanitizeHistoryMiddleware",
+    "TokenTrimMiddleware",
     "TrimMessagesMiddleware",
 ]

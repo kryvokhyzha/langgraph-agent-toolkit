@@ -11,6 +11,7 @@ from langgraph_agent_toolkit.agents.components.middlewares import (
     ClearIntermediateToolCallsMiddleware,
     ImmediateGenerationMiddleware,
     SanitizeHistoryMiddleware,
+    TokenTrimMiddleware,
     TrimMessagesMiddleware,
 )
 from langgraph_agent_toolkit.core.models.fake import FakeToolModel
@@ -244,6 +245,143 @@ def test_trim_messages_default_from_settings():
 def test_trim_messages_rejects_bad_max():
     with pytest.raises(ValueError, match="max_messages"):
         TrimMessagesMiddleware(max_messages=0)
+
+
+def _content_len(messages: list) -> int:
+    """Per-list token-counter stub: total characters of message content."""
+    return sum(len(m.content) for m in messages)
+
+
+def test_token_trim_bounds_to_token_budget():
+    """The model's view is trimmed until the token count fits the budget, starting on a human turn."""
+    mw = TokenTrimMiddleware(max_tokens=12, token_counter=_content_len)
+    request = MagicMock()
+    request.messages = [
+        HumanMessage("aaaa"),
+        AIMessage("bbbb"),
+        HumanMessage("cccc"),
+        AIMessage("dddd"),
+        HumanMessage("eeee"),
+    ]
+    request.override.return_value = "TRIMMED"
+    handler = MagicMock(return_value="R")
+
+    mw.wrap_model_call(request, handler)
+
+    trimmed = request.override.call_args.kwargs["messages"]
+    assert _content_len(trimmed) <= 12
+    assert trimmed[0].type == "human"
+    handler.assert_called_once_with("TRIMMED")
+
+
+def test_token_trim_keeps_system_message():
+    """include_system keeps a system message even when the rest is trimmed to fit the budget."""
+    mw = TokenTrimMiddleware(max_tokens=8, token_counter=_content_len)
+    request = MagicMock()
+    request.messages = [SystemMessage("sys"), HumanMessage("aaaa"), AIMessage("bbbb"), HumanMessage("cccc")]
+    handler = MagicMock()
+
+    mw.wrap_model_call(request, handler)
+
+    trimmed = request.override.call_args.kwargs["messages"]
+    assert any(m.type == "system" for m in trimmed)
+
+
+def test_token_trim_disabled_passes_through():
+    """With no budget (None), the middleware is a no-op."""
+    mw = TokenTrimMiddleware(max_tokens=None)
+    assert mw.max_tokens is None  # toolkit default is opt-in
+    request = MagicMock()
+    request.messages = [HumanMessage("q1"), AIMessage("a1"), HumanMessage("q2")]
+    handler = MagicMock()
+
+    mw.wrap_model_call(request, handler)
+
+    assert request.override.call_args.kwargs["messages"] == request.messages
+
+
+def test_token_trim_default_from_settings():
+    assert TokenTrimMiddleware().max_tokens == settings.DEFAULT_MAX_TOKENS_HISTORY_LENGTH
+
+
+def test_token_trim_rejects_bad_max():
+    with pytest.raises(ValueError, match="max_tokens"):
+        TokenTrimMiddleware(max_tokens=0)
+
+
+def _latest_human_present(view: list, text: str) -> bool:
+    return any(m.type == "human" and text in str(m.content) for m in view)
+
+
+def test_token_trim_preserves_oversize_latest_human():
+    """A single user message larger than the budget is kept, not dropped to an empty/system-only view."""
+    mw = TokenTrimMiddleware(max_tokens=5, token_counter=_content_len)
+    request = MagicMock()
+    request.messages = [HumanMessage("this question is far longer than the tiny budget UNIQUE")]
+    handler = MagicMock()
+
+    mw.wrap_model_call(request, handler)
+
+    kept = request.override.call_args.kwargs["messages"]
+    assert _latest_human_present(kept, "UNIQUE")  # question preserved despite exceeding the budget
+
+
+def test_token_trim_preserves_oversize_tool_turn():
+    """A current turn (human + big tool result) over budget is kept verbatim, not emptied."""
+    mw = TokenTrimMiddleware(max_tokens=5, token_counter=_content_len)
+    request = MagicMock()
+    request.messages = [
+        HumanMessage("q UNIQUE"),
+        _ai_tool("search", "s1"),
+        ToolMessage("x" * 200, tool_call_id="s1", name="search"),
+    ]
+    handler = MagicMock()
+
+    mw.wrap_model_call(request, handler)
+
+    kept = request.override.call_args.kwargs["messages"]
+    assert _latest_human_present(kept, "UNIQUE")
+    ai_ids = {c["id"] for m in kept if m.type == "ai" and m.tool_calls for c in m.tool_calls}
+    assert all(m.tool_call_id in ai_ids for m in kept if m.type == "tool")  # pairing intact
+
+
+def test_trim_messages_preserves_long_tool_burst_turn():
+    """A current turn with more messages than max_messages is kept, not wiped to an empty view."""
+    mw = TrimMessagesMiddleware(max_messages=12)
+    burst = [HumanMessage("BURST_Q")]
+    for i in range(6):  # 1 human + 6*(AI tool_call, Tool) = 13 messages > 12
+        burst += [_ai_tool("search", f"s{i}"), ToolMessage("r", tool_call_id=f"s{i}", name="search")]
+    request = MagicMock()
+    request.messages = burst
+    handler = MagicMock()
+
+    mw.wrap_model_call(request, handler)
+
+    kept = request.override.call_args.kwargs["messages"]
+    assert _latest_human_present(kept, "BURST_Q")  # the human survives the burst
+    ai_ids = {c["id"] for m in kept if m.type == "ai" and m.tool_calls for c in m.tool_calls}
+    assert all(m.tool_call_id in ai_ids for m in kept if m.type == "tool")
+
+
+def test_keep_latest_turn_floor_keeps_only_latest_turn_and_leading_system():
+    """The floor preserves leading system messages + the latest turn, dropping older over-budget turns."""
+    from langgraph_agent_toolkit.agents.components.middlewares._history import keep_latest_turn_if_emptied
+
+    original = [SystemMessage("sys"), HumanMessage("old"), AIMessage("a"), HumanMessage("latest")]
+    floored = keep_latest_turn_if_emptied(original, [])  # [] simulates a budget collapse
+
+    assert floored[0].type == "system"
+    assert floored[-1].content == "latest"
+    assert [m.content for m in floored if m.type == "human"] == ["latest"]  # only the latest turn's human
+
+
+def test_keep_latest_turn_floor_passes_through_healthy_trim():
+    """When trimming kept user content, the floor returns it unchanged."""
+    from langgraph_agent_toolkit.agents.components.middlewares._history import keep_latest_turn_if_emptied
+
+    original = [HumanMessage("a"), AIMessage("b"), HumanMessage("c")]
+    trimmed = [HumanMessage("c")]
+    assert keep_latest_turn_if_emptied(original, trimmed) is trimmed
 
 
 def test_create_agent_with_middleware_runs_end_to_end():

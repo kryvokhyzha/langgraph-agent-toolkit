@@ -7,6 +7,7 @@ from langchain.agents.middleware.types import ModelRequest, ModelResponse
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.utils import trim_messages
 
+from langgraph_agent_toolkit.agents.components.middlewares._history import keep_latest_turn_if_emptied
 from langgraph_agent_toolkit.core.settings import settings
 
 
@@ -32,7 +33,7 @@ class TrimMessagesMiddleware(AgentMiddleware):
         self.max_messages = resolved
 
     def _trim(self, messages: list[BaseMessage]) -> list[BaseMessage]:
-        return trim_messages(
+        trimmed = trim_messages(
             messages,
             token_counter=len,  # count messages, not tokens
             max_tokens=self.max_messages,
@@ -42,6 +43,9 @@ class TrimMessagesMiddleware(AgentMiddleware):
             include_system=True,
             allow_partial=False,
         )
+        # A current turn longer than max_messages collapses to []; keep that turn instead of
+        # invoking the model with no user content.
+        return keep_latest_turn_if_emptied(messages, trimmed)
 
     def wrap_model_call(
         self,
