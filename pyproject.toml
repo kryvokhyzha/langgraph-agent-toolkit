@@ -34,16 +34,16 @@ dependencies = [
     "rootutils >= 1.0.7",
     "duckduckgo-search >= 7.3.0",
     "ddgs >= 9.5.0",
-    "fastapi >= 0.134.0, < 0.136.4",  # >=0.134 for native JSON Lines (NDJSON) streaming responses
+    "fastapi >= 0.134.0, < 0.138.3",  # >=0.134 for native JSON Lines (NDJSON) streaming responses
     "grpcio >= 1.68.0",
     "httpx ~= 0.28.1",
-    "jiter >= 0.10, < 0.16",
-    "langchain >= 0.3.20, < 1.3.5",
+    "jiter >= 0.10, < 0.17",
+    "langchain >= 0.3.20, < 1.3.12",
     # "langfuse >= 2.60.3,< 2.70.0",
     # "langchain == 0.3.27",
-    "langchain-core >= 0.3.40, < 1.4.3",
+    "langchain-core >= 0.3.40, < 1.4.9",
     "langchain-community >= 0.3.20, < 0.4.3",
-    "langgraph >= 0.4.2, < 1.2.5",
+    "langgraph >= 0.4.2, < 1.2.7",
     "langgraph-cli[inmem] >= 0.2.10, < 0.5.0",
     # "langgraph-checkpoint-sqlite ~= 2.0.7",  # ~= 3.0.0
     "langgraph-checkpoint-sqlite >= 3.0.0, < 3.1.1",
@@ -54,12 +54,12 @@ dependencies = [
     "langgraph-supervisor ~= 0.0.31",
     "numpy >= 1.26.4, < 2.4.0; python_version == '3.11'",
     "numpy >= 2.0.0, < 2.4.0; python_version >= '3.12'",
-    "onnxruntime >= 1.20.0,< 1.24.0",
-    "pandas >= 2.2.3,< 2.4.0",
-    "psycopg[binary,pool] ~= 3.2.4",
+    "onnxruntime >= 1.20.0,< 1.28.0",
+    "pandas >= 2.2.3,< 3.1.0",
+    "psycopg[binary,pool] >= 3.2.4,< 3.4.0",
     "pyarrow >= 19.0.1",
     "pydantic >= 2.11.1, < 2.13.5",
-    "pydantic-settings >= 2.9.1, < 2.14.2",
+    "pydantic-settings >= 2.9.1, < 2.14.3",
     "pyowm >= 3.3,< 3.6",
     "python-dotenv >= 1.1, < 1.3",
     "setuptools >= 75.6.0",
@@ -101,7 +101,7 @@ docs = [
 client = [
     "httpx ~= 0.28.1",
     "pydantic >= 2.11.1, < 2.13.5",
-    "pydantic-settings >= 2.9.1, < 2.14.2",
+    "pydantic-settings >= 2.9.1, < 2.14.3",
     "python-dotenv >= 1.1, < 1.3",
     "streamlit >= 1.45, < 1.58.1",
     "loguru ~= 0.7.3",
@@ -112,7 +112,7 @@ client = [
 
 # Service runner backends
 aws-backend = [
-    "mangum ~= 0.19.0",
+    "mangum >= 0.19,< 0.22",
 ]
 
 azure-backend = [
@@ -129,7 +129,7 @@ uvicorn-backend = [
 ]
 
 all-backends = [
-    "mangum ~= 0.19.0",
+    "mangum >= 0.19,< 0.22",
     "azure-functions >= 1.23, < 1.25",
     "gunicorn ~= 26.0.0",
     "uvicorn >= 0.35, < 0.50",
@@ -137,49 +137,49 @@ all-backends = [
 
 # Different LLM providers
 aws = [
-    "langchain-aws >= 0.2.20, < 1.5.2",
+    "langchain-aws >= 0.2.20, < 1.6.2",
 ]
 
 anthropic = [
-    "langchain-anthropic >= 0.3.10, < 1.4.5",
+    "langchain-anthropic >= 0.3.10, < 1.4.9",
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai >= 2.0.0, < 3.2.4",
+    "langchain-google-vertexai >= 2.0.0, < 3.2.5",
 ]
 
 google-genai = [
-    "langchain-google-genai >= 2.0.0, < 4.2.5",
+    "langchain-google-genai >= 2.0.0, < 4.2.7",
 ]
 
 openai = [
-    "langchain-openai >= 0.3.15, < 1.2.3",
+    "langchain-openai >= 0.3.15, < 1.3.4",
 ]
 
 all-llms = [
-    "langchain-aws >= 0.2.20, < 1.5.2",
-    "langchain-anthropic >= 0.3.10, < 1.4.5",
-    "langchain-google-vertexai >= 2.0.0, < 3.2.4",
-    "langchain-google-genai >= 2.0.0, < 4.2.5",
-    "langchain-openai >= 0.3.15, < 1.2.3",
+    "langchain-aws >= 0.2.20, < 1.6.2",
+    "langchain-anthropic >= 0.3.10, < 1.4.9",
+    "langchain-google-vertexai >= 2.0.0, < 3.2.5",
+    "langchain-google-genai >= 2.0.0, < 4.2.7",
+    "langchain-openai >= 0.3.15, < 1.3.4",
 ]
 
 # Observability tools and platforms
 langfuse = [
     # "langfuse >= 2.60.3,< 2.70.0",
     # "langfuse >= 2.60.3, < 3.9.2",
-    "langfuse >= 2.60.3, < 4.7.2",
+    "langfuse >= 2.60.3, < 4.12.1",
  ]
 
  langsmith = [
-    "langsmith >= 0.3.31, < 0.5.0",
+    "langsmith >= 0.3.31, < 0.10.0",
  ]
 
  all-observability = [
     # "langfuse >= 2.60.3,< 2.70.0",
     # "langfuse >= 2.60.3, < 3.9.2",
-    "langfuse >= 2.60.3, < 4.7.2",
-    "langsmith >= 0.3.31, < 0.8.12",
+    "langfuse >= 2.60.3, < 4.12.1",
+    "langsmith >= 0.3.31, < 0.9.4",
  ]
 
 [project.urls]
