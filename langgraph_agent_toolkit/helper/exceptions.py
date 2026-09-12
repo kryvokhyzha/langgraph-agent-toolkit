@@ -1,16 +1,13 @@
 class AgentToolkitError(Exception):
-    """Base exception for all LangGraph Agent Toolkit errors.
-
-    All custom exceptions should inherit from this base class.
-    """
+    """Base class for LangGraph Agent Toolkit errors."""
 
     def __init__(self, message: str, error_code: str = None, details: dict = None):
-        """Initialize the base exception.
+        """Initialize the exception.
 
         Args:
-            message: Human-readable error message
-            error_code: Optional error code for programmatic handling
-            details: Optional dictionary with additional error context
+            message: Error message for a user.
+            error_code: Optional error code for a program.
+            details: Optional error context.
 
         """
         super().__init__(message)
@@ -20,19 +17,19 @@ class AgentToolkitError(Exception):
 
 
 class AgentError(AgentToolkitError):
-    """Base exception for agent-related errors."""
+    """Base class for agent errors."""
 
     pass
 
 
 class AgentConfigurationError(AgentError):
-    """Raised when there's an error in agent configuration."""
+    """Raised when an agent configuration has an error."""
 
     pass
 
 
 class AgentExecutionError(AgentError):
-    """Raised when an agent fails to execute properly."""
+    """Raised when an agent cannot run."""
 
     pass
 
@@ -44,23 +41,20 @@ class AgentTimeoutError(AgentError):
 
 
 class MessageError(AgentToolkitError):
-    """Base exception for message-related errors."""
+    """Base class for message errors."""
 
     pass
 
 
 class UnsupportedMessageTypeError(MessageError):
-    """Raised when encountering an unsupported message type.
-
-    This replaces the string-based check for "Unsupported message type".
-    """
+    """Raised for an unsupported message type."""
 
     def __init__(self, message_type: str, supported_types: list = None):
-        """Initialize with specific message type information.
+        """Initialize the error with message type information.
 
         Args:
-            message_type: The unsupported message type
-            supported_types: List of supported message types
+            message_type: Unsupported message type.
+            supported_types: Supported message types.
 
         """
         supported = f" Supported types: {supported_types}" if supported_types else ""
@@ -77,7 +71,7 @@ class MessageConversionError(MessageError):
 
 
 class ValidationError(AgentToolkitError):
-    """Base exception for validation errors."""
+    """Base class for validation errors."""
 
     pass
 
@@ -95,7 +89,7 @@ class ConfigurationValidationError(ValidationError):
 
 
 class ModelError(AgentToolkitError):
-    """Base exception for model-related errors."""
+    """Base class for model errors."""
 
     pass
 
@@ -104,11 +98,11 @@ class ModelNotFoundError(ModelError):
     """Raised when a requested model is not found."""
 
     def __init__(self, model_name: str, provider: str = None):
-        """Initialize with model information.
+        """Initialize the error with model information.
 
         Args:
-            model_name: Name of the model that wasn't found
-            provider: Optional model provider
+            model_name: Name of the missing model.
+            provider: Optional model provider.
 
         """
         provider_info = f" from provider '{provider}'" if provider else ""
@@ -119,13 +113,13 @@ class ModelNotFoundError(ModelError):
 
 
 class ModelConfigurationError(ModelError):
-    """Raised when there's an error in model configuration."""
+    """Raised when a model configuration has an error."""
 
     pass
 
 
 class ToolError(AgentToolkitError):
-    """Base exception for tool-related errors."""
+    """Base class for tool errors."""
 
     pass
 
@@ -134,11 +128,11 @@ class ToolNotFoundError(ToolError):
     """Raised when a requested tool is not found."""
 
     def __init__(self, tool_name: str, available_tools: list = None):
-        """Initialize with tool information.
+        """Initialize the error with tool information.
 
         Args:
-            tool_name: Name of the tool that wasn't found
-            available_tools: List of available tools
+            tool_name: Name of the missing tool.
+            available_tools: Available tools.
 
         """
         available = f" Available tools: {available_tools}" if available_tools else ""
@@ -152,11 +146,11 @@ class ToolExecutionError(ToolError):
     """Raised when tool execution fails."""
 
     def __init__(self, tool_name: str, original_error: Exception = None):
-        """Initialize with tool execution information.
+        """Initialize the error with tool execution information.
 
         Args:
-            tool_name: Name of the tool that failed
-            original_error: The original exception that caused the failure
+            tool_name: Name of the failed tool.
+            original_error: Exception that caused the failure.
 
         """
         message = f"Tool '{tool_name}' execution failed"
@@ -168,20 +162,20 @@ class ToolExecutionError(ToolError):
 
 
 class MemoryError(AgentToolkitError):
-    """Base exception for memory-related errors."""
+    """Base class for memory errors."""
 
     pass
 
 
 class MemoryNotFoundError(MemoryError):
-    """Raised when requested memory/thread is not found."""
+    """Raised when the requested memory or thread is missing."""
 
     def __init__(self, identifier: str, identifier_type: str = "thread"):
-        """Initialize with memory identifier information.
+        """Initialize the error with memory identifier information.
 
         Args:
-            identifier: The identifier that wasn't found
-            identifier_type: Type of identifier (thread, user, etc.)
+            identifier: Missing identifier.
+            identifier_type: Identifier type, such as `thread` or `user`.
 
         """
         message = f"{identifier_type.capitalize()} '{identifier}' not found"
@@ -197,7 +191,7 @@ class MemoryOperationError(MemoryError):
 
 
 class ObservabilityError(AgentToolkitError):
-    """Base exception for observability-related errors."""
+    """Base class for observability errors."""
 
     pass
 
@@ -206,12 +200,12 @@ class FeedbackError(ObservabilityError):
     """Raised when feedback operations fail."""
 
     def __init__(self, run_id: str, operation: str, reason: str = None):
-        """Initialize with feedback operation information.
+        """Initialize the error with feedback operation information.
 
         Args:
-            run_id: The run ID associated with the feedback
-            operation: The feedback operation that failed
-            reason: Optional reason for the failure
+            run_id: Run ID for the feedback.
+            operation: Failed feedback operation.
+            reason: Optional failure reason.
 
         """
         message = f"Feedback {operation} failed for run {run_id}"
@@ -239,12 +233,12 @@ class RateLimitError(AgentToolkitError):
     """Raised when rate limits are exceeded."""
 
     def __init__(self, resource: str, limit: int, reset_time: float = None):
-        """Initialize with rate limit information.
+        """Initialize the error with rate-limit information.
 
         Args:
-            resource: The resource that hit the rate limit
-            limit: The rate limit that was exceeded
-            reset_time: Optional time when the limit resets
+            resource: Resource that reached the rate limit.
+            limit: Exceeded rate limit.
+            reset_time: Optional limit reset time.
 
         """
         message = f"Rate limit exceeded for {resource} (limit: {limit})"
@@ -257,7 +251,7 @@ class RateLimitError(AgentToolkitError):
 
 
 class NetworkError(AgentToolkitError):
-    """Base exception for network-related errors."""
+    """Base class for network errors."""
 
     pass
 
@@ -266,11 +260,11 @@ class ServiceUnavailableError(NetworkError):
     """Raised when an external service is unavailable."""
 
     def __init__(self, service: str, details: str = None):
-        """Initialize with service information.
+        """Initialize the error with service information.
 
         Args:
-            service: Name of the unavailable service
-            details: Optional details about the unavailability
+            service: Name of the unavailable service.
+            details: Optional unavailability details.
 
         """
         message = f"Service '{service}' is unavailable"

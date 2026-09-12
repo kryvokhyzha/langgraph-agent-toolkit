@@ -1,4 +1,4 @@
-"""Middleware that removes incomplete tool calls from the messages sent to the model."""
+"""Middleware that removes incomplete tool calls before model calls."""
 
 from collections.abc import Awaitable, Callable
 
@@ -9,13 +9,10 @@ from langgraph_agent_toolkit.helper.utils import sanitize_chat_history
 
 
 class SanitizeHistoryMiddleware(AgentMiddleware):
-    """Repair broken tool-call/tool-result pairing in the messages before each model call.
+    """Repair tool-call and tool-result pairs before each model call.
 
-    Mirrors the custom ``create_react_agent``'s ``sanitize_chat_history``, fixing both directions
-    that providers reject: an AIMessage tool call with no ToolMessage (call without result) has the
-    dangling call stripped, and a ToolMessage with no requesting AIMessage tool call (orphaned
-    result, e.g. after trimming/summarization) is dropped. Only the messages sent to the model are
-    sanitized; persisted state is left untouched.
+    Remove tool calls without results. Remove tool results without matching calls.
+    The middleware changes only the messages sent to the model.
     """
 
     def wrap_model_call(

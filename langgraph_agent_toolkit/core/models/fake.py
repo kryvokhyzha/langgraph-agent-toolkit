@@ -8,7 +8,7 @@ from langchain_core.tools import BaseTool
 
 
 class FakeToolModel(FakeListChatModel):
-    """A fake model that returns a fixed response for testing purposes."""
+    """Fake model that returns a fixed test response."""
 
     def __init__(self, responses: list[str]):
         super().__init__(responses=responses)

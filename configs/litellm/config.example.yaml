@@ -1,7 +1,7 @@
-# Proxy doc: https://docs.litellm.ai/docs/proxy/configs
-# Caching doc: https://docs.litellm.ai/docs/proxy/config_settings
+# LiteLLM proxy documentation: https://docs.litellm.ai/docs/proxy/configs
+# LiteLLM cache documentation: https://docs.litellm.ai/docs/proxy/config_settings
 
-# list of supported models on the server, with model-specific configs
+# Define each model that the server supports.
 model_list:
   - model_name: gpt-4o-mini
     litellm_params:
@@ -18,7 +18,7 @@ model_list:
     model_info:
       supported_environments: ["development", "production", "staging"]
 
-# list of credentials to be used by the models
+# Define the credentials that models use.
 credential_list:
   - credential_name: default_azure_credential
     credential_values:
@@ -28,20 +28,20 @@ credential_list:
     credential_info:
       description: "Production credentials for EU region"
 
-# litellm Module settings
+# LiteLLM module settings
 litellm_settings:
   drop_params: True
-  num_retries: 2 # retry call 3 times on each model_name (e.g. zephyr-beta)
-  request_timeout: 40 # raise Timeout error if call takes longer than 10s. Sets litellm.request_timeout
-  allowed_fails: 3 # cooldown model if it fails > 1 call in a minute.
+  num_retries: 2 # Retry each model call two times.
+  request_timeout: 40 # Stop a call after 40 seconds.
+  allowed_fails: 3 # Start cooldown after three failed calls in one minute.
 
-# litellm Router settings
-router_settings: # router_settings are optional
-  routing_strategy: latency-based-routing # Literal["simple-shuffle", "least-busy", "usage-based-routing","latency-based-routing"], default="simple-shuffle"
-  model_group_alias: { "gpt-4": "gpt-3.5-turbo" } # all requests with `gpt-4` will be routed to models with `gpt-3.5-turbo`
+# LiteLLM router settings
+router_settings: # These settings are optional.
+  routing_strategy: latency-based-routing # The default is `simple-shuffle`.
+  model_group_alias: { "gpt-4": "gpt-3.5-turbo" } # Route `gpt-4` requests to `gpt-3.5-turbo`.
   num_retries: 2
-  timeout: 30 # 30 seconds
-  redis_host: <your redis host> # set this when using multiple litellm proxy deployments, load balancing state stored in redis
+  timeout: 30 # Set the router timeout to 30 seconds.
+  redis_host: <your redis host> # Use Redis when multiple LiteLLM proxy deployments share load-balancing state.
   redis_password: os.environ/REDIS_AUTH
   redis_port: 1992
 
@@ -53,7 +53,7 @@ general_settings:
   store_model_in_db: True
   store_prompts_in_spend_logs: True
 # environment_variables:
-#   # settings for using redis caching
+#   # Configure Redis caching.
 #   REDIS_HOST: redis-16337.c322.us-east-1-2.ec2.cloud.redislabs.com
 #   REDIS_PORT: "16337"
 #   REDIS_PASSWORD:

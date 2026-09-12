@@ -1,0 +1,65 @@
+name: Langfuse live server compatibility
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: langfuse-live-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test-server:
+    name: Server ${{ matrix.server }} with SDK ${{ matrix.sdk }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: langfuse-v${{ matrix.server }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - server: 2
+            sdk: "2.60.10"
+            extra: langfuse-v2
+          - server: 3
+            sdk: "2.60.10"
+            extra: langfuse-v2
+          - server: 3
+            sdk: "3.15.0"
+            extra: langfuse-v3
+          - server: 3
+            sdk: "4.15.2"
+            extra: langfuse-v4
+          - server: 4
+            sdk: "4.15.2"
+            extra: langfuse-v4
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Install the selected SDK and test dependencies
+        run: |
+          uv venv .venv-live
+          uv pip install --python .venv-live/bin/python \
+            '.[${{ matrix.extra }},openai,deepagents]' 'langfuse==${{ matrix.sdk }}' \
+            pytest pytest-asyncio pytest-env
+          uv pip check --python .venv-live/bin/python
+      - name:
+          Verify prompts, native and Deep Agents traces, subagents, and feedback
+        run: >-
+          uv run --no-project --python .venv-live/bin/python python -m pytest
+          tests/integration/test_langfuse_live.py --run-langfuse -q
+        env:
+          LAT_TEST_LANGFUSE_BASE_URL: ${{ vars.LANGFUSE_TEST_URL }}
+          LAT_TEST_LANGFUSE_SERVER_VERSION: ${{ vars.LANGFUSE_TEST_VERSION }}
+          LAT_TEST_LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_TEST_PUBLIC_KEY }}
+          LAT_TEST_LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_TEST_SECRET_KEY }}
+          LAT_TEST_LANGFUSE_TIMEOUT: "180"

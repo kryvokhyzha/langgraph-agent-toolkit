@@ -5,7 +5,7 @@ from langgraph_agent_toolkit.core.observability.types import ObservabilityBacken
 
 
 class ObservabilityFactory:
-    """Factory for creating observability platform instances."""
+    """Create observability platform instances."""
 
     @staticmethod
     def create(
@@ -13,7 +13,7 @@ class ObservabilityFactory:
         remote_first: bool = False,
         **kwargs,
     ) -> BaseObservabilityPlatform:
-        """Create and return an observability platform instance.
+        """Create and return an observability platform.
 
         Args:
             platform: The observability platform to create

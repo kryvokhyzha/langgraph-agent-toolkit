@@ -5,20 +5,20 @@ from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 
 
 class MemoryFactory:
-    """Factory for creating memory backend instances."""
+    """Create memory backend instances."""
 
     @staticmethod
     def create(backend: MemoryBackends) -> BaseMemoryBackend:
-        """Create and return a memory backend instance.
+        """Create and return a memory backend.
 
         Args:
-            backend: The memory backend to create
+            backend: Memory backend type.
 
         Returns:
-            An instance of the requested memory backend
+            Requested memory backend.
 
         Raises:
-            ValueError: If the requested backend is not supported
+            ValueError: If the requested backend is unsupported.
 
         """
         match backend:

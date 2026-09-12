@@ -1,7 +1,7 @@
 from langgraph_agent_toolkit.core.settings import settings
 
 
-# Lazy import to avoid requiring openai at import time
+# Import lazily to avoid requiring `openai` at import time.
 def __getattr__(name: str):
     if name == "CompletionModelFactory":
         from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory

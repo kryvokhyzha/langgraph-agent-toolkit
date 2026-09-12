@@ -1,32 +1,32 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report that helps us improve
 title: ""
 labels: "kind/bug, priority/p2"
 assignees: ""
 ---
 
-## Issue Description
+## Describe the issue
 
-A clear and concise description of what the bug is.
+Describe the bug. State what happened.
 
-### Expected Behavior
+### Expected behavior
 
-A clear and concise description of what you expected to happen.
+State what you expected to happen.
 
-### Steps to reproduce
+### Reproduction steps
 
-Steps to reproduce the behavior:
+Give the steps that reproduce the issue.
 
 - Step 1
 - Step 2
 
-### Reproducible Example
+### Reproducible example
 
-Provide a reproducible example.
+Provide a minimal reproducible example.
 
 ```python
-# Your code here
+# Add your code.
 ```
 
 ### Specifications
@@ -37,12 +37,12 @@ Provide a reproducible example.
   - `package1_name==x.y.z`
   - `package2_name==x.y.z`
 
-**Dockerfile (Optional):**
+**Dockerfile (optional):**
 
 ```dockerfile
-# Your Dockerfile here
+# Add your Dockerfile.
 ```
 
-## Possible Solution (Optional)
+## Possible solution (optional)
 
-A clear and concise description of the solution you've considered.
+Describe a solution that you considered.

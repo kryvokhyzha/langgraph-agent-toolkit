@@ -21,7 +21,7 @@ x-langfuse-depends-on: &langfuse-depends-on
     condition: service_healthy
 
 services:
-  # === LLM Services ===
+  # LLM services
   litellm:
     <<: *service-defaults
     image: ghcr.io/berriai/litellm:main-stable
@@ -52,7 +52,7 @@ services:
           action: sync+restart
           target: /app/
 
-  # === Database Services ===
+  # Database services
   postgres:
     <<: *service-defaults
     hostname: postgres
@@ -125,7 +125,7 @@ services:
           cpus: "0.5"
           memory: 512M
 
-  # === Storage Services ===
+  # Storage services
   minio:
     <<: *service-defaults
     image: minio/minio
@@ -153,7 +153,7 @@ services:
           cpus: "0.5"
           memory: 512M
 
-  # === Langfuse Services ===
+  # Langfuse services
   langfuse-worker:
     <<: *service-defaults
     image: langfuse/langfuse-worker:3
@@ -186,23 +186,23 @@ services:
       - "3000:3000"
     healthcheck:
       <<: *healthcheck-defaults
-      # Gate the backend on Langfuse being ready (blueprints push/pull prompts at import time).
-      # NB: langfuse's Next.js server binds to $$HOSTNAME (the container id), NOT localhost, so the
-      # check must target the container's own hostname ($$(hostname)); /api/public/health = web serving.
+      # Start the backend after Langfuse is ready for configured tracing and prompts.
+      # The Langfuse Next.js server binds to $$HOSTNAME, not `localhost`.
+      # Check the container hostname ($$(hostname)) at `/api/public/health`.
       test:
         [
           "CMD-SHELL",
           "wget --no-verbose --tries=1 -O /dev/null
           http://$$(hostname):3000/api/public/health || exit 1",
         ]
-      start_period: 120s # langfuse-web runs DB migrations on first boot
+      start_period: 120s # Allow time for the first database migration.
     deploy:
       resources:
         limits:
           cpus: "1"
           memory: 1G
 
-  # === Application Services ===
+  # Application services
   lat-agent-backend:
     <<: *service-defaults
     build:
@@ -216,12 +216,12 @@ services:
       - .env
     healthcheck:
       <<: *healthcheck-defaults
-      # Use /health/ready to ensure agents are initialized before accepting traffic
+      # Use `/health/ready` to verify agent initialization before routing traffic.
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 120s # Allow time for agent initialization
+      start_period: 120s # Allow time for agent initialization.
     depends_on:
       postgres:
         condition: service_healthy

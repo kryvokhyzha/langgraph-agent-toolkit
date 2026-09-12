@@ -1,38 +1,35 @@
-# Release Notes Template
+# Release notes template
 
-Look through the github diff between the previous release to see what's changed.
-The commit titles should give an outline of what's happened.
+Review the GitHub diff from the previous release. Use commit titles to create
+the initial outline.
 
 ### Upgrade Steps
 
-- List out, as concretely as possible, any steps users have to take when they
-  upgrade beyond just dumping the dependency.
-- Write pseudocode that highlights what code should change and how.
-- Call out if users are recommended to upgrade because of known problems with
-  older releases.
-- Preferably, there's nothing here.
+- List each action that users must take after they update the dependency.
+- Use pseudocode to show required code changes.
+- Tell users to update when older releases have known problems.
+- Leave this section empty when no actions are required.
 
 ### Breaking Changes
 
-- A complete list of breaking changes (preferably there are none, unless this is
-  a major version).
+- List all breaking changes. Leave this section empty when there are none.
 
 ### New Features
 
-- Describe the new feature and when/why to use it. Add some pictures! Call out
-  any caveats/warnings? Is it a beta feature?
+- Describe the feature and when to use it.
+- Add images when they help the reader.
+- State all limitations, warnings, and beta status.
 
 ### Bug Fixes
 
-- Call out any existing feature/functionality that now works as intended or
-  expected.
+- List existing features that now work as intended.
 
 ### Improvements
 
-- Improvements/enhancements to a workflow, performance, logging, error
-  messaging, or user experience
+- List improvements to workflows, performance, logging, error messages, or user
+  experience.
 
 ### Other Changes
 
-- Other miscellaneous changes that don't fit into any of the above categories.
-  Try to leave this empty - ideally, all changes fit into the categories above
+- List changes that do not fit the other categories.
+- Leave this section empty when possible.

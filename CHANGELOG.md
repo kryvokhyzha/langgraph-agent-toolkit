@@ -1,622 +1,789 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+This file records all notable project changes.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to
+This file uses the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+format. The project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.10.0]
+
+### Changed
+
+- Add Python 3.14 support and CI coverage. Require Pydantic 2.13.0 or later on
+  this interpreter. Use a compatible native JSON schema dependency for Studio.
+- Run process tests with package coverage. Check the lockfile once, retain test
+  reports, and validate releases before publication. Add native uv, Docker, and
+  pre-commit updates to Dependabot. Send one complete report to Codecov.
+- Update `actions/checkout` and `actions/setup-python` to v7 in all workflows.
+- Reduce the default Uvicorn worker heartbeat allowance to 10 seconds after
+  deferring launcher imports. Keep an explicit override for slower startup.
+
+- Bound active HTTP requests before buffering bodies. Return 503 when worker
+  capacity is full. Apply one request deadline through streaming and cleanup.
+- Reuse service-owned OpenAI and Azure HTTP connections with explicit pool and
+  timeout settings. Support `DefaultAioHttpClient` through `openai-aiohttp`. See
+  [the reliability guide](docs/reliability.rst) for limits and tuning.
+
+- Permit the provider and LangSmith versions required by Deep Agents 0.7.13.
+  Keep the existing LangChain, Core, and LangGraph version ranges.
+- Share native agent setup and client request parsing. Consolidate repeated
+  dependency constraints and remove the unused `duckduckgo-search` dependency.
+- Replace duplicate and import-only assertions with tests of graph execution,
+  exported telemetry, and HTTP behavior. See
+  [the testing guide](docs/testing.rst) for test layers and commands.
+- Bind API conversations to the authenticated user, agent, and public thread ID.
+  Use one `AUTH_SECRET` with `AUTH_MODE=trusted` for each client deployment
+  whose trusted application supplies `user_id`. Individual user tokens remain
+  optional. See [the migration guide](docs/migration.rst) before upgrading
+  stored conversations.
+- Serialize conversation operations across workers with PostgreSQL advisory
+  locks or SQLite file locks. Bound queue waiting, request duration, and body
+  size.
+- Use the configured service checkpointer for built-in agents. Fail worker
+  startup when required resources cannot initialize. Readiness checks database
+  connectivity.
+- Paginate history. Clear-history now deletes all checkpoints for the
+  conversation.
+- Reuse client HTTP connections and expose stream failures as
+  `AgentClientError`. Close owned clients with context managers or `close()` /
+  `aclose()`.
+- Move Streamlit and LangGraph Studio to `ui` and `studio` extras. Remove unused
+  direct dependencies and narrow core compatibility to tested API versions.
+- Update LangGraph to 1.2.11, LangChain to 1.4.0, and the default Langfuse SDK
+  to 4.15.2. Update their checkpoint and OpenAI integrations. See
+  [the dependency review](docs/dependency_updates.rst) for release changes.
+
+### Fixed
+
+- Bind token-user feedback to the authenticated user, agent, and run with
+  server-signed response proof. Require a separate `FEEDBACK_SIGNING_SECRET` for
+  this mode. Keep trusted backend feedback compatible. See
+  [the migration guide](docs/migration.rst) for client changes.
+- Restore Streamlit conversations through the URL-selected agent. Update the URL
+  after new chats and agent changes. Build resume links with the public
+  Streamlit URL API and preserve the deployment path. Load all history pages
+  before displaying a saved conversation. Stop chat input if any page fails.
+- Extract text from content blocks before knowledge-base retrieval. Preserve
+  Bedrock source locations and nested document titles in the augmented prompt.
+- Preserve HTTP status, service error codes, and `Retry-After` in
+  `AgentClientError`. Bound rejected-stream body reads. Disable proxy buffering
+  and caching for SSE responses.
+- Preserve streamed OpenAI and Azure refusal text and provider token usage in
+  API messages and imported history. Reject incomplete SSE responses in the
+  Python client, including clean EOF without the completion marker.
+- Return a fixed 503 error for rejected model-provider credentials. Keep
+  provider authentication error details out of API responses and toolkit logs in
+  all environment modes.
+- Return explicit 429, 503, and 504 responses for provider rate limits,
+  connection failures, and timeouts. Normalize interrupted OpenAI and Azure
+  streams at the model boundary without retrying received tokens.
+
+- Stop abandoned invoke requests and close stream generators in their original
+  context. Keep conversation locks until graph and checkpoint cleanup finish.
+  Mark health probes unhealthy when cancellation cleanup stalls.
+- Bound feedback threads after HTTP cancellation and bound owned HTTP-client
+  shutdown without leaving default-executor threads running.
+- Roll back cancelled SQLite writes. Remove SQLite iterator and PostgreSQL
+  startup migration deadlocks. Include health checks in pool checkout deadlines,
+  close uncertain sessions on cancellation, and permit concurrent pooled reads.
+- Consume invoke state incrementally instead of retaining every full graph
+  state.
+
+- Keep internal summaries and retained history out of the answer stream for Deep
+  Agents and native LangChain summarization middleware.
+- Keep client and UI imports available without optional agent dependencies.
+- Omit unset history query parameters. Accept SSE comments and keepalive frames
+  without ending the stream. Report malformed stream events as
+  `AgentClientError`.
+- Read the complete saved history of Functional API agents. Append imported
+  messages without replacing earlier turns or other saved fields. Preserve
+  existing checkpoints and emit only the new answer during streaming.
+- Require `thread_id` in client history operations. Keep short-term checkpoint
+  history separate from long-term stores addressed by a stable `user_id`.
+- Reject nested coordinated calls before they can wait for their parent. Release
+  checkpoint iterator cursors before yielding. Discard uncertain PostgreSQL lock
+  sessions after cancellation, and release locks when streams close in another
+  context.
+- Bound telemetry shutdown, so a stalled flush cannot prevent worker exit.
+- Support Langfuse SDK v2 with current LangChain callbacks. Bind SDK v3 and v4
+  callbacks to the configured project. Preserve trace identities, root output,
+  and feedback links across concurrent runs. See
+  [the Langfuse compatibility guide](docs/langfuse_compatibility.rst) to select
+  an SDK for each server version.
+- Isolate model defaults and credentials between factory calls. Validate
+  settings overrides and preserve constructor and dotenv configuration values.
+- Repair history add/clear, tool calls in the custom creator, standalone
+  executor inputs, async feedback, and the Azure Functions request/lifespan
+  adapter.
+- Preserve configured prompts during fallback, restore sandboxed Jinja
+  rendering, honor pinned prompt versions, and clear stale retrieval context on
+  misses.
+- Coordinate prompt refreshes and move blocking prompt/feedback work off the
+  event loop.
+- Escape PostgreSQL credentials and bind checkpoint writes to the
+  conversation-lock session, so a lost connection cannot continue writes through
+  a replacement session.
+
+### Added
+
+- Add a verified local quickstart with a fake model and SQLite. Update the
+  README, setup guides, and API usage examples. Generate the complete Python API
+  reference and fail documentation builds on warnings.
+- Install and select `openai-aiohttp` by default in the API Docker image. Keep
+  HTTPX available through `LLM_HTTP_ASYNC_TRANSPORT=httpx`. Python installations
+  outside the image retain HTTPX as their default.
+- Add opt-in real OpenAI journeys for HTTPX and aiohttp, with fixed request and
+  output limits. Check tools, concurrent streams, token usage, disconnects, and
+  recovery. See [the live model guide](docs/live_llm_testing.rst).
+- Add repeatable API load tests with a local model simulator, real database
+  persistence, worker replacement, slow readers, fault injection, and soak
+  measurements. See [the load-testing guide](docs/load_testing.rst).
+
+- Published `langfuse-v2`, `langfuse-v3`, and `langfuse-v4` extras to select one
+  Python SDK major. Keep the existing `langfuse` extra for compatibility. Use
+  `uv sync --extra all` instead of `--all-extras`, because the version selectors
+  cannot be installed together.
+- Optional `deepagents` integration with planning, virtual files, subagents,
+  approvals, MCP tools, and the configured service checkpointer. Add an offline
+  SQLite example, integration guide, and a comparison of supported approaches.
+- Optional Deep Agents backend image build with `INSTALL_DEEPAGENTS=true`.
+- API process journeys for authentication, user memory, thread history,
+  concurrent turns, durable restarts, and interrupt resume.
+- Real Langfuse SDK export tests for v2, v3, and v4. Add an opt-in live server
+  matrix that checks stored prompts, native and Deep Agent model/tool traces,
+  subagent parent links, and feedback.
+- Container tests for API history and frontend health. Include subprocesses in
+  whole-package coverage and enforce a 77% combined line and branch minimum.
+- Optional MCP tools through `langchain[mcp]` and FastMCP 4. Configure HTTP or
+  stdio servers, credentials, tool allowlists, and agent assignments. Discover
+  tools before readiness and close connections after use. See
+  [the MCP guide](docs/mcp.rst).
+- MCP human-input requests through invoke and streaming responses. Preserve all
+  interrupt IDs and validate single or parallel resume answers.
+- Gitleaks v8.30.1 pre-commit hook. Redact detected credentials in its output.
+- Explicit, transactional checkpoint ownership migration and inactive-thread
+  retention commands. Both default to dry runs.
+- Regression tests for real HTTP/schema contracts, durable restarts, concurrent
+  turns, cancellation, database reconnection, and worker replacement.
 
 ## [0.9.2]
 
 ### Fixed
 
-- `TrimMessagesMiddleware` / `TokenTrimMiddleware` no longer silently destroy
-  the model's view when the **latest turn does not fit the budget**.
-  `trim_messages` (`strategy="last"`, `start_on="human"`) returns `[]` whenever
-  the current turn exceeds the budget — e.g. a single user message larger than
-  the token budget, or a turn with more tool calls than the message budget —
-  which invoked the model with the system prompt only and made it answer with
-  the user's question dropped. Both middlewares now floor to the latest turn
-  (kept verbatim, over budget but answerable) rather than emptying it.
-  Regression tests cover an oversize user message, an oversize tool result, and
-  a 6+ tool-call burst.
+- `TrimMessagesMiddleware` / `TokenTrimMiddleware` now keep the model's view
+  when the **latest turn does not fit the budget**. `trim_messages`
+  (`strategy="last"`, `start_on="human"`) returns `[]` when the current turn
+  exceeds the budget. This can occur when one user message exceeds the token
+  budget. It can also occur when a turn contains more tool calls than the
+  message budget permits. Previously, this result invoked the model with only
+  the system prompt. The model did not receive the user's question. Both
+  middlewares now keep the latest turn unchanged. The turn can exceed the
+  budget, but the model can answer it. Regression tests cover an oversized user
+  message, an oversized tool result, and a burst of 6+ tool calls.
 
 ### Added
 
-- `TokenTrimMiddleware` — bounds the model's message view by a **token** budget
-  (the token-counting companion to `TrimMessagesMiddleware`, which bounds by
-  message count). View-only, so the full history stays in state and the system
-  prompt is preserved. The token counter is configurable (`token_counter`,
-  default `count_tokens_approximately` — no extra dependency; pass a
-  `tiktoken`-backed counter or the model for an exact count), and the budget
-  defaults to the new `DEFAULT_MAX_TOKENS_HISTORY_LENGTH` setting (unset by
-  default, since a sensible budget is model-specific). Compose it after
-  `TrimMessagesMiddleware` to cap both message count and token size.
+- `TokenTrimMiddleware` limits the model's message view by a **token** budget.
+  It complements `TrimMessagesMiddleware`, which limits the view by message
+  count. It changes only the view. The full history stays in state, and the
+  system prompt stays in the view. Configure the token counter with
+  `token_counter`. The default counter is `count_tokens_approximately`, which
+  adds no dependency. For an exact count, pass a `tiktoken`-backed counter or
+  the model. The new `DEFAULT_MAX_TOKENS_HISTORY_LENGTH` setting defines the
+  default budget. This setting has no default value because the correct budget
+  depends on the model. Put `TokenTrimMiddleware` after `TrimMessagesMiddleware`
+  to limit the message count and token count.
 
 ## [0.9.1]
 
 ### Added
 
-- Reusable `create_agent` middleware that brings the custom `create_react_agent`
-  history features to native LangChain `create_agent`, using only public API:
-  `ImmediateGenerationMiddleware` (graceful model-call budget — on the last
-  allowed call it strips tools and asks the model to synthesize a direct answer
-  instead of stalling), `SanitizeHistoryMiddleware` (repair broken
-  tool-call/result pairing before the model call), and
-  `ClearIntermediateToolCallsMiddleware` (token reduction — keep only the most
-  recent result(s) per tool from earlier turns; configurable via constructor or
-  `CLEAR_INTERMEDIATE_TOOL_CALLS*` settings, with a safe `name_args` dedup key
-  that collapses only identical repeat calls by default), and
-  `TrimMessagesMiddleware` (view-only window bound — trims the model's input to
-  the last `DEFAULT_MAX_MESSAGE_HISTORY_LENGTH` messages while keeping full
-  state). Demonstrated in the `create_agent` blueprint
-- `hitl_agent` blueprint: human-in-the-loop tool approval on native
-  `create_agent` via `HumanInTheLoopMiddleware`. The executor bridges the resume
-  (`build_resume_command`): replying `approve` / `reject: <reason>` / free text
-  maps to the middleware's decision format, with custom `interrupt()` blueprints
-  unchanged
-- Multimodal input: `UserComplexInput.message` accepts LangChain content blocks
-  (text / image / file / audio / video, via URL or base64), with a configurable
-  per-message attachment cap (`MULTIMODAL_MAX_ATTACHMENTS`), and the Streamlit
-  chat supports file/image uploads
+- Reusable `create_agent` middleware adds the custom `create_react_agent`
+  history features to the native LangChain `create_agent`. It uses only the
+  public API. `ImmediateGenerationMiddleware` handles the model-call budget. On
+  the last permitted call, it removes tools and asks the model for a direct
+  answer. This action prevents a stall. `SanitizeHistoryMiddleware` repairs
+  broken tool-call and result pairs before the model call.
+  `ClearIntermediateToolCallsMiddleware` reduces token use. It keeps only the
+  most recent results for each tool from earlier turns. Configure it with the
+  constructor or the `CLEAR_INTERMEDIATE_TOOL_CALLS*` settings. By default, the
+  safe `name_args` deduplication key combines only identical repeated calls.
+  `TrimMessagesMiddleware` limits the view. It keeps the last
+  `DEFAULT_MAX_MESSAGE_HISTORY_LENGTH` messages in the model input and keeps the
+  full state. The `create_agent` blueprint shows these features.
+- The `hitl_agent` blueprint adds human-in-the-loop tool approval to the native
+  `create_agent` through `HumanInTheLoopMiddleware`. The executor uses
+  `build_resume_command` to resume. It maps replies of `approve`,
+  `reject: <reason>`, or free text to the middleware decision format. Custom
+  `interrupt()` blueprints do not change.
+- `UserComplexInput.message` accepts multimodal LangChain content blocks. It
+  accepts text, image, file, audio, and video blocks through a URL or base64.
+  `MULTIMODAL_MAX_ATTACHMENTS` sets the attachment limit for each message. The
+  Streamlit chat supports file and image uploads.
 
 ### Changed
 
-- Dockerfiles (`docker/api`, `docker/app`) are now multi-stage with uv cache
-  mounts and dependency-before-source layering: faster rebuilds (a code change
-  no longer reinstalls dependencies), smaller images, and a trimmed build
-  context
-- Renamed and de-duplicated the ReAct example blueprints: `react_new` →
-  `create_agent`, `react_so` → `create_agent_structured`; removed `react_old` (a
-  duplicate of `react`) and `react_so_old`. Examples are now grouped by builder
-  (toolkit `create_react_agent` vs native `create_agent`)
-- `sanitize_chat_history` is now bidirectional: in addition to stripping
-  unanswered tool calls, it drops orphaned ToolMessages (a tool result whose
-  requesting tool call is gone, e.g. after trimming/summarization). Both the
-  custom `create_react_agent` and `SanitizeHistoryMiddleware` benefit
-- Refactored the Streamlit UI from a single `run_app.py` into a `ui/` package
-  (`main_page`, `components/`, `utils/`); `run_app.py` is now a thin entry point
+- The Dockerfiles (`docker/api`, `docker/app`) now use multiple stages, uv cache
+  mounts, and dependency-before-source layers. Code changes no longer reinstall
+  dependencies, so rebuilds are faster. The changes also make images smaller and
+  reduce the build context.
+- Renamed and removed duplicate ReAct example blueprints. Renamed `react_new` to
+  `create_agent` and `react_so` to `create_agent_structured`. Removed
+  `react_old`, which duplicated `react`, and removed `react_so_old`. The
+  examples are now grouped by builder: toolkit `create_react_agent` or native
+  `create_agent`.
+- `sanitize_chat_history` now operates in both directions. It removes unanswered
+  tool calls. It also removes orphaned ToolMessages when the related tool call
+  is gone, such as after trimming or summarization. This change applies to the
+  custom `create_react_agent` and `SanitizeHistoryMiddleware`.
+- Moved the Streamlit UI from one `run_app.py` file to a `ui/` package. The
+  package contains `main_page`, `components/`, and `utils/`. The `run_app.py`
+  file is now a small entry point.
 
 ### Fixed
 
-- Human-in-the-loop interrupts now resume by default (`CHECK_INTERRUPTS`
-  defaults to `True`); previously the resume was silently skipped
-- Streaming now surfaces an agent's `structured_response` (`response_format`),
-  matching `invoke`
+- Human-in-the-loop interrupts now resume by default because `CHECK_INTERRUPTS`
+  defaults to `True`. Previously, the executor did not resume them.
+- Streaming now returns an agent's `structured_response` (`response_format`).
+  This behavior now matches `invoke`.
 
 ## [0.9.0]
 
 ### Added
 
-- JSON Lines (NDJSON) streaming endpoint `/stream/jsonl` (and
-  `/{agent_id}/stream/jsonl`) as a typed alternative to SSE, with a
-  `StreamChunk` response schema
-- `AgentClient.stream_jsonl` / `astream_jsonl` SDK methods
-- Streamlit option to choose the streaming protocol (SSE or JSON Lines)
-- Idiomatic OpenAPI operation IDs, documented error responses
-  (401/404/422/429/500/503) with an `ErrorResponse` schema, and grouped
-  `openapi_tags`
+- Added the JSON Lines (NDJSON) streaming endpoints `/stream/jsonl` and
+  `/{agent_id}/stream/jsonl`. They provide a typed alternative to SSE and use a
+  `StreamChunk` response schema.
+- Added the `AgentClient.stream_jsonl` / `astream_jsonl` SDK methods.
+- Added a Streamlit option to select SSE or JSON Lines as the streaming
+  protocol.
+- Added idiomatic OpenAPI operation IDs and grouped `openapi_tags`. Documented
+  the 401/404/422/429/500/503 error responses with an `ErrorResponse` schema.
 
 ### Changed
 
-- Migrated the Langfuse integration to the v4 SDK (still v3-compatible)
-- Upgraded to LangChain 1.x / LangGraph 1.x APIs (`create_agent`,
-  `context_schema`, the new `SummarizationMiddleware` and supervisor APIs)
-- Error responses no longer expose internal exception details in production
-  (gated by `ENV_MODE`)
-- Supervisor blueprint uses `output_mode="full_history"` so sub-agent messages
-  survive history reloads
-- `docker-compose`: the backend now waits for Langfuse to be healthy before
-  starting
+- Migrated the Langfuse integration to the v4 SDK. It remains compatible with
+  v3.
+- Upgraded to the LangChain 1.x / LangGraph 1.x APIs. These APIs include
+  `create_agent`, `context_schema`, the new `SummarizationMiddleware`, and the
+  supervisor APIs.
+- Production error responses no longer contain internal exception details.
+  `ENV_MODE` controls this behavior.
+- The supervisor blueprint uses `output_mode="full_history"`. Sub-agent messages
+  now remain after history reloads.
+- In `docker-compose`, the backend now waits for a healthy Langfuse service
+  before it starts.
 
 ### Fixed
 
-- Trace-level output is now recorded in Langfuse (regression introduced by the
-  v4 callback change)
-- Kubernetes degraded boot: the startup probe now passes (no CrashLoop) and the
-  DB pool / readiness flags are cleared on shutdown
-- `/health/db` no longer errors when using the SQLite backend
-- `401` responses include a `WWW-Authenticate: Bearer` header
-- `PostgresMemoryBackend.get_store` `app_prefix` TypeError
-- Various LangGraph / Starlette deprecation warnings
+- Langfuse now records trace-level output. The v4 callback change caused this
+  regression.
+- The Kubernetes startup probe now passes during a degraded start and prevents a
+  CrashLoop. Shutdown now clears the DB pool and readiness flags.
+- `/health/db` no longer reports an error with the SQLite backend.
+- `401` responses now include a `WWW-Authenticate: Bearer` header.
+- Fixed the `app_prefix` TypeError in `PostgresMemoryBackend.get_store`.
+- Fixed various LangGraph / Starlette deprecation warnings.
 
 ## [0.8.15]
 
 ### Fixed
 
-- `add_messages` and `clear_history` endpoints
-- `[-1]` handling
+- Fixed the `add_messages` and `clear_history` endpoints.
+- Fixed `[-1]` handling.
 
 ## [0.8.14]
 
 ### Added
 
-- Cors settings
+- Added Cors settings.
 
 ## [0.8.13]
 
 ### Added
 
-- New default settings
+- Added new default settings.
 
 ### Updated
 
-- Callback creation
-- Project structure
+- Updated callback creation.
+- Updated the project structure.
 
 ## [0.8.12]
 
 ### Added
 
-- New API healthchecks
+- Added new API healthchecks.
 
 ### Update
 
-- Main logger
+- Updated the main logger.
 
 ## [0.8.11]
 
 ### Fixed
 
-- Handling AIMessage that has tool calls without ToolMessage
+- Fixed handling for an AIMessage that has tool calls without a ToolMessage.
 
 ## [0.8.10]
 
 ### Updated
 
-- Default Postgres settings
+- Updated the default Postgres settings.
 
 ## [0.8.9]
 
 ### Updated
 
-- Refactoring of observability class
-- Refactoring of prompt manager class
-- Fix uvicorn setup
+- Refactored the observability class.
+- Refactored the prompt manager class.
+- Fixed the uvicorn setup.
 
 ## [0.8.8]
 
 ### Fixed
 
-- Fixed bug to support `langfuse < 2.70.0`
+- Fixed a bug to support `langfuse < 2.70.0`.
 
 ## [0.8.7]
 
 ### Fixed
 
-- Fixed bug to support `langfuse < 2.70.0`
+- Fixed a bug to support `langfuse < 2.70.0`.
 
 ## [0.8.6]
 
 ### Fixed
 
-- Fixed bug to support `langfuse < 2.70.0`
+- Fixed a bug to support `langfuse < 2.70.0`.
 
 ## [0.8.5]
 
 ### Updated
 
-- Core Dependencies to support `langchain < 1.0.0`
+- Updated Core Dependencies to support `langchain < 1.0.0`.
 
 ## [0.8.4]
 
 ### Added
 
-- New postgres settings
-- DB healthcheck API
+- Added new postgres settings.
+- Added a DB healthcheck API.
 
 ### Fixed
 
-- Problem with support of old langfuse sdk
+- Fixed support for the old langfuse sdk.
 
 ## [0.8.3]
 
 ### Updated
 
-- Structure of configuration setting
+- Updated the configuration setting structure.
 
 ## [0.8.2]
 
 ### Added
 
-- Factory for embedding models
+- Added a factory for embedding models.
 
 ## [0.8.1]
 
 ### Fixed
 
-- langfuse `score` -> `create_score`
+- Changed langfuse `score` to `create_score`.
 
 ### Updated
 
-- Core Dependencies
+- Updated Core Dependencies.
 
 ## [0.8.0]
 
 ### Added
 
-- `create_agent` example
+- Added a `create_agent` example.
 
 ### Updated
 
-- Core Dependencies
+- Updated Core Dependencies.
 
 ### Fixed
 
-- Fix Langfuse
-- Stream mode inside `invoke` method
+- Fixed Langfuse.
+- Fixed stream mode in the `invoke` method.
 
 ## [0.7.23]
 
 ### Updated
 
-- Default logging configuration
+- Updated the default logging configuration.
 
 ## [0.7.22]
 
 ### Added
 
-- NoOpSaver for checkpointing
+- Added NoOpSaver for checkpointing.
 
 ### Updated
 
-- Logging configuration
+- Updated the logging configuration.
 
 ## [0.7.21]
 
 ### Updated
 
-- Remove caching decorator from create method
+- Removed the caching decorator from the create method.
 
 ## [0.7.20]
 
 ### Updated
 
-- Enhance logging configuration
-- Improve message parsing
+- Improved the logging configuration.
+- Improved message parsing.
 
 ## [0.7.19]
 
 ### Updated
 
-- Enhance model parameter values and improve factory model creation logic
+- Improved model parameter values and factory model creation logic.
 
 ## [0.7.18]
 
 ### Added
 
-- `SKIP_REDIRECTION_LOGGING` environment variable and enhance logging middleware
+- Added the `SKIP_REDIRECTION_LOGGING` environment variable and improved the
+  logging middleware.
 
 ## [0.7.17]
 
 ### Fixed
 
-- Error handling
-- Tests
+- Fixed error handling.
+- Fixed tests.
 
 ## [0.7.16]
 
 ### Fixed
 
-- Type of `content` field for `ChatMessage` model
+- Fixed the type of the `content` field in the `ChatMessage` model.
 
 ### Added
 
-- New tests
+- Added new tests.
 
 ## [0.7.15]
 
 ### Added
 
-- `remote first` logic for observability platform
+- Added `remote first` logic for the observability platform.
 
 ### Updated
 
-- minor updates on UI
-- you can read some default values from env vars
+- Updated the UI.
+- Added support to read some default values from env vars.
 
 ## [0.7.14]
 
 ### Updated
 
-- Make `message` field optional
-- Default value for `MEMORY_BACKEND`
-- Refactor `lifespan` function
+- Made the `message` field optional.
+- Updated the default value for `MEMORY_BACKEND`.
+- Refactored the `lifespan` function.
 
 ## [0.7.13]
 
 ### Added
 
-- `DB_CONFIGS` initialization
+- Added `DB_CONFIGS` initialization.
 
 ## [0.7.12]
 
 ### Updated
 
-- Dependencies
+- Updated dependencies.
 
 ## [0.7.11]
 
 ### Updated
 
-- Dependencies
+- Updated dependencies.
 
 ## [0.7.10]
 
 ### Fixed
 
-- error handling in `message_generator`
-- max_messages type
+- Fixed error handling in `message_generator`.
+- Fixed the max_messages type.
 
 ## [0.7.9]
 
 ### Fixed
 
-- type of graph (create_react_agent)
+- Fixed the graph type (create_react_agent).
 
 ## [0.7.8]
 
 ### Added
 
-- Prompt manager
-- Utils functions
+- Added a prompt manager.
+- Added Utils functions.
 
 ### Updated
 
-- Dependencies
+- Updated dependencies.
 
 ## [0.7.7]
 
 ### Fixed
 
-- Error handling
+- Fixed error handling.
 
 ## [0.7.6]
 
 ### Fixed
 
-- Added schema for postgres db
+- Added a schema for the postgres db.
 
 ## [0.7.5]
 
 ### Fixed
 
-- Downgrade langfuse
+- Downgraded langfuse.
 
 ## [0.7.4]
 
 ### Updated
 
-- Langfuse Callback import fix
+- Fixed the Langfuse Callback import.
 
 ## [0.7.3]
 
 ### Added
 
-- New env variable for model config (base64)
+- Added a new env variable for the model config (base64).
 
 ## [0.7.2]
 
 ### Added
 
-- New env variable for model config (file)
+- Added a new env variable for the model config (file).
 
 ## [0.7.1]
 
 ### Fixed
 
-- Agent executor test mock assertion to include additional `environment` and
-  `tags` parameters
-- Async test methods missing `@pytest.mark.asyncio` decorator in prompts tests
+- Updated the agent executor test mock assertion for the additional
+  `environment` and `tags` parameters.
+- Added the missing `@pytest.mark.asyncio` decorator to asynchronous test
+  methods in the prompt tests.
 
 ### Updated
 
-- Dependencies to latest versions
-- Agent executor `get_callback_handler` method to pass additional parameters:
-  - Added `environment` parameter from settings.ENV_MODE
-  - Added `tags` parameter with agent name for better observability tracking
+- Updated dependencies to the latest versions.
+- Updated the agent executor `get_callback_handler` method to pass these
+  parameters:
+  - Added the `environment` parameter from settings.ENV_MODE.
+  - Added the `tags` parameter with the agent name for observability tracking.
 
 ### Improved
 
-- Langfuse observability prompt hash detection with fallback mechanism:
-  - Enhanced `push_prompt` method to use tags as fallback when commit_message is
-    empty
-  - Added robust `hasattr` checks for both `commit_message` and `tags`
-    attributes
-  - Improved logging to show old vs new hash values for better debugging
+- Improved Langfuse observability prompt hash detection with a fallback:
+  - Updated the `push_prompt` method to use tags when commit_message is empty.
+  - Added `hasattr` checks for the `commit_message` and `tags` attributes.
+  - Updated logging to show the old and new hash values.
 
 ## [0.7.0]
 
 ### Fixed
 
-- React Agent with SO
+- Fixed the React Agent with SO.
 
 ### Updated
 
-- Dependencies
-- Name of default configurable parameters
+- Updated dependencies.
+- Updated the names of the default configurable parameters.
 
 ## [0.6.0]
 
 ### Fixed
 
-- React Agent with SO
+- Fixed the React Agent with SO.
 
 ### Added
 
-- Complex input
+- Added complex input.
 
 ### Updated
 
-- Dependencies
-- Error handling
-- Tests
+- Updated dependencies.
+- Updated error handling.
+- Updated tests.
 
 ## [0.5.0]
 
 ### Fixed
 
-- Streamlit UI bugs
-- Windows compatibility issue
-- Enhance message handling inside `pre_hook_model`
-- Add prompt hash to Langfuse observability class
-- Rename few parameters
+- Fixed Streamlit UI bugs.
+- Fixed a Windows compatibility issue.
+- Improved message handling in `pre_hook_model`.
+- Added a prompt hash to the Langfuse observability class.
+- Renamed some parameters.
 
 ## [0.4.5]
 
 ### Fixed
 
-- Strucuted output and model factory
+- Fixed structured output and the model factory.
 
 ## [0.4.4]
 
 ### Updated
 
-- Project dependencies
+- Updated project dependencies.
 
 ### Fixed
 
-- Strucuted output and model factory
+- Fixed structured output and the model factory.
 
 ## [0.4.3]
 
 ### Updated
 
-- Project dependencies
+- Updated project dependencies.
 
 ## [0.4.2]
 
 ### Fixed
 
-- Streaming bug
-- Steamlit welcom message display
-- Client handling error
-- Package dependencies
+- Fixed a streaming bug.
+- Fixed the Streamlit welcome message display.
+- Fixed client error handling.
+- Fixed package dependencies.
 
 ## [0.4.1]
 
 ### Updated
 
-- Client API to fully align with server endpoints
-- Extended invoke, stream methods with additional parameters
+- Aligned the Client API with the server endpoints.
+- Added parameters to the invoke and stream methods.
 
 ### Added
 
-- Message management methods in the client (add_messages, aadd_messages)
-- Chat history retrieval methods (get_history, aget_history)
-- History clearing methods (clear_history, aclear_history)
-- Synchronous feedback creation method (create_feedback)
-- Support for model_config_key parameter
-- Support for recursion_limit parameter
+- Added message management methods to the client (add_messages, aadd_messages).
+- Added chat history retrieval methods (get_history, aget_history).
+- Added history clearing methods (clear_history, aclear_history).
+- Added the synchronous feedback creation method (create_feedback).
+- Added support for the model_config_key parameter.
+- Added support for the recursion_limit parameter.
 
 ### Fixed
 
-- Client tests to properly mock API endpoints
-- Parameter handling in stream and invoke methods
+- Updated client tests to mock API endpoints correctly.
+- Fixed parameter handling in the stream and invoke methods.
 
 ## [0.4.0]
 
 ### Updated
 
-- Endpoints
+- Updated endpoints.
 
 ### Added
 
-- Endpoint to clear history
-- Add new message to the history
+- Added an endpoint to clear history.
+- Added an endpoint to add a message to the history.
 
 ### Fixed
 
-- Minor fixes and refactoring
+- Made minor fixes and refactored code.
 
 ## [0.3.1]
 
 ### Added
 
-- Ability to pass parameters to service runner
-- Argument to select service runner
+- Added the ability to pass parameters to the service runner.
+- Added an argument to select the service runner.
 
 ### Updated
 
-- Service Dockerfile
+- Updated the service Dockerfile.
 
 ## [0.3.0]
 
 ### Added
 
-- `MODEL_CONFIGS` to unify LLM env variables
-- New blueprint with AWS KB
+- Added `MODEL_CONFIGS` to unify LLM env variables.
+- Added a blueprint with AWS KB.
 
 ### Fixed
 
-- Streaming messages handling
-- Refactored code structure for better maintainability
-- Optional dependencies
-- API exception handling
+- Fixed streaming message handling.
+- Refactored the code structure to make maintenance easier.
+- Fixed optional dependencies.
+- Fixed API exception handling.
 
 ## [0.2.0]
 
 ### Fixed
 
-- Refactored code structure for better maintainability
-- Refactored Model factory
+- Refactored the code structure to make maintenance easier.
+- Refactored the Model factory.
 
 ### Removed
 
-- Removed AllModels and added environment variables for different providers
+- Removed AllModels. Added environment variables for different providers.
 
 ## [0.1.2]
 
 ### Added
 
-- `user_id` parameter
-- `store` creator to memory classes
+- Added the `user_id` parameter.
+- Added the `store` creator to memory classes.
 
 ### Fixed
 
-- enhance error handling and testing in Streamlit app
-- add new chat button
-- variable names
-- type hints
+- Improved error handling and testing in the Streamlit app.
+- Added a new chat button.
+- Fixed variable names.
+- Fixed type hints.
 
 ### Removed
 
-- print statements
+- Removed print statements.
 
 ## [0.1.1]
 
 ### Added
 
-- `get_default_agent` and `set_default_agent` functions
+- Added the `get_default_agent` and `set_default_agent` functions.
 
 ### Fixed
 
-- Minor fixes
-- Refactoring
-- Update dependencies
-- Update README
+- Made minor fixes.
+- Refactored code.
+- Updated dependencies.
+- Updated README.
 
 ## [0.1.0]
 
 ### Changed
 
-- Project structure
-- Code style
-- Agent blueprints
+- Updated the project structure.
+- Updated the code style.
+- Updated the agent blueprints.
 
 ### Added
 
-- Support of `Langfuse` observability platform.
-- Agent executor
-- Prompt manager
-- Custom implementation of React Agent
-- Service runners: standard, aws lambda, azure functions
+- Added support for the `Langfuse` observability platform.
+- Added an agent executor.
+- Added a prompt manager.
+- Added a custom implementation of React Agent.
+- Added these service runners: standard, aws lambda, and azure functions.
 
 ### Fixed
 
-- Minor fixes
+- Made minor fixes.
 
 ### Removed
 
-- Support of dozen LLM providers. They were replaced by a single one -
-  `openai-compatible`. We can use `LiteLLM` as proxy for any LLM provider.
+- Removed support for twelve LLM providers. Replaced them with
+  `openai-compatible`. Use `LiteLLM` as a proxy for any LLM provider.

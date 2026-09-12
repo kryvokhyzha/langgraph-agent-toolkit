@@ -20,26 +20,25 @@ from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, Me
 
 T = TypeVar("T")
 
-# Type for prompt templates that can be provided to push_prompt
+# Prompt templates accepted by `push_prompt`.
 PromptTemplateType = Union[str, List[ChatMessageDict]]
 
-# Type for the return value of pull_prompt
+# Return type for `pull_prompt`.
 PromptReturnType = Union[ChatPromptTemplate, str, dict, None]
 
 
 class BaseObservabilityPlatform(ABC):
     """Base class for observability platforms.
 
-    This is a lightweight base class that provides common utilities for
-    observability platforms. It does NOT perform any disk I/O operations
-    to avoid blocking in async contexts.
+    Provides shared utilities without disk I/O.
+    This prevents blocking in asynchronous contexts.
     """
 
     def __init__(self, remote_first: bool = False):
         """Initialize the observability platform.
 
         Args:
-            remote_first: If True, prioritize remote prompts over local cache.
+            remote_first: Prioritize remote prompts over the local cache.
 
         """
         self._required_vars: List[str] = []
@@ -117,8 +116,8 @@ class BaseObservabilityPlatform(ABC):
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
         **kwargs,
     ) -> PromptReturnType:
-        """Async version of pull_prompt. Runs synchronous version in thread pool."""
-        return await asyncio.to_thread(self.pull_prompt, name, template_format, **kwargs)
+        """Asynchronously run `pull_prompt` in a thread pool."""
+        return await asyncio.to_thread(self.pull_prompt, name, template_format=template_format, **kwargs)
 
     @abstractmethod
     def delete_prompt(self, name: str) -> None:
@@ -127,26 +126,25 @@ class BaseObservabilityPlatform(ABC):
 
     @contextmanager
     def trace_context(self, run_id: str, **kwargs):
-        """Create a trace context for the execution.
+        """Create an execution trace context.
 
-        Override in subclasses for platform-specific implementation.
+        Subclasses provide platform-specific implementations.
 
         Args:
-            run_id: The run ID to use as trace ID
-            **kwargs: Additional context parameters (user_id, input, etc.)
+            run_id: Run ID to use as trace ID.
+            **kwargs: Context parameters, such as `user_id` and `input`.
 
         Yields:
-            None (or platform-specific context object)
+            `None` or a platform-specific context object.
 
         """
         yield
 
     def update_trace(self, trace: Any, **attributes: Any) -> None:
-        """Set trace-level attributes (e.g. the final output) on a trace yielded by trace_context.
+        """Set attributes on a trace from `trace_context`.
 
-        ``trace_context`` is entered before the run's output is known, so the caller invokes this
-        afterwards to record the output on the trace. No-op for platforms without a trace object;
-        override per platform.
+        Call this after the run to record output.
+        Platforms without a trace object do nothing.
         """
         pass
 

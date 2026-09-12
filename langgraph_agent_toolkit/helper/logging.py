@@ -9,7 +9,7 @@ from langgraph_agent_toolkit.helper.types import EnvironmentMode
 
 
 class DuplicateFilter:
-    """Filters away duplicate log messages to prevent spamming."""
+    """Filter duplicate log messages."""
 
     def __init__(self):
         self.msgs: set[str] = set()
@@ -24,14 +24,13 @@ class DuplicateFilter:
 
 
 class Formatter:
-    """Formatter class for configuring log message format based on log level."""
+    """Format log messages by log level."""
 
     def __init__(self, debug: bool = False):
         """Initialize the formatter.
 
         Args:
-        ----
-            debug (bool): Whether to use the detailed debug format with function and line info.
+            debug (bool): Use the detailed format with function and line data.
 
         """
         if debug:
@@ -51,15 +50,13 @@ class Formatter:
         self.fmt += "\n{exception}"
 
     def format(self, record):
-        """Format the log record according to the configured format.
+        """Format a log record.
 
         Args:
-        ----
-            record: The log record.
+            record: Log record.
 
         Returns:
-        -------
-            str: The formatted log message.
+            str: Formatted log message.
 
         """
         if record["level"].no == LoggerConfig.WARN_ONCE_NO:
@@ -68,7 +65,7 @@ class Formatter:
 
 
 class SingletonMeta(type):
-    """Singleton metaclass to ensure only one instance of LoggerConfig exists."""
+    """Create one `LoggerConfig` instance."""
 
     _instances = {}
 
@@ -80,7 +77,7 @@ class SingletonMeta(type):
 
 
 class LoggerConfig(metaclass=SingletonMeta):
-    """Singleton class for configuring and managing the logger."""
+    """Configure and manage the singleton logger."""
 
     WARN_ONCE_NO = 25
     DEPRECATED_NO = 26
@@ -96,11 +93,10 @@ class LoggerConfig(metaclass=SingletonMeta):
         self._setup_logger()
 
     def _setup_logger(self, log_file: str | None = None) -> None:
-        """Configure Loguru logger based on environment settings.
+        """Configure the Loguru logger from environment settings.
 
         Args:
-        ----
-            log_file (Optional[str]): Path to a log file to write logs to, in addition to console output.
+            log_file (Optional[str]): Optional path for a log file.
 
         """
         try:
@@ -174,35 +170,32 @@ class LoggerConfig(metaclass=SingletonMeta):
         self._logger_initialized = True
 
     def configure_file_logging(self, log_file: str) -> None:
-        """Add file logging to the current logger configuration.
+        """Add file logging to the logger configuration.
 
         Args:
-        ----
-            log_file (str): Path to the log file.
+            log_file (str): Log file path.
 
         """
         self._setup_logger(log_file=log_file)
 
     @property
     def logger(self):
-        """Get the configured logger instance.
+        """Get the configured logger.
 
-        Returns
-        -------
-            loguru_logger: The configured logger instance.
+        Returns:
+            loguru_logger: Configured logger.
 
         """
         return loguru_logger
 
 
 def warn_once(message, *args, **kwargs):
-    """Log a warning message only once to prevent log spamming.
+    """Log a warning message once.
 
     Args:
-    ----
-        message (str): The warning message to log.
-        *args: Additional positional arguments.
-        **kwargs: Additional keyword arguments.
+        message (str): Warning message.
+        *args: Positional arguments.
+        **kwargs: Keyword arguments.
 
     """
     try:
@@ -215,10 +208,9 @@ def log_deprecated(message, *args, **kwargs):
     """Log a deprecation warning.
 
     Args:
-    ----
-        message (str): The deprecation message.
-        *args: Additional positional arguments.
-        **kwargs: Additional keyword arguments.
+        message (str): Deprecation message.
+        *args: Positional arguments.
+        **kwargs: Keyword arguments.
 
     """
     try:
@@ -246,16 +238,13 @@ logger = _logger_config.logger
 
 
 def get_logger(log_file: str | None = None):
-    """Get the configured logger instance, optionally with file logging.
+    """Get the configured logger and optionally add file logging.
 
     Args:
-    ----
-        log_file (Optional[str]): Path to log file. If provided, logs will be written
-            to this file as well as the console.
+        log_file (Optional[str]): Optional log file path.
 
     Returns:
-    -------
-        logger: The configured logger instance.
+        logger: Configured logger.
 
     """
     if log_file is not None:

@@ -1,13 +1,25 @@
+codecov:
+  require_ci_to_pass: true
+  notify:
+    # CI uploads one complete report from Python 3.13.
+    after_n_builds: 1
+    wait_for_ci: true
+    notify_error: true
+
 coverage:
+  precision: 1
   status:
-    # Fail PRs that reduce total coverage by more than 2%
+    # Fail if total coverage falls by more than 2 percentage points.
     project:
       default:
         target: auto
         threshold: 2%
-    # Treat patch coverage as informational only
+        if_not_found: failure
+    # Report patch coverage without enforcing it.
     patch:
       default:
         informational: true
 comment:
+  require_changes: true
+  after_n_builds: 1
   hide_project_coverage: false

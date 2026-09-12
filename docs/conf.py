@@ -1,66 +1,79 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# Configure the Sphinx documentation builder.
+# See https://www.sphinx-doc.org/en/master/usage/configuration.html for built-in values.
 
-# -- Project information -----------------------------------------------------
+# Project information
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import ast
+import inspect
 import os
 import sys
-import warnings
+from datetime import date
+from pathlib import Path
 
+import dotenv
 import rootutils
+from sphinx import addnodes
 from sphinx_pyproject import SphinxConfig
 
 
-# Set environment variables for fake models and authentication bypass
-os.environ["USE_FAKE_MODEL"] = "true"
-os.environ["OPENAI_API_KEY"] = "sk-fake-key-for-docs-generation"
-os.environ["OPENAI_MODEL_NAME"] = "gpt-4-fake-model"
-os.environ["OPENAI_API_BASE_URL"] = "https://fake-api.openai.com/v1"
-os.environ["OPENAI_API_VERSION"] = "2023-05-15"
-os.environ["LANGFUSE_SECRET_KEY"] = "lf-sk-fake-for-docs"
-os.environ["LANGFUSE_PUBLIC_KEY"] = "lf-pk-fake-for-docs"
-os.environ["LANGFUSE_HOST"] = "http://localhost:3000"
-os.environ["MEMORY_BACKEND"] = "sqlite"
-os.environ["SQLITE_DB_PATH"] = ":memory:"
-os.environ["ANTHROPIC_API_KEY"] = "sk-ant-fake-key"
-os.environ["ANTHROPIC_MODEL_NAME"] = "claude-3-fake"
-os.environ["GOOGLE_VERTEXAI_API_KEY"] = "fake-vertexai-key"
-os.environ["GOOGLE_VERTEXAI_MODEL_NAME"] = "gemini-fake"
-os.environ["GOOGLE_GENAI_API_KEY"] = "fake-genai-key"
-os.environ["GOOGLE_GENAI_MODEL_NAME"] = "gemini-pro-fake"
-os.environ["OBSERVABILITY_BACKEND"] = "empty"
+root_path = Path(rootutils.find_root(search_from=__file__, indicator=["pyproject.toml"]))
 
-# Find project root path - using pyproject.toml as indicator since .project-root might not exist
-root_path = rootutils.find_root(search_from=__file__, indicator=["pyproject.toml"])
-# Add project root to path so packages can be imported
-rootutils.setup_root(root_path, indicator=["pyproject.toml"], pythonpath=True)
+# Autodoc must not read local credentials or use deployment settings.
+os.environ["PYTHON_DOTENV_DISABLED"] = "1"
+dotenv.find_dotenv = lambda *args, **kwargs: ""
+dotenv.load_dotenv = lambda *args, **kwargs: False
+settings_source = root_path / "langgraph_agent_toolkit/core/_base_settings.py"
+settings_fields = set()
+for definition in ast.parse(settings_source.read_text()).body:
+    if isinstance(definition, ast.ClassDef) and definition.name == "Settings":
+        for field in definition.body:
+            if isinstance(field, ast.AnnAssign) and isinstance(field.target, ast.Name):
+                settings_fields.add(field.target.id)
+for name in tuple(os.environ):
+    if name.upper() in settings_fields or name.upper().startswith(
+        (
+            "LANGGRAPH_",
+            "LANGFUSE_",
+            "LANGSMITH_",
+            "LANGCHAIN_",
+            "OTEL_",
+            "OPENAI_",
+            "AZURE_",
+            "ANTHROPIC_",
+            "GOOGLE_",
+            "AWS_",
+        )
+    ):
+        os.environ.pop(name)
+os.environ.update(
+    ENV_MODE="development",
+    USE_FAKE_MODEL="true",
+    OPENAI_API_KEY="documentation-test-only",
+    OPENAI_MODEL_NAME="documentation-model",
+    MEMORY_BACKEND="sqlite",
+    SQLITE_DB_PATH=":memory:",
+    OBSERVABILITY_BACKEND="empty",
+    LANGSMITH_TRACING="false",
+    LANGCHAIN_TRACING_V2="false",
+    LANGFUSE_TRACING_ENABLED="false",
+)
+rootutils.setup_root(root_path, indicator=["pyproject.toml"], pythonpath=True, dotenv=False)
+sys.path.insert(0, str(root_path))
 
-# Add the package to the path for autodoc to find it
-sys.path.insert(0, os.path.abspath(root_path))
-
-# Create a warning filter to ignore specific warnings during documentation building
-warnings.filterwarnings("ignore", message=".*Model name must be provided for non-fake models.*")
-warnings.filterwarnings("ignore", message=".*Missing required environment variables.*")
-warnings.filterwarnings("ignore", message=".*Agent .* not found.*")
-warnings.filterwarnings("ignore", message=".*unsupported operand type.*")
-warnings.filterwarnings("ignore", message=".*has no attribute.*")
-
-# Load configuration from pyproject.toml
+# Load configuration from `pyproject.toml`.
 config = SphinxConfig(os.path.join(root_path, "pyproject.toml"), globalns=globals())
 
-# Explicitly set project information from pyproject.toml via SphinxConfig
+# Set project information from `pyproject.toml`.
 project = config.name
 author = "Roman Kryvokhyzha"
-copyright = f"2023-2025, {author}"
+copyright = f"2023-{date.today().year}, {author}"
 
-# Extract version from pyproject.toml
+# Extract the version from `pyproject.toml`.
 release = config.version
 version = ".".join(release.split(".")[:2])
 
-# Additional project information from pyproject.toml
+# Load additional project information from `pyproject.toml`.
 description = config.description
 html_title = project
 
@@ -68,18 +81,17 @@ html_title = project
 repository_url = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
 documentation_url = "https://kryvokhyzha.github.io/langgraph-agent-toolkit"
 
-# -- General configuration ---------------------------------------------------
+# General configuration
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
-    "sphinx.ext.linkcode",  # Add linkcode extension for better source links
-    "sphinx.ext.githubpages",  # Enable linking to GitHub repository
+    "sphinx.ext.linkcode",  # Add links to source code.
+    "sphinx.ext.githubpages",  # Enable GitHub Pages links.
 ]
 
 templates_path = ["_templates"]
@@ -87,11 +99,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Napoleon settings
 napoleon_google_docstring = True
-napoleon_numpy_docstring = False
+napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = True
 napoleon_include_private_with_doc = False
-napoleon_use_param = True  # Show parameter types and descriptions
-napoleon_use_rtype = True  # Show return types
+napoleon_use_param = True  # Show parameter types and descriptions.
+napoleon_use_rtype = True  # Show return types.
 
 # Autodoc settings
 autodoc_default_options = {
@@ -100,43 +112,34 @@ autodoc_default_options = {
     "undoc-members": True,
     "special-members": "__init__",
     "show-inheritance": True,
-    "inherited-members": True,
+    "ignore-module-all": True,
 }
+# Third-party inherited docstrings can use a different markup format.
+autodoc_inherit_docstrings = False
 autodoc_typehints = "description"
 autoclass_content = "both"
-autodoc_preserve_defaults = True  # Preserve default values in signature
+autodoc_preserve_defaults = True  # Preserve default values in signatures.
 
-# Enable autosummary
+# Enable autosummary.
 autosummary_generate = True
 
-# Intersphinx mappings - update with corrected URLs
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "langgraph": ("https://langchain-ai.github.io/langgraph/", None),
-    "pydantic": ("https://docs.pydantic.dev/latest/", None),
-    "fastapi": ("https://fastapi.tiangolo.com/", None),
-}
-
-
-# -- Options for HTML output -------------------------------------------------
+# HTML output options
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-# html_logo = "_static/logo.png"  # Comment out logo as it doesn't exist
 html_theme_options = {
     "logo_only": False,
-    "display_version": True,
     "style_external_links": True,
 }
 
-# Set the master document
+# Set the master document.
 master_doc = "index"
 
-# Show source links for all entities
+# Show source links for all entities.
 html_show_sourcelink = True
 
-# Enable linking to GitHub repository
+# Enable links to the GitHub repository.
 html_context = {
     "display_github": True,
     "github_user": "kryvokhyzha",
@@ -145,23 +148,32 @@ html_context = {
     "conf_py_path": "/docs/",
 }
 
-# Build documentation URL
+# Set the documentation URL.
 html_baseurl = "https://kryvokhyzha.github.io/langgraph-agent-toolkit/"
 
 
-# Function to resolve links to GitHub source code
-def linkcode_resolve(domain, info):
-    """Determine the URL corresponding to a Python object.
+def qualify_builtin_types(app, doctree):
+    """Keep the built-in type separate from message fields named type."""
+    for node in doctree.findall(addnodes.pending_xref):
+        if node.get("refdomain") == "py" and node.get("reftype") == "class" and node.get("reftarget") == "type":
+            node["reftarget"] = "builtins.type"
 
-    This function links documentation to the source code on GitHub.
-    """
+
+def setup(app):
+    """Resolve type annotations before Sphinx builds cross-references."""
+    app.connect("doctree-read", qualify_builtin_types)
+
+
+# Resolve links to GitHub source code.
+def linkcode_resolve(domain, info):
+    """Return the GitHub source URL for a Python object."""
     if domain != "py":
         return None
 
     modname = info["module"]
     fullname = info["fullname"]
 
-    # Handle special cases like imported modules or objects
+    # Skip imported modules and objects.
     if not modname:
         return None
 
@@ -170,9 +182,7 @@ def linkcode_resolve(domain, info):
         for part in fullname.split("."):
             obj = getattr(obj, part)
 
-        # Get the source file
-        import inspect
-
+        # Get the source file.
         try:
             source_file = inspect.getsourcefile(obj)
         except (TypeError, AttributeError):
@@ -181,11 +191,13 @@ def linkcode_resolve(domain, info):
         if source_file is None:
             return None
 
-        # Convert source file path to relative path in the repository
-        source_file = os.path.relpath(source_file, start=root_path)
+        # Convert the source path to a repository-relative path.
+        source_path = Path(source_file).resolve()
+        if not source_path.is_relative_to(root_path / "langgraph_agent_toolkit"):
+            return None
+        source_file = source_path.relative_to(root_path).as_posix()
 
-        # Convert to URL
-        # Line number info (if available)
+        # Get line information when available.
         try:
             source_lines, lineno = inspect.getsourcelines(obj)
         except (OSError, TypeError):
@@ -196,7 +208,7 @@ def linkcode_resolve(domain, info):
         else:
             linespec = ""
 
-        # Create GitHub URL
+        # Create the GitHub URL.
         github_url = f"{repository_url}/blob/main/{source_file}{linespec}"
         return github_url
     except Exception:

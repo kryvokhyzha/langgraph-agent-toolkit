@@ -1,5 +1,3 @@
-from unittest.mock import Mock
-
 import pytest
 from langchain_core.messages import (
     AIMessage,
@@ -143,7 +141,7 @@ class TestLangchainToChatMessage:
     def test_dict_input_with_raw(self):
         """Test converting dict input with raw field."""
         raw_content = "Content from raw field"
-        input_dict = {"raw": Mock(content=raw_content), "other": "data"}
+        input_dict = {"raw": AIMessage(content=raw_content), "other": "data"}
         result = langchain_to_chat_message(input_dict)
 
         assert isinstance(result, ChatMessage)
@@ -240,9 +238,8 @@ class TestSanitizeChatHistory:
         result = sanitize_chat_history(messages)
 
         assert len(result) == 4
-        # Complete tool call should remain
-        assert len(result[1].tool_calls) == 1
-        assert result[1].tool_calls[0]["id"] == tool_call_id
+        assert result == messages
+        _validate_chat_history(result)
 
     def test_incomplete_tool_call(self):
         """Test sanitizing messages with incomplete tool call (AIMessage without ToolMessage)."""
@@ -270,7 +267,11 @@ class TestSanitizeChatHistory:
                 tool_calls=[{"name": "search", "args": {}, "id": "call_456", "type": "tool_call"}],
             ),
         ]
+        with pytest.raises(ValueError, match="do not have a corresponding ToolMessage"):
+            _validate_chat_history(messages)
+
         result = sanitize_chat_history(messages)
+        _validate_chat_history(result)
 
         assert len(result) == 2
         # Tool calls should be removed and content should indicate interruption
@@ -291,7 +292,11 @@ class TestSanitizeChatHistory:
             ToolMessage(content="Search result", tool_call_id="call_complete"),
             # No ToolMessage for call_incomplete
         ]
+        with pytest.raises(ValueError, match="do not have a corresponding ToolMessage"):
+            _validate_chat_history(messages)
+
         result = sanitize_chat_history(messages)
+        _validate_chat_history(result)
 
         assert len(result) == 3
         # Only the complete tool call should remain
@@ -359,106 +364,3 @@ class TestSanitizeChatHistory:
 
         assert all(not isinstance(m, ToolMessage) for m in sanitized)
         _validate_chat_history(sanitized)  # no exception
-
-    def test_valid_tool_message_kept(self):
-        """A ToolMessage with a matching AIMessage tool call is preserved (regression guard)."""
-        messages = [
-            HumanMessage(content="Search"),
-            AIMessage(content="", tool_calls=[{"name": "search", "args": {}, "id": "c1", "type": "tool_call"}]),
-            ToolMessage(content="result", tool_call_id="c1", name="search"),
-            AIMessage(content="done"),
-        ]
-        result = sanitize_chat_history(messages)
-
-        assert len(result) == 4
-        assert isinstance(result[2], ToolMessage)
-
-
-class TestValidateChatHistoryErrorReproduction:
-    """Tests demonstrating the original error and how sanitize_chat_history fixes it."""
-
-    def test_validate_chat_history_raises_on_incomplete_tool_calls(self):
-        """Reproduce the original error: _validate_chat_history raises ValueError for incomplete tool calls.
-
-        This demonstrates the error:
-        ValueError: Found AIMessages with tool_calls that do not have a corresponding ToolMessage.
-        """
-        # This is the problematic message history that caused the original error
-        messages = [
-            HumanMessage(content="FK1252CE water filter"),
-            AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "QdrantSemanticSearch",
-                        "args": {"question": "FK1252CE water filter"},
-                        "id": "call_HqrkPBmCwWJwQ5QedeAvwSy4",
-                        "type": "tool_call",
-                    }
-                ],
-            ),
-            # Missing ToolMessage for call_HqrkPBmCwWJwQ5QedeAvwSy4
-        ]
-
-        # This should raise ValueError - reproducing the original error
-        with pytest.raises(
-            ValueError, match="Found AIMessages with tool_calls that do not have a corresponding ToolMessage"
-        ):
-            _validate_chat_history(messages)
-
-    def test_sanitize_fixes_incomplete_tool_calls_before_validation(self):
-        """Demonstrate that sanitize_chat_history fixes the issue before validation."""
-        # Same problematic message history
-        messages = [
-            HumanMessage(content="FK1252CE water filter"),
-            AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "QdrantSemanticSearch",
-                        "args": {"question": "FK1252CE water filter"},
-                        "id": "call_HqrkPBmCwWJwQ5QedeAvwSy4",
-                        "type": "tool_call",
-                    }
-                ],
-            ),
-        ]
-
-        # Sanitize first
-        sanitized = sanitize_chat_history(messages)
-
-        # Now validation should pass without raising
-        _validate_chat_history(sanitized)  # No exception raised
-
-        # Verify the tool calls were removed
-        assert sanitized[1].tool_calls == []
-        assert sanitized[1].content == "[Tool call was interrupted]"
-
-    def test_multiple_tool_calls_one_missing_response(self):
-        """Reproduce error when one of multiple tool calls is missing its response."""
-        messages = [
-            HumanMessage(content="Search and calculate"),
-            AIMessage(
-                content="I'll help with both",
-                tool_calls=[
-                    {"name": "search", "args": {"query": "data"}, "id": "call_search", "type": "tool_call"},
-                    {"name": "calculator", "args": {"expr": "2+2"}, "id": "call_calc", "type": "tool_call"},
-                ],
-            ),
-            ToolMessage(content="Search result", tool_call_id="call_search"),
-            # Missing ToolMessage for call_calc
-        ]
-
-        # This should raise because call_calc has no corresponding ToolMessage
-        with pytest.raises(
-            ValueError, match="Found AIMessages with tool_calls that do not have a corresponding ToolMessage"
-        ):
-            _validate_chat_history(messages)
-
-        # Sanitize should fix it
-        sanitized = sanitize_chat_history(messages)
-        _validate_chat_history(sanitized)  # No exception
-
-        # Only complete tool call remains
-        assert len(sanitized[1].tool_calls) == 1
-        assert sanitized[1].tool_calls[0]["id"] == "call_search"

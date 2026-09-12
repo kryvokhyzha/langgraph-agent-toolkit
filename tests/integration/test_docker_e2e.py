@@ -1,44 +1,68 @@
+"""Check the running service and app containers with client-only dependencies."""
+
+import os
+from uuid import uuid4
+
+import httpx
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
-@pytest.mark.docker
-def test_service_with_fake_model(check_service_available):
-    """Test the service using the fake model.
-
-    This test requires the service container to be running with USE_FAKE_MODEL=true
-    """
-    service_url = "http://0.0.0.0:8080"
-
-    # Skip test if service is not available
-    if not check_service_available(service_url, timeout=60):
-        pytest.skip(f"Service at {service_url} is not available. Is the Docker container running?")
-
-    client = AgentClient(service_url, agent="chatbot-agent")
-    response = client.invoke({"message": "Tell me a joke?"}, model_provider=ModelProvider.FAKE)
-    assert response.type == "ai"
-    assert response.content == "This is a test response from the fake model."
+pytestmark = pytest.mark.docker
 
 
-@pytest.mark.docker
-def test_service_with_app():
-    """Test the service using the app.
-
-    This test requires the service container to be running with USE_FAKE_MODEL=true
-    """
+@pytest.fixture
+def docker_service_url():
+    url = os.environ.get("AGENT_URL", "http://127.0.0.1:8080").rstrip("/")
     try:
-        # Increase timeout to allow app more time to load
-        at = AppTest.from_file("../../langgraph_agent_toolkit/run_app.py", default_timeout=60).run()
+        response = httpx.get(f"{url}/health/ready", timeout=10, trust_env=False)
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        pytest.fail(f"The requested Docker service is not ready at {url}: {exc}")
+    return url
 
-        # First check for the welcome message that appears when the app first loads
-        assert len(at.chat_message) >= 1, "Expected at least one chat message"
-        assert at.chat_message[0].avatar == "assistant", "Expected first message from assistant"
 
-        # Check that the title elements exist (indicating successful loading)
-        assert at.sidebar, "Expected sidebar to be present"
+def test_docker_service_invokes_streams_and_retains_conversation(docker_service_url):
+    expected = "This is a test response from the fake model."
+    thread_id = f"docker-{uuid4()}"
+    with httpx.Client(trust_env=False) as http:
+        with AgentClient(docker_service_url, agent="chatbot-agent", http_client=http) as client:
+            response = client.invoke(
+                {"message": "First message."}, model_provider=ModelProvider.FAKE, thread_id=thread_id
+            )
+            assert response.type == "ai"
+            assert response.content == expected
+            events = list(
+                client.stream_jsonl(
+                    {"message": "Second message."}, model_provider=ModelProvider.FAKE, thread_id=thread_id
+                )
+            )
+            messages = [event for event in events if isinstance(event, ChatMessage)]
+            assert messages[-1].content == expected
+            assert messages[-1].thread_id == thread_id
+            assert [message.content for message in client.get_history(thread_id).messages] == [
+                "First message.",
+                expected,
+                "Second message.",
+                expected,
+            ]
+            client.clear_history(thread_id)
+            assert client.get_history(thread_id).messages == []
 
-    except Exception as e:
-        pytest.skip(f"Failed to run Streamlit app: {str(e)}")
+
+def test_docker_app_serves_health_and_html():
+    url = os.environ.get("APP_URL", "http://127.0.0.1:8501").rstrip("/")
+    try:
+        with httpx.Client(base_url=url, timeout=10, trust_env=False) as client:
+            health = client.get("/_stcore/health")
+            health.raise_for_status()
+            page = client.get("/")
+            page.raise_for_status()
+    except httpx.HTTPError as exc:
+        pytest.fail(f"The requested Docker app is not available at {url}: {exc}")
+    assert health.text.strip() == "ok"
+    assert page.headers["content-type"].startswith("text/html")
+    assert "<title>" in page.text

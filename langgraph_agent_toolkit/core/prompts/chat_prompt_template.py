@@ -1,11 +1,14 @@
+import asyncio
 import inspect
 import re
+import threading
 import time
+from concurrent.futures import Future
 from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
-from jinja2 import Environment
+from jinja2.sandbox import SandboxedEnvironment
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_core.prompt_values import ChatPromptValue, PromptValue
+from langchain_core.prompt_values import PromptValue
 from langchain_core.prompts.chat import (
     AIMessagePromptTemplate,
     BaseChatPromptTemplate,
@@ -18,7 +21,7 @@ from langchain_core.prompts.chat import (
     SystemMessagePromptTemplate,
 )
 from langchain_core.prompts.string import get_template_variables
-from pydantic import Field
+from pydantic import Field, PrivateAttr
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform, PromptReturnType
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
@@ -27,11 +30,10 @@ from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
 
-# Create a custom Jinja2 environment that allows attribute access on dictionaries
-# This is needed because LangChain's default SandboxedEnvironment restricts this
-_JINJA2_ENV = Environment(autoescape=False)
+# Keep dictionary attribute access and block access to Python internals.
+_JINJA2_ENV = SandboxedEnvironment(autoescape=False)
 
-# Map message roles to their corresponding prompt template classes
+# Map message roles to prompt template classes.
 _MESSAGE_TYPE_MAP = {
     MessageRole.SYSTEM: SystemMessagePromptTemplate,
     MessageRole.HUMAN: HumanMessagePromptTemplate,
@@ -40,7 +42,7 @@ _MESSAGE_TYPE_MAP = {
     MessageRole.ASSISTANT: AIMessagePromptTemplate,
 }
 
-# Map string message types to prompt template classes (for BaseMessage.type)
+# Map `BaseMessage.type` strings to prompt template classes.
 _STRING_TYPE_MAP = {
     "system": SystemMessagePromptTemplate,
     "human": HumanMessagePromptTemplate,
@@ -50,21 +52,21 @@ _STRING_TYPE_MAP = {
 
 
 def _convert_template_format(content: str, target_format: str) -> str:
-    """Convert template string between different formats."""
+    """Convert a template string between formats."""
     if not content or not isinstance(content, str):
         return content
 
     if target_format == "jinja2" and "{" in content and "{{" not in content:
-        # Convert f-string format to Jinja2 format
+        # Convert f-string format to Jinja2 format.
         return re.sub(r"{(\w+)}", r"{{ \1 }}", content)
     elif target_format == "f-string" and "{{" in content:
-        # Convert Jinja2 format to f-string format
+        # Convert Jinja2 format to f-string format.
         return re.sub(r"{{\s*(\w+)\s*}}", r"{\1}", content)
     return content
 
 
 class ObservabilityChatPromptTemplate(ChatPromptTemplate):
-    """A chat prompt template that loads prompts from observability platforms."""
+    """Chat prompt template that loads prompts from observability platforms."""
 
     prompt_name: Optional[str] = Field(default=None, description="Name of the prompt to load")
     prompt_version: Optional[int] = Field(default=None, description="Version of the prompt")
@@ -84,6 +86,9 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
     _loaded_prompt: Any = None
     _last_load_time: float = 0
     _jinja2_template_cache: Dict[str, Any] = {}
+    _load_state_lock: Any = PrivateAttr(default_factory=threading.Lock)
+    _load_future: Any = PrivateAttr(default=None)
+    _declared_input_variables: List[str] = PrivateAttr(default_factory=list)
 
     model_config = {"extra": "allow"}
 
@@ -104,7 +109,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         **kwargs: Any,
     ):
         """Initialize ObservabilityChatPromptTemplate."""
-        # Process observability platform/backend
+        # Process the observability platform and backend.
         _observability_platform = observability_platform
         _observability_backend = observability_backend
 
@@ -116,11 +121,12 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
             )
             _observability_platform = ObservabilityFactory.create(_observability_backend)
 
-        # Load messages if needed
+        # Load messages when required.
         _messages = messages or []
+        loaded_prompt = None
         if not load_at_runtime and prompt_name and _observability_platform:
             try:
-                self._loaded_prompt = loaded_prompt = self._load_prompt_from_platform(
+                loaded_prompt = self._load_prompt_from_platform(
                     _observability_platform,
                     prompt_name=prompt_name,
                     prompt_version=prompt_version,
@@ -129,7 +135,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                     template_format=template_format,
                 )
 
-                # Process returned prompt based on type
+                # Process the returned prompt by type.
                 if not _messages:
                     if hasattr(loaded_prompt, "messages"):
                         _messages = self._process_messages_from_prompt(loaded_prompt.messages, template_format)
@@ -139,17 +145,28 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                         processed_messages = self._process_list_prompt(loaded_prompt, template_format)
                         if processed_messages:
                             _messages = processed_messages
+                    elif isinstance(loaded_prompt, str):
+                        _messages = [("human", loaded_prompt)]
+                if not _messages:
+                    raise ValueError("The prompt backend returned no messages")
             except Exception as e:
                 logger.warning(f"Failed to load prompt {prompt_name}: {e}")
+                if not _messages:
+                    raise ValueError(f"Failed to load prompt and no fallback available: {e}") from e
 
-        # Save input variables and partial variables
+        # Save input and partial variables.
         _input_variables = list(input_variables) if input_variables else []
         _partial_variables = dict(partial_variables) if partial_variables else {}
 
-        # Initialize parent class with messages only
-        super().__init__(messages=_messages)
+        # Let the parent derive required variables and process partial values.
+        super().__init__(
+            messages=_messages,
+            template_format=template_format,
+            partial_variables=_partial_variables,
+            **kwargs,
+        )
 
-        # Set attributes
+        # Set attributes.
         self.prompt_name = prompt_name
         self.prompt_version = prompt_version
         self.prompt_label = prompt_label
@@ -158,15 +175,16 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         self.cache_ttl_seconds = cache_ttl_seconds
         self.template_format = template_format
 
-        # Explicitly set input variables and partial variables
-        if _input_variables:
-            self.input_variables = _input_variables
+        self._declared_input_variables = _input_variables
+        self.input_variables = sorted(
+            (set(self.input_variables) | set(_input_variables))
+            - set(self.partial_variables)
+            - set(self.optional_variables)
+        )
 
-        if _partial_variables:
-            self.partial_variables = _partial_variables
-
-        # Set private attributes
+        # Set private attributes.
         self._observability_platform = _observability_platform
+        self._loaded_prompt = loaded_prompt
         self._last_load_time = time.time()
 
     @property
@@ -195,9 +213,10 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
         try:
             sig = inspect.signature(platform.pull_prompt).parameters
-            if "cache_ttl_seconds" in sig:
+            accepts_kwargs = any(parameter.kind == inspect.Parameter.VAR_KEYWORD for parameter in sig.values())
+            if "cache_ttl_seconds" in sig or accepts_kwargs:
                 kwargs["cache_ttl_seconds"] = cache_ttl_seconds
-            if "template_format" in sig:
+            if "template_format" in sig or accepts_kwargs:
                 kwargs["template_format"] = template_format
         except (ValueError, TypeError):
             pass
@@ -226,37 +245,41 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
             template_format=self.template_format,
         )
 
-    def _update_messages_from_loaded_prompt(self) -> None:
-        """Update the messages from the loaded prompt."""
-        if self._loaded_prompt is None:
-            return
-
-        if hasattr(self._loaded_prompt, "messages"):
-            processed_messages = []
-            for msg in self._loaded_prompt.messages:
-                if isinstance(msg, BaseMessage) and msg.type in _STRING_TYPE_MAP:
-                    content = _convert_template_format(msg.content, self.template_format)
-                    template_class = _STRING_TYPE_MAP[msg.type]
-                    processed_messages.append(
-                        template_class.from_template(content, template_format=self.template_format)
-                    )
-                else:
-                    processed_messages.append(msg)
-
-            self.messages = processed_messages
-        elif isinstance(self._loaded_prompt, list):
-            processed_messages = self._process_list_prompt(self._loaded_prompt, self.template_format)
-            if processed_messages:
-                self.messages = processed_messages
-        elif isinstance(self._loaded_prompt, BaseChatPromptTemplate):
-            self.messages = self._loaded_prompt.messages
+    def _accept_loaded_prompt(self, loaded_prompt: Any) -> None:
+        """Validate a refreshed prompt before replacing the active messages."""
+        if hasattr(loaded_prompt, "messages"):
+            messages = self._process_messages_from_prompt(loaded_prompt.messages, self.template_format)
+        elif isinstance(loaded_prompt, list):
+            messages = self._process_list_prompt(loaded_prompt, self.template_format)
+        elif isinstance(loaded_prompt, str):
+            messages = [("human", loaded_prompt)]
+        else:
+            raise ValueError("The prompt backend returned an unsupported prompt")
+        if not messages:
+            raise ValueError("The prompt backend returned no messages")
+        template = ChatPromptTemplate(
+            messages=messages,
+            template_format=self.template_format,
+            partial_variables=self.partial_variables,
+        )
+        self.messages = template.messages
+        self.partial_variables = template.partial_variables
+        self.optional_variables = template.optional_variables
+        self.input_variables = sorted(
+            (set(template.input_variables) | set(self._declared_input_variables))
+            - set(template.partial_variables)
+            - set(template.optional_variables)
+        )
+        self._jinja2_template_cache.clear()
+        self._loaded_prompt = loaded_prompt
+        self._last_load_time = time.time()
 
     def _process_messages_from_prompt(self, messages: Any, template_format: str) -> List[MessageLikeRepresentation]:
         """Process messages from a loaded prompt."""
         processed_messages = []
         for msg in messages:
             if isinstance(msg, MessagesPlaceholder):
-                # Preserve MessagesPlaceholder objects
+                # Keep `MessagesPlaceholder` objects.
                 processed_messages.append(msg)
             elif isinstance(msg, BaseMessage) and msg.type in _STRING_TYPE_MAP:
                 content = _convert_template_format(msg.content, template_format)
@@ -285,7 +308,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         """Process a list prompt from an observability platform."""
         processed_messages = []
 
-        # Handle list of tuples (role, content)
+        # Process a list of `(role, content)` tuples.
         if all(isinstance(item, tuple) and len(item) == 2 for item in prompt_list):
             for role, content in prompt_list:
                 if role in _MESSAGE_TYPE_MAP:
@@ -294,7 +317,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
             return processed_messages
 
-        # Handle list of dicts with role and content
+        # Process a list of dictionaries with `role` and `content`.
         if all(isinstance(item, dict) and "role" in item and "content" in item for item in prompt_list):
             for item in prompt_list:
                 role, content = item["role"], item["content"]
@@ -302,150 +325,157 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
                     content = _convert_template_format(content, template_format)
                     template_class = _MESSAGE_TYPE_MAP[role]
                     processed_messages.append(template_class.from_template(content, template_format=template_format))
-                # Handle MessagesPlaceholder
+                # Process a `MessagesPlaceholder`.
                 elif role.lower() in (MessageRole.PLACEHOLDER, MessageRole.MESSAGES_PLACEHOLDER):
-                    # Create a MessagesPlaceholder with the content as variable name
+                    # Use `content` as the `MessagesPlaceholder` variable name.
                     processed_messages.append(MessagesPlaceholder(variable_name=content))
             return processed_messages
 
         return processed_messages or None
 
     def _should_reload_prompt(self) -> bool:
-        """Check if prompt should be reloaded based on cache TTL."""
+        """Return whether cache TTL requires a prompt reload."""
         if not self.load_at_runtime or not self.prompt_name or not self._observability_platform:
             return False
         current_time = time.time()
         return self._loaded_prompt is None or current_time - self._last_load_time > self.cache_ttl_seconds
 
-    def _ensure_messages_loaded(self) -> None:
-        """Ensure messages are loaded from observability platform if needed."""
-        if not self._should_reload_prompt():
-            return
+    def _begin_load(self) -> tuple[Optional[Future], bool]:
+        """Share one prompt load across synchronous and asynchronous callers."""
+        with self._load_state_lock:
+            if self._load_future is not None:
+                return self._load_future, False
+            if not self._should_reload_prompt():
+                return None, False
+            self._load_future = Future()
+            return self._load_future, True
 
+    def _finish_load(self, future: Future, error: Optional[BaseException] = None) -> None:
+        with self._load_state_lock:
+            if error is None:
+                future.set_result(None)
+            else:
+                future.set_exception(error)
+            self._load_future = None
+
+    def _load_error(self, error: BaseException) -> Optional[BaseException]:
+        if not isinstance(error, Exception):
+            return error
+        logger.error(f"Failed to load prompt: {error}")
+        if not self.messages:
+            return ValueError(f"Failed to load prompt and no fallback available: {error}")
+        return None
+
+    def _ensure_messages_loaded(self) -> None:
+        """Load messages from the observability platform when required."""
+        future, owner = self._begin_load()
+        if future is None:
+            return
+        if not owner:
+            future.result()
+            return
         try:
-            self._loaded_prompt = self._load_prompt_from_observability()
-            self._last_load_time = time.time()
-            self._update_messages_from_loaded_prompt()
-        except Exception as e:
-            logger.error(f"Failed to load prompt: {e}")
-            if not self.messages:
-                raise ValueError(f"Failed to load prompt and no fallback available: {e}")
+            self._accept_loaded_prompt(self._load_prompt_from_observability())
+        except BaseException as error:
+            failure = self._load_error(error)
+            self._finish_load(future, failure)
+            if failure is not None:
+                raise failure from error
+        else:
+            self._finish_load(future)
 
     async def _aensure_messages_loaded(self) -> None:
-        """Async version: Ensure messages are loaded from observability platform if needed."""
-        if not self._should_reload_prompt():
+        """Load messages without blocking the event loop."""
+        future, owner = self._begin_load()
+        if future is None:
             return
-
+        if not owner:
+            await asyncio.shield(asyncio.wrap_future(future))
+            return
         try:
-            # Use async version to avoid blocking the event loop
-            self._loaded_prompt = await self._observability_platform.apull_prompt(
+            loaded_prompt = await self._observability_platform.apull_prompt(
                 name=self.prompt_name,
                 cache_ttl_seconds=self.cache_ttl_seconds,
                 template_format=self.template_format,
                 version=self.prompt_version,
                 label=self.prompt_label,
             )
-            self._last_load_time = time.time()
-            self._update_messages_from_loaded_prompt()
-        except Exception as e:
-            logger.error(f"Failed to load prompt: {e}")
-            if not self.messages:
-                raise ValueError(f"Failed to load prompt and no fallback available: {e}")
+            self._accept_loaded_prompt(loaded_prompt)
+        except BaseException as error:
+            failure = self._load_error(error)
+            self._finish_load(future, failure)
+            if failure is not None:
+                raise failure from error
+        else:
+            self._finish_load(future)
 
     def _get_compiled_template(self, template_content: str):
-        """Get or create a compiled Jinja2 template from cache.
+        """Get a compiled Jinja2 template from cache or create one.
 
-        Caches compiled templates to avoid re-parsing on every render.
+        The cache avoids parsing templates for each render.
         """
-        if template_content not in self._jinja2_template_cache:
-            self._jinja2_template_cache[template_content] = _JINJA2_ENV.from_string(template_content)
-        return self._jinja2_template_cache[template_content]
+        template = self._jinja2_template_cache.get(template_content)
+        if template is None:
+            template = _JINJA2_ENV.from_string(template_content)
+            self._jinja2_template_cache[template_content] = template
+        return template
 
     def _render_jinja2_template(self, template_content: str, variables: Dict[str, Any]) -> str:
-        """Render a Jinja2 template using an unsandboxed environment.
-
-        This allows attribute access on dictionaries (e.g., item.name instead of item['name']).
-        Uses cached compiled templates for better performance.
-        """
+        """Render a cached template inside the Jinja2 sandbox."""
         template = self._get_compiled_template(template_content)
         return template.render(**variables)
 
     def _format_messages_with_jinja2(self, input_values: Dict[str, Any]) -> List[BaseMessage]:
-        """Format messages using custom Jinja2 environment for unsandboxed rendering."""
+        """Format Jinja2 text and keep standard message behavior."""
         formatted_messages = []
-
+        message_types = {
+            SystemMessagePromptTemplate: SystemMessage,
+            HumanMessagePromptTemplate: HumanMessage,
+            AIMessagePromptTemplate: AIMessage,
+        }
         for msg in self.messages:
-            if isinstance(msg, MessagesPlaceholder):
-                # Get messages from input
-                placeholder_messages = input_values.get(msg.variable_name, [])
-                if isinstance(placeholder_messages, list):
-                    formatted_messages.extend(placeholder_messages)
-                continue
-
-            if isinstance(msg, BaseMessagePromptTemplate):
-                # Get the template content
-                if hasattr(msg, "prompt") and hasattr(msg.prompt, "template"):
-                    template_content = msg.prompt.template
-                    # Render using custom Jinja2 environment
-                    rendered_content = self._render_jinja2_template(template_content, input_values)
-
-                    # Create the appropriate message type
-                    if isinstance(msg, SystemMessagePromptTemplate):
-                        formatted_messages.append(SystemMessage(content=rendered_content))
-                    elif isinstance(msg, HumanMessagePromptTemplate):
-                        formatted_messages.append(HumanMessage(content=rendered_content))
-                    elif isinstance(msg, AIMessagePromptTemplate):
-                        formatted_messages.append(AIMessage(content=rendered_content))
-                    else:
-                        # Fallback to parent formatting
-                        formatted_messages.append(msg.format(**input_values))
-                else:
-                    # Fallback to parent formatting
-                    formatted_messages.append(msg.format(**input_values))
-            elif isinstance(msg, BaseMessage):
+            if isinstance(msg, BaseMessage):
                 formatted_messages.append(msg)
+                continue
+            prompt = getattr(msg, "prompt", None)
+            message_type = next((value for key, value in message_types.items() if isinstance(msg, key)), None)
+            if message_type and getattr(prompt, "template_format", None) == "jinja2":
+                variables = prompt._merge_partial_and_user_variables(**input_values)
+                content = self._render_jinja2_template(prompt.template, variables)
+                formatted_messages.append(message_type(content=content, **msg.additional_kwargs))
             else:
-                # Try to format if it has a format method
-                if hasattr(msg, "format"):
-                    formatted_messages.append(msg.format(**input_values))
-                else:
-                    formatted_messages.append(msg)
-
+                formatted_messages.extend(msg.format_messages(**input_values))
         return formatted_messages
 
+    def format_messages(self, **kwargs: Any) -> List[BaseMessage]:
+        """Format messages with standard partial and placeholder handling."""
+        if self.template_format != "jinja2":
+            return super().format_messages(**kwargs)
+        input_values = self._merge_partial_and_user_variables(**kwargs)
+        return self._format_messages_with_jinja2(input_values)
+
+    async def aformat_messages(self, **kwargs: Any) -> List[BaseMessage]:
+        if self.template_format != "jinja2":
+            return await super().aformat_messages(**kwargs)
+        return self.format_messages(**kwargs)
+
     def invoke(self, input: Any, config: Optional[Dict[str, Any]] = None, **kwargs: Any) -> PromptValue:
-        """Invoke the prompt template."""
+        """Invoke the prompt with standard input validation and callbacks."""
         self._ensure_messages_loaded()
-
-        # For jinja2 templates, use custom rendering to avoid sandbox restrictions
-        if self.template_format == "jinja2":
-            # Merge input with partial variables
-            input_values = {**self.partial_variables, **(input if isinstance(input, dict) else {})}
-
-            # Format messages using custom Jinja2 environment
-            formatted_messages = self._format_messages_with_jinja2(input_values)
-
-            return ChatPromptValue(messages=formatted_messages)
-
-        # Delegate to parent class for other formats
         return super().invoke(input=input, config=config, **kwargs)
 
     async def ainvoke(self, input: Any, config: Optional[Dict[str, Any]] = None, **kwargs: Any) -> PromptValue:
-        """Asynchronously invoke the prompt template."""
+        """Asynchronously invoke the prompt with standard callbacks."""
         await self._aensure_messages_loaded()
-
-        # For jinja2 templates, use custom rendering to avoid sandbox restrictions
-        if self.template_format == "jinja2":
-            # Merge input with partial variables
-            input_values = {**self.partial_variables, **(input if isinstance(input, dict) else {})}
-
-            # Format messages using custom Jinja2 environment
-            formatted_messages = self._format_messages_with_jinja2(input_values)
-
-            return ChatPromptValue(messages=formatted_messages)
-
-        # Delegate to parent class for other formats
         return await super().ainvoke(input=input, config=config, **kwargs)
+
+    def partial(self, **kwargs: Any) -> "ObservabilityChatPromptTemplate":
+        """Keep the remote backend when binding partial variables."""
+        template = super().partial(**kwargs)
+        template._observability_platform = self._observability_platform
+        template._loaded_prompt = self._loaded_prompt
+        template._last_load_time = self._last_load_time
+        return template
 
     @classmethod
     def from_observability_platform(
@@ -500,13 +530,13 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
     def __add__(self, other: Any) -> ChatPromptTemplate:
         """Combine two prompt templates."""
         if isinstance(other, ChatPromptTemplate):
-            # Create a copy of messages from both templates
+            # Copy messages from both templates.
             combined_messages = list(self.messages)
 
-            # Process messages from the other template
+            # Process messages from the other template.
             other_messages = []
             for msg in other.messages:
-                # Special handling for MessagesPlaceholder
+                # Process `MessagesPlaceholder`.
                 if isinstance(msg, MessagesPlaceholder):
                     other_messages.append(msg)
                     continue
@@ -532,26 +562,26 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
 
             combined_messages.extend(other_messages)
 
-            # Collect all input variables
+            # Collect input variables.
             all_vars = set(self.input_variables or [])
             other_vars = set(other.input_variables or [])
             all_vars.update(other_vars)
 
-            # Get variables from MessagesPlaceholder
+            # Get variables from `MessagesPlaceholder`.
             for msg in combined_messages:
                 if isinstance(msg, MessagesPlaceholder):
                     all_vars.add(msg.variable_name)
                 elif hasattr(msg, "input_variables"):
                     all_vars.update(msg.input_variables)
 
-            # Create new partial variables dict
+            # Create the partial variable dictionary.
             combined_partial_vars = dict(self.partial_variables or {})
             if hasattr(other, "partial_variables") and other.partial_variables:
                 for k, v in other.partial_variables.items():
                     if k not in combined_partial_vars:
                         combined_partial_vars[k] = v
 
-            # Create the combined template
+            # Create the combined template.
             return ChatPromptTemplate(
                 messages=combined_messages,
                 input_variables=list(all_vars),

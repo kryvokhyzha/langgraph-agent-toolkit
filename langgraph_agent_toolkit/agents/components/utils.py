@@ -43,15 +43,15 @@ def default_pre_model_hook(state: T, config: RunnableConfig) -> T:
 
 
 def trim_messages_wrapper(messages: Sequence[BaseMessage], config: RunnableConfig, **kwargs):
-    """Trim messages to fit within the max token limit.
+    """Trim messages to the configured limit.
 
     Args:
-        messages (Sequence[BaseMessage]): The list of messages to trim.
-        config (RunnableConfig): Configuration containing parameters for trimming.
-        **kwargs: Additional keyword arguments to pass to the trim function.
+        messages: Messages to trim.
+        config: Configuration with trimming parameters.
+        **kwargs: Additional arguments for `trim_messages`.
 
     Returns:
-        Sequence[BaseMessage]: The trimmed list of messages.
+        Trimmed messages.
 
     """
     _max_messages = config.get("configurable", {}).get("checkpointer_params", {}).get("k", None)

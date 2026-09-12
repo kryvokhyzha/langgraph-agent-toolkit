@@ -1,4 +1,4 @@
-"""Reusable agent middleware that brings custom ``create_react_agent`` features to native ``create_agent``."""
+"""Reusable middleware for native ``create_agent``."""
 
 from langgraph_agent_toolkit.agents.components.middlewares.clear_intermediate_tool_calls import (
     ClearIntermediateToolCallsMiddleware,

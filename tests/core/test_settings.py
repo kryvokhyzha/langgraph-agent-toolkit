@@ -209,3 +209,14 @@ def test_get_model_config():
 
         # Test getting non-existent config
         assert settings.get_model_config("non-existent") is None
+
+
+@pytest.mark.parametrize(
+    "invalid", [{"REQUEST_QUEUE_MAX_WAITERS": -1}, {"LLM_HTTP_READ_TIMEOUT": "Infinity"}, {"POSTGRES_MAX_LIFETIME": 0}]
+)
+def test_invalid_reliability_override_does_not_partially_change_settings(invalid):
+    configuration = Settings(_env_file=None)
+    before = configuration.REQUEST_MAX_CONCURRENT
+    with pytest.raises(ValidationError):
+        configuration.apply_overrides({"REQUEST_MAX_CONCURRENT": before + 1, **invalid})
+    assert configuration.REQUEST_MAX_CONCURRENT == before

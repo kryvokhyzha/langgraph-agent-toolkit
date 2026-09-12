@@ -1,6 +1,5 @@
 from langchain.agents import create_agent
 from langchain_community.tools import DuckDuckGoSearchResults
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph_supervisor import create_supervisor
 
 from langgraph_agent_toolkit.agents.agent import Agent
@@ -11,7 +10,7 @@ from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 model = CompletionModelFactory.create(
-    model_provider=ModelProvider.OPENAI,
+    model_provider=ModelProvider.FAKE if settings.USE_FAKE_MODEL else ModelProvider.OPENAI,
     model_name=settings.OPENAI_MODEL_NAME,
     openai_api_base=settings.OPENAI_API_BASE_URL,
     openai_api_key=settings.OPENAI_API_KEY,
@@ -31,7 +30,6 @@ research_agent = create_agent(
     system_prompt="You are a world class researcher with access to web search. Do not do any math.",
 ).with_config(tags=["skip_stream"])
 
-# Create supervisor workflow
 workflow = create_supervisor(
     [research_agent, math_agent],
     model=model,
@@ -41,11 +39,11 @@ workflow = create_supervisor(
         "For math problems, use math_agent."
     ),
     add_handoff_back_messages=False,
-    output_mode="full_history",  # retain sub-agent messages when a conversation is reloaded from history
+    output_mode="full_history",
 )
 
 supervisor_agent = Agent(
     name="supervisor-agent",
     description="A langgraph supervisor agent",
-    graph=workflow.compile(checkpointer=MemorySaver()),
+    graph=workflow.compile(checkpointer=None),
 )

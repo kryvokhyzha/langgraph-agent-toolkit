@@ -1,8 +1,10 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import rootutils
+from langchain_core.tools import BaseTool
 from langgraph.func import Pregel
 
 from langgraph_agent_toolkit.core.observability.base import BaseObservabilityPlatform
@@ -14,6 +16,7 @@ class Agent:
     description: str
     graph: Pregel
     observability: BaseObservabilityPlatform | None = None
+    graph_factory: Callable[[list[BaseTool]], Pregel] | None = None
 
 
 def draw_agent_graph(agent: Agent, image_path: Optional[str | Path] = None, **kwargs):

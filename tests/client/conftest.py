@@ -1,11 +1,12 @@
-import pytest
+import pytest_asyncio
 
 from langgraph_agent_toolkit.client import AgentClient
 
 
-@pytest.fixture
-def agent_client(mock_env):
-    """Fixture for creating a test client with a clean environment."""
+@pytest_asyncio.fixture
+async def agent_client(mock_env):
+    """Create a test client with a clean environment."""
     ac = AgentClient(base_url="http://test", get_info=False)
     ac.update_agent("test-agent", verify=False)
-    return ac
+    yield ac
+    await ac.aclose()

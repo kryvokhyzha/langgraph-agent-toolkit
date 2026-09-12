@@ -1,4 +1,4 @@
-"""Render chat messages — replay existing history or stream new tokens, tool calls, and task data."""
+"""Render chat history, tokens, tool calls, and task data."""
 
 from collections.abc import AsyncGenerator
 
@@ -14,40 +14,33 @@ async def draw_messages(
     messages_agen: AsyncGenerator[ChatMessage | str, None],
     is_new: bool = False,
 ) -> None:
-    """Draw a set of chat messages - either replaying existing messages or streaming new ones.
+    """Draw chat messages from history or a stream.
 
-    This function has additional logic to handle streaming tokens and tool calls.
-    - Use a placeholder container to render streaming tokens as they arrive.
-    - Use a status container to render tool calls. Track the tool inputs and outputs
-      and update the status container accordingly.
-
-    The function also needs to track the last message container in session state
-    since later messages can draw to the same container. This is also used for
-    drawing the feedback widget in the latest chat message.
+    Use a placeholder to render incoming tokens.
+    Use status containers to render tool calls and results.
+    Store the last message container in session state for later messages and feedback.
 
     Args:
-        messages_agen: An async iterator over messages to draw.
-        is_new: Whether the messages are new or not.
+        messages_agen: Asynchronous message iterator.
+        is_new: Whether the messages are new.
 
     """
-    # Keep track of the last message container
+    # Store the last message container.
     last_message_type = None
     st.session_state.last_message = None
 
-    # Placeholder for intermediate streaming tokens
+    # Store intermediate streaming tokens.
     streaming_content = ""
     streaming_placeholder = None
 
-    # Iterate over the messages and draw them. Use an explicit None sentinel (not truthiness) so an
-    # empty-string token chunk ("") doesn't prematurely terminate the stream.
+    # Use `None` to terminate the stream. An empty token is valid.
     while True:
         msg = await anext(messages_agen, None)
         if msg is None:
             break
-        # str message represents an intermediate token being streamed
+        # A `str` message is an incoming token.
         if isinstance(msg, str):
-            # If placeholder is empty, this is the first token of a new message
-            # being streamed. We need to do setup.
+            # Create a placeholder for the first token of a message.
             if not streaming_placeholder:
                 if last_message_type != "ai":
                     last_message_type = "ai"
@@ -65,27 +58,25 @@ async def draw_messages(
             st.stop()
 
         match msg.type:
-            # A message from the user, the easiest case
+            # Render a user message.
             case "human":
                 last_message_type = "human"
                 with st.chat_message("user"):
                     render_human_message(msg.content)
 
-            # A message from the agent is the most complex case, since we need to
-            # handle streaming tokens and tool calls.
+            # Render an agent message, its tokens, and its tool calls.
             case "ai":
-                # If we're rendering new messages, store the message in session state
+                # Store new messages in session state.
                 if is_new:
                     st.session_state.messages.append(msg)
 
-                # If the last message type was not AI, create a new chat message
+                # Create a chat message after a non-AI message.
                 if last_message_type != "ai":
                     last_message_type = "ai"
                     st.session_state.last_message = st.chat_message("assistant")
 
                 with st.session_state.last_message:
-                    # If the message has content, write it out.
-                    # Reset the streaming variables to prepare for the next message.
+                    # Write message content and reset streaming data.
                     if msg.content:
                         if streaming_placeholder:
                             streaming_placeholder.write(msg.content)
@@ -95,9 +86,7 @@ async def draw_messages(
                             st.write(msg.content)
 
                     if msg.tool_calls:
-                        # Create a status container for each tool call and store the
-                        # status container by ID to ensure results are mapped to the
-                        # correct status container.
+                        # Map each tool call ID to its status container.
                         call_results = {}
 
                         for tool_call in msg.tool_calls:
@@ -110,15 +99,13 @@ async def draw_messages(
                                 status.write("Input:")
                                 status.write(tool_call["args"])
 
-                        # Expect one ToolMessage for each tool call — unless the run pauses first.
+                        # Read one `ToolMessage` for each tool call unless the run pauses.
                         for _ in range(len(msg.tool_calls)):
                             tool_result: ChatMessage | str | None = await anext(messages_agen, None)
 
-                            # Anything other than a ToolMessage means we stop waiting for results.
-                            # Human-in-the-loop: the run can interrupt for approval before a tool
-                            # executes, so the next message is the interrupt prompt (an "ai"
-                            # ChatMessage) — render it. The stream may also end (None). A bare token
-                            # chunk (str) here is unexpected, so fail fast instead of AttributeError.
+                            # Stop when the next item is not a `ToolMessage`.
+                            # A human-in-the-loop run can emit an AI interrupt prompt before a tool runs.
+                            # A token at this point is invalid.
                             if not isinstance(tool_result, ChatMessage) or tool_result.type != "tool":
                                 if isinstance(tool_result, ChatMessage):
                                     if is_new:
@@ -132,28 +119,22 @@ async def draw_messages(
                                     st.stop()
                                 break
 
-                            # Record the message if it's new, and update the correct
-                            # status container with the result
+                            # Store new results and update the matching status container.
                             if is_new:
                                 st.session_state.messages.append(tool_result)
 
                             if st.session_state.display_tools_execution:
-                                # Resilient to a missing/empty tool_call_id (e.g. expert-agent tool
-                                # messages) — fall back to a standalone status instead of KeyError.
+                                # Use a standalone status when `tool_call_id` is missing.
                                 status = call_results.get(tool_result.tool_call_id)
                                 if status is None:
                                     status = st.status("Tool Result", state="complete")
                                 status.write("Output:")
-                                # Render as a code block (plain text, no markdown/HTML) so tool output
-                                # can't inject HTML.
+                                # Render plain tool output in a code block.
                                 status.code(str(tool_result.content))
                                 status.update(state="complete")
 
             case "custom":
-                # CustomData example used by the bg-task-agent
-                # See:
-                # - langgraph_agent_toolkit/agents/components/utils.py CustomData
-                # - langgraph_agent_toolkit/agents/blueprints/bg_task_agent/task.py
+                # The `bg-task-agent` uses `CustomData` for task data.
                 try:
                     task_data: TaskData = TaskData.model_validate(msg.custom_data)
                 except ValidationError:
@@ -172,7 +153,7 @@ async def draw_messages(
 
                 status.add_and_draw_task_data(task_data)
 
-            # In case of an unexpected message type, log an error and stop
+            # Report and stop on an unexpected message type.
             case _:
                 st.error(f"Unexpected ChatMessage type: {msg.type}")
                 st.write(msg)

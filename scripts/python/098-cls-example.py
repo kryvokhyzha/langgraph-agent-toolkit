@@ -63,7 +63,7 @@ if __name__ == "__main__":
         **DEFAULT_MODEL_PARAMETER_VALUES,
     ).with_structured_output(ResponseSchema)
 
-    # Few-shot examples for better classification
+    # Provide few-shot examples for classification.
     few_shot_examples = [
         {"query": "What features are included in your service?", "intent": "GENERAL_QUESTION"},
         {"query": "How do I reset my password?", "intent": "GENERAL_QUESTION"},
@@ -95,17 +95,6 @@ if __name__ == "__main__":
                 "into one of the provided intent types:\n"
                 "'''{query}'''"
             ),
-            # AIMessagePromptTemplate.from_template(
-            #     "Here is the classification result:\n"
-            #     "Thoughts: {{ thoughts.thoughts_on_input_query }}\n"
-            #     "Reflection: {{ thoughts.reflection_on_previous_thoughts }}\n"
-            #     "Classified Intent Type: {{ classifyied_intent_type }}"
-            # ),
-            # HumanMessagePromptTemplate.from_template(
-            #     "Classify the following user query (encapsulated in triple quotes) "
-            #     "into one of the provided intent types:\n"
-            #     "'''{query}'''"
-            # ),
         ]
     )
 

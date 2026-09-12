@@ -12,13 +12,13 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 
 class LangsmithObservability(BaseObservabilityPlatform):
-    """Langsmith implementation of observability platform."""
+    """LangSmith observability platform."""
 
     def __init__(self, remote_first: bool = False):
         """Initialize LangsmithObservability.
 
         Args:
-            remote_first: If True, prioritize remote prompts over local ones.
+            remote_first: Prioritize remote prompts when `True`.
 
         """
         super().__init__(remote_first)
@@ -26,7 +26,7 @@ class LangsmithObservability(BaseObservabilityPlatform):
 
     @BaseObservabilityPlatform.requires_env_vars
     def get_callback_handler(self, **kwargs) -> None:
-        """Get the callback handler - LangSmith uses automatic tracing."""
+        """Get the callback handler. LangSmith uses automatic tracing."""
         return None
 
     def before_shutdown(self) -> None:
@@ -70,7 +70,7 @@ class LangsmithObservability(BaseObservabilityPlatform):
         client = LangsmithClient()
         prompt_obj = self._convert_to_chat_prompt(prompt_template)
 
-        # Check if prompt already exists when remote_first is enabled
+        # Use the existing prompt when `remote_first` is enabled.
         if self.remote_first:
             try:
                 existing = client.pull_prompt(name)
@@ -80,7 +80,7 @@ class LangsmithObservability(BaseObservabilityPlatform):
             except Exception:
                 logger.debug(f"Remote-first: Prompt '{name}' not found, creating new")
 
-        # Check if we should skip creation (prompt exists and force_create=False)
+        # Skip creation when the prompt exists and `force_create=False`.
         if not force_create_new_version:
             try:
                 existing = client.pull_prompt(name)
@@ -88,9 +88,9 @@ class LangsmithObservability(BaseObservabilityPlatform):
                     logger.debug(f"Prompt '{name}' exists, skipping (force_create_new_version=False)")
                     return
             except Exception:
-                pass  # Prompt doesn't exist, will create
+                pass
 
-        # Push to LangSmith
+        # Push the prompt to LangSmith.
         try:
             if metadata and metadata.get("model"):
                 chain = prompt_obj | metadata["model"]

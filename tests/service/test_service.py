@@ -357,7 +357,7 @@ def test_feedback(test_client, mock_agent, mock_agent_executor) -> None:
                 run_id="847c6285-8fc9-4560-a83f-4e6285809254",
                 key="human-feedback-stars",
                 score=0.8,
-                user_id=None,
+                user_id="anonymous",
                 comment="Great response!",
             )
 
@@ -475,9 +475,9 @@ def test_history(test_client, mock_agent, mock_agent_executor) -> None:
             assert output.messages[1].content == ANSWER
 
 
-def test_info(test_client, mock_settings, mock_agent_executor):
+def test_info(test_client, monkeypatch, mock_agent_executor):
     """Test that /info returns the correct service metadata."""
-    # Note: mock_settings is fixed to patch the correct modules
+    monkeypatch.setattr("langgraph_agent_toolkit.helper.constants._runtime_default_agent", "base-agent")
 
     with patch("langgraph_agent_toolkit.service.routes.get_agent_executor", return_value=mock_agent_executor):
         with patch(
@@ -488,7 +488,7 @@ def test_info(test_client, mock_settings, mock_agent_executor):
             assert response.status_code == 200
             output = ServiceMetadata.model_validate(response.json())
 
-    assert output.default_agent == "react-agent"
+    assert output.default_agent == "base-agent"
     assert len(output.agents) == 1
     assert output.agents[0].key == "base-agent"
     assert output.agents[0].description == "A base agent."

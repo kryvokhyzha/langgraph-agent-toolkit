@@ -1,12 +1,15 @@
-from collections.abc import AsyncIterable
+import asyncio
+from contextlib import aclosing
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import RedirectResponse, StreamingResponse
-from langchain_core.messages import AnyMessage, RemoveMessage
+from fastapi.responses import RedirectResponse
+from langchain_core.messages import AIMessage
+from langchain_core.messages import ChatMessage as LangchainChatMessage
 from langchain_core.runnables import RunnableConfig
 
 from langgraph_agent_toolkit import __version__
-from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.agent_executor import add_graph_history, get_graph_history
+from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 from langgraph_agent_toolkit.schema import (
@@ -30,9 +33,11 @@ from langgraph_agent_toolkit.schema import (
     StreamInput,
     UserInput,
 )
+from langgraph_agent_toolkit.service.auth import conversation_identity, execution_input
+from langgraph_agent_toolkit.service.feedback import authorize_feedback, sign_feedback_message
+from langgraph_agent_toolkit.service.responses import ClosingStreamingResponse as StreamingResponse
 from langgraph_agent_toolkit.service.utils import (
     _sse_response_example,
-    _validate_thread_or_user_id,
     get_agent,
     get_agent_executor,
     get_all_agent_info,
@@ -41,12 +46,16 @@ from langgraph_agent_toolkit.service.utils import (
 )
 
 
-# Create separate routers for private and public endpoints
+# Create routers for private and public endpoints.
 private_router = APIRouter()
 public_router = APIRouter()
 
-# Error responses shared (in OpenAPI) by all authenticated endpoints; applied at include_router time.
+# Authenticated endpoints share these OpenAPI error responses.
 COMMON_ERROR_RESPONSES = {
+    status.HTTP_403_FORBIDDEN: {"model": ErrorResponse, "description": "User identity does not match token"},
+    status.HTTP_409_CONFLICT: {"model": ErrorResponse, "description": "Conversation queue is full or wait expired"},
+    status.HTTP_413_CONTENT_TOO_LARGE: {"model": ErrorResponse, "description": "Request body exceeds byte limit"},
+    status.HTTP_504_GATEWAY_TIMEOUT: {"model": ErrorResponse, "description": "Request time limit expired"},
     status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse, "description": "Missing or invalid bearer token"},
     status.HTTP_404_NOT_FOUND: {"model": ErrorResponse, "description": "Agent or resource not found"},
     status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": ErrorResponse, "description": "Request validation error"},
@@ -86,18 +95,20 @@ async def info(request: Request) -> ServiceMetadata:
     description="Invoke an agent with user input to retrieve a final response.",
 )
 async def invoke(user_input: UserInput, agent_id: str = None, request: Request = None) -> ChatMessage:
-    """Invoke an agent with user input to retrieve a final response.
+    """Invoke an agent and return its final response.
 
-    If agent_id is not provided, the default agent will be used.
-    Use thread_id to persist and continue a multi-turn conversation. run_id kwarg
-    is also attached to messages for recording feedback.
+    Use the default agent when `agent_id` is not provided.
+    Use `thread_id` to persist a multi-turn conversation.
+    Messages include the `run_id` keyword argument for feedback recording.
     """
     executor = get_agent_executor(request)
 
     if agent_id is None:
         agent_id = get_default_agent()
 
-    return await executor.invoke(
+    get_agent(request, agent_id)
+    public_id, user_input = execution_input(request, agent_id, user_input)
+    response = await executor.invoke(
         agent_id=agent_id,
         input=user_input.input,
         thread_id=user_input.thread_id,
@@ -108,6 +119,8 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
         agent_config=user_input.agent_config,
         recursion_limit=user_input.recursion_limit,
     )
+    response.thread_id = public_id
+    return sign_feedback_message(request, agent_id, response)
 
 
 @private_router.post(
@@ -130,20 +143,22 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
     description="Stream an agent's response to a user input, including intermediate messages and tokens.",
 )
 async def stream(user_input: StreamInput, agent_id: str | None = None, request: Request = None) -> StreamingResponse:
-    """Stream an agent's response to a user input, including intermediate messages and tokens.
+    """Stream agent responses, including messages and tokens.
 
-    If agent_id is not provided, the default agent will be used.
-    Use thread_id to persist and continue a multi-turn conversation. run_id kwarg
-    is also attached to all messages for recording feedback.
-
-    Set `stream_tokens=false` to return intermediate messages but not token-by-token.
+    Use the default agent when `agent_id` is not provided.
+    Use `thread_id` to persist a multi-turn conversation.
+    Messages include the `run_id` keyword argument for feedback recording.
+    Set `stream_tokens=false` to exclude token output.
     """
     if agent_id is None:
         agent_id = get_default_agent()
 
+    get_agent(request, agent_id)
+    public_id, user_input = execution_input(request, agent_id, user_input)
     return StreamingResponse(
-        message_generator(user_input, request, agent_id),
+        message_generator(user_input, request, agent_id, public_id),
         media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
@@ -182,19 +197,26 @@ async def stream(user_input: StreamInput, agent_id: str | None = None, request: 
 )
 async def stream_jsonl(
     user_input: StreamInput, agent_id: str | None = None, request: Request = None
-) -> AsyncIterable[StreamChunk]:
-    """Stream an agent's response as JSON Lines: one StreamChunk per line (media type application/jsonl).
+) -> StreamingResponse:
+    """Stream agent responses as JSON Lines with one `StreamChunk` per line.
 
-    A typed, OpenAPI-documented alternative to the SSE `/stream` endpoint for clients that prefer
-    NDJSON over Server-Sent Events. Mirrors `/stream` behaviour: token chunks (when stream_tokens is
-    true), full message chunks, and a trailing error chunk on failure. There is no `[DONE]` sentinel —
-    the end of the response body terminates the stream.
+    This typed, OpenAPI-documented endpoint is an alternative to SSE `/stream`.
+    It emits token chunks when `stream_tokens` is true and full message chunks.
+    A failure emits a final error chunk.
+    The response body end terminates the stream.
     """
     if agent_id is None:
         agent_id = get_default_agent()
 
-    async for chunk in jsonl_message_generator(user_input, request, agent_id):
-        yield chunk
+    get_agent(request, agent_id)
+    public_id, user_input = execution_input(request, agent_id, user_input)
+
+    async def encoded():
+        async with aclosing(jsonl_message_generator(user_input, request, agent_id, public_id)) as chunks:
+            async for chunk in chunks:
+                yield chunk.model_dump_json() + "\n"
+
+    return StreamingResponse(encoded(), media_type="application/jsonl")
 
 
 @private_router.post(
@@ -213,20 +235,22 @@ async def stream_jsonl(
     description="Record feedback for a run to the configured observability platform for a specific agent.",
 )
 async def feedback(feedback: Feedback, agent_id: str | None = None, request: Request = None) -> FeedbackResponse:
-    """Record feedback for a run to the configured observability platform.
+    """Record feedback for a run on the configured observability platform.
 
-    This routes the feedback to the appropriate platform based on the agent's configuration.
+    The agent configuration selects the observability platform.
     """
     try:
         if agent_id is None:
             agent_id = get_default_agent()
 
         agent = get_agent(request, agent_id)
-        agent.observability.record_feedback(
+        owner = authorize_feedback(request, agent_id, feedback)
+        await request.app.state.blocking_executor.run(
+            agent.observability.record_feedback,
             run_id=feedback.run_id,
             key=feedback.key,
             score=feedback.score,
-            user_id=feedback.user_id,
+            user_id=owner,
             **feedback.kwargs,
         )
 
@@ -237,7 +261,7 @@ async def feedback(feedback: Feedback, agent_id: str | None = None, request: Req
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception:
-        # Let the global exception handler deal with all other exceptions
+        # Let the global exception handler process other exceptions.
         raise
 
 
@@ -246,7 +270,7 @@ async def feedback(feedback: Feedback, agent_id: str | None = None, request: Req
     status_code=status.HTTP_200_OK,
     tags=["history"],
     summary="Get chat history",
-    description="Get chat history for a thread or user.",
+    description="Get short-term chat history for one thread. user_id identifies its owner.",
 )
 @private_router.get(
     "/{agent_id}/history",
@@ -254,37 +278,30 @@ async def feedback(feedback: Feedback, agent_id: str | None = None, request: Req
     status_code=status.HTTP_200_OK,
     tags=["history"],
     summary="Get chat history for a specific agent",
-    description="Get chat history for a thread or user with a specific agent.",
+    description="Get short-term chat history for one agent and thread. user_id identifies its owner.",
 )
 async def history(
     input: ChatHistoryInput = Depends(),
     agent_id: str | None = None,
     request: Request = None,
 ) -> ChatHistory:
-    """Get chat history."""
-    _validate_thread_or_user_id(input.thread_id, input.user_id)
-
-    if agent_id is None:
-        agent_id = get_default_agent()
-
-    agent: Agent = get_agent(request, agent_id)
-    try:
-        state_snapshot = await agent.graph.aget_state(
-            config=RunnableConfig(
-                configurable={
-                    "thread_id": input.thread_id,
-                    "user_id": input.user_id,
-                }
-            )
+    """Get short-term chat history for one thread."""
+    agent_id = agent_id or get_default_agent()
+    _, owner, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
+    executor = get_agent_executor(request)
+    agent = get_agent(request, agent_id)
+    async with executor.concurrency.lock(key):
+        messages = await get_graph_history(
+            agent.graph, RunnableConfig(configurable={"thread_id": key, "user_id": owner})
         )
-        messages: list[AnyMessage] = state_snapshot.values.get("messages", [])
-        chat_messages: list[ChatMessage] = [langchain_to_chat_message(m) for m in messages]
-        return ChatHistory(messages=chat_messages)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception:
-        # Let the global exception handler deal with all other exceptions
-        raise
+        limit = min(input.limit, settings.HISTORY_MAX_PAGE_SIZE)
+        page = messages[input.offset : input.offset + limit]
+        next_offset = input.offset + len(page)
+        return ChatHistory(
+            messages=[langchain_to_chat_message(m) for m in page],
+            total=len(messages),
+            next_offset=next_offset if next_offset < len(messages) else None,
+        )
 
 
 @private_router.delete(
@@ -292,7 +309,7 @@ async def history(
     status_code=status.HTTP_200_OK,
     tags=["history"],
     summary="Clear chat history",
-    description="Clear chat history for a thread or user.",
+    description="Delete checkpoints for one thread. Keep long-term memory.",
 )
 @private_router.delete(
     "/{agent_id}/history/clear",
@@ -300,53 +317,28 @@ async def history(
     status_code=status.HTTP_200_OK,
     tags=["history"],
     summary="Clear chat history for a specific agent",
-    description="Clear chat history for a thread or user with a specific agent.",
+    description="Delete checkpoints for one agent and thread. Keep long-term memory.",
 )
 async def clear_history(
     input: ClearHistoryInput,
     agent_id: str | None = None,
     request: Request = None,
 ) -> ClearHistoryResponse:
-    """Clear chat history."""
-    _validate_thread_or_user_id(input.thread_id, input.user_id)
-
-    if agent_id is None:
-        agent_id = get_default_agent()
-
-    agent: Agent = get_agent(request, agent_id)
-    try:
-        state_snapshot = await agent.graph.aget_state(
-            config=RunnableConfig(
-                configurable={
-                    "thread_id": input.thread_id,
-                    "user_id": input.user_id,
-                }
-            )
-        )
-        if not state_snapshot or not state_snapshot.values:
-            identifier = f"thread '{input.thread_id}'" if input.thread_id else f"user '{input.user_id}'"
-            raise HTTPException(status_code=404, detail=f"No history found for {identifier}")
-        messages: list[AnyMessage] = state_snapshot.values.get("messages", [])
-
-        await agent.graph.aupdate_state(
-            config=RunnableConfig(
-                configurable={
-                    "thread_id": input.thread_id,
-                    "user_id": input.user_id,
-                }
-            ),
-            values={"messages": [RemoveMessage(id=m.id) for m in messages]},
-        )
-
-        return ClearHistoryResponse(
-            status="success",
-            thread_id=input.thread_id,
-            user_id=input.user_id,
-            message=f"Cleared {len(messages)} messages from chat history.",
-        )
-    except Exception:
-        # Let the global exception handler deal with all exceptions
-        raise
+    """Delete one thread's checkpoints. Keep long-term memory."""
+    agent_id = agent_id or get_default_agent()
+    public_id, _, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
+    executor = get_agent_executor(request)
+    agent = get_agent(request, agent_id)
+    async with executor.concurrency.lock(key):
+        if not agent.graph.checkpointer:
+            raise HTTPException(503, "This agent has no checkpointer")
+        await agent.graph.checkpointer.adelete_thread(key)
+    return ClearHistoryResponse(
+        status="success",
+        thread_id=public_id,
+        user_id=input.user_id,
+        message="Deleted all checkpoints for this conversation.",
+    )
 
 
 @private_router.post(
@@ -354,7 +346,7 @@ async def clear_history(
     status_code=status.HTTP_201_CREATED,
     tags=["history"],
     summary="Add messages to chat history",
-    description="Add messages to the end of chat history for a thread or user.",
+    description="Add messages to one short-term conversation. user_id identifies its owner.",
 )
 @private_router.post(
     "/{agent_id}/history/add_messages",
@@ -362,54 +354,45 @@ async def clear_history(
     status_code=status.HTTP_201_CREATED,
     tags=["history"],
     summary="Add messages to chat history for a specific agent",
-    description="Add messages to the end of chat history for a thread or user with a specific agent.",
+    description="Add messages to one agent and thread. user_id identifies its owner.",
 )
 async def add_messages(
     input: AddMessagesInput,
     agent_id: str | None = None,
     request: Request = None,
 ) -> AddMessagesResponse:
-    """Add messages to the end of chat history."""
-    _validate_thread_or_user_id(input.thread_id, input.user_id)
-
-    if agent_id is None:
-        agent_id = get_default_agent()
-
-    agent: Agent = get_agent(request, agent_id)
-    try:
-        await agent.graph.aupdate_state(
-            config=RunnableConfig(
-                configurable={
-                    "thread_id": input.thread_id,
-                    "user_id": input.user_id,
-                }
-            ),
-            values={
-                "messages": [
-                    {
-                        k: v
-                        for k, v in {
-                            "type": m.type,
-                            "content": m.content,
-                            "tool_call_id": m.tool_call_id,
-                            "tool_calls": m.tool_calls or None,
-                        }.items()
-                        if v is not None
-                    }
-                    for m in input.messages
-                ]
-            },
+    """Add messages to one thread's short-term history."""
+    agent_id = agent_id or get_default_agent()
+    public_id, owner, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
+    executor = get_agent_executor(request)
+    agent = get_agent(request, agent_id)
+    async with executor.concurrency.lock(key):
+        messages = []
+        for message in input.messages:
+            if message.type == "custom":
+                messages.append(LangchainChatMessage(role="custom", content=[message.custom_data]))
+            elif message.type == "ai":
+                messages.append(
+                    AIMessage(
+                        content=message.content,
+                        tool_calls=message.tool_calls,
+                        usage_metadata=message.usage_metadata,
+                        response_metadata=message.response_metadata,
+                    )
+                )
+            else:
+                messages.append(message.model_dump(exclude_none=True, exclude={"custom_data"}))
+        await add_graph_history(
+            agent.graph,
+            config=RunnableConfig(configurable={"thread_id": key, "user_id": owner}),
+            messages=messages,
         )
-
-        return AddMessagesResponse(
-            status="success",
-            thread_id=input.thread_id,
-            user_id=input.user_id,
-            message=f"Added {len(input.messages)} messages to chat history.",
-        )
-    except Exception:
-        # Let the global exception handler deal with all exceptions
-        raise
+    return AddMessagesResponse(
+        status="success",
+        thread_id=public_id,
+        user_id=input.user_id,
+        message=f"Added {len(input.messages)} messages to chat history.",
+    )
 
 
 @public_router.get(
@@ -443,18 +426,25 @@ async def health_check() -> HealthCheck:
     "/health/live",
     tags=["healthcheck"],
     summary="Liveness Probe",
-    description="Kubernetes liveness probe - checks if the process is alive. "
-    "Returns 200 if process is running, use to trigger container restart on failure.",
+    description="Check whether the worker responds and request cleanup is progressing. "
+    "Returns 503 for stalled cleanup. Configure the supervisor to restart on failure.",
     response_description="Return HTTP Status Code 200 (OK) if alive",
     status_code=status.HTTP_200_OK,
     response_model=LivenessResponse,
+    responses={503: {"description": "Request cleanup is stalled", "model": LivenessResponse}},
 )
-async def liveness_probe() -> LivenessResponse:
-    """Liveness probe for Kubernetes.
+async def liveness_probe(request: Request):
+    """Return the Kubernetes liveness probe response.
 
-    This probe indicates if the process is alive and should be restarted if it fails.
-    It performs minimal checks - just confirms the process can respond.
+    This probe confirms that the process responds.
+    Kubernetes restarts the process when the probe fails.
     """
+    if getattr(request.app.state, "stalled_request_cleanups", 0):
+        from fastapi.responses import JSONResponse
+
+        return JSONResponse(
+            status_code=503, content=LivenessResponse(status="unhealthy", version=__version__).model_dump()
+        )
     return LivenessResponse(
         status="alive",
         version=__version__,
@@ -478,16 +468,32 @@ async def liveness_probe() -> LivenessResponse:
     },
 )
 async def readiness_probe(request: Request):
-    """Readiness probe for Kubernetes.
+    """Return the Kubernetes readiness probe response.
 
-    This probe indicates if the service is ready to accept traffic.
-    It checks that agents have been initialized successfully.
-    Kubernetes will not route traffic to the pod until this returns 200.
+    This probe checks that the service initializes agents successfully.
+    Kubernetes routes traffic to the pod only after this returns 200.
     """
     from fastapi.responses import JSONResponse
 
-    is_ready = getattr(request.app.state, "ready", False)
+    is_ready = getattr(request.app.state, "ready", False) and not getattr(
+        request.app.state, "stalled_request_cleanups", 0
+    )
     initialized_agents = getattr(request.app.state, "initialized_agents", [])
+
+    if is_ready:
+        try:
+            async with asyncio.timeout(2):
+                for name in ("db_pool", "lock_pool"):
+                    pool = getattr(request.app.state, name, None)
+                    if pool is not None:
+                        async with pool.connection(timeout=1) as connection:
+                            await connection.execute("SELECT 1")
+                sqlite = getattr(request.app.state, "sqlite_connection", None)
+                if sqlite is not None:
+                    async with sqlite.execute("SELECT 1") as cursor:
+                        await cursor.fetchone()
+        except Exception:
+            is_ready = False
 
     if is_ready and initialized_agents:
         return ReadinessResponse(
@@ -525,11 +531,11 @@ async def readiness_probe(request: Request):
     },
 )
 async def startup_probe(request: Request):
-    """Startup probe for Kubernetes.
+    """Return the Kubernetes startup probe response.
 
-    This probe indicates if the application has finished its initialization.
-    It's designed for slow-starting containers and allows more time than liveness probe.
-    The startup probe is checked before liveness/readiness probes are activated.
+    This probe checks whether the application finished initialization.
+    It supports slow-starting containers.
+    Kubernetes checks it before liveness and readiness probes.
     """
     from fastapi.responses import JSONResponse
 
@@ -571,7 +577,7 @@ async def db_health_check(request: Request) -> DatabaseHealthResponse:
         )
 
     if not hasattr(pool, "get_stats"):
-        # e.g. the SQLite saver exposes a raw connection, not a pool with statistics.
+        # The SQLite saver exposes a raw connection, not a pool with statistics.
         return DatabaseHealthResponse(
             status="no_pool",
             message="Connection pool statistics are only available for the PostgreSQL backend",
@@ -586,8 +592,8 @@ async def db_health_check(request: Request) -> DatabaseHealthResponse:
             requests_waiting=stats.get("requests_waiting", 0),
             connections_num=stats.get("connections_num", 0),
         )
-    except Exception as e:
+    except Exception:
         return DatabaseHealthResponse(
             status="error",
-            message=str(e),
+            message="Could not read database pool statistics",
         )

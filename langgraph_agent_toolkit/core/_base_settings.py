@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import Annotated, Any, Dict, Literal, Optional
+from typing import Annotated, Any, Dict, Literal, Mapping, Optional
 
 from dotenv import find_dotenv
 from pydantic import (
@@ -10,10 +10,12 @@ from pydantic import (
     HttpUrl,
     SecretStr,
     TypeAdapter,
+    ValidationError,
     computed_field,
 )
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, EnvSettingsSource, SettingsConfigDict
 
+from langgraph_agent_toolkit.core.mcp import MCPServerConfig, ServerName
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.helper.logging import logger
@@ -39,57 +41,81 @@ class Settings(BaseSettings):
     PORT: int = 8080
 
     AUTH_SECRET: SecretStr | None = None
+    AUTH_MODE: Literal["token", "trusted"] = "token"
+    AUTH_USERS: dict[str, SecretStr] = Field(default_factory=dict)
+    AUTH_SERVICE_USER_ID: str = "service"
+    FEEDBACK_SIGNING_SECRET: SecretStr | None = Field(default=None, min_length=32)
     USE_FAKE_MODEL: bool = False
 
-    # OpenAI Settings
+    # OpenAI settings.
     OPENAI_API_KEY: SecretStr | None = None
     OPENAI_API_BASE_URL: str | None = None
     OPENAI_API_VERSION: str | None = None
     OPENAI_MODEL_NAME: str | None = None
 
-    # Azure OpenAI Settings
+    # Per-worker HTTP pools for OpenAI and Azure models created by the factory.
+    LLM_HTTP_ASYNC_TRANSPORT: Literal["httpx", "aiohttp"] = "httpx"
+    LLM_HTTP_MAX_CONNECTIONS: int = Field(default=100, gt=0)
+    LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS: int = Field(default=20, ge=0)
+    LLM_HTTP_KEEPALIVE_EXPIRY: float = Field(default=30.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_CONNECT_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_READ_TIMEOUT: float = Field(default=120.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_WRITE_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_POOL_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_MAX_RETRIES: int = Field(default=2, ge=0)
+    LLM_HTTP_SHUTDOWN_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_MAX_POOLS: int = Field(default=32, gt=0)
+
+    # Azure OpenAI settings.
     AZURE_OPENAI_API_KEY: SecretStr | None = None
     AZURE_OPENAI_ENDPOINT: str | None = None
     AZURE_OPENAI_API_VERSION: str | None = None
     AZURE_OPENAI_MODEL_NAME: str | None = None
     AZURE_OPENAI_DEPLOYMENT_NAME: str | None = None
 
-    # Anthropic Settings
+    # Anthropic settings.
     ANTHROPIC_MODEL_NAME: str | None = None
     ANTHROPIC_API_KEY: SecretStr | None = None
 
-    # Google VertexAI Settings
+    # Google VertexAI settings.
     GOOGLE_VERTEXAI_MODEL_NAME: str | None = None
     GOOGLE_VERTEXAI_API_KEY: SecretStr | None = None
 
-    # Google GenAI Settings
+    # Google GenAI settings.
     GOOGLE_GENAI_MODEL_NAME: str | None = None
     GOOGLE_GENAI_API_KEY: SecretStr | None = None
 
-    # Bedrock Settings
+    # Bedrock settings.
     AWS_BEDROCK_MODEL_NAME: str | None = None
 
-    # DeepSeek Settings
+    # DeepSeek settings.
     DEEPSEEK_MODEL_NAME: str | None = None
     DEEPSEEK_API_KEY: SecretStr | None = None
 
-    # Ollama Settings
+    # Ollama settings.
     OLLAMA_MODEL_NAME: str | None = None
     OLLAMA_BASE_URL: str | None = None
 
-    # OpenRouter Settings
+    # OpenRouter settings.
     OPENROUTER_API_KEY: SecretStr | None = None
 
-    # Observability platform
+    # Observability platform.
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
+    OBSERVABILITY_SHUTDOWN_TIMEOUT: float = Field(default=10.0, gt=0)
 
-    # Agent configuration
+    # Agent configuration.
     AGENT_PATHS: list[str] = [
         "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent",
         "langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent",
         "langgraph_agent_toolkit.agents.blueprints.create_agent.agent:react_agent",
         "langgraph_agent_toolkit.agents.blueprints.create_agent_structured.agent:react_agent_so",
+        "langgraph_agent_toolkit.agents.blueprints.interrupt_agent.agent:interrupt_agent",
+        "langgraph_agent_toolkit.agents.blueprints.hitl_agent.agent:hitl_agent",
     ]
+
+    MCP_SERVERS: dict[ServerName, MCPServerConfig] = Field(default_factory=dict)
+    MCP_AGENT_SERVERS: dict[str, list[ServerName]] = Field(default_factory=dict)
+    MCP_DISCOVERY_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
 
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"
@@ -107,11 +133,11 @@ class Settings(BaseSettings):
     LANGFUSE_DEBUG: bool = False
     LANGFUSE_SAMPLE_RATE: float = 1.0
 
-    # Database Configuration
+    # Database configuration.
     MEMORY_BACKEND: MemoryBackends | None = None
     SQLITE_DB_PATH: str = "checkpoints.db"
 
-    # postgresql Configuration
+    # PostgreSQL configuration.
     POSTGRES_APPLICATION_NAME: str = "langgraph-agent-toolkit"
     POSTGRES_USER: str | None = None
     POSTGRES_PASSWORD: SecretStr | None = None
@@ -119,51 +145,83 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int | None = None
     POSTGRES_DB: str | None = None
     POSTGRES_SCHEMA: str = "public"
-    POSTGRES_POOL_SIZE: int = Field(default=100, description="Maximum number of connections in the pool")
-    POSTGRES_MIN_SIZE: int = Field(default=5, description="Minimum number of connections in the pool")
-    POSTGRES_MAX_IDLE: int = Field(default=120, description="Maximum number of idle connections")
-    POSTGRES_POOL_TIMEOUT: float = Field(default=45.0, description="Timeout in seconds to get a connection from pool")
-    POSTGRES_RECONNECT_TIMEOUT: float = Field(default=60.0, description="Timeout for reconnecting to database")
+    POSTGRES_POOL_SIZE: int = Field(default=20, ge=1, description="Maximum number of connections in the pool")
+    POSTGRES_MIN_SIZE: int = Field(default=2, ge=0, description="Minimum number of connections in the pool")
+    POSTGRES_MAX_IDLE: int = Field(default=120, gt=0, description="Idle seconds before closing excess connections")
+    POSTGRES_POOL_TIMEOUT: float = Field(
+        default=45.0, gt=0, allow_inf_nan=False, description="Timeout in seconds to get a connection from pool"
+    )
+    POSTGRES_RECONNECT_TIMEOUT: float = Field(
+        default=60.0, gt=0, allow_inf_nan=False, description="Timeout for reconnecting to database"
+    )
+    POSTGRES_CONNECT_TIMEOUT: int = Field(default=10, gt=0)
+    POSTGRES_KEEPALIVES_IDLE: int = Field(default=30, gt=0)
+    POSTGRES_KEEPALIVES_INTERVAL: int = Field(default=10, gt=0)
+    POSTGRES_KEEPALIVES_COUNT: int = Field(default=3, gt=0)
+    POSTGRES_TCP_USER_TIMEOUT: int = Field(default=60000, gt=0)
+    POSTGRES_HEALTH_CHECK_TIMEOUT: float = Field(default=5.0, gt=0, allow_inf_nan=False)
     POSTGRES_MAX_LIFETIME: float = Field(
         default=300.0,
+        gt=0,
+        allow_inf_nan=False,
         description="Maximum lifetime of a connection in seconds. After this time, the connection will be closed "
-        "and replaced with a new one. Set to 0 to disable. Helps prevent stale connections.",
+        "and replaced with a new one. Helps prevent stale connections.",
     )
     POSTGRES_NUM_WORKERS: int = Field(
         default=3,
+        gt=0,
         description="Number of background workers for pool maintenance (creating/closing connections)",
     )
     POSTGRES_STATEMENT_TIMEOUT: int = Field(
         default=120000,
+        ge=0,
         description="Maximum time in milliseconds a query can run before being cancelled. "
         "Prevents stuck queries from blocking connections forever. Set to 0 to disable.",
     )
     POSTGRES_LOCK_TIMEOUT: int = Field(
         default=45000,
+        ge=0,
         description="Maximum time in milliseconds to wait for a lock before giving up. "
         "Prevents deadlocks from blocking connections. Set to 0 to disable.",
     )
     POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: int = Field(
         default=120000,
+        ge=0,
         description="Maximum time in milliseconds a connection can stay idle in transaction. "
         "Terminates connections that started a transaction but didn't finish. Set to 0 to disable.",
     )
 
-    # Model configurations dictionary
+    # Model configuration dictionary.
     MODEL_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     MODEL_CONFIGS_BASE64: str | None = None
     MODEL_CONFIGS_PATH: str | None = None
 
-    # Database configurations dictionary
+    # Database configuration dictionary.
     DB_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     DB_CONFIGS_BASE64: str | None = None
     DB_CONFIGS_PATH: str | None = None
 
-    # Agent configuration
+    # Agent configuration.
+    # Bound service work and database lock resources.
+    THREAD_QUEUE_TIMEOUT: float = Field(default=60, gt=0, allow_inf_nan=False)
+    THREAD_QUEUE_MAX_WAITERS: int = Field(default=32, ge=0)
+    REQUEST_TIMEOUT: float = Field(default=300, gt=0, allow_inf_nan=False)
+    REQUEST_CLEANUP_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    REQUEST_MAX_CONCURRENT: int = Field(default=8, ge=1)
+    REQUEST_QUEUE_MAX_WAITERS: int = Field(default=0, ge=0)
+    REQUEST_QUEUE_TIMEOUT: float = Field(default=1.0, gt=0, allow_inf_nan=False)
+    RESPONSE_SEND_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
+    REQUEST_MAX_BYTES: int = Field(default=20 * 1024 * 1024, gt=0)
+    HISTORY_MAX_PAGE_SIZE: int = Field(default=1000, ge=1, le=1000)
+    POSTGRES_LOCK_POOL_SIZE: int = Field(default=10, ge=1)
+    POSTGRES_POOL_MAX_WAITING: int = Field(default=100, ge=1)
+    THREAD_LOCK_HEARTBEAT: float = Field(default=5, gt=0)
+    THREAD_LOCK_HEARTBEAT_TIMEOUT: float = Field(default=5, gt=0)
+
     DEFAULT_AGENT: str = "create-agent"
     DEFAULT_MAX_MESSAGE_HISTORY_LENGTH: int = 18
-    # Token budget for the model's message view (TokenTrimMiddleware). None disables it (opt-in,
-    # since a sensible budget is model-specific); set a value to bound history by tokens.
+    # `TokenTrimMiddleware` uses this token budget for the model message view.
+    # `None` disables it. Set a model-specific value to limit history tokens.
     DEFAULT_MAX_TOKENS_HISTORY_LENGTH: int | None = None
     DEFAULT_RECURSION_LIMIT: int = 64
     MULTIMODAL_MAX_ATTACHMENTS: int | None = Field(
@@ -173,12 +231,12 @@ class Settings(BaseSettings):
             "None = no toolkit limit (the model provider still enforces its own per-model caps)."
         ),
     )
-    # Detect an interrupted run and resume it (Command(resume=...)) on the next request. Requires one
-    # extra checkpointer read per request; set False to skip it if no agent uses interrupt().
+    # Detect an interrupted run and resume `Command(resume=...)` on the next request.
+    # This requires one checkpointer read per request.
     CHECK_INTERRUPTS: bool = True
 
-    # Defaults for ClearIntermediateToolCallsMiddleware (opt-in; added to an agent's middleware list).
-    # These tune it globally; constructor arguments override them per agent.
+    # These are optional defaults for `ClearIntermediateToolCallsMiddleware`.
+    # Add it to an agent middleware list. Constructor arguments override these values.
     CLEAR_INTERMEDIATE_TOOL_CALLS: bool = Field(
         default=True,
         description=(
@@ -199,10 +257,10 @@ class Settings(BaseSettings):
         description="How many most-recent results to keep per dedup key in previous turns.",
     )
 
-    # Streamlit configuration
+    # Streamlit configuration.
     DEFAULT_STREAMLIT_USER_ID: str = "streamlit-user"
 
-    # CORS configuration
+    # CORS configuration.
     CORS_ENABLED: bool = Field(
         default=False,
         description="Enable CORS middleware. Must be explicitly set to True to enable CORS.",
@@ -230,120 +288,69 @@ class Settings(BaseSettings):
     )
 
     def _apply_langgraph_env_overrides(self) -> None:
-        """Apply any LANGGRAPH_ prefixed environment variables to override settings."""
-        for env_name, env_value in os.environ.items():
-            if env_name.startswith("LANGGRAPH_"):
-                setting_name = env_name[10:]  # Remove the "LANGGRAPH_" prefix
-                if hasattr(self, setting_name):
-                    try:
-                        current_value = getattr(self, setting_name)
+        """Validate `LANGGRAPH_` overrides before applying them."""
+        source = EnvSettingsSource(type(self), env_prefix="LANGGRAPH_", case_sensitive=True, env_parse_none_str="null")
+        self.apply_overrides(source())
 
-                        # Handle different types
-                        if isinstance(current_value, list):
-                            # Parse JSON array
-                            try:
-                                parsed_value = json.loads(env_value)
-                                if isinstance(parsed_value, list):
-                                    setattr(self, setting_name, parsed_value)
-                                    logger.debug(f"Applied environment override for {setting_name}")
-                            except json.JSONDecodeError:
-                                logger.warning(f"Failed to parse JSON for {setting_name}: {env_value}")
-                        elif isinstance(current_value, bool):
-                            # Convert string to boolean
-                            if env_value.lower() in ("true", "1", "yes"):
-                                setattr(self, setting_name, True)
-                                logger.debug(f"Applied environment override for {setting_name}")
-                            elif env_value.lower() in ("false", "0", "no"):
-                                setattr(self, setting_name, False)
-                                logger.debug(f"Applied environment override for {setting_name}")
-                        elif current_value is None or isinstance(current_value, (str, int, float)):
-                            # Convert to the appropriate type
-                            if isinstance(current_value, int) or current_value is None and env_value.isdigit():
-                                setattr(self, setting_name, int(env_value))
-                            elif isinstance(current_value, float) or current_value is None and "." in env_value:
-                                try:
-                                    setattr(self, setting_name, float(env_value))
-                                except ValueError:
-                                    setattr(self, setting_name, env_value)
-                            else:
-                                setattr(self, setting_name, env_value)
-                            logger.debug(f"Applied environment override for {setting_name}")
-                        # Add more type handling as needed
-                    except Exception as e:
-                        logger.warning(f"Failed to apply environment override for {setting_name}: {e}")
+    def apply_overrides(self, overrides: Mapping[str, Any]) -> None:
+        """Validate all overrides before changing any setting.
+
+        JSON strings are accepted for collection fields. Unknown fields fail.
+        """
+        fields = type(self).model_fields
+        unknown = set(overrides) - set(fields)
+        if unknown:
+            raise ValueError(f"Unknown settings: {', '.join(sorted(unknown))}")
+        validated = {}
+        for name, value in overrides.items():
+            adapter = TypeAdapter(fields[name].rebuild_annotation())
+            try:
+                validated[name] = adapter.validate_python(value)
+            except ValidationError:
+                if not isinstance(value, str):
+                    raise
+                validated[name] = adapter.validate_json(value)
+        for name, value in validated.items():
+            setattr(self, name, value)
+            logger.debug(f"Applied environment override for {name}")
 
     def _initialize_configs(self, config_type: str) -> Dict[str, Dict[str, Any]]:
-        """Initialize configurations from environment variables.
+        """Load configurations from the validated settings fields.
 
-        Args:
-            config_type: Type of configuration ('MODEL' or 'DB')
-
-        Returns:
-            Dictionary of configurations
-
+        Direct configurations take precedence over base64 and file inputs.
+        This keeps values from constructor arguments and `.env` files.
         """
-        configs = {}
-
-        # Try direct JSON environment variable
-        configs_env = os.environ.get(f"{config_type}_CONFIGS")
-        if configs_env:
-            try:
-                parsed_configs = json.loads(configs_env)
-                if isinstance(parsed_configs, dict):
-                    configs = parsed_configs
-                    logger.info(
-                        f"Loaded {len(configs)} {config_type.lower()} configurations from {config_type}_CONFIGS"
-                    )
-                else:
-                    logger.warning(f"{config_type}_CONFIGS environment variable is not a valid JSON object")
-            except json.JSONDecodeError:
-                logger.error(f"Failed to parse {config_type}_CONFIGS environment variable as JSON")
+        field_name = f"{config_type}_CONFIGS"
+        configs = getattr(self, field_name)
+        if configs or field_name in self.model_fields_set:
             return configs
 
-        # Try base64 encoded environment variable
-        configs_base64_env = os.environ.get(f"{config_type}_CONFIGS_BASE64")
-        if configs_base64_env:
-            try:
-                decoded_configs = base64.b64decode(configs_base64_env).decode("utf-8")
-                parsed_configs = json.loads(decoded_configs)
-                if isinstance(parsed_configs, dict):
-                    configs = parsed_configs
-                    logger.info(
-                        f"Loaded {len(configs)} {config_type.lower()} configurations from {config_type}_CONFIGS_BASE64"
-                    )
-                else:
-                    logger.warning(f"{config_type}_CONFIGS_BASE64 cannot be parsed as a valid JSON object")
-            except (ValueError, json.JSONDecodeError) as e:
-                logger.error(f"Failed to decode {config_type}_CONFIGS_BASE64: {e}")
-            return configs
-
-        # Try file path
-        configs_path_env = os.environ.get(f"{config_type}_CONFIGS_PATH")
-        if configs_path_env:
-            try:
-                with open(configs_path_env, "r", encoding="utf-8") as f:
-                    parsed_configs = json.load(f)
-                    if isinstance(parsed_configs, dict):
-                        configs = parsed_configs
-                        logger.info(
-                            f"Loaded {len(configs)} {config_type.lower()} configurations from {configs_path_env}"
-                        )
-                    else:
-                        logger.warning(f"{config_type}_CONFIGS_PATH cannot be parsed as a valid JSON object")
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logger.error(f"Failed to load {config_type.lower()} configurations from {configs_path_env}: {e}")
-            return configs
-
-        logger.info(f"No {config_type}_CONFIGS found in environment variables or file")
-        return configs
+        encoded = getattr(self, f"{field_name}_BASE64")
+        path = getattr(self, f"{field_name}_PATH")
+        try:
+            if encoded:
+                raw = base64.b64decode(encoded, validate=True).decode("utf-8")
+                parsed = json.loads(raw)
+            elif path:
+                with open(path, "r", encoding="utf-8") as config_file:
+                    parsed = json.load(config_file)
+            else:
+                return configs
+            return TypeAdapter(Dict[str, Dict[str, Any]]).validate_python(parsed)
+        except (OSError, ValueError) as error:
+            raise ValueError(f"Invalid {field_name} configuration source") from error
 
     def _initialize_model_configs(self) -> None:
         """Initialize model configurations from environment variables."""
-        self.MODEL_CONFIGS = self._initialize_configs("MODEL")
+        configs = self._initialize_configs("MODEL")
+        if configs != self.MODEL_CONFIGS:
+            self.MODEL_CONFIGS = configs
 
     def _initialize_db_configs(self) -> None:
         """Initialize database configurations from environment variables."""
-        self.DB_CONFIGS = self._initialize_configs("DB")
+        configs = self._initialize_configs("DB")
+        if configs != self.DB_CONFIGS:
+            self.DB_CONFIGS = configs
 
     def get_model_config(self, config_key: str) -> Optional[Dict[str, Any]]:
         """Get a model configuration by key.
@@ -375,7 +382,7 @@ class Settings(BaseSettings):
         self._initialize_model_configs()
         self._initialize_db_configs()
 
-        # Set LANGFUSE_TRACING_ENVIRONMENT to ENV_MODE if not explicitly set
+        # Set `LANGFUSE_TRACING_ENVIRONMENT` from `ENV_MODE` when it is unset.
         if self.LANGFUSE_TRACING_ENVIRONMENT is None:
             self.LANGFUSE_TRACING_ENVIRONMENT = self.ENV_MODE.value
             os.environ["LANGFUSE_TRACING_ENVIRONMENT"] = self.LANGFUSE_TRACING_ENVIRONMENT

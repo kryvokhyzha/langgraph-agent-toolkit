@@ -1,4 +1,4 @@
-"""Tests for the create_agent middleware that ports custom create_react_agent features."""
+"""Test ``create_agent`` middleware."""
 
 from unittest.mock import MagicMock
 
@@ -23,11 +23,11 @@ def _tool_call(call_id: str = "1") -> dict:
 
 
 def test_immediate_generation_counts_model_calls_this_run():
-    """Only AI messages since the latest human message count as this-run model calls."""
+    """Count AI messages after the latest human message."""
     mw = ImmediateGenerationMiddleware()
     messages = [
         HumanMessage("old turn"),
-        AIMessage("old answer"),  # previous turn — must NOT count
+        AIMessage("old answer"),
         HumanMessage("this turn"),
         AIMessage("", tool_calls=[_tool_call("1")]),
         ToolMessage("3", tool_call_id="1"),
@@ -37,10 +37,9 @@ def test_immediate_generation_counts_model_calls_this_run():
 
 
 def test_immediate_generation_forces_tool_free_answer_at_budget():
-    """At the budget, tools are stripped and the synthesize-now instruction is appended."""
+    """Remove tools and add the instruction at the call limit."""
     mw = ImmediateGenerationMiddleware(model_call_limit=2)
     request = MagicMock()
-    # 1 model call already made this run -> next call is the 2nd (== limit) -> force
     request.messages = [HumanMessage("q"), AIMessage("", tool_calls=[_tool_call()])]
     request.system_message = SystemMessage("You are helpful.")
     request.override.return_value = "OVERRIDDEN"
@@ -50,24 +49,24 @@ def test_immediate_generation_forces_tool_free_answer_at_budget():
 
     kwargs = request.override.call_args.kwargs
     assert kwargs["tools"] == []
-    assert "best final answer" in kwargs["system_message"].content  # answer-now wording, not a prohibition
-    assert "You are helpful." in kwargs["system_message"].content  # original preserved
+    assert "best final answer" in kwargs["system_message"].content
+    assert "You are helpful." in kwargs["system_message"].content
     handler.assert_called_once_with("OVERRIDDEN")
     assert result == "RESPONSE"
 
 
 def test_immediate_generation_default_budget_from_recursion_limit():
-    """With no explicit limit, the budget derives from the recursion limit (~half), not a flat 5."""
+    """Set the default budget from the recursion limit."""
     mw = ImmediateGenerationMiddleware()
     assert mw.model_call_limit == max(1, settings.DEFAULT_RECURSION_LIMIT // 2)
-    assert mw.model_call_limit > 5  # not the old over-aggressive default
+    assert mw.model_call_limit > 5
 
 
 def test_immediate_generation_passes_through_under_budget():
-    """Below the budget, the request is forwarded unchanged."""
+    """Forward the request unchanged below the call limit."""
     mw = ImmediateGenerationMiddleware(model_call_limit=5)
     request = MagicMock()
-    request.messages = [HumanMessage("q")]  # 0 calls made -> well under budget
+    request.messages = [HumanMessage("q")]
     handler = MagicMock(return_value="R")
 
     mw.wrap_model_call(request, handler)
@@ -82,10 +81,9 @@ def test_immediate_generation_rejects_bad_limit():
 
 
 def test_sanitize_history_strips_incomplete_tool_calls():
-    """The messages sent to the model have incomplete tool calls removed."""
+    """Remove incomplete tool calls from model messages."""
     mw = SanitizeHistoryMiddleware()
     request = MagicMock()
-    # AIMessage requests a tool but there is no matching ToolMessage (interrupted run)
     request.messages = [HumanMessage("q"), AIMessage("", tool_calls=[_tool_call("missing")])]
     request.override.return_value = "SANITIZED"
     handler = MagicMock(return_value="R")
@@ -93,7 +91,7 @@ def test_sanitize_history_strips_incomplete_tool_calls():
     mw.wrap_model_call(request, handler)
 
     sanitized = request.override.call_args.kwargs["messages"]
-    assert sanitized[-1].tool_calls == []  # incomplete tool call removed
+    assert sanitized[-1].tool_calls == []
     handler.assert_called_once_with("SANITIZED")
 
 
@@ -104,14 +102,13 @@ def _ai_tool(name: str, call_id: str, args: dict | None = None) -> AIMessage:
 def _kept_tool_ids(mw: ClearIntermediateToolCallsMiddleware, messages: list) -> list[str]:
     out = mw._process(messages)
     kept = [m.tool_call_id for m in out if isinstance(m, ToolMessage)]
-    # invariant: pairing is always consistent (no orphan in either direction)
     ai_ids = {c["id"] for m in out if isinstance(m, AIMessage) and m.tool_calls for c in m.tool_calls}
     assert set(kept) == ai_ids
     return kept
 
 
 def test_clear_intermediate_keeps_current_turn_dedups_previous():
-    """Earlier turns keep only the most recent result per key; the current turn is untouched."""
+    """Keep recent prior results and preserve the current turn."""
     mw = ClearIntermediateToolCallsMiddleware(by="name")
     messages = [
         HumanMessage("turn 1"),
@@ -120,16 +117,16 @@ def test_clear_intermediate_keeps_current_turn_dedups_previous():
         _ai_tool("search", "s2"),
         ToolMessage("newer", tool_call_id="s2", name="search"),
         AIMessage("answer 1"),
-        HumanMessage("turn 2"),  # current turn below — preserved in full
+        HumanMessage("turn 2"),
         _ai_tool("search", "s3"),
         ToolMessage("current", tool_call_id="s3", name="search"),
     ]
     kept = _kept_tool_ids(mw, messages)
-    assert kept == ["s2", "s3"]  # s1 (intermediate) dropped; last-of-prev + current kept
+    assert kept == ["s2", "s3"]
 
 
 def test_name_args_preserves_distinct_argument_calls():
-    """by='name_args' (default) keeps repeat calls that have different arguments."""
+    """Keep repeated calls with distinct arguments for `by="name_args"`."""
     mw = ClearIntermediateToolCallsMiddleware(by="name_args")
     messages = [
         HumanMessage("turn 1"),
@@ -139,11 +136,11 @@ def test_name_args_preserves_distinct_argument_calls():
         ToolMessage("paris", tool_call_id="b", name="search"),
         HumanMessage("turn 2"),
     ]
-    assert sorted(_kept_tool_ids(mw, messages)) == ["a", "b"]  # distinct args -> both kept
+    assert sorted(_kept_tool_ids(mw, messages)) == ["a", "b"]
 
 
 def test_name_collapses_distinct_argument_calls():
-    """by='name' collapses repeats of a tool regardless of arguments."""
+    """Collapse repeated calls for `by="name"`."""
     mw = ClearIntermediateToolCallsMiddleware(by="name")
     messages = [
         HumanMessage("turn 1"),
@@ -153,7 +150,7 @@ def test_name_collapses_distinct_argument_calls():
         ToolMessage("paris", tool_call_id="b", name="search"),
         HumanMessage("turn 2"),
     ]
-    assert _kept_tool_ids(mw, messages) == ["b"]  # only the last survives
+    assert _kept_tool_ids(mw, messages) == ["b"]
 
 
 def test_keep_last_n_and_exclude_tools():
@@ -171,9 +168,9 @@ def test_keep_last_n_and_exclude_tools():
         HumanMessage("turn 2"),
     ]
     kept = _kept_tool_ids(mw, messages)
-    assert "s1" not in kept  # keep_last_n=2 -> oldest search dropped
-    assert {"s2", "s3"}.issubset(set(kept))  # last 2 search kept
-    assert "w1" in kept  # excluded tool never deduped
+    assert "s1" not in kept
+    assert {"s2", "s3"}.issubset(set(kept))
+    assert "w1" in kept
 
 
 def test_disabled_passes_through_unchanged():
@@ -190,7 +187,7 @@ def test_disabled_passes_through_unchanged():
 
 
 def test_uses_settings_defaults(monkeypatch):
-    """With no constructor args the middleware reads its config from Settings."""
+    """Read middleware settings when no arguments are set."""
     monkeypatch.setattr(settings, "CLEAR_INTERMEDIATE_TOOL_CALLS_BY", "name")
     monkeypatch.setattr(settings, "CLEAR_INTERMEDIATE_TOOL_CALLS_KEEP_LAST_N", 1)
     monkeypatch.setattr(settings, "CLEAR_INTERMEDIATE_TOOL_CALLS", True)
@@ -210,7 +207,7 @@ def test_clear_intermediate_no_human_returns_unchanged():
 
 
 def test_trim_messages_bounds_to_max_and_starts_on_human():
-    """The model's view is trimmed to the last max_messages, starting on a human turn."""
+    """Trim the model view to `max_messages` from a human turn."""
     mw = TrimMessagesMiddleware(max_messages=4)
     request = MagicMock()
     request.messages = [SystemMessage("sys")] + [
@@ -229,7 +226,6 @@ def test_trim_messages_bounds_to_max_and_starts_on_human():
 def test_trim_messages_keeps_short_history_unchanged():
     mw = TrimMessagesMiddleware(max_messages=10)
     request = MagicMock()
-    # realistic model input ends on a human turn (the model is about to answer it)
     request.messages = [HumanMessage("q1"), AIMessage("a1"), HumanMessage("q2")]
     handler = MagicMock()
 
@@ -248,12 +244,12 @@ def test_trim_messages_rejects_bad_max():
 
 
 def _content_len(messages: list) -> int:
-    """Per-list token-counter stub: total characters of message content."""
+    """Count characters in message content."""
     return sum(len(m.content) for m in messages)
 
 
 def test_token_trim_bounds_to_token_budget():
-    """The model's view is trimmed until the token count fits the budget, starting on a human turn."""
+    """Trim the model view to the token budget from a human turn."""
     mw = TokenTrimMiddleware(max_tokens=12, token_counter=_content_len)
     request = MagicMock()
     request.messages = [
@@ -275,7 +271,7 @@ def test_token_trim_bounds_to_token_budget():
 
 
 def test_token_trim_keeps_system_message():
-    """include_system keeps a system message even when the rest is trimmed to fit the budget."""
+    """Keep the system message when other messages are trimmed."""
     mw = TokenTrimMiddleware(max_tokens=8, token_counter=_content_len)
     request = MagicMock()
     request.messages = [SystemMessage("sys"), HumanMessage("aaaa"), AIMessage("bbbb"), HumanMessage("cccc")]
@@ -288,9 +284,9 @@ def test_token_trim_keeps_system_message():
 
 
 def test_token_trim_disabled_passes_through():
-    """With no budget (None), the middleware is a no-op."""
+    """Keep messages unchanged when the budget is `None`."""
     mw = TokenTrimMiddleware(max_tokens=None)
-    assert mw.max_tokens is None  # toolkit default is opt-in
+    assert mw.max_tokens is None
     request = MagicMock()
     request.messages = [HumanMessage("q1"), AIMessage("a1"), HumanMessage("q2")]
     handler = MagicMock()
@@ -314,7 +310,7 @@ def _latest_human_present(view: list, text: str) -> bool:
 
 
 def test_token_trim_preserves_oversize_latest_human():
-    """A single user message larger than the budget is kept, not dropped to an empty/system-only view."""
+    """Keep an oversized user message."""
     mw = TokenTrimMiddleware(max_tokens=5, token_counter=_content_len)
     request = MagicMock()
     request.messages = [HumanMessage("this question is far longer than the tiny budget UNIQUE")]
@@ -323,11 +319,11 @@ def test_token_trim_preserves_oversize_latest_human():
     mw.wrap_model_call(request, handler)
 
     kept = request.override.call_args.kwargs["messages"]
-    assert _latest_human_present(kept, "UNIQUE")  # question preserved despite exceeding the budget
+    assert _latest_human_present(kept, "UNIQUE")
 
 
 def test_token_trim_preserves_oversize_tool_turn():
-    """A current turn (human + big tool result) over budget is kept verbatim, not emptied."""
+    """Keep an oversized current turn."""
     mw = TokenTrimMiddleware(max_tokens=5, token_counter=_content_len)
     request = MagicMock()
     request.messages = [
@@ -342,14 +338,14 @@ def test_token_trim_preserves_oversize_tool_turn():
     kept = request.override.call_args.kwargs["messages"]
     assert _latest_human_present(kept, "UNIQUE")
     ai_ids = {c["id"] for m in kept if m.type == "ai" and m.tool_calls for c in m.tool_calls}
-    assert all(m.tool_call_id in ai_ids for m in kept if m.type == "tool")  # pairing intact
+    assert all(m.tool_call_id in ai_ids for m in kept if m.type == "tool")
 
 
 def test_trim_messages_preserves_long_tool_burst_turn():
-    """A current turn with more messages than max_messages is kept, not wiped to an empty view."""
+    """Keep a current turn that exceeds `max_messages`."""
     mw = TrimMessagesMiddleware(max_messages=12)
     burst = [HumanMessage("BURST_Q")]
-    for i in range(6):  # 1 human + 6*(AI tool_call, Tool) = 13 messages > 12
+    for i in range(6):
         burst += [_ai_tool("search", f"s{i}"), ToolMessage("r", tool_call_id=f"s{i}", name="search")]
     request = MagicMock()
     request.messages = burst
@@ -358,25 +354,25 @@ def test_trim_messages_preserves_long_tool_burst_turn():
     mw.wrap_model_call(request, handler)
 
     kept = request.override.call_args.kwargs["messages"]
-    assert _latest_human_present(kept, "BURST_Q")  # the human survives the burst
+    assert _latest_human_present(kept, "BURST_Q")
     ai_ids = {c["id"] for m in kept if m.type == "ai" and m.tool_calls for c in m.tool_calls}
     assert all(m.tool_call_id in ai_ids for m in kept if m.type == "tool")
 
 
 def test_keep_latest_turn_floor_keeps_only_latest_turn_and_leading_system():
-    """The floor preserves leading system messages + the latest turn, dropping older over-budget turns."""
+    """Keep leading system messages and the latest turn."""
     from langgraph_agent_toolkit.agents.components.middlewares._history import keep_latest_turn_if_emptied
 
     original = [SystemMessage("sys"), HumanMessage("old"), AIMessage("a"), HumanMessage("latest")]
-    floored = keep_latest_turn_if_emptied(original, [])  # [] simulates a budget collapse
+    floored = keep_latest_turn_if_emptied(original, [])
 
     assert floored[0].type == "system"
     assert floored[-1].content == "latest"
-    assert [m.content for m in floored if m.type == "human"] == ["latest"]  # only the latest turn's human
+    assert [m.content for m in floored if m.type == "human"] == ["latest"]
 
 
 def test_keep_latest_turn_floor_passes_through_healthy_trim():
-    """When trimming kept user content, the floor returns it unchanged."""
+    """Return the trimmed messages when they contain user content."""
     from langgraph_agent_toolkit.agents.components.middlewares._history import keep_latest_turn_if_emptied
 
     original = [HumanMessage("a"), AIMessage("b"), HumanMessage("c")]
@@ -385,7 +381,7 @@ def test_keep_latest_turn_floor_passes_through_healthy_trim():
 
 
 def test_create_agent_with_middleware_runs_end_to_end():
-    """create_agent composes both middleware and runs without error (FAKE model, no tool loop)."""
+    """Verify that ``create_agent`` composes the middleware."""
 
     @tool
     def add(a: int, b: int) -> int:

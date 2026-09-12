@@ -1,4 +1,4 @@
-"""Middleware that trims the model's input to a bounded token budget (view-only)."""
+"""Middleware that limits the model input to a token budget."""
 
 from collections.abc import Awaitable, Callable
 
@@ -13,25 +13,14 @@ from langgraph_agent_toolkit.core.settings import settings
 
 
 class TokenTrimMiddleware(AgentMiddleware):
-    """Bound the model's input to a token budget, non-destructively.
+    """Limit the model input to a token budget.
 
-    The token-counting companion to ``TrimMessagesMiddleware`` (which bounds by *message* count). Each
-    model call sees at most ``max_tokens`` tokens of recent history (trimmed to start on a human turn
-    and to keep the system prompt), while the full history stays in state. Compose the two to cap both
-    message count and token size, as the custom ``create_react_agent``'s ``pre_model_hook`` did.
+    Each model call receives at most ``max_tokens`` from recent history. The
+    middleware keeps the full history in state.
 
     Args:
-        max_tokens: Token budget for the model's message view. Defaults to
-            ``settings.DEFAULT_MAX_TOKENS_HISTORY_LENGTH``. ``None`` (the toolkit default) disables
-            trimming — set it, or pass ``max_tokens``, to a budget appropriate for your model.
-        token_counter: How to count tokens — a per-message or per-list callable, or a chat model.
-            Defaults to ``count_tokens_approximately`` (fast, model-agnostic, no extra dependency).
-            Pass a ``tiktoken``-backed counter (or the model itself) for an exact count.
-
-    Note:
-        On ``create_agent`` the system prompt is never part of ``request.messages`` (it lives on
-        ``request.system_message`` and is prepended at call time), so it is always preserved
-        regardless of the budget.
+        max_tokens: Token budget for the message view. `None` disables trimming.
+        token_counter: Token-counting callable or chat model.
 
     """
 
@@ -62,8 +51,6 @@ class TokenTrimMiddleware(AgentMiddleware):
             include_system=True,
             allow_partial=False,
         )
-        # A latest turn larger than the budget collapses to []; keep that turn (over budget but
-        # answerable) instead of invoking the model with no user content.
         return keep_latest_turn_if_emptied(messages, trimmed)
 
     def wrap_model_call(

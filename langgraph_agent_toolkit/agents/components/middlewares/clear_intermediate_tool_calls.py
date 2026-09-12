@@ -1,4 +1,4 @@
-"""Middleware that drops repeated/intermediate tool calls from earlier turns to save tokens."""
+"""Middleware that removes repeated tool calls from earlier turns."""
 
 import json
 from collections import OrderedDict
@@ -13,7 +13,7 @@ from langgraph_agent_toolkit.core.settings import settings
 
 
 def _args_key(args: object) -> str:
-    """Stable string key for a tool call's arguments (order-independent)."""
+    """Return a stable string key for tool-call arguments."""
     if not args:
         return ""
     try:
@@ -28,8 +28,7 @@ def _compute_kept_ids(
     keep_last_n: int,
     exclude_tools: Collection[str],
 ) -> set[str]:
-    """Decide which tool_call_ids to keep: the last ``keep_last_n`` per dedup key, plus excluded tools."""
-    # tool_call_id -> (name, args_key) from the AIMessage tool calls (where the args live)
+    """Return tool-call IDs to keep."""
     call_meta: dict[str, tuple[str | None, str]] = {}
     for msg in messages:
         if isinstance(msg, AIMessage) and msg.tool_calls:
@@ -46,7 +45,7 @@ def _compute_kept_ids(
         name, args_key = call_meta.get(msg.tool_call_id, (None, ""))
         name = msg.name or name
         if name in exclude_tools:
-            kept.add(msg.tool_call_id)  # protected tool: never deduped
+            kept.add(msg.tool_call_id)
             continue
         key: object = name if by == "name" else (name, args_key)
         groups.setdefault(key, []).append(msg.tool_call_id)
@@ -62,11 +61,10 @@ def _dedup_previous_turns(
     keep_last_n: int,
     exclude_tools: Collection[str],
 ) -> list[BaseMessage]:
-    """Keep only the last ``keep_last_n`` result(s) of each tool key; drop earlier call/result pairs.
+    """Keep the last ``keep_last_n`` result(s) for each tool key.
 
-    Pairing stays consistent: a tool call is kept iff its result is kept, so the output never contains
-    an orphan in either direction. An AIMessage that loses all of its tool calls is kept only if it
-    still has textual content.
+    Keep each tool call with its result. Keep an `AIMessage` that loses all tool
+    calls only when it has text content.
     """
     kept_ids = _compute_kept_ids(messages, by, keep_last_n, exclude_tools)
 
@@ -75,11 +73,10 @@ def _dedup_previous_turns(
         if isinstance(msg, ToolMessage):
             if msg.tool_call_id in kept_ids:
                 result.append(msg)
-            # else: drop intermediate tool result
         elif isinstance(msg, AIMessage) and msg.tool_calls:
             kept_calls = [call for call in msg.tool_calls if call.get("id") in kept_ids]
             if len(kept_calls) == len(msg.tool_calls):
-                result.append(msg)  # nothing to drop
+                result.append(msg)
             elif kept_calls or (msg.content and str(msg.content).strip()):
                 result.append(
                     AIMessage(
@@ -90,25 +87,17 @@ def _dedup_previous_turns(
                         response_metadata=msg.response_metadata,
                     )
                 )
-            # else: AIMessage had only dropped tool calls and no content -> drop entirely
         else:
             result.append(msg)
     return result
 
 
 class ClearIntermediateToolCallsMiddleware(AgentMiddleware):
-    """Reduce tokens by keeping only the most recent result(s) of each tool from *previous* turns.
+    """Reduce tokens by keeping recent tool results from previous turns.
 
-    Ports the ``_clean_intermediate_tool_calls`` history-stripping used in downstream agents: the
-    current turn (everything from the latest human message onward) is preserved in full, while in
-    earlier turns each tool keeps only its last ``keep_last_n`` call/result pair(s).
-
-    Defaults come from ``Settings`` (``CLEAR_INTERMEDIATE_TOOL_CALLS*``) and can be overridden per
-    agent. With ``by="name_args"`` (the default) only genuinely identical repeat calls are collapsed,
-    so distinct-argument calls are preserved; ``by="name"`` is the aggressive variant that collapses
-    all repeats of a tool regardless of arguments. ``exclude_tools`` are never deduped — use it for
-    stateful tools whose every call matters. Only the messages sent to the model are affected;
-    persisted state is left untouched.
+    The current turn remains unchanged. Earlier turns keep only the last
+    ``keep_last_n`` call-and-result pairs for each tool. The middleware changes
+    only the messages sent to the model. It does not change persisted state.
     """
 
     def __init__(

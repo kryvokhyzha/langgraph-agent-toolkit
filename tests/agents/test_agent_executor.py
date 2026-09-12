@@ -15,14 +15,14 @@ from langgraph_agent_toolkit.schema import ChatMessage
 
 
 class MockInput(BaseModel):
-    """Test input model."""
+    """Define test input."""
 
     message: str
 
 
 @pytest.fixture
 def mock_agent(mock_state_snapshot):
-    """Create a mock agent for testing."""
+    """Create a mock agent."""
     agent = Mock(spec=Agent)
     agent.name = "test-agent"
     agent.description = "A test agent"
@@ -33,11 +33,9 @@ def mock_agent(mock_state_snapshot):
     graph.aget_state = AsyncMock(return_value=mock_state_snapshot(values={"messages": []}, tasks=[]))
     agent.graph = graph
 
-    # Properly mock observability with context manager support
     agent.observability = Mock()
     agent.observability.get_callback_handler = Mock(return_value=None)
 
-    # Create a proper context manager mock
     @contextmanager
     def mock_trace_context(*args, **kwargs):
         yield MagicMock()
@@ -49,7 +47,7 @@ def mock_agent(mock_state_snapshot):
 
 @pytest.fixture
 def agent_executor(mock_agent):
-    """Create an AgentExecutor with a mock agent."""
+    """Create an `AgentExecutor` with a mock agent."""
     default_agent = Mock(spec=Agent)
     default_agent.name = settings.DEFAULT_AGENT
     default_agent.description = "Default test agent"
@@ -66,9 +64,9 @@ def agent_executor(mock_agent):
 
 @pytest.mark.asyncio
 async def test_invoke_basic_flow(agent_executor, mock_agent):
-    """Test basic invoke flow with successful response."""
+    """Verify a successful `invoke` response."""
     mock_response = [("values", {"messages": [AIMessage(content="Test response")]})]
-    mock_agent.graph.ainvoke.return_value = mock_response
+    mock_agent.graph.astream = Mock(side_effect=_astream(mock_response))
 
     input_obj = MockInput(message="Hello, agent!")
     result = await agent_executor.invoke(
@@ -83,7 +81,7 @@ async def test_invoke_basic_flow(agent_executor, mock_agent):
     assert result.content == "Test response"
     assert result.run_id is not None
 
-    call_args = mock_agent.graph.ainvoke.call_args[1]
+    call_args = mock_agent.graph.astream.call_args[1]
     config = call_args["config"]
     assert config["configurable"]["thread_id"] == "test-thread"
     assert config["configurable"]["user_id"] == "test-user"
@@ -91,7 +89,7 @@ async def test_invoke_basic_flow(agent_executor, mock_agent):
 
 @pytest.mark.asyncio
 async def test_invoke_with_interrupt_handling(agent_executor, mock_agent, mock_state_snapshot):
-    """Test invoke correctly handles interrupts."""
+    """Verify that `invoke` handles interrupts."""
     with patch.object(settings, "CHECK_INTERRUPTS", True):
         mock_agent.graph.checkpointer = Mock()
 
@@ -99,22 +97,21 @@ async def test_invoke_with_interrupt_handling(agent_executor, mock_agent, mock_s
         interrupt_task.interrupts = [Mock()]
         mock_agent.graph.aget_state.return_value = mock_state_snapshot(values={"messages": []}, tasks=[interrupt_task])
 
-        # ainvoke(stream_mode=["values"]) surfaces the interrupt in the final "values" event.
         mock_response = [("values", {"__interrupt__": [Mock(value="Need more info")]})]
-        mock_agent.graph.ainvoke.return_value = mock_response
+        mock_agent.graph.astream = Mock(side_effect=_astream(mock_response))
 
         user_input = MockInput(message="Continue")
         result = await agent_executor.invoke(agent_id="test-agent", input=user_input)
 
         assert result.content == "Need more info"
 
-        call_args = mock_agent.graph.ainvoke.call_args[1]
+        call_args = mock_agent.graph.astream.call_args[1]
         assert isinstance(call_args["input"], Command)
         assert call_args["input"].resume == user_input.model_dump()
 
 
 def _real_executor(agents: dict) -> AgentExecutor:
-    """Build an AgentExecutor with the given real agents (bypassing import-based loading)."""
+    """Build an `AgentExecutor` with real agents."""
     with (
         patch.object(AgentExecutor, "load_agents_from_imports"),
         patch.object(AgentExecutor, "_validate_default_agent_loaded"),
@@ -135,7 +132,7 @@ def _real_agent(name: str, graph):
 
 @pytest.mark.asyncio
 async def test_invoke_interrupt_then_resume_real_graph():
-    """A real interrupting graph surfaces the interrupt, then resumes on the next invoke."""
+    """Verify that an interrupting graph resumes on the next call."""
     from langgraph.checkpoint.memory import MemorySaver
     from langgraph.graph import END, START, MessagesState, StateGraph
     from langgraph.types import interrupt
@@ -154,14 +151,14 @@ async def test_invoke_interrupt_then_resume_real_graph():
 
     with patch.object(settings, "CHECK_INTERRUPTS", True):
         r1 = await ex.invoke(agent_id="int", input=UserComplexInput(message="my sign?"), thread_id="th")
-        assert r1.content == "What is your birthdate?"  # interrupt surfaced
+        assert r1.content == "What is your birthdate?"
         r2 = await ex.invoke(agent_id="int", input=UserComplexInput(message="1990-05-15"), thread_id="th")
-        assert r2.content == "Got it: 1990-05-15"  # resumed with the reply
+        assert r2.content == "Got it: 1990-05-15"
 
 
 @pytest.mark.asyncio
 async def test_stream_surfaces_structured_response():
-    """Streaming a response_format graph yields structured_response (parity with invoke)."""
+    """Verify that streaming returns `structured_response`."""
     from typing import Annotated, TypedDict
 
     from langgraph.graph import END, START, StateGraph
@@ -195,8 +192,8 @@ async def test_stream_surfaces_structured_response():
 
 @pytest.mark.asyncio
 async def test_error_handling_with_recursion_error(agent_executor, mock_agent):
-    """Test error handling decorator catches GraphRecursionError."""
-    mock_agent.graph.ainvoke.side_effect = GraphRecursionError("Recursion limit exceeded")
+    """Verify that the error handler raises `GraphRecursionError`."""
+    mock_agent.graph.astream = Mock(side_effect=GraphRecursionError("Recursion limit exceeded"))
 
     with pytest.raises(GraphRecursionError, match="Recursion limit exceeded"):
         await agent_executor.invoke(agent_id="test-agent", input=MockInput(message="Test"))
@@ -204,7 +201,7 @@ async def test_error_handling_with_recursion_error(agent_executor, mock_agent):
 
 @pytest.mark.asyncio
 async def test_setup_agent_execution_configuration(agent_executor, mock_agent):
-    """Test _setup_agent_execution correctly configures the agent."""
+    """Verify that `_setup_agent_execution` configures the agent."""
     input_obj = MockInput(message="Hello")
 
     agent, input_data, config, run_id = await agent_executor._setup_agent_execution(
@@ -232,7 +229,7 @@ async def test_setup_agent_execution_configuration(agent_executor, mock_agent):
 
 @pytest.mark.asyncio
 async def test_setup_agent_execution_multimodal_message(agent_executor, mock_agent):
-    """A list-of-content-blocks message becomes a HumanMessage with list content (multimodal input)."""
+    """Verify that content blocks become a `HumanMessage` list."""
     from langgraph_agent_toolkit.schema.schema import UserComplexInput
 
     blocks = [
@@ -257,34 +254,31 @@ async def test_setup_agent_execution_multimodal_message(agent_executor, mock_age
 
 
 def test_user_complex_input_accepts_and_validates_content_blocks():
-    """UserComplexInput accepts text or content blocks, and rejects malformed blocks."""
+    """Verify that `UserComplexInput` validates content blocks."""
     from pydantic import ValidationError
 
     from langgraph_agent_toolkit.schema.schema import UserComplexInput
 
-    # text (back-compat) and valid blocks both accepted
     assert UserComplexInput(message="hi").message == "hi"
     assert len(UserComplexInput(message=[{"type": "image", "url": "https://x/y.jpg"}]).message) == 1
-    # alternative valid content sources must NOT be rejected (permissive — LangChain validates deeply)
     assert UserComplexInput(message=[{"type": "image", "file_id": "file-abc"}]).message
     assert UserComplexInput(message=[{"type": "text", "text": "hello"}]).message
     assert UserComplexInput(message=[{"type": "file", "base64": "QUJD", "mime_type": "application/pdf"}]).message
 
-    # malformed blocks rejected
     for bad in (
-        [{"type": "hologram"}],  # unsupported type
-        [{"text": "no type"}],  # missing type
-        ["not-a-dict"],  # not a dict
-        [{"type": "image"}],  # media block with no content source
-        [{"type": "text"}],  # text block with no 'text' field
-        [{"type": "image", "base64": "QUJD"}],  # base64 without a mime_type
+        [{"type": "hologram"}],
+        [{"text": "no type"}],
+        ["not-a-dict"],
+        [{"type": "image"}],
+        [{"type": "text"}],
+        [{"type": "image", "base64": "QUJD"}],
     ):
         with pytest.raises(ValidationError):
             UserComplexInput(message=bad)
 
 
 def test_user_complex_input_enforces_attachment_limit():
-    """When MULTIMODAL_MAX_ATTACHMENTS is set, too many attachments are rejected (text doesn't count)."""
+    """Reject excess attachments when `MULTIMODAL_MAX_ATTACHMENTS` is set."""
     from pydantic import ValidationError
 
     from langgraph_agent_toolkit.schema.schema import UserComplexInput
@@ -295,16 +289,15 @@ def test_user_complex_input_enforces_attachment_limit():
         with pytest.raises(ValidationError):
             UserComplexInput(message=three_images)
     with patch.object(settings, "MULTIMODAL_MAX_ATTACHMENTS", 5):
-        assert len(UserComplexInput(message=three_images).message) == 4  # 1 text + 3 images
+        assert len(UserComplexInput(message=three_images).message) == 4
 
 
 @pytest.mark.asyncio
 async def test_trace_context_integration(agent_executor, mock_agent):
-    """Test that trace_context is properly integrated with invoke."""
+    """Verify that `invoke` uses `trace_context`."""
     mock_response = [("values", {"messages": [AIMessage(content="Response")]})]
-    mock_agent.graph.ainvoke.return_value = mock_response
+    mock_agent.graph.astream = Mock(side_effect=_astream(mock_response))
 
-    # Track if trace_context was called by wrapping it
     trace_context_called = False
     original_trace_context = mock_agent.observability.trace_context
 
@@ -325,12 +318,11 @@ async def test_trace_context_integration(agent_executor, mock_agent):
         user_id="test-user",
     )
 
-    # Verify trace_context was called
     assert trace_context_called
 
 
 def test_agent_management_operations(mock_agent):
-    """Test agent add/get operations."""
+    """Verify agent add and get operations."""
     with patch.object(AgentExecutor, "load_agents_from_imports"):
         with patch.object(AgentExecutor, "_validate_default_agent_loaded"):
             executor = AgentExecutor("dummy_import:dummy_agent")
@@ -356,7 +348,7 @@ def test_agent_management_operations(mock_agent):
 
 
 def _astream(events):
-    """Build an async-generator stand-in for graph.astream that yields the given (mode, event) tuples."""
+    """Build an async generator that yields the specified events."""
 
     async def _gen(*args, **kwargs):
         for event in events:
@@ -366,7 +358,7 @@ def _astream(events):
 
 
 async def test_stream_updates_emits_message(agent_executor, mock_agent):
-    """An 'updates' event with messages yields a converted ChatMessage."""
+    """Verify that an `updates` event yields a `ChatMessage`."""
     mock_agent.graph.astream = _astream([("updates", {"agent": {"messages": [AIMessage(content="hello")]}})])
 
     out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
@@ -377,7 +369,7 @@ async def test_stream_updates_emits_message(agent_executor, mock_agent):
 
 
 async def test_stream_supervisor_keeps_only_last_ai_message(agent_executor, mock_agent):
-    """The 'supervisor' node is special-cased to emit only its last AIMessage."""
+    """Verify that the supervisor emits its last `AIMessage`."""
     mock_agent.graph.astream = _astream(
         [("updates", {"supervisor": {"messages": [AIMessage(content="a"), AIMessage(content="b")]}})]
     )
@@ -388,7 +380,7 @@ async def test_stream_supervisor_keeps_only_last_ai_message(agent_executor, mock
 
 
 async def test_stream_expert_node_becomes_tool_message(agent_executor, mock_agent):
-    """research_expert/math_expert updates are rewritten as tool messages."""
+    """Verify that expert updates become tool messages."""
     mock_agent.graph.astream = _astream(
         [("updates", {"research_expert": {"messages": [AIMessage(content="research result")]}})]
     )
@@ -401,7 +393,7 @@ async def test_stream_expert_node_becomes_tool_message(agent_executor, mock_agen
 
 
 async def test_stream_interrupt_yields_ai_message(agent_executor, mock_agent):
-    """An __interrupt__ update yields its value as an AIMessage."""
+    """Verify that an interrupt update yields an `AIMessage`."""
     mock_agent.graph.astream = _astream([("updates", {"__interrupt__": [Mock(value="need input")]})])
 
     out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]
@@ -411,7 +403,7 @@ async def test_stream_interrupt_yields_ai_message(agent_executor, mock_agent):
 
 
 async def test_stream_tokens_filters_skip_stream_and_non_chunks(agent_executor, mock_agent):
-    """'messages' mode yields token strings, skipping skip_stream-tagged and non-AIMessageChunk events."""
+    """Verify that `messages` mode yields valid token strings."""
     mock_agent.graph.astream = _astream(
         [
             ("messages", (AIMessageChunk(content="hi"), {"tags": []})),
@@ -426,7 +418,7 @@ async def test_stream_tokens_filters_skip_stream_and_non_chunks(agent_executor, 
 
 
 async def test_stream_reassembles_tuple_parts_into_message(agent_executor, mock_agent):
-    """Streamed (field, value) tuple parts are reassembled into a single AIMessage."""
+    """Verify that tuple parts form one `AIMessage`."""
     mock_agent.graph.astream = _astream([("updates", {"agent": {"messages": [("content", "assembled")]}})])
 
     out = [m async for m in agent_executor.stream(agent_id="test-agent", input=MockInput(message="hi"))]

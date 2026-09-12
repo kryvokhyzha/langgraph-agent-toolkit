@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---------------------------------------------------------------------------
-# Builder: install the minimal Streamlit client deps into an isolated venv.
+# Builder: install the minimum Streamlit client dependencies in an isolated virtual environment.
 # ---------------------------------------------------------------------------
 FROM python:3.13-slim AS builder
 
@@ -15,11 +15,13 @@ COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /bin/uv
 WORKDIR /app
 
 COPY pyproject.toml uv.lock ./
+# Use the source-only client group to omit the service dependency set.
+# Published package users can install the `ui` extra instead.
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --only-group client
 
 # ---------------------------------------------------------------------------
-# Runtime: minimal image with just the venv + application source.
+# Runtime: include only the virtual environment and application source.
 # ---------------------------------------------------------------------------
 FROM python:3.13-slim AS runtime
 

@@ -6,7 +6,6 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig, RunnableLambda, RunnableSerializable
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.types import interrupt
 from pydantic import BaseModel, Field
@@ -18,10 +17,7 @@ from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
 class AgentState(MessagesState, total=False):
-    """`total=False` is PEP589 specs.
-
-    documentation: https://typing.readthedocs.io/en/latest/spec/typeddict.html#totality
-    """
+    """State that permits optional keys."""
 
     birthdate: datetime | None
 
@@ -44,9 +40,11 @@ Don't tell the user what their sign is, you are just demonstrating your knowledg
 
 
 async def background(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Demonstrate doing work before the interrupt."""
+    """Run a model call before the interrupt."""
     m = CompletionModelFactory.create(
-        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_provider=config["configurable"].get(
+            "model_provider", ModelProvider.FAKE if settings.USE_FAKE_MODEL else ModelProvider.OPENAI
+        ),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
@@ -76,12 +74,14 @@ class BirthdateExtraction(BaseModel):
 
 
 async def determine_birthdate(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Examine the conversation history to determine user's birthdate.
+    """Find the user's birthdate in the conversation history.
 
-    If no birthdate is found, it will perform an interrupt before proceeding.
+    Interrupt when no birthdate is found.
     """
     m = CompletionModelFactory.create(
-        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_provider=config["configurable"].get(
+            "model_provider", ModelProvider.FAKE if settings.USE_FAKE_MODEL else ModelProvider.OPENAI
+        ),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         config_prefix="",
         configurable_fields=(),
@@ -103,27 +103,20 @@ async def determine_birthdate(state: AgentState, config: RunnableConfig) -> Agen
     else:
         raise ValueError("No valid response from the model")
 
-    # If no birthdate found, interrupt
     if response.birthdate is None:
-        # from langgraph_agent_toolkit.helper.exceptions import InputValidationError
-        # raise InputValidationError("No birthdate found in the conversation history.")
         birthdate_input = interrupt(f"{response.reasoning}\nPlease tell me your birthdate?")
-        # Re-run extraction with the new input
         state["messages"].append(HumanMessage(birthdate_input["message"]))
         return await determine_birthdate(state, config)
 
-    # Birthdate found - convert string to datetime
     try:
         birthdate = datetime.fromisoformat(response.birthdate)
     except ValueError:
-        # If parsing fails, ask for clarification
         birthdate_input = interrupt(
             "I couldn't understand the date format. Please provide your birthdate in YYYY-MM-DD format."
         )
         state["messages"].append(HumanMessage(birthdate_input["message"]))
         return await determine_birthdate(state, config)
 
-    # Birthdate found
     return {
         "messages": [],
         "birthdate": birthdate,
@@ -137,12 +130,14 @@ What is the sign of somebody born on {birthdate}?
 
 
 async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Determine the zodiac sign of the user based on their birthdate."""
+    """Determine the user's zodiac sign from their birthdate."""
     if not state.get("birthdate"):
         raise ValueError("No birthdate found in state")
 
     m = CompletionModelFactory.create(
-        model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+        model_provider=config["configurable"].get(
+            "model_provider", ModelProvider.FAKE if settings.USE_FAKE_MODEL else ModelProvider.OPENAI
+        ),
         model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
         openai_api_base=settings.OPENAI_API_BASE_URL,
         openai_api_key=settings.OPENAI_API_KEY,
@@ -153,7 +148,6 @@ async def determine_sign(state: AgentState, config: RunnableConfig) -> AgentStat
     return {"messages": [AIMessage(content=response.content)]}
 
 
-# Define the graph
 agent = StateGraph(AgentState)
 agent.add_node("background", background)
 agent.add_node("determine_birthdate", determine_birthdate)
@@ -167,6 +161,6 @@ agent.add_edge("determine_sign", END)
 interrupt_agent = Agent(
     name="interrupt-agent",
     description="An agent the uses interrupts.",
-    graph=agent.compile(checkpointer=MemorySaver()),
+    graph=agent.compile(checkpointer=None),
 )
 interrupt_agent.graph.name = "interrupt-agent"
