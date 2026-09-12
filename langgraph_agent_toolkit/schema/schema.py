@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, NotRequired
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.core.settings import settings
@@ -11,7 +11,7 @@ from langgraph_agent_toolkit.helper.constants import (
 
 
 class AgentInfo(BaseModel):
-    """Info about an available agent."""
+    """Information about an available agent."""
 
     key: str = Field(
         description="Agent key.",
@@ -24,7 +24,7 @@ class AgentInfo(BaseModel):
 
 
 class ServiceMetadata(BaseModel):
-    """Metadata about the service including available agents and models."""
+    """Service metadata, including available agents and models."""
 
     agents: list[AgentInfo] = Field(
         description="List of available agents.",
@@ -36,7 +36,7 @@ class ServiceMetadata(BaseModel):
 
 
 class UserComplexInput(BaseModel):
-    """Basic user input for the agent, supporting dynamic fields."""
+    """User input for an agent with dynamic fields."""
 
     message: str | list[dict[str, Any]] | None = Field(
         default=None,
@@ -66,13 +66,16 @@ class UserComplexInput(BaseModel):
     @field_validator("message")
     @classmethod
     def _validate_content_blocks(cls, value: "str | list[dict[str, Any]] | None"):
-        """Lightly validate multimodal content blocks; LangChain does the deep validation downstream."""
+        """Validate basic multimodal content block requirements.
+
+        LangChain does detailed validation later.
+        """
         if not isinstance(value, list):
             return value
         allowed = {"text", "image", "file", "audio", "video"}
-        # Any recognized content source. Kept permissive on purpose so valid alternative forms
-        # (file_id, id, source_type, ...) are not rejected — only blocks that carry no content
-        # reference at all (e.g. {"type": "image"}) fail here; LangChain does the deep validation.
+        # Accept each recognized content source.
+        # LangChain validates alternative forms, such as `file_id`, `id`, and `source_type`.
+        # Reject only blocks without a content reference, such as {"type": "image"}.
         content_keys = {"url", "base64", "data", "file_id", "id", "source_type", "source", "path"}
         media_count = 0
         for i, block in enumerate(value):
@@ -105,7 +108,7 @@ class UserComplexInput(BaseModel):
 
 
 class UserInput(BaseModel):
-    """Basic user input for the agent."""
+    """User input for an agent."""
 
     input: UserComplexInput = Field(
         description="Structured input from the user, including a message and optional dynamic fields.",
@@ -134,12 +137,12 @@ class UserInput(BaseModel):
         examples=["gpt4o", "gemini"],
     )
     thread_id: str | None = Field(
-        description="Thread ID to persist and continue a multi-turn conversation.",
+        description="Thread ID for one conversation and its short-term checkpoint state.",
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     user_id: str | None = Field(
-        description="User ID to persist in observability platform and share long-term memory.",
+        description="Stable user ID for observability and long-term memory across threads when the agent has a store.",
         default=None,
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
@@ -161,7 +164,7 @@ class UserInput(BaseModel):
 
 
 class StreamInput(UserInput):
-    """User input for streaming the agent's response."""
+    """User input for streaming an agent response."""
 
     stream_tokens: bool = Field(
         description="Whether to stream LLM tokens to the client.",
@@ -170,19 +173,29 @@ class StreamInput(UserInput):
 
 
 class ToolCall(TypedDict):
-    """Represents a request to call a tool."""
+    """Tool call request."""
 
     name: str
-    """The name of the tool to be called."""
+    """Tool name."""
     args: dict[str, Any]
-    """The arguments to the tool call."""
+    """Tool call arguments."""
     id: str | None
-    """An identifier associated with the tool call."""
+    """Tool call identifier."""
     type: NotRequired[Literal["tool_call"]]
 
 
+class UsageMetadata(TypedDict):
+    """Provider token counts in the LangChain usage format."""
+
+    input_tokens: int
+    output_tokens: int
+    total_tokens: int
+    input_token_details: NotRequired[dict[str, int]]
+    output_token_details: NotRequired[dict[str, int]]
+
+
 class ChatMessage(BaseModel):
-    """Message in a chat."""
+    """Chat message."""
 
     type: Literal["human", "ai", "tool", "custom"] = Field(
         description="Role of the message.",
@@ -206,9 +219,20 @@ class ChatMessage(BaseModel):
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
+    feedback_token: str | None = Field(
+        default=None,
+        description="Server proof for feedback on this run. Send it with feedback from a token user.",
+        max_length=128,
+    )
+    thread_id: str | None = Field(
+        default=None, description="Public thread ID. Use this ID to continue the conversation."
+    )
     response_metadata: dict[str, Any] = Field(
         description="Response metadata. For example: response headers, logprobs, token counts.",
         default={},
+    )
+    usage_metadata: UsageMetadata | None = Field(
+        default=None, description="Provider token counts. None means that counts are unavailable."
     )
     custom_data: dict[str, Any] = Field(
         description="Custom message data.",
@@ -216,7 +240,7 @@ class ChatMessage(BaseModel):
     )
 
     def pretty_repr(self) -> str:
-        """Get a pretty representation of the message."""
+        """Get a readable message representation."""
         base_title = self.type.title() + " Message"
         padded = " " + base_title + " "
         sep_len = (80 - len(padded)) // 2
@@ -230,13 +254,12 @@ class ChatMessage(BaseModel):
 
 
 class StreamChunk(BaseModel):
-    """A single chunk of a JSON Lines (NDJSON) agent stream.
+    """One JSON Lines (NDJSON) chunk from an agent stream.
 
-    One StreamChunk is emitted per line by the ``/stream/jsonl`` endpoint:
-
-    - ``type="token"``   -> ``content`` is an incremental token string.
-    - ``type="message"`` -> ``content`` is a complete :class:`ChatMessage`.
-    - ``type="error"``   -> ``content`` is an error description string.
+    The ``/stream/jsonl`` endpoint emits one `StreamChunk` per line.
+    `type="token"` contains an incremental token string.
+    `type="message"` contains a complete `ChatMessage`.
+    `type="error"` contains an error description string.
     """
 
     type: Literal["token", "message", "error"] = Field(description="The kind of chunk.")
@@ -244,18 +267,23 @@ class StreamChunk(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """Standard error response body returned by the service's exception handlers."""
+    """Standard error response from service exception handlers."""
 
     detail: str = Field(description="Human-readable error message.")
     error_code: str | None = Field(default=None, description="Stable machine-readable error code, when present.")
 
 
 class Feedback(BaseModel):
-    """Feedback for a run, to record to LangSmith."""
+    """Feedback for the configured observability platform."""
 
     run_id: str = Field(
         description="Run ID to record feedback for.",
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    feedback_token: str | None = Field(
+        default=None,
+        description="Server proof from the response. Required for feedback from a token user.",
+        max_length=128,
     )
     key: str = Field(
         description="Feedback key.",
@@ -278,7 +306,7 @@ class Feedback(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
-    """Response after recording feedback."""
+    """Response after feedback is recorded."""
 
     status: Literal["success"] = "success"
     run_id: str = Field(
@@ -292,28 +320,46 @@ class FeedbackResponse(BaseModel):
 
 
 class MessageInput(BaseModel):
-    """Input for a message to be added to the chat history."""
+    """Input for a chat history message."""
 
     type: Literal["human", "ai", "tool", "custom"] = Field(
         description="Role of the message.",
         examples=["human", "ai", "tool", "custom"],
     )
-    content: str = Field(
+    content: str | list[str | dict[str, Any]] = Field(
         description="Content of the message.",
         examples=["Hello, world!"],
     )
+    custom_data: dict[str, Any] | None = Field(default=None, description="Payload for a custom message.")
+    tool_call_id: str | None = Field(default=None, description="ID of the tool call for a tool response.")
+    tool_calls: list[ToolCall] = Field(default_factory=list, description="Tool calls in an AI message.")
+    usage_metadata: UsageMetadata | None = Field(default=None, description="Provider token counts for an AI message.")
+    response_metadata: dict[str, Any] = Field(default_factory=dict, description="Provider response metadata.")
+
+    @model_validator(mode="after")
+    def validate_tool_message(self) -> "MessageInput":
+        """Require the call ID for tool responses."""
+        if self.type == "custom" and self.custom_data is None:
+            raise ValueError("A custom message must include custom_data.")
+        if self.type == "tool" and not self.tool_call_id:
+            raise ValueError("A tool message must include tool_call_id.")
+        if self.tool_calls and self.type != "ai":
+            raise ValueError("Only AI messages can include tool_calls.")
+        if self.usage_metadata is not None and self.type != "ai":
+            raise ValueError("Only AI messages can include usage_metadata.")
+        return self
 
 
 class AddMessagesInput(BaseModel):
-    """Input for adding messages to the chat history."""
+    """Input for adding chat history messages."""
 
     thread_id: str | None = Field(
-        description="Thread ID to persist and continue a multi-turn conversation.",
+        description="Thread ID for one conversation and its short-term checkpoint state.",
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     user_id: str | None = Field(
-        description="User ID to persist in observability platform and share long-term memory.",
+        description="Owner of this thread. This operation does not read or change long-term memory.",
         default=None,
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
@@ -335,7 +381,7 @@ class AddMessagesInput(BaseModel):
 
 
 class AddMessagesResponse(BaseModel):
-    """Response after adding messages to the chat history."""
+    """Response after chat history messages are added."""
 
     status: Literal["success"] = "success"
     thread_id: str | None = Field(
@@ -355,22 +401,22 @@ class AddMessagesResponse(BaseModel):
 
 
 class ClearHistoryInput(BaseModel):
-    """Input for clearing messages from the chat history."""
+    """Input for clearing one thread's checkpoints without changing long-term memory."""
 
     thread_id: str | None = Field(
-        description="Thread ID to persist and continue a multi-turn conversation.",
+        description="Thread ID for one conversation and its short-term checkpoint state.",
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     user_id: str | None = Field(
-        description="User ID to persist in observability platform and share long-term memory.",
+        description="Owner of this thread. This operation does not read or change long-term memory.",
         default=None,
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
 
 
 class ClearHistoryResponse(BaseModel):
-    """Response after clearing messages from the chat history."""
+    """Response after chat history messages are cleared."""
 
     status: Literal["success"] = "success"
     thread_id: str | None = Field(
@@ -393,23 +439,27 @@ class ChatHistoryInput(BaseModel):
     """Input for retrieving chat history."""
 
     thread_id: str | None = Field(
-        description="Thread ID to persist and continue a multi-turn conversation.",
+        description="Thread ID for one conversation and its short-term checkpoint state.",
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     user_id: str | None = Field(
-        description="User ID to persist in observability platform and share long-term memory.",
+        description="Owner of this thread. This operation does not read or change long-term memory.",
         default=None,
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
+    offset: int = Field(default=0, ge=0, description="Number of messages to skip.")
+    limit: int = Field(default=100, ge=1, le=1000, description="Maximum number of messages to return.")
 
 
 class ChatHistory(BaseModel):
     messages: list[ChatMessage]
+    next_offset: int | None = None
+    total: int | None = None
 
 
 class HealthCheck(BaseModel):
-    """Response model to validate and return when performing a health check."""
+    """Response model for a health check."""
 
     content: str = Field(
         ...,
@@ -424,7 +474,7 @@ class HealthCheck(BaseModel):
 
 
 class LivenessResponse(BaseModel):
-    """Response model for liveness probe - checks if the process is alive."""
+    """Response model for a liveness probe."""
 
     status: Literal["alive", "unhealthy"] = Field(
         description="Liveness status of the service.",
@@ -437,7 +487,7 @@ class LivenessResponse(BaseModel):
 
 
 class ReadinessResponse(BaseModel):
-    """Response model for readiness probe - checks if service can accept traffic."""
+    """Response model for a readiness probe."""
 
     status: Literal["ready", "not_ready"] = Field(
         description="Readiness status of the service.",
@@ -460,7 +510,7 @@ class ReadinessResponse(BaseModel):
 
 
 class StartupResponse(BaseModel):
-    """Response model for startup probe - checks if application has started."""
+    """Response model for a startup probe."""
 
     status: Literal["started", "starting"] = Field(
         description="Startup status of the service.",
@@ -478,7 +528,7 @@ class StartupResponse(BaseModel):
 
 
 class DatabaseHealthResponse(BaseModel):
-    """Response model for database health check."""
+    """Response model for a database health check."""
 
     status: Literal["healthy", "exhausted", "no_pool", "error"] = Field(
         description="Database connection pool status.",

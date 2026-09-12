@@ -22,12 +22,12 @@ from langgraph_agent_toolkit.core.prompts.chat_prompt_template import Observabil
 
 
 def format_time(seconds: float) -> str:
-    """Format time in ms with 2 decimal places."""
+    """Format seconds as milliseconds with two decimal places."""
     return f"{seconds * 1000:.2f}ms"
 
 
 def print_separator(title: str = None):
-    """Print a separator line with optional title."""
+    """Print a separator line with an optional title."""
     width = 80
     if title:
         print(f"\n{'=' * 5} {title} {'=' * (width - 7 - len(title))}")
@@ -38,15 +38,12 @@ def print_separator(title: str = None):
 if __name__ == "__main__":
     print_separator("ObservabilityChatPromptTemplate Demo")
 
-    # Step 1: Create observability platforms
+    # Create the observability platform.
     os_platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY)
-    # os_platform = ObservabilityFactory.create(ObservabilityBackend.LANGFUSE)
-    # os_platform = ObservabilityFactory.create(ObservabilityBackend.LANGSMITH)
 
     print("✓ Created observability platforms")
 
-    # Step 2: Create and store some sample prompts
-    # Basic system+human prompt
+    # Create and store sample prompts.
     basic_chat_messages: List[ChatMessageDict] = [
         {"role": "system", "content": "You are an AI assistant specialized in {{ domain }}."},
         {"role": "human", "content": "I need help with {{ question }} related to {{ topic }}."},
@@ -54,7 +51,7 @@ if __name__ == "__main__":
     os_platform.push_prompt("basic-assistant", basic_chat_messages)
     print("✓ Stored basic chat prompt")
 
-    # Comprehensive agent prompt
+    # Define a tool-using agent prompt.
     agent_chat_messages: List[ChatMessageDict] = [
         {"role": "system", "content": "You are an AI agent that can use tools. Available tools: {{ tools }}"},
         {"role": "human", "content": "I want to {{ task }} with the following context: {{ context }}"},
@@ -62,7 +59,7 @@ if __name__ == "__main__":
     os_platform.push_prompt("tool-using-agent", agent_chat_messages)
     print("✓ Stored tool-using agent prompt")
 
-    # Conditional prompt with Jinja2 if-else statements
+    # Define a prompt with Jinja2 conditions.
     conditional_chat_messages: List[ChatMessageDict] = [
         {"role": "system", "content": "You are an AI assistant specialized in {{ domain }}."},
         {
@@ -86,63 +83,63 @@ if __name__ == "__main__":
     os_platform.push_prompt("conditional-assistant", conditional_chat_messages)
     print("✓ Stored conditional chat prompt with Jinja2 if-else statements")
 
-    # Step 3: Create ObservabilityChatPromptTemplate instances with different configurations
+    # Create templates with different configurations.
     print_separator("Creating prompt templates")
 
-    # Example 1: Basic template with initialization-time loading
+    # Load this template during initialization.
     print("\n1. Template with initialization-time loading:")
     start_time = time.time()
     init_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="basic-assistant",
         observability_platform=os_platform,
-        load_at_runtime=False,  # Load during initialization
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        load_at_runtime=False,
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
     load_time = time.time() - start_time
     print(f"   ✓ Created template (load time: {format_time(load_time)})")
     print(f"   ✓ Template has {len(init_template.messages)} message(s)")
 
-    # Example 2: Template with runtime loading
+    # Load this template when it runs.
     print("\n2. Template with runtime loading:")
     start_time = time.time()
     runtime_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="tool-using-agent",
         observability_platform=os_platform,
-        load_at_runtime=True,  # Load during invoke
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["tools", "task", "context"],  # Explicitly define input variables
+        load_at_runtime=True,
+        template_format="jinja2",
+        input_variables=["tools", "task", "context"],
     )
     create_time = time.time() - start_time
     print(f"   ✓ Created template (create time: {format_time(create_time)})")
 
-    # Example 3: Using factory method with backend
+    # Create a template from a backend.
     print("\n3. Template using backend factory method:")
     backend_template = ObservabilityChatPromptTemplate.from_observability_backend(
         prompt_name="basic-assistant",
         observability_backend=ObservabilityBackend.EMPTY,
         load_at_runtime=True,
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
     print("   ✓ Created template using backend factory")
 
-    # Example 4: Direct initialization
+    # Create a template directly.
     print("\n4. Template with direct initialization:")
     direct_template = ObservabilityChatPromptTemplate(
         prompt_name="tool-using-agent",
         observability_backend=ObservabilityBackend.EMPTY,
         load_at_runtime=True,
-        template_format="jinja2",  # Specify template format
-        cache_ttl_seconds=120,  # Custom cache TTL
-        input_variables=["tools", "task", "context"],  # Explicitly define input variables
+        template_format="jinja2",
+        cache_ttl_seconds=120,
+        input_variables=["tools", "task", "context"],
     )
     print("   ✓ Created template with direct initialization")
 
-    # Step 4: Invoking the templates
+    # Run the templates.
     print_separator("Invoking templates")
 
-    # Test the initialization-time loaded template
+    # Run the initialization-loaded template.
     print("\n1. Invoking initialization-loaded template:")
     start_time = time.time()
     result1 = init_template.invoke(
@@ -158,7 +155,7 @@ if __name__ == "__main__":
     for msg in result1.to_messages():
         print(f"   - [{msg.type}]: {msg.content}")
 
-    # Test the runtime-loaded template
+    # Run the runtime-loaded template.
     print("\n2. Invoking runtime-loaded template:")
     print("   First invocation (should load the prompt):")
     start_time = time.time()
@@ -176,10 +173,10 @@ if __name__ == "__main__":
     for msg in result2.to_messages():
         print(f"   - [{msg.type}]: {msg.content}")
 
-    # Test conditional template with Jinja2 if-else
+    # Run the conditional template.
     print("\nInvoking conditional template with different expertise levels:")
 
-    # Create conditional template
+    # Create the conditional template.
     conditional_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="conditional-assistant",
         observability_platform=os_platform,
@@ -188,7 +185,7 @@ if __name__ == "__main__":
         input_variables=["domain", "expertise_level", "topic", "context"],
     )
 
-    # Test with different expertise levels
+    # Run the template at each expertise level.
     expertise_levels = ["beginner", "intermediate", "advanced"]
 
     for level in expertise_levels:
@@ -205,25 +202,25 @@ if __name__ == "__main__":
         print(f"   Messages for {level} level:")
         for msg in result.to_messages():
             if msg.type == "human":
-                # Only show the first 100 chars of content for brevity
+                # Show the first 100 characters of the content.
                 content = msg.content.strip()[:100] + "..." if len(msg.content) > 100 else msg.content.strip()
                 print(f"   - [{msg.type}]: {content}")
             else:
                 print(f"   - [{msg.type}]: {msg.content}")
 
-    # Example 5: Create a custom prompt template and add it to a larger template
+    # Add a custom prompt template to a larger template.
     print_separator("Combining with standard ChatPromptTemplate")
 
-    # Create a combined template
+    # Create the combined template.
     observability_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="basic-assistant",
         observability_platform=os_platform,
         load_at_runtime=True,
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
 
-    # Create a standard ChatPromptTemplate
+    # Create a standard `ChatPromptTemplate`.
     standard_template = ChatPromptTemplate.from_messages(
         [
             SystemMessage(content="Additional context: This is a follow-up question."),
@@ -233,7 +230,7 @@ if __name__ == "__main__":
         template_format="jinja2",  # Use jinja2 templating
     )
 
-    # Add them together
+    # Combine the templates.
     combined_template = observability_template + standard_template
 
     print("\nInvoking combined template:")
@@ -254,14 +251,14 @@ if __name__ == "__main__":
     for msg in result3.to_messages():
         print(f"   - [{msg.type}]: {msg.content}")
 
-    # Example 6: Demonstrate platform switching
+    # Switch the observability platform.
     print_separator("Platform switching")
 
     switchable_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="basic-assistant",
         observability_platform=os_platform,
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
 
     print("\n1. Using original platform:")
@@ -273,7 +270,7 @@ if __name__ == "__main__":
         )
     )
 
-    # Create a new platform instance and switch
+    # Create and use a new platform instance.
     new_platform = ObservabilityFactory.create(ObservabilityBackend.EMPTY)
     new_platform.push_prompt(
         "basic-assistant",
@@ -302,28 +299,28 @@ if __name__ == "__main__":
 
     print_separator("Performance comparison")
 
-    # Compare performance of runtime vs initialization loading
+    # Compare runtime and initialization loading.
     print("\nCreating templates:")
 
-    # Init-time template
+    # Create the initialization-loaded template.
     start_time = time.time()
     init_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="basic-assistant",
         observability_platform=os_platform,
         load_at_runtime=False,
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
     init_create_time = time.time() - start_time
 
-    # Runtime template
+    # Create the runtime-loaded template.
     start_time = time.time()
     runtime_template = ObservabilityChatPromptTemplate.from_observability_platform(
         prompt_name="basic-assistant",
         observability_platform=os_platform,
         load_at_runtime=True,
-        template_format="jinja2",  # Use jinja2 templating
-        input_variables=["domain", "question", "topic"],  # Explicitly define input variables
+        template_format="jinja2",
+        input_variables=["domain", "question", "topic"],
     )
     runtime_create_time = time.time() - start_time
 
@@ -332,14 +329,14 @@ if __name__ == "__main__":
 
     print("\nInvoking templates (5 times each):")
 
-    # Test init-time template
+    # Run the initialization-loaded template.
     init_times = []
     for i in range(5):
         start_time = time.time()
         init_template.invoke(input=dict(domain="test", question="question", topic="topic"))
         init_times.append(time.time() - start_time)
 
-    # Test runtime template
+    # Run the runtime-loaded template.
     runtime_times = []
     for i in range(5):
         start_time = time.time()

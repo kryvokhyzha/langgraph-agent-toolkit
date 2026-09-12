@@ -9,17 +9,16 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 
 class EmptyObservability(BaseObservabilityPlatform):
-    """Empty implementation of observability platform with in-memory prompt storage.
+    """Observability platform with in-memory prompt storage.
 
-    This implementation stores prompts in memory, allowing the prompt template
-    system to work without a remote observability backend like Langfuse or LangSmith.
+    This supports prompt templates without a remote Langfuse or LangSmith backend.
     """
 
     def __init__(self, remote_first: bool = False):
         """Initialize EmptyObservability.
 
         Args:
-            remote_first: Ignored in empty implementation.
+            remote_first: Ignored by this implementation.
 
         """
         super().__init__(remote_first)
@@ -35,7 +34,7 @@ class EmptyObservability(BaseObservabilityPlatform):
         pass
 
     def record_feedback(self, run_id: str, key: str, score: float, **kwargs) -> None:
-        """Record feedback - silently ignored without a remote backend."""
+        """Record feedback by ignoring it without a remote backend."""
         logger.debug(f"Feedback ignored (no observability backend): run_id={run_id}, key={key}, score={score}")
 
     def push_prompt(
@@ -48,10 +47,10 @@ class EmptyObservability(BaseObservabilityPlatform):
         """Store a prompt in memory.
 
         Args:
-            name: Name of the prompt
-            prompt_template: The prompt template to store
-            metadata: Optional metadata for the prompt
-            force_create_new_version: If True, overwrite existing prompt
+            name: Prompt name.
+            prompt_template: Prompt template to store.
+            metadata: Optional prompt metadata.
+            force_create_new_version: Overwrite an existing prompt when `True`.
 
         """
         if name in self._prompts and not force_create_new_version:
@@ -72,15 +71,15 @@ class EmptyObservability(BaseObservabilityPlatform):
         """Retrieve a prompt from memory.
 
         Args:
-            name: Name of the prompt to retrieve
-            template_format: Format for the template (used for processing)
-            **kwargs: Additional arguments (ignored)
+            name: Prompt name.
+            template_format: Template format for processing.
+            **kwargs: Ignored arguments.
 
         Returns:
-            The stored prompt template, processed into a ChatPromptTemplate
+            Stored prompt template as a `ChatPromptTemplate`.
 
         Raises:
-            ValueError: If prompt not found in memory
+            ValueError: If the prompt is missing from memory.
 
         """
         if name not in self._prompts:
@@ -91,14 +90,14 @@ class EmptyObservability(BaseObservabilityPlatform):
 
         prompt_template = self._prompts[name]
 
-        # Process the prompt using the base class helper
+        # Process the prompt with the base-class helper.
         return self._process_prompt_object(prompt_template, template_format=template_format)
 
     def delete_prompt(self, name: str) -> None:
         """Delete a prompt from memory.
 
         Args:
-            name: Name of the prompt to delete
+            name: Prompt name to delete.
 
         """
         if name in self._prompts:

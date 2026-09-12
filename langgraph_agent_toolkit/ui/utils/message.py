@@ -1,4 +1,4 @@
-"""Message helpers for the Streamlit UI: welcome messages, feedback, and multimodal content blocks."""
+"""Provide Streamlit message, feedback, and multimodal content helpers."""
 
 import base64
 
@@ -10,7 +10,7 @@ from langgraph_agent_toolkit.schema import ChatMessage
 
 
 def create_welcome_message(agent: str) -> ChatMessage:
-    """Create a welcome message based on the current agent."""
+    """Create a welcome message for the current agent."""
     match agent:
         case "chatbot":
             welcome_content = "Hello! I'm a simple chatbot. Ask me anything!"
@@ -24,7 +24,7 @@ def create_welcome_message(agent: str) -> ChatMessage:
 
 
 def file_to_content_block(file) -> dict:
-    """Encode an uploaded Streamlit file as a LangChain multimodal content block (base64)."""
+    """Encode an uploaded Streamlit file as a base64 LangChain content block."""
     mime = file.type or "application/octet-stream"
     data = base64.b64encode(file.getvalue()).decode("utf-8")
     if mime.startswith("image/"):
@@ -39,7 +39,7 @@ def file_to_content_block(file) -> dict:
 
 
 def build_chat_message(text: str, files: list) -> str | list[dict]:
-    """Return plain text, or a list of content blocks when files are attached."""
+    """Return text or content blocks when files are attached."""
     if not files:
         return text
     blocks: list[dict] = []
@@ -50,7 +50,7 @@ def build_chat_message(text: str, files: list) -> str | list[dict]:
 
 
 def render_human_message(content: str | list) -> None:
-    """Render a user message that may be plain text or a list of multimodal content blocks."""
+    """Render text or multimodal content blocks from a user message."""
     if not isinstance(content, list):
         st.write(content)
         return
@@ -61,7 +61,7 @@ def render_human_message(content: str | list) -> None:
         elif btype == "image" and block.get("url"):
             st.image(block["url"])
         elif btype == "image" and block.get("base64"):
-            # A malformed base64 payload (e.g. replayed from history) must not crash the app.
+            # Do not crash when history contains invalid base64 data.
             try:
                 st.image(base64.b64decode(block["base64"]))
             except Exception:
@@ -71,8 +71,8 @@ def render_human_message(content: str | list) -> None:
 
 
 async def handle_feedback() -> None:
-    """Draw a feedback widget and record feedback from the user."""
-    # Keep track of last feedback sent to avoid sending duplicates
+    """Draw the feedback widget and record user feedback."""
+    # Store the last feedback to prevent duplicate records.
     if "last_feedback" not in st.session_state:
         st.session_state.last_feedback = (None, None)
 
@@ -81,9 +81,9 @@ async def handle_feedback() -> None:
     if latest_run_id:
         feedback = st.feedback("stars", key=latest_run_id)
 
-        # If the feedback value or run ID has changed, send a new feedback record
+        # Send a record when the feedback value or run ID changes.
         if feedback is not None and (latest_run_id, feedback) != st.session_state.last_feedback:
-            # Normalize the feedback value (an index) to a score between 0 and 1
+            # Convert the feedback index to a score from 0 to 1.
             normalized_score = (feedback + 1) / 5.0
 
             agent_client: AgentClient = st.session_state.agent_client
@@ -93,7 +93,8 @@ async def handle_feedback() -> None:
                     key="human-feedback-stars",
                     score=normalized_score,
                     kwargs={"comment": "In-line human feedback"},
-                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
+                    user_id=settings.DEFAULT_STREAMLIT_USER_ID if settings.AUTH_MODE == "trusted" else None,
+                    feedback_token=st.session_state.messages[-1].feedback_token,
                 )
             except AgentClientError as e:
                 st.error(f"Error recording feedback: {e}")

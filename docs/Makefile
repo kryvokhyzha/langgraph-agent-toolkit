@@ -1,20 +1,28 @@
-# Minimal makefile for Sphinx documentation
+# Minimal Makefile for Sphinx documentation.
 #
 
-# You can set these variables from the command line, and also
-# from the environment for the first two.
-SPHINXOPTS    ?=
-SPHINXBUILD   ?= sphinx-build
+# Set these variables on the command line.
+# You can also set the first two variables in the environment.
+SPHINXOPTS    ?= -W --keep-going
+SPHINXBUILD   ?= uv run --no-sync sphinx-build
+SPHINXAPIDOC  ?= uv run --no-sync sphinx-apidoc
 SOURCEDIR     = .
 BUILDDIR      = _build
 
-# Put it first so that "make" without argument is like "make help".
+# Place this target first so `make` runs `make help` by default.
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+.PHONY: help api html Makefile
 
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+# Generate the API root and remove pages for deleted modules.
+api:
+	@$(SPHINXAPIDOC) -f -e -M --remove-old -o generated ../langgraph_agent_toolkit --doc-project="API Reference"
+
+html: api
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+# Send unknown targets to Sphinx with the `make` mode.
+# `$(O)` is a shortcut for `$(SPHINXOPTS)`.
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

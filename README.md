@@ -1,232 +1,205 @@
 <div align="center">
-   <img alt="LangGraph Agent Toolkit Logo" src="https://raw.githubusercontent.com/kryvokhyzha/langgraph-agent-toolkit/main/docs/media/logo.svg" width="300">
+  <img alt="LangGraph Agent Toolkit" src="https://raw.githubusercontent.com/kryvokhyzha/langgraph-agent-toolkit/main/docs/media/logo.svg" width="260">
 </div>
 
----
-
-# 🧰 LangGraph Agent Toolkit
-
-|            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CI/Testing | [![build status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml) [![docs status](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml) [![codecov](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit/graph/badge.svg?token=OHSACTNSWZ)](https://codecov.io/gh/kryvokhyzha/langgraph-agent-toolkit) |
-| Package    | [![PyPI version](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![PyPI Downloads](https://img.shields.io/pypi/dm/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/) [![Python Version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fkryvokhyzha%2Flanggraph-agent-toolkit%2Fmain%2Fpyproject.toml)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/pyproject.toml)                          |
-| Meta       | [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![GitHub License](https://img.shields.io/github/license/kryvokhyzha/langgraph-agent-toolkit)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/LICENSE)                                                                                                                                                                                                                                      |
-
-<!-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_red.svg)](https://langgraph-agent-toolkit.streamlit.app/) -->
-
-## 📋 Introduction
-
-A comprehensive toolkit for building, deploying, and managing AI agents using
-LangGraph, FastAPI, and Streamlit. It provides a production-ready framework for
-creating conversational AI agents with features like multi-provider LLM support,
-streaming responses, observability, memory and prompt management.
-
-### What is langGraph-agent-toolkit?
-
-The langgraph-agent-toolkit is a full-featured framework for developing and
-deploying AI agent services. Built on the foundation of:
-
-- **[LangGraph](https://langchain-ai.github.io/langgraph/)** for agent creation
-  with advanced flows and human-in-the-loop capabilities
-- **[FastAPI](https://fastapi.tiangolo.com/)** for robust, high-performance API
-  services with streaming support
-- **[Streamlit](https://streamlit.io/)** for intuitive user interfaces
-
-Key components include:
-
-- Data structures and settings built with
-  **[Pydantic](https://github.com/pydantic/pydantic)**
-- **[LiteLLM](https://github.com/BerriAI/litellm)** proxy for universal
-  multi-provider LLM support
-- Comprehensive memory management and persistence using PostgreSQL/SQLite
-- Advanced observability tooling via Langfuse and Langsmith
-- Modular architecture allowing customization while maintaining a consistent
-  application structure
-
-Whether you're building a simple chatbot or complex multi-agent system, this
-toolkit provides the infrastructure to develop, test, and deploy your
-LangGraph-based agents with confidence.
-
-You can use [DeepWiki](https://deepwiki.com/kryvokhyzha/langgraph-agent-toolkit)
-to learn more about this repository.
-
-## 📑 Contents
-
-- [Introduction](#-introduction)
-- [Quickstart](#-quickstart)
-- [Installation Options](#-installation-options)
-- [Architecture](#architecture)
-- [Key Features](#-key-features)
-- [Environment Setup](#environment-setup)
-- [Project Structure](#-project-structure)
-- [Setup and Usage](#setup-and-usage)
-- [Documentation](#-documentation)
-- [Useful Resources](#-useful-resources)
-- [Development and Contributing](#-development-and-contributing)
-- [License](#-license)
-
-## 🚀 Quickstart
-
-1. Create a `.env` file based on [`.env.example`](./.env.example)
-
-2. **Option 1: Run with Python from source**
-
-   ```sh
-   # Install dependencies
-   pip install uv
-   uv sync --frozen
-   source .venv/bin/activate
-
-   # Start the service
-   python langgraph_agent_toolkit/run_api.py
-
-   # In another terminal
-   source .venv/bin/activate
-   streamlit run langgraph_agent_toolkit/run_app.py
-   ```
-
-3. **Option 2: Run with Python from PyPi repository**
-
-   ```sh
-   pip install langgraph-agent-toolkit
-   ```
-
-   ℹ️ For more details on installation options, see the
-   [Installation Documentation](docs/installation.rst).
-
-4. **Option 3: Run with Docker**
-
-   ```sh
-   docker compose watch
-   ```
-
-<a name="installation-options"></a>
-
-## 📦 Installation Options
-
-The toolkit supports multiple installation options using "extras" to include
-just the dependencies you need.
-
-For detailed installation instructions and available extras, see the
-[Installation Documentation](docs/installation.rst).
-
-<a name="architecture"></a>
-
-## 🏗️ Architecture
-
-<img src="https://raw.githubusercontent.com/kryvokhyzha/langgraph-agent-toolkit/main/docs/media/agent_architecture.png" width="800">
-
-<a name="key-features"></a>
-
-## ✨ Key Features
-
-1. **LangGraph Integration**
-
-   - Latest LangGraph v1.x features
-   - Human-in-the-loop with `interrupt()`
-   - Flow control with `Command` and `langgraph-supervisor`
-
-2. **API Service**
-
-   - FastAPI with streaming and non-streaming endpoints
-   - Streaming over Server-Sent Events (SSE) or JSON Lines (NDJSON)
-   - Multimodal input (images, files/PDF, audio, video) via LangChain content
-     blocks
-   - Support for both token-based and message-based streaming
-   - Multiple agent support with URL path routing
-   - Available agents and models listed at `/info` endpoint
-   - Supports different runners (unicorn, gunicorn, mangum, azure functions)
-
-3. **Developer Experience**
-
-   - Asynchronous design with async/await
-   - Docker configuration with live reloading
-   - Comprehensive testing suite
-
-4. **Enterprise Components**
-   - Configurable PostgreSQL/SQLite connection pools
-   - Observability via Langfuse and Langsmith
-   - User feedback system
-   - Prompt management system
-   - LiteLLM proxy integration
-
-For more details on features, see the [Usage Documentation](docs/usage.rst).
-
-<a name="environment-setup"></a>
-
-## ⚙️ Environment Setup
-
-For detailed environment setup instructions, including creating your `.env` file
-and configuring LiteLLM, see the
-[Environment Setup Documentation](docs/environment_setup.rst).
-
-<a name="project-structure"></a>
-
-## 📂 Project Structure
-
-The repository contains:
-
-- `langgraph_agent_toolkit/agents/blueprints/`: Agent definitions
-- `langgraph_agent_toolkit/agents/agent_executor.py`: Agent execution control
-- `langgraph_agent_toolkit/schema/`: Protocol schema definitions
-- `langgraph_agent_toolkit/core/`: Core modules (LLM, memory, settings)
-- `langgraph_agent_toolkit/service/service.py`: FastAPI service
-- `langgraph_agent_toolkit/client/client.py`: Service client
-- `langgraph_agent_toolkit/run_app.py`: Chat interface
-- `docker/`: Docker configurations
-- `tests/`: Test suite
-
-<a name="setup-and-usage"></a>
-
-## 🛠️ Setup and Usage
-
-For detailed setup and usage instructions, including building your own agent,
-Docker setup, using the AgentClient, and local development, see the
-[Usage Documentation](docs/usage.rst).
-
-<a name="documentation"></a>
-
-## 📚 Documentation
-
-Full documentation is available at
-[GitHub repository](https://github.com/kryvokhyzha/langgraph-agent-toolkit/tree/main/docs/)
-and includes:
-
-- [Installation Guide](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/installation.rst)
-- [Environment Setup](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/environment_setup.rst)
-- [Usage Guide](https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/usage.rst)
-
-<a name="useful-resources"></a>
-
-## 📚 Useful Resources
-
-- [LangGraph documentation](https://langchain-ai.github.io/langgraph/concepts/low_level/#multiple-schemas)
-- [LangGraph Memory Concept](https://langchain-ai.github.io/langgraph/concepts/memory/)
-- [LangGraph Memory Persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/#memory)
-- [LangGraph Memory Template](https://github.com/langchain-ai/memory-template)
-- [LangGraph Human in the Loop](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/wait-user-input/)
-- [LangGraph 101 - blueprints](https://github.com/langchain-ai/langgraph-101)
-- [LangGraph - Examples](https://github.com/langchain-ai/langgraph/tree/main/examples)
-- [Complex data extraction with function calling](https://langchain-ai.github.io/langgraph/tutorials/extraction/retries/)
-- [How to edit graph state](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/edit-graph-state/)
-- [Memory in the background](https://www.youtube.com/watch?v=R1jKQ1Jn5T4&ab_channel=LangChain)
-- [Building an agent with LangGraph](https://www.kaggle.com/code/markishere/day-3-building-an-agent-with-langgraph/)
-- [How to create tools in Langchain](https://python.langchain.com/docs/how_to/custom_tools/)
-- [Simple Serverless FastAPI with AWS Lambda](https://www.deadbear.io/simple-serverless-fastapi-with-aws-lambda/)
-- [LangGraph Middleware](https://docs.langchain.com/oss/python/langchain/middleware)
-
-<a name="development-and-contributing"></a>
-
-## 👥 Development and Contributing
-
-Thank you for considering contributing to `Langgraph Agent Toolkit`! We
-encourage the community to post Issues and Pull Requests.
-
-Before you get started, please see our [Contribution Guide](CONTRIBUTING.md).
-
-<a name="license"></a>
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for
-details.
+# LangGraph Agent Toolkit
+
+[![Tests](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/test.yml)
+[![Documentation](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml/badge.svg)](https://github.com/kryvokhyzha/langgraph-agent-toolkit/actions/workflows/sphinx.yml)
+[![PyPI](https://img.shields.io/pypi/v/langgraph-agent-toolkit.svg)](https://pypi.org/project/langgraph-agent-toolkit/)
+
+Serve LangGraph agents through an authenticated HTTP API. Add streaming,
+persistent conversation history, managed model connections, and optional tools
+and observability. Use your own client or the included Streamlit interface.
+
+**Python 3.11–3.14.** The API image uses Python 3.13. Existing deployments
+should read the [0.10.0 migration guide](docs/migration.rst) and
+[changelog](CHANGELOG.md) before upgrading.
+
+[Quickstart](#quickstart) · [Integrations](#choose-an-integration) ·
+[Onboarding](docs/onboarding.rst) ·
+[Memory and authentication](#memory-and-authentication) ·
+[Deployment](#deployment) · [Documentation](#documentation) ·
+[Development](#development)
+
+## What the toolkit provides
+
+- FastAPI routes for invocation, SSE, JSON Lines, history, and feedback.
+- Sync and async `AgentClient` interfaces, including multimodal messages.
+- SQLite or PostgreSQL checkpoints with conversation ownership and ordered
+  updates across workers.
+- Model factories with connection reuse, timeouts, bounded retries, and an
+  optional aiohttp transport for OpenAI and Azure.
+- Native LangChain agents, custom LangGraph workflows, human approvals, and
+  optional Deep Agents.
+- MCP tools, Langfuse SDK v2/v3/v4 integration, LangSmith, and local or managed
+  prompts.
+
+Install only the integrations that your service needs. LiteLLM, Langfuse, MCP,
+Deep Agents, and Streamlit are optional.
+
+## Quickstart
+
+This local demo uses a deterministic fake model and SQLite. It needs no model
+key, Docker, or external service. It checks API behavior and persistence. Model
+quality requires separate evaluation.
+
+Install `uv`, then use a fresh checkout:
+
+```sh
+git clone https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
+cd langgraph-agent-toolkit
+uv sync --frozen --no-install-project --no-dev --extra uvicorn-backend
+```
+
+Create `.env` in this fresh checkout with these values. Use a shell without
+other toolkit or tracing overrides.
+
+```dotenv
+USE_FAKE_MODEL=true
+AUTH_MODE=trusted
+AUTH_SECRET=local-demo-token
+AGENT_PATHS=["langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent"]
+DEFAULT_AGENT=chatbot-agent
+MEMORY_BACKEND=sqlite
+SQLITE_DB_PATH=quickstart.sqlite
+OBSERVABILITY_BACKEND=empty
+MCP_SERVERS={}
+MODEL_CONFIGS={}
+LANGSMITH_TRACING=false
+LANGCHAIN_TRACING_V2=false
+```
+
+Start the API on localhost:
+
+```sh
+uv run --no-sync python -m langgraph_agent_toolkit.run_api --host 127.0.0.1 --port 8080
+```
+
+In another terminal, check readiness and send a request:
+
+```sh
+export AUTH_SECRET=local-demo-token
+
+curl --fail http://127.0.0.1:8080/health/ready
+
+curl --fail-with-body http://127.0.0.1:8080/chatbot-agent/invoke \
+  -H "Authorization: Bearer ${AUTH_SECRET}" \
+  -H 'Content-Type: application/json' \
+  -d '{"input":{"message":"Hello"},"user_id":"demo-user","thread_id":"demo-thread"}'
+```
+
+The response content is `This is a test response from the fake model.` Reuse the
+same `user_id` and `thread_id` for the next turn. The SQLite file retains
+history after the API stops. Use the demo token only for this local example.
+
+Use the [quickstart guide](docs/quickstart.rst) for streaming, saved history,
+the Python client, the UI, and real-model configuration.
+
+## Choose an integration
+
+| Need                                         | Start with                                          | Guide                                                     |
+| -------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| Chat without tools                           | `chatbot`                                           | [Agent patterns](docs/integrations.rst)                   |
+| A model that selects business tools          | Native `create_agent`                               | [Usage](docs/usage.rst)                                   |
+| Structured extraction                        | `create_agent_structured`                           | [Agent patterns](docs/integrations.rst)                   |
+| A fixed workflow or required approval        | Custom `StateGraph` or human-in-the-loop middleware | [Usage](docs/usage.rst)                                   |
+| Planning, intermediate files, and delegation | Optional Deep Agents                                | [Deep Agents](docs/deepagents.rst)                        |
+| Tools exposed by another service             | MCP, combined with a supported agent                | [MCP](docs/mcp.rst)                                       |
+| Traces, prompts, and feedback                | Langfuse or LangSmith                               | [Langfuse compatibility](docs/langfuse_compatibility.rst) |
+
+For an existing Python project, select provider and backend extras:
+
+```sh
+uv add 'langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v4]'
+```
+
+Follow the [application onboarding guide](docs/onboarding.rst) to register
+agents, set identity and memory contracts, connect a client, and verify the
+deployment. It also gives the upgrade sequence for existing applications.
+
+`langfuse-v2`, `langfuse-v3`, and `langfuse-v4` select a Python SDK version
+range. Choose one. SDK and server versions are separate. Use the compatibility
+guide for supported combinations. `mcp`, `deepagents`, `ui`, and
+`openai-aiohttp` are separate extras. See [installation](docs/installation.rst)
+for all options.
+
+## Memory and authentication
+
+`thread_id` identifies short-term conversation state. A long-term store can use
+`user_id` to identify one user across threads. Passing `user_id` does not create
+a store. SQLite supplies checkpoints but has no long-term store.
+
+The service separates conversation storage by authenticated user, agent, and
+public thread ID. Keep these values consistent when reading or updating history.
+
+For one deployment per client, use one `AUTH_SECRET`. With `AUTH_MODE=trusted`,
+your trusted application backend supplies the end user's `user_id`. That backend
+must authenticate the end user. With `AUTH_MODE=token`, the token identifies the
+user. The service rejects a different supplied user ID. See the
+[authentication and migration guide](docs/migration.rst) for curl examples and
+existing checkpoint migration.
+
+## Deployment
+
+The API can run alone under Uvicorn or Gunicorn. Docker Compose adds the
+optional frontend, model proxy, and observability services. Configure the full
+stack through the [environment guide](docs/environment_setup.rst).
+
+- The API Docker image installs and selects **aiohttp** for managed async OpenAI
+  and Azure calls. Python installations default to HTTPX. Set
+  `LLM_HTTP_ASYNC_TRANSPORT=httpx` to override the image default.
+- Each worker accepts eight active requests by default. Excess work receives
+  `503` before an agent run starts. The optional admission queue is bounded.
+- Use PostgreSQL for replicas across hosts. SQLite workers must share a file on
+  a local filesystem. Configure persistence; the default backend is unset.
+- Supervisors replace failed workers. Requests running in a failed worker can
+  fail. The toolkit does not provide durable jobs or exactly-once tool writes.
+
+Read [deployment](docs/deployment.rst) for health probes and worker recovery,
+and [reliability](docs/reliability.rst) for database pools, connection limits,
+timeouts, cancellation, and retry boundaries.
+
+## Documentation
+
+Read the
+[documentation site](https://kryvokhyzha.github.io/langgraph-agent-toolkit/) or
+the source guides below. The running service exposes its HTTP schema at `/docs`
+and `/openapi.json`.
+
+| Task                                 | Guide                                                                                                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Make the first request               | [Quickstart](docs/quickstart.rst)                                                                                                                                |
+| Add the toolkit to an application    | [Onboarding](docs/onboarding.rst)                                                                                                                                |
+| Select extras and configure services | [Installation](docs/installation.rst), [environment](docs/environment_setup.rst)                                                                                 |
+| Call the API or register an agent    | [Usage](docs/usage.rst)                                                                                                                                          |
+| Choose agents and tools              | [Integrations](docs/integrations.rst), [MCP](docs/mcp.rst), [Deep Agents](docs/deepagents.rst)                                                                   |
+| Upgrade an existing deployment       | [Migration](docs/migration.rst), [dependency review](docs/dependency_updates.rst), [changelog](CHANGELOG.md)                                                     |
+| Deploy and operate the service       | [Deployment](docs/deployment.rst), [reliability](docs/reliability.rst)                                                                                           |
+| Configure Langfuse                   | [SDK and server compatibility](docs/langfuse_compatibility.rst)                                                                                                  |
+| Verify behavior and capacity         | [Testing](docs/testing.rst), [live model checks](docs/live_llm_testing.rst), [load tests](docs/load_testing.rst), [recorded results](docs/load_test_results.rst) |
+
+## Development
+
+Install the locked dependencies and run the local tests. The pre-commit hook
+environments require Python 3.13.
+
+```sh
+uv sync --frozen --no-install-project --extra all
+uv run --no-sync pytest
+uv run --no-sync pre-commit run --all-files
+```
+
+Use `--extra all` because `--all-extras` selects incompatible Langfuse SDK
+versions. Ordinary tests use fake models and local services. Process, Docker,
+PostgreSQL, live Langfuse, and real-model checks have separate setup
+requirements. Test coverage and local load results do not establish production
+capacity or model quality.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow. Examples
+are in [scripts/python](scripts/python), including the
+[Deep Agents example](scripts/python/10-deep-agent.py).
+
+## License
+
+[MIT](LICENSE).

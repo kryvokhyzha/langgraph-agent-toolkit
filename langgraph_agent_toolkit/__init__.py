@@ -3,5 +3,5 @@ try:
 
     __version__ = version("langgraph_agent_toolkit")
 except Exception:
-    # Fallback for local development
+    # Use this version during local development.
     __version__ = "0.0.0.dev0"

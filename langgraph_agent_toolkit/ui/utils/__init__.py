@@ -1,1 +1,1 @@
-"""UI utilities (constants and message helpers)."""
+"""UI constants and message helpers."""

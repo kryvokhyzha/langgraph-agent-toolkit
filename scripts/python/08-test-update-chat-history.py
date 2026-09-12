@@ -19,9 +19,7 @@ from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 
 
 async def main():
-    # thread_id = "847c6285-8fc9-4560-a83f-4e6285809254"
     thread_id = "07afd798-8d98-4250-a730-6b609abded9d"
-    # user_id = "521c0a60-ea75-43fa-a793-a4cf11e013ae"
 
     agent: Agent = react_agent
     agent_graph: Pregel = agent.graph
@@ -50,7 +48,6 @@ async def main():
             config=RunnableConfig(
                 configurable={
                     "thread_id": thread_id,
-                    # "user_id": user_id,
                 }
             ),
         )

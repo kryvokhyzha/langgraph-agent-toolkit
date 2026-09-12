@@ -6,7 +6,6 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnableSerializable
 from langchain_core.runnables.base import RunnableSequence
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.managed import RemainingSteps
 
@@ -17,24 +16,20 @@ from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
-# Define the state
 class AgentState(MessagesState, total=False):
-    """State for Knowledge Base agent."""
+    """State for the knowledge-base agent."""
 
     remaining_steps: RemainingSteps
     retrieved_documents: list[dict[str, Any]]
     kb_documents: str
 
 
-# Create the retriever
 def get_kb_retriever():
-    """Create and return a Knowledge Base retriever instance."""
-    # Get the Knowledge Base ID from environment
+    """Create and return a knowledge-base retriever."""
     kb_id = os.environ.get("AWS_KB_ID", "")
     if not kb_id:
         raise ValueError("AWS_KB_ID environment variable must be set")
 
-    # Create the retriever with the specified Knowledge Base ID
     retriever = AmazonKnowledgeBasesRetriever(
         knowledge_base_id=kb_id,
         retrieval_config={
@@ -47,7 +42,7 @@ def get_kb_retriever():
 
 
 def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessage]:
-    """Wrap the model with a system prompt for the Knowledge Base agent."""
+    """Add the knowledge-base system prompt to the model."""
 
     def create_system_message(state):
         base_prompt = """You are a helpful assistant that provides accurate information based on retrieved documents.
@@ -66,9 +61,7 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
         Format your response in a clear, conversational manner. Use markdown formatting when appropriate.
         """
 
-        # Check if documents were retrieved
-        if "kb_documents" in state:
-            # Append document information to the system prompt
+        if state.get("kb_documents"):
             document_prompt = (
                 f"\n\nI've retrieved the following documents that may be relevant to the query:"
                 f"\n\n{state['kb_documents']}\n\n"
@@ -77,7 +70,6 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
             )
             return [SystemMessage(content=base_prompt + document_prompt)] + state["messages"]
         else:
-            # No documents were retrieved
             no_docs_prompt = "\n\nNo relevant documents were found in the knowledge base for this query."
             return [SystemMessage(content=base_prompt + no_docs_prompt)] + state["messages"]
 
@@ -88,31 +80,67 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
     return RunnableSequence(preprocessor, model)
 
 
+def _retrieval_query(content: str | list[str | dict[str, Any]]) -> str:
+    """Extract text for retrieval without sending attached media."""
+    if isinstance(content, str):
+        return content.strip()
+    parts = []
+    for block in content:
+        if isinstance(block, str):
+            parts.append(block)
+        elif isinstance(block, dict) and block.get("type") == "text" and isinstance(block.get("text"), str):
+            parts.append(block["text"])
+    return "\n".join(parts).strip()
+
+
+def _document_source(metadata: dict[str, Any], source_metadata: dict[str, Any]) -> str:
+    """Read custom sources and Bedrock document locations."""
+    source = metadata.get("source") or source_metadata.get("source")
+    if source:
+        return source
+
+    location = metadata.get("location")
+    if isinstance(location, dict):
+        for location_key, source_key in (
+            ("s3Location", "uri"),
+            ("webLocation", "url"),
+            ("confluenceLocation", "url"),
+            ("salesforceLocation", "url"),
+            ("sharePointLocation", "url"),
+            ("kendraDocumentLocation", "uri"),
+            ("customDocumentLocation", "id"),
+        ):
+            details = location.get(location_key)
+            if isinstance(details, dict) and isinstance(details.get(source_key), str) and details[source_key]:
+                return details[source_key]
+
+    return source_metadata.get("x-amz-bedrock-kb-source-uri") or "Unknown"
+
+
 async def retrieve_documents(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Retrieve relevant documents from the knowledge base."""
-    # Get the last human message
+    """Retrieve documents relevant to the latest user message."""
     human_messages = [msg for msg in state["messages"] if isinstance(msg, HumanMessage)]
     if not human_messages:
-        # Include messages from original state
         return {"messages": [], "retrieved_documents": []}
 
-    # Use the last human message as the query
-    query = human_messages[-1].content
+    query = _retrieval_query(human_messages[-1].content)
+    if not query:
+        return {"messages": [], "retrieved_documents": []}
 
     try:
-        # Initialize the retriever
         retriever = get_kb_retriever()
 
-        # Retrieve documents
         retrieved_docs = await retriever.ainvoke(query)
 
-        # Create document summaries for the state
         document_summaries = []
         for i, doc in enumerate(retrieved_docs, 1):
+            source_metadata = doc.metadata.get("source_metadata")
+            if not isinstance(source_metadata, dict):
+                source_metadata = {}
             summary = {
-                "id": doc.metadata.get("id", f"doc-{i}"),
-                "source": doc.metadata.get("source", "Unknown"),
-                "title": doc.metadata.get("title", f"Document {i}"),
+                "id": doc.metadata.get("id", source_metadata.get("id", f"doc-{i}")),
+                "source": _document_source(doc.metadata, source_metadata),
+                "title": doc.metadata.get("title", source_metadata.get("title", f"Document {i}")),
                 "content": doc.page_content,
                 "relevance_score": doc.metadata.get("score", 0),
             }
@@ -128,14 +156,12 @@ async def retrieve_documents(state: AgentState, config: RunnableConfig) -> Agent
 
 
 async def prepare_augmented_prompt(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Prepare a prompt augmented with retrieved document content."""
-    # Get retrieved documents
+    """Add retrieved document content to the prompt state."""
     documents = state.get("retrieved_documents", [])
 
     if not documents:
-        return {"messages": []}
+        return {"kb_documents": "", "messages": []}
 
-    # Format retrieved documents for the model
     formatted_docs = "\n\n".join(
         [
             f"--- Document {i + 1} ---\n"
@@ -146,23 +172,23 @@ async def prepare_augmented_prompt(state: AgentState, config: RunnableConfig) ->
         ]
     )
 
-    # Store formatted documents in the state
     return {"kb_documents": formatted_docs, "messages": []}
 
 
 async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
-    """Generate a response based on the retrieved documents."""
-    # Check if a model_config is specified in agent_config
-    model_config_key = config["configurable"].get("agent_config", {}).get("model_config")
+    """Generate a response from retrieved documents."""
+    model_config_key = config["configurable"].get("model_config_key") or config["configurable"].get(
+        "agent_config", {}
+    ).get("model_config")
 
     if model_config_key and model_config_key in settings.MODEL_CONFIGS:
-        # Use the model configuration from settings
         model_config = settings.MODEL_CONFIGS[model_config_key]
         model = CompletionModelFactory.get_model_from_config(model_config)
     else:
-        # Fall back to the traditional approach
         model = CompletionModelFactory.create(
-            model_provider=config["configurable"].get("model_provider", ModelProvider.OPENAI),
+            model_provider=config["configurable"].get(
+                "model_provider", ModelProvider.FAKE if settings.USE_FAKE_MODEL else ModelProvider.OPENAI
+            ),
             model_name=config["configurable"].get("model_name", settings.OPENAI_MODEL_NAME),
             openai_api_base=settings.OPENAI_API_BASE_URL,
             openai_api_key=settings.OPENAI_API_KEY,
@@ -175,25 +201,20 @@ async def acall_model(state: AgentState, config: RunnableConfig) -> AgentState:
     return {"messages": [response]}
 
 
-# Define the graph
 agent = StateGraph(AgentState)
 
-# Add nodes
 agent.add_node("retrieve_documents", retrieve_documents)
 agent.add_node("prepare_augmented_prompt", prepare_augmented_prompt)
 agent.add_node("model", acall_model)
 
-# Set entry point
 agent.set_entry_point("retrieve_documents")
 
-# Add edges to define the flow
 agent.add_edge("retrieve_documents", "prepare_augmented_prompt")
 agent.add_edge("prepare_augmented_prompt", "model")
 agent.add_edge("model", END)
 
-# Compile the agent
 kb_agent = Agent(
     name="kb-agent",
     description="A retrieval-augmented generation agent using Amazon Bedrock Knowledge Base.",
-    graph=agent.compile(checkpointer=MemorySaver()),
+    graph=agent.compile(checkpointer=None),
 )

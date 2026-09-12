@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # ---------------------------------------------------------------------------
-# Builder: resolve + install dependencies into an isolated venv. Kept out of
-# the final image so the uv binary and build cache never ship to production.
+# Builder: install dependencies in an isolated virtual environment.
+# The final image does not contain the `uv` binary or build cache.
 # ---------------------------------------------------------------------------
 FROM python:3.13-slim AS builder
 
@@ -15,24 +15,32 @@ COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /bin/uv
 
 WORKDIR /app
 
-# Only the manifest + lockfile are needed to install dependencies. Copying them
-# before the source keeps this expensive layer cached across code changes; the
-# cache mount reuses uv's download/wheel cache across builds.
+# Install dependencies from the manifest and lockfile.
+# Copy them before the source to cache this layer across source changes.
+# The cache mount reuses the `uv` download and wheel cache across builds.
+# Include both OpenAI transports. The runtime selects aiohttp by default.
 COPY pyproject.toml uv.lock ./
+ARG INSTALL_DEEPAGENTS=false
 RUN --mount=type=cache,target=/root/.cache/uv \
+    case "$INSTALL_DEEPAGENTS" in \
+      true) set -- --extra deepagents ;; \
+      false) set -- ;; \
+      *) echo "INSTALL_DEEPAGENTS must be true or false" >&2; exit 1 ;; \
+    esac && \
     uv sync --frozen --no-install-project --no-dev \
-    --extra gunicorn-backend --extra all-observability --extra openai
+    --extra gunicorn-backend --extra all-observability --extra openai-aiohttp --extra mcp "$@"
 
 # ---------------------------------------------------------------------------
-# Runtime: minimal image with just the venv + application source.
+# Runtime: include only the virtual environment and application source.
 # ---------------------------------------------------------------------------
 FROM python:3.13-slim AS runtime
 
 ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
+    LLM_HTTP_ASYNC_TRANSPORT=aiohttp \
     PATH=/opt/venv/bin:$PATH
 
-# curl is used by the container healthcheck (GET /health/ready).
+# The container health check uses `curl` to request `/health/ready`.
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -46,24 +54,21 @@ USER appuser
 
 EXPOSE 8080
 
-# Gunicorn worker management (see run_api.py):
-# --workers          N worker processes (recommend 2-4 per CPU core)
-# --preload_app      load the app once before forking — faster worker startup,
-#                    shared memory, agents initialized once (best for prod)
-# --timeout          kill workers that don't respond in N s (> slowest request)
-# --graceful_timeout time for in-flight requests to finish before a worker is killed
-# --max_requests[_jitter]  recycle workers after N requests to bound memory growth
-CMD ["python", "langgraph_agent_toolkit/run_api.py", "run_api", \
+# Gunicorn worker settings. See `run_api.py`.
+# `--workers`: set the number of worker processes.
+# `--preload_app`: load the app before forking workers.
+# `--timeout`: stop a worker that exceeds the timeout.
+# `--graceful_timeout`: let in-flight requests finish before a worker stops.
+# `--max_requests[_jitter]`: recycle workers to limit memory growth.
+CMD ["python", "langgraph_agent_toolkit/run_api.py", \
     "--runner_type", "gunicorn", \
     "--workers", "1", \
     "--preload_app", \
     "--timeout", "120", \
     "--graceful_timeout", "30"]
 
-# ====================================================
-# Health check endpoints for Kubernetes:
-# - /health/live    - Liveness probe (is process alive?)
-# - /health/ready   - Readiness probe (can accept traffic?)
-# - /health/startup - Startup probe (has initialization completed?)
-# - /health/db      - Database pool health (for monitoring)
-# ====================================================
+# Kubernetes health-check endpoints:
+# - `/health/live`: process liveness.
+# - `/health/ready`: traffic readiness.
+# - `/health/startup`: initialization status.
+# - `/health/db`: database-pool status.

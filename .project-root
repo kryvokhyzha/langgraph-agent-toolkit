@@ -1,2 +1,2 @@
-# this file is required for inferring the project root directory
-# do not delete
+# This file lets `rootutils` find the project root.
+# Do not delete this file.

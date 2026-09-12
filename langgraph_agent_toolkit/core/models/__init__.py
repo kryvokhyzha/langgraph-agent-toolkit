@@ -1,12 +1,15 @@
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory, EmbeddingModelFactory
 from langgraph_agent_toolkit.core.models.fake import FakeToolModel
+from langgraph_agent_toolkit.core.models.transport import LLMTransportConfig, LLMTransportManager
 
 
 __all__ = [
     "FakeToolModel",
     "EmbeddingModelFactory",
     "CompletionModelFactory",
+    "LLMTransportConfig",
+    "LLMTransportManager",
 ]
 
-# ChatOpenAIPatched is not exported here to avoid requiring openai at import time
-# Import it directly from langgraph_agent_toolkit.core.models.chat_openai when needed
+# Do not export `ChatOpenAIPatched` to avoid requiring `openai` at import time.
+# Import it from `langgraph_agent_toolkit.core.models.chat_openai` when required.

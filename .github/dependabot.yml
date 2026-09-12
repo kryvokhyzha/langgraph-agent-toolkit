@@ -5,20 +5,96 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "github-actions"
 
-  - package-ecosystem: "pip"
+  # Use the uv updater to keep pyproject.toml and uv.lock consistent.
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
     groups:
-      python-packages:
+      # Review major upgrades separately. Security updates remain separate.
+      agent-framework:
+        patterns:
+          - "langchain*"
+          - "langgraph*"
+          - "deepagents"
+          - "fastmcp"
+          - "mcp"
+          - "openai"
+          - "anthropic"
+          - "google-genai"
+        update-types:
+          - "minor"
+          - "patch"
+      observability:
+        patterns:
+          - "langfuse"
+          - "langsmith"
+          - "opentelemetry*"
+        update-types:
+          - "minor"
+          - "patch"
+      development-tools:
+        patterns:
+          - "pytest*"
+          - "coverage"
+          - "pre-commit"
+          - "ruff"
+          - "sphinx*"
+        update-types:
+          - "minor"
+          - "patch"
+      python-minor-and-patch:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "python"
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/docker/api"
+      - "/docker/app"
+    schedule:
+      interval: "weekly"
+    groups:
+      # Keep both application images on the same base image versions.
+      application-images:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      hooks-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"

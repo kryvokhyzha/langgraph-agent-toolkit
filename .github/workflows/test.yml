@@ -7,75 +7,258 @@ on:
       - "docker/**"
       - "langgraph_agent_toolkit/**"
       - "tests/**"
+      - "scripts/**"
+      - "docker-compose.yaml"
+      - ".dockerignore"
       - "pyproject.toml"
+      - "uv.lock"
+      - ".coveragerc"
+      - ".pre-commit-config.yaml"
+      - ".github/**"
   pull_request:
     branches: ["main"]
     paths:
       - "docker/**"
       - "langgraph_agent_toolkit/**"
       - "tests/**"
+      - "scripts/**"
+      - "docker-compose.yaml"
+      - ".dockerignore"
       - "pyproject.toml"
+      - "uv.lock"
+      - ".coveragerc"
+      - ".pre-commit-config.yaml"
+      - ".github/**"
   workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: build-and-test-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Verify the dependency lockfile
+        run: uv lock --check
+      - name: Install lint dependencies
+        run: uv sync --frozen --only-group lint
+      - name: Lint and format with ruff
+        run: |
+          uv run --no-sync ruff --config pyproject.toml format --check
+          uv run --no-sync ruff --config pyproject.toml check --output-format github
+
+  test-wheel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Build and install the base wheel in a clean environment
+        run: |
+          uv build --wheel
+          uv venv .venv-wheel
+          uv pip install --python .venv-wheel/bin/python dist/*.whl
+      - name:
+          Import the installed service and run the fake model without provider
+          extras
+        working-directory: ${{ runner.temp }}
+        run: >-
+          uv run --no-project --python
+          "$GITHUB_WORKSPACE/.venv-wheel/bin/python" python
+          "$GITHUB_WORKSPACE/scripts/ci/verify_base_wheel.py"
+        env:
+          USE_FAKE_MODEL: "true"
+      - name: Install the UI extra and import the frontend
+        run: |
+          wheel_path=(dist/*.whl)
+          uv pip install --python .venv-wheel/bin/python "${wheel_path[0]}[ui]"
+          cd "$RUNNER_TEMP"
+          uv run --no-project \
+            --python "$GITHUB_WORKSPACE/.venv-wheel/bin/python" python \
+            "$GITHUB_WORKSPACE/scripts/ci/verify_ui_imports.py"
+
   test-python:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.9.5"
+          version: "0.12.1"
       - name: Install dependencies with uv
-        run: |
-          uv sync --all-extras --frozen
-        env:
-          UV_SYSTEM_PYTHON: 1
-      - name: Lint and format with ruff
-        run: |
-          uv run ruff --config pyproject.toml format --check
-          uv run ruff --config pyproject.toml check --output-format github
+        run:
+          uv sync --frozen --no-install-project --no-default-groups --extra all
+          --group tests
 
-      - name: Test with pytest
-        run: |
-          uv run pytest --cov=langgraph_agent_toolkit/ --cov-report=xml
-        env:
-          MODEL_NAME: ${{ secrets.MODEL_NAME }}
-          MODEL_API_KEY: ${{ secrets.MODEL_API_KEY }}
-          MODEL_BASE_URL: ${{ secrets.MODEL_BASE_URL }}
+      - name: Test the package and API process journeys with coverage
+        run: >-
+          uv run --no-sync pytest --run-e2e --cov --cov-report=xml
+          --junitxml=test-results.xml
+
+      - name: Save test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-python-${{ matrix.python-version }}
+          path: |
+            coverage.xml
+            test-results.xml
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Upload coverage reports to Codecov
+        if: >-
+          success() && matrix.python-version == '3.13' && (github.event_name ==
+          'push' || github.event_name == 'pull_request')
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
+          files: ./coverage.xml
+          disable_search: true
+          name: python-3.13
+          fail_ci_if_error: >-
+            ${{ github.event_name == 'push' ||
+            (github.event.pull_request.head.repo.full_name == github.repository
+            && github.actor != 'dependabot[bot]') }}
+
+  test-langfuse-sdk:
+    name:
+      SDK ${{ matrix.langfuse.version }} / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        langfuse:
+          - extra: langfuse-v2
+            version: "2.60.10"
+          - extra: langfuse-v3
+            version: "3.15.0"
+          - extra: langfuse-v4
+            version: "4.15.2"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Verify the extra selects its SDK major
+        run: |
+          uv venv .venv-langfuse
+          uv pip install --python .venv-langfuse/bin/python \
+            '.[${{ matrix.langfuse.extra }},openai,mcp,deepagents]' \
+            pytest pytest-asyncio pytest-env
+          uv run --no-project --python .venv-langfuse/bin/python python \
+            scripts/ci/verify_langfuse_version.py \
+            '${{ matrix.langfuse.version }}'
+      - name: Resolve the tested SDK baseline with the selected extra
+        run: |
+          uv pip install --python .venv-langfuse/bin/python \
+            '.[${{ matrix.langfuse.extra }},openai,mcp,deepagents]' 'langfuse==${{ matrix.langfuse.version }}'
+          uv pip check --python .venv-langfuse/bin/python
+      - name: Test SDK exports, callbacks, prompts, and feedback
+        run: >-
+          uv run --no-project --python .venv-langfuse/bin/python python -m
+          pytest tests/core/test_langfuse_compatibility.py
+          tests/core/test_langfuse_settings.py tests/core/test_observability.py
+          tests/core/test_dependency_contracts.py
+          tests/integration/test_langfuse_sdk.py
+          tests/integration/test_deepagents.py -q
+
+  test-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13", "3.14"]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: lat_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: lat_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lat_test -d lat_test" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Install test dependencies
+        run:
+          uv sync --frozen --no-install-project --no-default-groups --group
+          tests
+      - name: Verify locking, restart, cancellation, and checkpoint migration
+        run: >-
+          uv run --no-sync pytest tests/integration/test_postgres_reliability.py
+          tests/integration/test_postgres_migration.py
+          tests/core/test_concurrency.py tests/core/test_deadlocks.py
+          --run-postgres -q
+        env:
+          LAT_TEST_POSTGRES_DSN: postgresql://lat_test@127.0.0.1:5432/lat_test
 
   test-docker:
     runs-on: ubuntu-latest
-
-    services:
-      dind:
-        image: docker:dind
-        ports:
-          - 2375:2375
-        options: >-
-          --privileged --health-cmd "docker info" --health-interval 10s
-          --health-timeout 5s --health-retries 5
+    timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -90,6 +273,15 @@ jobs:
           load: true
           tags: agent-service-toolkit.service:${{ github.sha }}
           file: docker/api/Dockerfile
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max,ignore-error=true,timeout=2m
+
+      - name: Verify both model transports in the service image
+        run: |
+          docker run --rm --network none \
+            --mount "type=bind,source=$PWD/tests/integration/docker_transport_smoke.py,target=/tmp/docker_transport_smoke.py,readonly" \
+            agent-service-toolkit.service:${{ github.sha }} \
+            python /tmp/docker_transport_smoke.py
 
       - name: Build app image
         uses: docker/build-push-action@v7
@@ -99,17 +291,20 @@ jobs:
           load: true
           tags: agent-service-toolkit.app:${{ github.sha }}
           file: docker/app/Dockerfile
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max,ignore-error=true,timeout=2m
 
       - name: Start service container
         run:
           docker run -d --name service-container --network host -e
-          USE_FAKE_MODEL=true -e PORT=8080 agent-service-toolkit.service:${{
-          github.sha }}
+          USE_FAKE_MODEL=true -e AUTH_SECRET=ci-test-token -e PORT=8080 -e
+          MEMORY_BACKEND=sqlite -e SQLITE_DB_PATH=/app/docker-test.sqlite
+          agent-service-toolkit.service:${{ github.sha }}
 
       - name: Confirm service starts correctly
         run: |
           timeout 30 bash -c '
-            while ! curl -s http://0.0.0.0:8080/health; do
+            while ! curl -fsS http://127.0.0.1:8080/health/ready; do
               echo "Waiting for service to be ready..."
               docker logs service-container
               sleep 2
@@ -119,38 +314,48 @@ jobs:
       - name: Run app container
         run:
           docker run -d --name app-container --network host -e
-          AGENT_URL=http://0.0.0.0:8080 agent-service-toolkit.app:${{ github.sha
-          }}
+          AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token --mount
+          "type=bind,source=$PWD/scripts/ci/verify_ui_imports.py,target=/tmp/verify_ui_imports.py,readonly"
+          agent-service-toolkit.app:${{ github.sha }}
 
       - name: Confirm app starts correctly
         run: |
           timeout 30 bash -c '
-            while ! curl -s http://localhost:8501/healthz; do
+            while ! curl -fsS http://localhost:8501/_stcore/health; do
               echo "Waiting for app to be ready..."
               docker logs app-container
               sleep 2
             done
           '
 
+      - name: Verify imports in the client-only image
+        run: docker exec app-container python /tmp/verify_ui_imports.py
+
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
-          python-version-file: "pyproject.toml"
+          python-version: "3.13"
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.9.5"
+          version: "0.12.1"
       - name: Install ONLY CLIENT dependencies with uv
         run: |
-          uv sync --frozen --only-group client --only-group dev
-        env:
-          UV_SYSTEM_PYTHON: 1
+          uv sync --frozen --only-group client --only-group tests
       - name: Run integration tests
         run: |
-          uv run pytest tests/integration -v --run-docker
+          uv run --no-sync pytest tests/integration/test_docker_e2e.py -v --run-docker
         env:
-          AGENT_URL: http://0.0.0.0:8080
+          AGENT_URL: http://127.0.0.1:8080
+          APP_URL: http://127.0.0.1:8501
           USE_FAKE_MODEL: true
+          AUTH_SECRET: ci-test-token
+
+      - name: Show container logs after a failure
+        if: failure()
+        run: |
+          docker logs service-container || true
+          docker logs app-container || true
 
       - name: Clean up containers
         if: always()

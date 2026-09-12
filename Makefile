@@ -1,7 +1,7 @@
 uv_install_deps:
-	uv sync --all-extras --no-install-project
+	uv sync --extra all --no-install-project
 uv_install_deps_compile:
-	uv sync --all-extras --no-install-project --compile --no-cache
+	uv sync --extra all --no-install-project --compile --no-cache
 uv_get_lock:
 	uv lock
 uv_update_deps:

@@ -2,23 +2,22 @@
 
 ## Summary
 
-<!-- Provide a concise summary "Why are the changes needed"?
-Include any relevant links, such as Jira tickets, Slack discussions,
-or design documents. -->
+<!-- Explain why the changes are necessary. Keep the summary concise.
+Add relevant links to Jira tickets, Slack discussions, or design documents. -->
 
 ## Changes Made
 
-<!-- Describe the specific changes that have been made in this pull
-request. Provide details on the approach taken to address the problem
-and any notable implementation details. -->
+<!-- Describe the changes in this pull request. Explain how the changes solve
+the problem. Add important implementation details. -->
 
 ## Checklist
 
-- [ ] I have added comments to code in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
+- [ ] I added comments to code that is difficult to understand
+- [ ] I made the related documentation changes
 - [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] Any dependent changes have been merged and published in downstream modules
+- [ ] I added tests that show that my fix or feature works
+- [ ] Maintainers merged and published all dependent changes in downstream
+      modules
 
 <!-- Optional Sections -->
 <details>
@@ -26,24 +25,20 @@ and any notable implementation details. -->
 
 ## Screenshots
 
-<!-- If the changes are visual, including screenshots or GIFs can
-help reviewers understand them more easily. -->
+<!-- If the changes are visual, add screenshots or GIFs. These images help
+reviewers understand the changes. -->
 
 ## Related issues
 
-<!-- A link to any related issues or bugs that the pull request
-addresses, connecting the code's context with the problem it
-solves. -->
+<!-- Add links to related issues or bugs that this pull request addresses. -->
 
 ## Testing instructions
 
-<!-- Instructions on how to test the changes made in the pull
-request, helping reviewers validate the code. -->
+<!-- Explain how reviewers can test the changes. -->
 
 ## Special notes for your reviewer
 
-<!-- If there are any specific instructions or considerations you
-want to highlight for the reviewer, include them in this section. -->
+<!-- Add specific instructions or important information for the reviewer. -->
 
 </details>
 <!-- End of Optional Sections -->

@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from psycopg.conninfo import conninfo_to_dict
 from pydantic import SecretStr
 
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
@@ -117,8 +118,22 @@ class TestPostgresMemoryBackend(unittest.TestCase):
         mock_settings.POSTGRES_PORT = "5432"
         mock_settings.POSTGRES_DB = "testdb"
 
-        expected = "postgresql://user:password@localhost:5432/testdb"
-        self.assertEqual(self.backend.get_connection_string(), expected)
+        mock_settings.POSTGRES_CONNECT_TIMEOUT = 10
+        mock_settings.POSTGRES_KEEPALIVES_IDLE = 30
+        mock_settings.POSTGRES_KEEPALIVES_INTERVAL = 10
+        mock_settings.POSTGRES_KEEPALIVES_COUNT = 3
+        mock_settings.POSTGRES_TCP_USER_TIMEOUT = 60000
+        mock_settings.POSTGRES_PASSWORD = SecretStr("pa ss'@:/word")
+        info = conninfo_to_dict(self.backend.get_connection_string())
+        self.assertEqual(info["password"], "pa ss'@:/word")
+        self.assertEqual(info["dbname"], "testdb")
+        self.assertEqual(info["host"], "localhost")
+        self.assertEqual(info["connect_timeout"], "10")
+        self.assertEqual(info["keepalives"], "1")
+        self.assertEqual(info["keepalives_idle"], "30")
+        self.assertEqual(info["keepalives_interval"], "10")
+        self.assertEqual(info["keepalives_count"], "3")
+        self.assertEqual(info["tcp_user_timeout"], "60000")
 
     @patch("langgraph_agent_toolkit.core.memory.postgres.settings")
     def test_validate_config_min_size_exceeds_pool_size(self, mock_settings):
@@ -167,6 +182,12 @@ class TestPostgresAsyncFunctionality:
         mock_settings.POSTGRES_STATEMENT_TIMEOUT = 300000
         mock_settings.POSTGRES_LOCK_TIMEOUT = 60000
         mock_settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT = 300000
+        mock_settings.POSTGRES_CONNECT_TIMEOUT = 10
+        mock_settings.POSTGRES_KEEPALIVES_IDLE = 30
+        mock_settings.POSTGRES_KEEPALIVES_INTERVAL = 10
+        mock_settings.POSTGRES_KEEPALIVES_COUNT = 3
+        mock_settings.POSTGRES_TCP_USER_TIMEOUT = 60000
+        mock_settings.POSTGRES_HEALTH_CHECK_TIMEOUT = 5
 
         # Setup AsyncContextManager mock for connection pool
         mock_pool_instance = MagicMock()
@@ -192,7 +213,7 @@ class TestPostgresAsyncFunctionality:
         # Verify that the pool was created with correct parameters
         mock_pool.assert_called_once()
         call_args = mock_pool.call_args[0][0]
-        assert "postgresql://user:password@localhost:5432/testdb" == call_args
+        assert conninfo_to_dict(call_args)["dbname"] == "testdb"
 
         # Verify that pool.open was called
         mock_pool_instance.open.assert_called_once()

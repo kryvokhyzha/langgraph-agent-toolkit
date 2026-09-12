@@ -1,4 +1,4 @@
-"""Tests for HumanInTheLoopMiddleware support: the executor resume bridge + an interrupt/resume flow."""
+"""Test ``HumanInTheLoopMiddleware`` interrupt and resume support."""
 
 from types import SimpleNamespace
 
@@ -15,17 +15,14 @@ from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
 
 
 def _hitl_task(n: int = 1):
-    """Build a pending task whose interrupt is a HITL request with n action_requests."""
+    """Build a task with a HITL interrupt and `n` action requests."""
     value = {"action_requests": [{"name": "send_email"}] * n}
     return SimpleNamespace(interrupts=[SimpleNamespace(value=value)])
 
 
 def _custom_interrupt_task(value: str = "Please tell me your birthdate?"):
-    """Build a pending task from a raw interrupt() blueprint (string payload)."""
+    """Build a task from a raw ``interrupt()`` blueprint."""
     return SimpleNamespace(interrupts=[SimpleNamespace(value=value)])
-
-
-# --- build_resume_command (the bridge) ---
 
 
 def test_bridge_approve():
@@ -55,13 +52,10 @@ def test_bridge_one_decision_per_action_request():
 
 
 def test_bridge_non_hitl_passes_raw_input():
-    """A custom interrupt() blueprint still receives the raw input dict (unchanged behavior)."""
+    """Pass raw input to a custom ``interrupt()`` blueprint."""
     user_input = {"message": "1990-05-15", "user_id": "u1"}
     cmd = build_resume_command([_custom_interrupt_task()], user_input)
     assert cmd.resume == user_input
-
-
-# --- interrupt_value_to_content (surfacing a HITL interrupt to the client) ---
 
 
 def test_interrupt_value_to_content_renders_hitl_request():
@@ -69,7 +63,7 @@ def test_interrupt_value_to_content_renders_hitl_request():
     content = interrupt_value_to_content(value)
     assert isinstance(content, str)
     assert "Approve sending email?" in content
-    assert "approve" in content.lower()  # reply hint included
+    assert "approve" in content.lower()
 
 
 def test_interrupt_value_to_content_passes_strings_through():
@@ -77,15 +71,12 @@ def test_interrupt_value_to_content_passes_strings_through():
 
 
 def test_hitl_interrupt_surfaces_as_valid_chat_message():
-    """Regression: a HITL interrupt dict must not break AIMessage(content=...) / ChatMessage."""
+    """Convert a HITL interrupt dictionary to `AIMessage` content."""
     value = {"action_requests": [{"name": "send_email", "args": {"to": "x"}, "description": "Approve?"}]}
-    msg = AIMessage(content=interrupt_value_to_content(value))  # previously raised a validation error
+    msg = AIMessage(content=interrupt_value_to_content(value))
     cm = langchain_to_chat_message(msg)
     assert cm.type == "ai"
     assert "Approve?" in cm.content
-
-
-# --- end-to-end interrupt/resume with HumanInTheLoopMiddleware (deterministic fake model) ---
 
 
 class _ToolScriptModel(FakeMessagesListChatModel):
@@ -130,7 +121,7 @@ def test_hitl_pauses_before_tool_then_approve_runs_it():
     graph.invoke({"messages": [HumanMessage("email bob")]}, config=cfg)
 
     tasks = [t for t in graph.get_state(cfg).tasks if getattr(t, "interrupts", None)]
-    assert tasks  # paused before executing the tool
+    assert tasks
 
     out = graph.invoke(build_resume_command(tasks, {"message": "approve"}), config=cfg)
     assert any(isinstance(m, ToolMessage) and "SENT" in str(m.content) for m in out["messages"])
@@ -143,5 +134,4 @@ def test_hitl_reject_does_not_run_tool():
     tasks = [t for t in graph.get_state(cfg).tasks if getattr(t, "interrupts", None)]
 
     out = graph.invoke(build_resume_command(tasks, {"message": "reject: not now"}), config=cfg)
-    # the real tool never executed (no "SENT" tool result)
     assert not any(isinstance(m, ToolMessage) and "SENT" in str(m.content) for m in out["messages"])

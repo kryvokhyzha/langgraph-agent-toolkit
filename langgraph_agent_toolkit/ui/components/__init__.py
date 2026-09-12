@@ -1,1 +1,1 @@
-"""Reusable Streamlit UI components (sidebar, message rendering)."""
+"""Reusable Streamlit sidebar and message components."""

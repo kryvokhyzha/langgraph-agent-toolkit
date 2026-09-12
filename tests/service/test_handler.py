@@ -1,7 +1,9 @@
 from unittest.mock import Mock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
+from langgraph_agent_toolkit.core.models.transport import current_llm_transport_manager
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.service.handler import create_app
 
@@ -21,6 +23,7 @@ def test_lifespan_marks_ready_after_initializing_agents():
     mock_agent = Mock()
     mock_agent.graph = Mock(checkpointer=None)
     mock_agent.observability = None
+    mock_agent.graph_factory = None
 
     agent_info = Mock()
     agent_info.key = "react-agent"
@@ -31,7 +34,14 @@ def test_lifespan_marks_ready_after_initializing_agents():
     with patch("langgraph_agent_toolkit.service.handler.AgentExecutor", return_value=mock_executor):
         with patch.object(settings, "MEMORY_BACKEND", None):
             app = create_app()
+
+            @app.get("/transport-owner")
+            async def transport_owner():
+                return {"bound": current_llm_transport_manager() is app.state.llm_transport_manager}
+
             with TestClient(app) as client:  # entering the context runs the lifespan
+                manager = app.state.llm_transport_manager
+                assert client.get("/transport-owner").json() == {"bound": True}
                 ready = client.get("/health/ready")
                 startup = client.get("/health/startup")
                 # Readiness/startup flags are set while the lifespan is active (serving).
@@ -45,21 +55,22 @@ def test_lifespan_marks_ready_after_initializing_agents():
     # Shutdown (context exit) resets readiness and drops the now-closed pool reference.
     assert app.state.ready is False
     assert app.state.db_pool is None
+    assert app.state.llm_transport_manager is None
+    with pytest.raises(RuntimeError, match="not open"):
+        with manager.bind():
+            pass
 
 
-def test_lifespan_degraded_boot_completes_startup_but_not_ready():
-    """If executor init fails, startup still completes (probe passes -> no CrashLoop) but stays not-ready."""
+def test_lifespan_failure_stops_worker_startup():
+    """A supervisor must see startup failure and replace an unusable worker."""
     with patch("langgraph_agent_toolkit.service.handler.AgentExecutor", side_effect=RuntimeError("boom")):
         with patch.object(settings, "MEMORY_BACKEND", None):
             app = create_app()
-            with TestClient(app) as client:  # lifespan runs the degraded path
-                ready = client.get("/health/ready")
-                startup = client.get("/health/startup")
-                assert app.state.startup_complete is True
-                assert app.state.ready is False
-
-    assert startup.status_code == 200  # startup probe passes so liveness can take over
-    assert ready.status_code == 503  # but the service is not ready for traffic
+            with pytest.raises(RuntimeError, match="boom"), TestClient(app):
+                pass
+    assert app.state.startup_complete is False
+    assert app.state.ready is False
+    assert not hasattr(app.state, "agent_executor")
 
 
 def test_health_db_pool_states():

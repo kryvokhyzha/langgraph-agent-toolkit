@@ -23,7 +23,9 @@ def test_init(mock_env):
     # Test default values
     client = AgentClient(get_info=False)
     assert client.base_url == "http://0.0.0.0"
-    assert client.timeout is None
+    assert client.timeout.connect == 10.0
+    assert client.timeout.read == 60.0
+    assert client.stream_timeout.read == 120.0
 
     # Test custom values
     client = AgentClient(
@@ -56,7 +58,7 @@ async def test_invoke(agent_client, mode):
     ANSWER = "The weather is sunny."
     mock_request = Request("POST", "http://test/invoke")
     mock_response = Response(200, json={"type": "ai", "content": ANSWER}, request=mock_request)
-    target = "httpx.post" if mode == "sync" else "httpx.AsyncClient.post"
+    target = "httpx.Client.post" if mode == "sync" else "httpx.AsyncClient.post"
 
     async def call(**kw):
         if mode == "sync":
@@ -120,7 +122,7 @@ def test_stream(agent_client):
     mock_response.__enter__ = Mock(return_value=mock_response)
     mock_response.__exit__ = Mock(return_value=None)
 
-    with patch("httpx.stream", return_value=mock_response):
+    with patch("httpx.Client.stream", return_value=mock_response):
         # Collect all streamed responses
         responses = list(agent_client.stream({"message": QUESTION}))
 
@@ -136,7 +138,7 @@ def test_stream(agent_client):
         assert final_message.content == FINAL_ANSWER
 
     # Test with all parameters
-    with patch("httpx.stream", return_value=mock_response) as mock_stream:
+    with patch("httpx.Client.stream", return_value=mock_response) as mock_stream:
         list(
             agent_client.stream(
                 {"message": QUESTION},
@@ -167,7 +169,7 @@ def test_stream(agent_client):
     error_response_mock = Mock()
     error_response_mock.__enter__ = Mock(return_value=error_response)
     error_response_mock.__exit__ = Mock(return_value=None)
-    with patch("httpx.stream", return_value=error_response_mock):
+    with patch("httpx.Client.stream", return_value=error_response_mock):
         with pytest.raises(AgentClientError) as exc:
             list(agent_client.stream({"message": QUESTION}))
         assert "500 Internal Server Error" in str(exc.value)
@@ -196,7 +198,7 @@ async def test_astream(agent_client):
     mock_response = AsyncMock()
     mock_response.status_code = 200
     mock_response.request = Request("POST", "http://test/stream")
-    mock_response.aiter_lines = Mock(return_value=async_events())
+    mock_response.aiter_lines = Mock(side_effect=async_events)
     mock_response.__aenter__ = AsyncMock(return_value=mock_response)
     mock_response.__aexit__ = AsyncMock(return_value=None)
     # Use Mock() instead of AsyncMock() since raise_for_status is synchronous
@@ -269,6 +271,7 @@ async def test_astream(agent_client):
     # Make stream raise the exception when called directly
     error_mock_client.stream = Mock(side_effect=http_error)
 
+    await agent_client.aclose()
     with patch("httpx.AsyncClient", return_value=error_mock_client):
         with pytest.raises(AgentClientError) as exc:
             async for _ in agent_client.astream({"message": QUESTION}):
@@ -292,7 +295,7 @@ def test_stream_jsonl(agent_client):
     mock_response.__enter__ = Mock(return_value=mock_response)
     mock_response.__exit__ = Mock(return_value=None)
 
-    with patch("httpx.stream", return_value=mock_response) as mock_stream:
+    with patch("httpx.Client.stream", return_value=mock_response) as mock_stream:
         responses = list(agent_client.stream_jsonl({"message": "hi"}))
 
     # Hit the JSON Lines endpoint, not the SSE one.
@@ -342,14 +345,11 @@ async def test_astream_jsonl(agent_client):
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
 async def test_create_feedback(agent_client, mode):
-    """create_feedback()/acreate_feedback(): forward run_id/key/score/kwargs, raise on 5xx.
-
-    Only the sync method returns a FeedbackResponse; the async one returns None.
-    """
+    """Verify that sync and async feedback use the same request and response fields."""
     RUN_ID, KEY, SCORE, KWARGS = "test-run", "test-key", 0.8, {"comment": "Great response!"}
     success_json = {"status": "success", "run_id": RUN_ID, "message": "Feedback recorded successfully."}
     mock_response = Response(200, json=success_json, request=Request("POST", "http://test/feedback"))
-    target = "httpx.post" if mode == "sync" else "httpx.AsyncClient.post"
+    target = "httpx.Client.post" if mode == "sync" else "httpx.AsyncClient.post"
 
     async def call(*args):
         if mode == "sync":
@@ -358,10 +358,10 @@ async def test_create_feedback(agent_client, mode):
 
     with patch(target, return_value=mock_response) as mock_post:
         result = await call(RUN_ID, KEY, SCORE, KWARGS)
-        if mode == "sync":
-            assert isinstance(result, FeedbackResponse)
-            assert result.status == "success"
-            assert result.run_id == RUN_ID
+        assert isinstance(result, FeedbackResponse)
+        assert result.status == "success"
+        assert result.run_id == RUN_ID
+        assert mock_post.call_args.args[0] == "http://test/test-agent/feedback"
         body = mock_post.call_args.kwargs["json"]
         assert body["run_id"] == RUN_ID
         assert body["key"] == KEY
@@ -386,7 +386,7 @@ async def test_get_history(agent_client, mode):
         ]
     }
     mock_response = Response(200, json=HISTORY, request=Request("GET", "http://test/history"))
-    target = "httpx.get" if mode == "sync" else "httpx.AsyncClient.get"
+    target = "httpx.Client.get" if mode == "sync" else "httpx.AsyncClient.get"
 
     async def call(**kw):
         if mode == "sync":
@@ -411,7 +411,7 @@ async def test_get_history(agent_client, mode):
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
 async def test_clear_history(agent_client, mode):
-    """clear_history()/aclear_history(): parse response, require thread_id|user_id, raise on 5xx."""
+    """Clear one thread and report server errors."""
     THREAD_ID, USER_ID = "test-thread", "test-user"
     success_json = {
         "status": "success",
@@ -420,7 +420,7 @@ async def test_clear_history(agent_client, mode):
         "message": "Messages cleared successfully.",
     }
     mock_response = Response(200, json=success_json, request=Request("DELETE", "http://test/history/clear"))
-    target = "httpx.delete" if mode == "sync" else "httpx.AsyncClient.delete"
+    target = "httpx.Client.request" if mode == "sync" else "httpx.AsyncClient.request"
 
     async def call(*args):
         if mode == "sync":
@@ -437,10 +437,8 @@ async def test_clear_history(agent_client, mode):
         assert body["thread_id"] == THREAD_ID
         assert body["user_id"] == USER_ID
 
-    # Requires at least one of thread_id / user_id.
-    with pytest.raises(AgentClientError) as exc:
+    with pytest.raises(AgentClientError, match="thread_id is required"):
         await call()
-    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
 
     error_response = Response(500, text="Internal Server Error", request=Request("DELETE", "http://test/history/clear"))
     with patch(target, return_value=error_response):
@@ -451,13 +449,13 @@ async def test_clear_history(agent_client, mode):
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
 async def test_add_messages(agent_client, mode):
-    """add_messages()/aadd_messages(): accept dicts or MessageInput, require thread_id|user_id, raise on 5xx."""
+    """Add both message formats to one thread and report server errors."""
     THREAD_ID = "test-thread"
     DICT_MESSAGES = [{"type": "human", "content": "Hello!"}, {"type": "ai", "content": "Hi there!"}]
     INPUT_MESSAGES = [MessageInput(type="human", content="Hello!"), MessageInput(type="ai", content="Hi there!")]
     success_json = {"status": "success", "thread_id": THREAD_ID, "message": "Added 2 messages to chat history."}
     mock_response = Response(201, json=success_json, request=Request("POST", "http://test/history/add_messages"))
-    target = "httpx.post" if mode == "sync" else "httpx.AsyncClient.post"
+    target = "httpx.Client.post" if mode == "sync" else "httpx.AsyncClient.post"
 
     async def call(messages, *args):
         if mode == "sync":
@@ -476,10 +474,8 @@ async def test_add_messages(agent_client, mode):
             assert body["messages"][0]["type"] == "human"
             assert body["messages"][0]["content"] == "Hello!"
 
-    # Requires at least one of thread_id / user_id.
-    with pytest.raises(AgentClientError) as exc:
+    with pytest.raises(AgentClientError, match="thread_id is required"):
         await call(DICT_MESSAGES)
-    assert "At least one of thread_id or user_id must be provided" in str(exc.value)
 
     error_response = Response(
         500, text="Internal Server Error", request=Request("POST", "http://test/history/add_messages")
@@ -488,6 +484,28 @@ async def test_add_messages(agent_client, mode):
         with pytest.raises(AgentClientError) as exc:
             await call(DICT_MESSAGES, THREAD_ID)
         assert "500 Internal Server Error" in str(exc.value)
+
+
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.parametrize("operation", ["get_history", "clear_history", "add_messages"])
+@pytest.mark.parametrize("thread_id", [None, ""])
+async def test_history_requires_thread_before_http_request(agent_client, mode, operation, thread_id):
+    """Reject user-only history requests before the client sends them."""
+    method = getattr(agent_client, ("a" if mode == "async" else "") + operation)
+    arguments = {"thread_id": thread_id, "user_id": "test-user"}
+    if operation == "add_messages":
+        arguments["messages"] = [{"type": "human", "content": "Hello"}]
+    with (
+        patch.object(agent_client, "_get_http_client") as sync_http,
+        patch.object(agent_client, "_get_async_http_client") as async_http,
+        pytest.raises(AgentClientError, match="thread_id is required"),
+    ):
+        if mode == "async":
+            await method(**arguments)
+        else:
+            method(**arguments)
+    sync_http.assert_not_called()
+    async_http.assert_not_called()
 
 
 def test_info(agent_client):
@@ -502,7 +520,7 @@ def test_info(agent_client):
     test_response = Response(200, json=test_info.model_dump(), request=Request("GET", "http://test/info"))
 
     # Update an existing client with info
-    with patch("httpx.get", return_value=test_response):
+    with patch("httpx.Client.get", return_value=test_response):
         agent_client.retrieve_info()
 
     assert agent_client.info == test_info
@@ -514,7 +532,7 @@ def test_info(agent_client):
     assert "Agent unknown-agent not found in available agents: custom-agent" in str(exc.value)
 
     # Test a fresh client with info
-    with patch("httpx.get", return_value=test_response):
+    with patch("httpx.Client.get", return_value=test_response):
         agent_client = AgentClient(base_url="http://test")
     assert agent_client.info == test_info
     assert agent_client.agent == "custom-agent"
@@ -536,7 +554,7 @@ async def test_invoke_accepts_model_provider_enum(agent_client, mode):
     from langgraph_agent_toolkit.schema.models import ModelProvider
 
     mock_response = Response(200, json={"type": "ai", "content": "ok"}, request=Request("POST", "http://test/invoke"))
-    target = "httpx.post" if mode == "sync" else "httpx.AsyncClient.post"
+    target = "httpx.Client.post" if mode == "sync" else "httpx.AsyncClient.post"
 
     async def call():
         if mode == "sync":

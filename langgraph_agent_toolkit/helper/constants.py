@@ -1,8 +1,8 @@
 import os
 
 
-# Runtime override (set by agent_executor when validating loaded agents)
-# This takes precedence over settings to allow dynamic adjustment at startup
+# `agent_executor` sets this override when it validates loaded agents.
+# It overrides settings during startup.
 _runtime_default_agent: str | None = None
 
 

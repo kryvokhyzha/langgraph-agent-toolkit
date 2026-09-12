@@ -62,7 +62,9 @@ def test_chat_openai_patched_normalizes_assistant_role(input_role):
 
 def test_init_chat_model_helper_openai_uses_patched():
     """The 'openai' provider routes through ChatOpenAIPatched."""
-    with patch("langgraph_agent_toolkit.core.models.factory.ChatOpenAIPatched", return_value="patched") as mock_patched:
+    with patch(
+        "langgraph_agent_toolkit.core.models.chat_openai.ChatOpenAIPatched", return_value="patched"
+    ) as mock_patched:
         result = CompletionModelFactory._init_chat_model_helper("gpt-4o", model_provider="openai", openai_api_key="k")
     assert result == "patched"
     mock_patched.assert_called_once_with(model_name="gpt-4o", openai_api_key="k")

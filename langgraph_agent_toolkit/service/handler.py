@@ -1,23 +1,35 @@
+import asyncio
+import threading
 import warnings
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
-from typing import Any, Optional
+from contextlib import AsyncExitStack, asynccontextmanager
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from langchain_core._api import LangChainBetaWarning
+from langgraph.checkpoint.memory import MemorySaver
 
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
+from langgraph_agent_toolkit.core.mcp import configure_mcp_agents
+from langgraph_agent_toolkit.core.memory.concurrency import (
+    ConversationCoordinator,
+    PostgresConversationCoordinator,
+    SQLiteConversationCoordinator,
+)
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
-from langgraph_agent_toolkit.core.observability.empty import BaseObservabilityPlatform, EmptyObservability
+from langgraph_agent_toolkit.core.memory.types import MemoryBackends
+from langgraph_agent_toolkit.core.models.transport import LLMTransportManager
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
+from langgraph_agent_toolkit.service.admission import RequestAdmissionMiddleware
+from langgraph_agent_toolkit.service.auth import validate_auth_configuration
+from langgraph_agent_toolkit.service.blocking import BoundedBlockingExecutor
 from langgraph_agent_toolkit.service.exception_handlers import register_exception_handlers
-from langgraph_agent_toolkit.service.middleware import LoggingMiddleware
+from langgraph_agent_toolkit.service.middleware import LoggingMiddleware, RequestSizeLimitMiddleware
 from langgraph_agent_toolkit.service.routes import COMMON_ERROR_RESPONSES, private_router, public_router
 from langgraph_agent_toolkit.service.utils import verify_bearer
 
@@ -25,130 +37,110 @@ from langgraph_agent_toolkit.service.utils import verify_bearer
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 
 
+async def shutdown_observability(observability) -> None:
+    """Give synchronous telemetry flush a deadline without blocking worker exit."""
+    loop = asyncio.get_running_loop()
+    completed = loop.create_future()
+
+    def finish(error: Exception | None) -> None:
+        if completed.done():
+            return
+        if error is None:
+            completed.set_result(None)
+        else:
+            completed.set_exception(error)
+
+    def flush() -> None:
+        error = None
+        try:
+            observability.before_shutdown()
+        except Exception as exc:
+            error = exc
+        try:
+            loop.call_soon_threadsafe(finish, error)
+        except RuntimeError:
+            pass  # The worker event loop has already stopped.
+
+    # A stuck default-executor thread would also block asyncio.run() shutdown.
+    threading.Thread(target=flush, name="observability-shutdown", daemon=True).start()
+    try:
+        await asyncio.wait_for(completed, settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
+    except TimeoutError:
+        logger.warning("Observability flush exceeded its shutdown time limit; pending telemetry may be lost")
+    except Exception:
+        logger.opt(exception=True).warning("Observability flush failed during shutdown")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Create a lifespan context manager for the FastAPI app."""
-    observability = None
-    initialized_agents = []
-
-    # Initialize readiness state - service is not ready until agents are loaded
+    """Initialize all required resources or fail worker startup."""
     app.state.ready = False
     app.state.startup_complete = False
     app.state.initialized_agents = []
-
-    def initialize_agents(
-        executor: AgentExecutor,
-        observability: BaseObservabilityPlatform,
-        checkpointer: Optional[Any] = None,
-    ):
-        agents = executor.get_all_agent_info()
-        if not agents:
-            logger.warning("No agents found in the executor.")
-        for a in agents:
-            try:
-                agent = executor.get_agent(a.key)
-
-                if checkpointer and not agent.graph.checkpointer:
-                    agent.graph.checkpointer = checkpointer
-
-                if not agent.observability:
-                    agent.observability = observability
-
-                initialized_agents.append(a.key)
-                logger.info(f"Successfully initialized agent: {a.key}")
-            except Exception as e:
-                logger.error(f"Error setting up agent {a.key}: {e}")
-
-        # Update app state with initialized agents
-        app.state.initialized_agents = initialized_agents.copy()
-
-        if initialized_agents:
-            logger.info(f"Successfully initialized {len(initialized_agents)} agents")
-            # Mark service as ready only after agents are initialized
-            app.state.ready = True
-            logger.info("Service is now ready to accept traffic")
-        else:
-            logger.warning("No agents were successfully initialized")
-
-        # Startup has completed (ready or degraded) so the k8s startup probe can pass and hand off
-        # to the liveness probe even when the service came up degraded.
-        app.state.startup_complete = True
-
+    app.state.db_pool = None
+    app.state.lock_pool = None
+    app.state.sqlite_connection = None
+    app.state.llm_transport_manager = None
     try:
-        # Initialize observability platform
-        try:
+        validate_auth_configuration()
+        async with AsyncExitStack() as resources:
+            manager = await resources.enter_async_context(LLMTransportManager.from_settings(settings))
+            resources.enter_context(manager.bind())
+            app.state.llm_transport_manager = manager
             observability = ObservabilityFactory.create(settings.OBSERVABILITY_BACKEND or ObservabilityBackend.EMPTY)
-            logger.info(f"Initialized observability backend: {settings.OBSERVABILITY_BACKEND}")
-        except Exception as e:
-            logger.error(f"Failed to initialize observability backend: {e}")
-            observability = EmptyObservability()
+            resources.push_async_callback(shutdown_observability, observability)
+            app.state.blocking_executor = BoundedBlockingExecutor(settings.REQUEST_MAX_CONCURRENT)
+            resources.push_async_callback(app.state.blocking_executor.aclose, settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
+            saver = None
+            concurrency = ConversationCoordinator()
+            if settings.MEMORY_BACKEND:
+                backend = MemoryFactory.create(settings.MEMORY_BACKEND)
+                saver = await resources.enter_async_context(backend.get_checkpoint_saver())
+                await saver.setup()
+                if settings.MEMORY_BACKEND == MemoryBackends.POSTGRES:
+                    app.state.db_pool = saver.conn
+                    lock_pool = await resources.enter_async_context(backend.get_lock_pool())
+                    app.state.lock_pool = lock_pool
+                    concurrency = PostgresConversationCoordinator(lock_pool)
+                else:
+                    app.state.sqlite_connection = saver.conn
+                    if settings.SQLITE_DB_PATH != ":memory:":
+                        concurrency = SQLiteConversationCoordinator(settings.SQLITE_DB_PATH)
 
-        # Initialize memory backend
-        try:
-            memory_backend = MemoryFactory.create(settings.MEMORY_BACKEND) if settings.MEMORY_BACKEND else None
-
-            if memory_backend:
-                logger.info(f"Initialized memory backend: {settings.MEMORY_BACKEND}")
-            else:
-                logger.warning("No memory backend configured.")
-        except Exception as e:
-            logger.error(f"Failed to initialize memory backend: {e}")
-            app.state.startup_complete = True
-            yield
-            return
-
-        # Initialize agent executor
-        try:
             executor = AgentExecutor(*settings.AGENT_PATHS)
-            logger.info(f"Initialized AgentExecutor: {settings.AGENT_PATHS}")
-            app.state.agent_executor = executor
-        except Exception as e:
-            logger.error(f"Failed to initialize AgentExecutor: {e}")
-            app.state.startup_complete = True
-            yield
-            return
+            executor.concurrency = concurrency
+            await configure_mcp_agents(executor, settings, rebuild_all=True)
+            agents = executor.get_all_agent_info()
+            if not agents:
+                raise RuntimeError("No agents were initialized")
+            for info in agents:
+                agent = executor.get_agent(info.key)
+                if agent.graph.checkpointer is None:
+                    agent.graph.checkpointer = saver if saver is not None else MemorySaver()
+                if agent.observability is None:
+                    agent.observability = observability
+                app.state.initialized_agents.append(info.key)
 
-        if memory_backend:
-            checkpoint = memory_backend.get_checkpoint_saver()
-            async with checkpoint as saver:
-                try:
-                    if saver is not None:
-                        await saver.setup()
-                        # Store pool reference for health monitoring
-                        if hasattr(saver, "conn") and saver.conn is not None:
-                            app.state.db_pool = saver.conn
-                    initialize_agents(executor, observability, checkpointer=saver)
-                    yield
-                except Exception as e:
-                    logger.error(f"Error during database setup: {e}")
-                    app.state.startup_complete = True
-                    yield
-        else:
-            initialize_agents(executor, observability)
+            app.state.agent_executor = executor
+            app.state.startup_complete = True
+            app.state.ready = True
+            logger.info(f"Initialized {len(agents)} agents")
             yield
-    except Exception as e:
-        logger.error(f"Error during initialization: {e}")
-        app.state.startup_complete = True
-        yield
     finally:
-        # On shutdown: mark not-ready and drop the (now-closed) pool reference. The pool itself is
-        # closed when the `async with checkpoint` block exits, which happens before this finally runs.
         app.state.ready = False
         app.state.db_pool = None
-        if observability:
-            try:
-                logger.info("Closing observability platform...")
-                observability.before_shutdown()
-            except Exception as e:
-                logger.error(f"Error closing observability: {e}")
+        app.state.lock_pool = None
+        app.state.sqlite_connection = None
+        app.state.llm_transport_manager = None
+        if hasattr(app.state, "agent_executor"):
+            del app.state.agent_executor
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
-    """Use the route's function name as its OpenAPI operationId.
+    """Use the route function name as its OpenAPI `operationId`.
 
-    Yields idiomatic operationIds for client codegen (e.g. ``invoke`` instead of FastAPI's default
-    ``invoke_invoke_post``). Routes that share a function (the ``/{agent_id}/...`` variant and its
-    default alias) set an explicit ``operation_id`` on the ``/{agent_id}/...`` decorator to stay unique.
+    This produces client-friendly IDs, such as `invoke` instead of `invoke_invoke_post`.
+    Routes that share a function set `operation_id` on the `/{agent_id}/...` decorator.
     """
     return route.name
 
@@ -172,8 +164,13 @@ def create_app() -> FastAPI:
             {"name": "public", "description": "Unauthenticated endpoints (home / docs redirect)."},
         ],
     )
+    app.state.blocking_executor = BoundedBlockingExecutor(settings.REQUEST_MAX_CONCURRENT)
 
-    # Add CORS middleware if explicitly enabled
+    app.add_middleware(LoggingMiddleware)
+    app.add_middleware(RequestSizeLimitMiddleware)
+    app.add_middleware(RequestAdmissionMiddleware)
+
+    # CORS also applies to admission and request-size errors.
     if settings.CORS_ENABLED:
         app.add_middleware(
             CORSMiddleware,
@@ -189,16 +186,13 @@ def create_app() -> FastAPI:
             f"methods: {settings.CORS_METHODS}"
         )
 
-    # add middleware
-    app.add_middleware(LoggingMiddleware)
-
-    # Register exception handlers
+    # Register exception handlers.
     register_exception_handlers(app)
 
-    # Include public router without authentication
+    # Include the public router without authentication.
     app.include_router(public_router)
 
-    # Include private router with authentication; document shared error responses in OpenAPI.
+    # Include the authenticated router with shared OpenAPI error responses.
     app.include_router(private_router, dependencies=[Depends(verify_bearer)], responses=COMMON_ERROR_RESPONSES)
 
     return app

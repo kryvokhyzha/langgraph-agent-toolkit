@@ -1,47 +1,43 @@
 import uuid
 
+from langgraph.checkpoint.base import empty_checkpoint
+
 from langgraph_agent_toolkit.agents.components.checkpoint.empty import NoOpSaver
 
 
-def test_get_and_list_are_empty():
+def test_sync_writes_return_config_without_retaining_state():
+    """Keep request configuration and discard checkpoints and pending writes."""
     saver = NoOpSaver()
-    cfg = {"configurable": {"thread_id": "t1"}}
-    assert saver.get(cfg) is None
-    assert saver.get_tuple(cfg) is None
-    assert list(saver.list(cfg)) == []
+    cfg = {"configurable": {"thread_id": "t1", "user_id": "u1"}, "tags": ["request"]}
 
+    result = saver.put(cfg, checkpoint=empty_checkpoint(), metadata={}, new_versions={})
+    saver.put_writes(result, [("channel", "value")], "task-1")
 
-def test_put_returns_fake_checkpoint_id_and_preserves_configurable():
-    saver = NoOpSaver()
-    cfg = {"configurable": {"thread_id": "t1"}}
-
-    result = saver.put(cfg, checkpoint={}, metadata={}, new_versions={})
-
-    # A valid uuid checkpoint_id is returned, the namespace is set, and existing keys survive.
     uuid.UUID(result["configurable"]["checkpoint_id"])
     assert result["configurable"]["checkpoint_ns"] == ""
     assert result["configurable"]["thread_id"] == "t1"
+    assert result["configurable"]["user_id"] == "u1"
+    assert result["tags"] == ["request"]
+    assert "checkpoint_id" not in cfg["configurable"]
+    assert saver.get(result) is None
+    assert saver.get_tuple(result) is None
+    assert list(saver.list(cfg)) == []
 
 
-def test_put_writes_is_noop():
+async def test_async_writes_return_config_without_retaining_state():
+    """Use the same no-persistence contract through the asynchronous methods."""
     saver = NoOpSaver()
-    assert saver.put_writes({"configurable": {}}, [("channel", "value")], "task-1") is None
+    cfg = {"configurable": {"thread_id": "t1", "user_id": "u1"}, "tags": ["request"]}
 
+    result = await saver.aput(cfg, empty_checkpoint(), {}, {})
+    await saver.aput_writes(result, [("channel", "value")], "task-1")
 
-async def test_async_get_and_list_are_empty():
-    saver = NoOpSaver()
-    cfg = {"configurable": {"thread_id": "t1"}}
-    assert await saver.aget(cfg) is None
-    assert await saver.aget_tuple(cfg) is None
-    assert [c async for c in saver.alist(cfg)] == []
-
-
-async def test_aput_mirrors_put_and_aput_writes_is_noop():
-    saver = NoOpSaver()
-    cfg = {"configurable": {"thread_id": "t1"}}
-
-    result = await saver.aput(cfg, {}, {}, {})
     uuid.UUID(result["configurable"]["checkpoint_id"])
+    assert result["configurable"]["checkpoint_ns"] == ""
     assert result["configurable"]["thread_id"] == "t1"
-
-    assert await saver.aput_writes(cfg, [("channel", "value")], "task-1") is None
+    assert result["configurable"]["user_id"] == "u1"
+    assert result["tags"] == ["request"]
+    assert "checkpoint_id" not in cfg["configurable"]
+    assert await saver.aget(result) is None
+    assert await saver.aget_tuple(result) is None
+    assert [c async for c in saver.alist(cfg)] == []

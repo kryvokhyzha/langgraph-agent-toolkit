@@ -1,23 +1,40 @@
-import asyncio
 import functools
 import importlib
+import inspect
 import os
 import traceback
+from contextlib import aclosing
+from copy import copy
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
 
 import joblib
-from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, ToolMessage
+from langchain_core.exceptions import ModelAuthenticationError
+from langchain_core.messages import (
+    AIMessage,
+    AIMessageChunk,
+    BaseMessage,
+    HumanMessage,
+    RemoveMessage,
+    ToolMessage,
+    convert_to_messages,
+)
 from langchain_core.runnables import RunnableConfig
+from langgraph._internal._constants import PREVIOUS
+from langgraph.constants import END, START
 from langgraph.errors import GraphRecursionError
+from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.pregel import Pregel
 from langgraph.types import Command, Interrupt
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.core.memory.concurrency import ConversationCoordinator, serialize_execution
+from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import get_default_agent, set_default_agent
+from langgraph_agent_toolkit.helper.exceptions import InputValidationError
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.utils import (
     convert_message_content_to_string,
@@ -32,16 +49,63 @@ _HITL_APPROVE = {"approve", "yes", "y", "ok", "accept", "approved"}
 _HITL_REJECT = {"reject", "no", "n", "deny", "rejected"}
 
 
-def interrupt_value_to_content(value: Any) -> Any:
-    """Render an interrupt payload as valid ``AIMessage`` content (a string).
+def _uses_functional_history(graph: Pregel) -> bool:
+    """Identify the Functional API checkpoint layout.
 
-    Custom ``interrupt()`` blueprints pass a string (used as-is). ``HumanInTheLoopMiddleware`` passes
-    a request dict (``{"action_requests": [...]}``); its per-action ``description`` already holds a
-    readable approval prompt, so join those and append a hint on how to reply. This keeps the dict
-    out of ``AIMessage(content=...)``, which only accepts a string or content-block list.
+    LangGraph stores `entrypoint.final.save` in its private `PREVIOUS` channel.
+    Keep this dependency contract covered when the LangGraph version changes.
+    """
+    return graph.input_channels == START and graph.output_channels == END and PREVIOUS in graph.channels
+
+
+async def _graph_history_values(graph: Pregel, config: RunnableConfig) -> dict[str, Any]:
+    """Read saved conversation state without changing the graph output."""
+    state = await graph.aget_state(config)
+    if not _uses_functional_history(graph):
+        return state.values
+    checkpoint = await graph.checkpointer.aget_tuple(state.config)
+    values = checkpoint.checkpoint["channel_values"].get(PREVIOUS) if checkpoint else None
+    if values is None:
+        return {}
+    if not isinstance(values, dict) or not isinstance(values.get("messages", []), list):
+        raise InputValidationError("Functional agent history must save an object with a messages list.")
+    return values
+
+
+async def get_graph_history(graph: Pregel, config: RunnableConfig) -> list[BaseMessage]:
+    """Read messages from StateGraph state or Functional API saved state."""
+    values = await _graph_history_values(graph, config)
+    return convert_to_messages(values.get("messages", []))
+
+
+async def add_graph_history(graph: Pregel, config: RunnableConfig, messages: list[Any]) -> None:
+    """Append messages while preserving Functional API saved state."""
+    if _uses_functional_history(graph):
+        values = dict(await _graph_history_values(graph, config))
+        values["messages"] = add_messages(values.get("messages", []), messages)
+    else:
+        values = {"messages": messages}
+    await graph.aupdate_state(config=config, values=values)
+
+
+def interrupt_value_to_content(value: Any) -> Any:
+    """Convert an interrupt payload to valid ``AIMessage`` content.
+
+    Custom ``interrupt()`` blueprints pass a string. The function returns that
+    string unchanged. ``HumanInTheLoopMiddleware`` passes a request dictionary.
+    The function joins the action descriptions and adds reply instructions. This
+    prevents an invalid dictionary value in ``AIMessage(content=...)``.
     """
     if isinstance(value, (str, list)):
         return value
+    if _is_mcp_elicitation(value):
+        lines = []
+        for request in value.get("requests", []):
+            lines.append(str(request.get("message", "The MCP tool needs more information.")))
+            if request.get("mode") == "url":
+                lines.append(str(request.get("url", "")))
+        lines.append("\nSend answers in input.responses. Use input.resume for multiple pending interrupts.")
+        return "\n".join(lines)
     if isinstance(value, dict) and value.get("action_requests"):
         lines = []
         for req in value["action_requests"]:
@@ -54,20 +118,100 @@ def interrupt_value_to_content(value: Any) -> Any:
     return str(value)
 
 
+def _is_mcp_elicitation(value: Any) -> bool:
+    """Check the MCP elicitation discriminator without loading optional packages."""
+    return isinstance(value, dict) and value.get("type") == "mcp_elicitation"
+
+
+def interrupts_to_chat_message(interrupts: list[Interrupt]) -> ChatMessage:
+    """Keep every interrupt ID and payload in the response."""
+    contents = [interrupt_value_to_content(interrupt.value) for interrupt in interrupts]
+    content = contents[0] if len(contents) == 1 else "\n\n".join(str(value) for value in contents)
+    return ChatMessage(
+        type="ai",
+        content=content,
+        custom_data={
+            "interrupts": [
+                {
+                    "id": interrupt.id if isinstance(getattr(interrupt, "id", None), str) else None,
+                    "value": interrupt.value,
+                }
+                for interrupt in interrupts
+            ]
+        },
+    )
+
+
+def _validate_mcp_resume(value: dict[str, Any], resume: Any) -> dict[str, Any]:
+    """Validate the answer envelope and each MCP form value."""
+    if not isinstance(resume, dict) or set(resume) != {"responses"}:
+        raise InputValidationError("Each MCP resume value must contain only a responses object.")
+    responses = resume["responses"]
+    requests = value.get("requests")
+    if (
+        not isinstance(requests, list)
+        or not requests
+        or any(not isinstance(request, dict) or not isinstance(request.get("key"), str) for request in requests)
+    ):
+        raise InputValidationError("The pending MCP interrupt has invalid request keys.")
+    expected_keys = {request["key"] for request in requests}
+    if not isinstance(responses, dict) or set(responses) != expected_keys:
+        raise InputValidationError("MCP responses must contain one answer for each pending request key.")
+
+    for request in requests:
+        answer = responses[request["key"]]
+        if not isinstance(answer, dict) or set(answer) - {"action", "content"}:
+            raise InputValidationError("Each MCP answer must contain an action and optional content.")
+        action = answer.get("action")
+        if not isinstance(action, str) or action not in {"accept", "decline", "cancel"}:
+            raise InputValidationError("An MCP answer action must be accept, decline, or cancel.")
+        content = answer.get("content")
+        if action != "accept" or request.get("mode") == "url":
+            if content is not None:
+                raise InputValidationError("Only an accepted MCP form answer can contain content.")
+            continue
+        if not isinstance(content, dict) or any(
+            not isinstance(key, str)
+            or not (
+                item is None
+                or isinstance(item, (str, int, float, bool))
+                or isinstance(item, list)
+                and all(isinstance(element, str) for element in item)
+            )
+            for key, item in content.items()
+        ):
+            raise InputValidationError("An accepted MCP form answer must contain an object with valid form values.")
+    return resume
+
+
 def build_resume_command(interrupted_tasks: list, user_input: Dict[str, Any]) -> Command:
     """Build the ``Command(resume=...)`` for an interrupted run.
 
-    ``HumanInTheLoopMiddleware`` expects ``{"decisions": [...]}``; other interrupts (custom
-    ``interrupt()`` blueprints) read the raw input dict (e.g. ``resume_value["message"]``). When the
-    pending interrupt is a HITL tool-approval request, translate the user's reply into one decision
-    per pending tool call: ``approve``/``yes`` -> approve, ``reject[: reason]``/``no`` -> reject, any
-    other text -> respond (sent to the model). Otherwise resume with the raw input unchanged.
+    ``HumanInTheLoopMiddleware`` expects ``{"decisions": [...]}``. Other
+    ``interrupt()`` blueprints read the input dictionary. For a HITL tool
+    approval request, translate the user's reply to a decision for each pending
+    tool call. Otherwise, return the input dictionary unchanged.
     """
-    interrupt_value = None
-    try:
-        interrupt_value = interrupted_tasks[0].interrupts[0].value
-    except (IndexError, AttributeError, TypeError):
-        pass
+    pending = [interrupt for task in interrupted_tasks for interrupt in (getattr(task, "interrupts", None) or [])]
+    mcp_pending = [interrupt for interrupt in pending if _is_mcp_elicitation(interrupt.value)]
+    if mcp_pending:
+        if "resume" in user_input:
+            resume_map = user_input["resume"]
+            pending_ids = {getattr(interrupt, "id", None) for interrupt in pending}
+            if "responses" in user_input:
+                raise InputValidationError("Send input.resume or input.responses, not both.")
+            if not all(isinstance(interrupt_id, str) and interrupt_id for interrupt_id in pending_ids):
+                raise InputValidationError("The pending interrupts do not have valid IDs.")
+            if not isinstance(resume_map, dict) or set(resume_map) != pending_ids:
+                raise InputValidationError("input.resume must contain one value for each pending interrupt ID.")
+            for interrupt in mcp_pending:
+                _validate_mcp_resume(interrupt.value, resume_map[interrupt.id])
+            return Command(resume=resume_map)
+        if len(pending) != 1:
+            raise InputValidationError("Multiple interrupts are pending. Send answers in input.resume by interrupt ID.")
+        return Command(resume=_validate_mcp_resume(mcp_pending[0].value, {"responses": user_input.get("responses")}))
+
+    interrupt_value = pending[0].value if pending else None
 
     if isinstance(interrupt_value, dict) and interrupt_value.get("action_requests"):
         count = len(interrupt_value["action_requests"]) or 1
@@ -90,30 +234,31 @@ T = TypeVar("T")
 
 
 class AgentExecutor:
-    """Handles the loading, execution and saving logic for different LangGraph agents."""
+    """Load, run, and save LangGraph agents."""
 
     def __init__(self, *args):
-        """Initialize the AgentExecutor by importing agents.
+        """Initialize the `AgentExecutor` and import agents.
 
         Args:
-            *args: Variable length strings specifying the agents to import,
-                  e.g., "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent".
+            *args: Import strings for the agents. Example:
+                "langgraph_agent_toolkit.agents.blueprints.react.agent:react_agent".
 
         Raises:
             ValueError: If no agents are provided.
 
         """
         self.agents: Dict[str, Agent] = {}
+        self.concurrency = ConversationCoordinator()
 
         if not args:
             raise ValueError("At least one agent must be provided to AgentExecutor.")
 
-        # Load agents from import strings
         self.load_agents_from_imports(args)
         self._validate_default_agent_loaded()
 
     def load_agents_from_imports(self, args: tuple) -> None:
-        """Dynamically imports agents based on the provided import strings."""
+        """Import agents from the specified import strings."""
+        errors = []
         for import_str in args:
             try:
                 module_path, object_name = import_str.split(":")
@@ -121,35 +266,36 @@ class AgentExecutor:
                 agent_obj = getattr(module, object_name)
 
                 if isinstance(agent_obj, (CompiledStateGraph, Pregel)):
-                    agent = Agent(name=object_name, description=f"Dynamically loaded {object_name}", graph=agent_obj)
+                    agent = Agent(
+                        name=object_name, description=f"Dynamically loaded {object_name}", graph=copy(agent_obj)
+                    )
                     self.agents[agent.name] = agent
                 elif isinstance(agent_obj, Agent):
-                    self.agents[agent_obj.name] = agent_obj
+                    agent = copy(agent_obj)
+                    agent.graph = copy(agent_obj.graph)
+                    self.agents[agent.name] = agent
                 else:
-                    logger.warning(f"Object '{object_name}' is neither a graph nor an Agent instance")
+                    raise ValueError(f"Object '{object_name}' is neither a graph nor an Agent instance")
             except (ImportError, AttributeError, ValueError) as e:
                 logger.error(f"Error loading agent from '{import_str}': {e}")
+                errors.append(import_str)
+        if errors:
+            raise ValueError(f"Required agents failed to load: {', '.join(errors)}")
 
     def _validate_default_agent_loaded(self) -> None:
-        """Validate that a default agent is available and set it if needed.
+        """Validate the configured default agent.
 
-        If the configured default agent (from settings or constants) is not available
-        in the loaded agents, use the first loaded agent as the default.
-
-        This ensures that get_default_agent() always returns an agent that exists.
+        Use the first loaded agent if the configured default is unavailable.
         """
         if not self.agents:
             raise ValueError("No agents were loaded. Please check your imports.")
 
-        # Get the current default (from settings, runtime override, or constants)
         configured_default = get_default_agent()
 
-        # Check if the configured default is actually available
         if configured_default in self.agents:
             logger.debug(f"Default agent '{configured_default}' is available in loaded agents.")
             return
 
-        # Configured default not found - use first available agent
         new_default = list(self.agents.keys())[0]
         logger.warning(
             f"Default agent '{configured_default}' not found in loaded agents. Using '{new_default}' as default."
@@ -157,16 +303,16 @@ class AgentExecutor:
         set_default_agent(new_default)
 
     def get_agent(self, agent_id: str) -> Agent:
-        """Get an agent by its ID.
+        """Return the agent with the specified ID.
 
         Args:
-            agent_id: The ID of the agent to retrieve
+            agent_id: The ID of the agent.
 
         Returns:
-            The requested Agent instance
+            The requested `Agent` instance.
 
         Raises:
-            KeyError: If the agent_id is not found
+            KeyError: The agent ID is not found.
 
         """
         if agent_id not in self.agents:
@@ -174,41 +320,43 @@ class AgentExecutor:
         return self.agents[agent_id]
 
     def get_all_agent_info(self) -> list[AgentInfo]:
-        """Get information about all available agents.
+        """Return information about all available agents.
 
         Returns:
-            A list of AgentInfo objects containing agent IDs and descriptions
+            `AgentInfo` objects with agent IDs and descriptions.
 
         """
         return [AgentInfo(key=agent_id, description=agent.description) for agent_id, agent in self.agents.items()]
 
     def add_agent(self, agent_id: str, agent: Agent) -> None:
-        """Add a new agent to the executor.
+        """Add an agent to the executor.
 
         Args:
-            agent_id: The ID to assign to the agent
-            agent: The Agent instance to add
+            agent_id: The ID for the agent.
+            agent: The `Agent` instance.
 
         """
         self.agents[agent_id] = agent
 
     @staticmethod
     def handle_agent_errors(func: Callable[..., T]) -> Callable[..., T]:
-        """Handle errors occurring during agent execution.
+        """Handle errors during agent execution.
 
-        Specifically handles GraphRecursionError and other exceptions.
+        Handle `GraphRecursionError` and other exceptions.
 
         Args:
-            func: The function to decorate
+            func: The function to decorate.
 
         Returns:
-            The decorated function
+            The decorated function.
 
         """
 
         def _handle_error(e: Exception):
-            """Handle and re-raise errors with logging."""
-            # Get detailed traceback
+            """Log an error and raise it again."""
+            if isinstance(e, ModelAuthenticationError):
+                logger.warning("The model provider credentials were rejected")
+                raise e
             tb_str = traceback.format_exc()
 
             if isinstance(e, GraphRecursionError):
@@ -216,7 +364,6 @@ class AgentExecutor:
             else:
                 logger.error(f"Error during agent execution: {e}\n\nFull traceback:\n{tb_str}")
 
-            # Re-raise the original exception to preserve details
             raise e
 
         @functools.wraps(func)
@@ -233,7 +380,7 @@ class AgentExecutor:
             except Exception as e:
                 return _handle_error(e)
 
-        if asyncio.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:
             return sync_wrapper
@@ -250,25 +397,25 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> Tuple[Agent, Any, Any, UUID]:
-        """Apply common setup for agent execution that both invoke and stream methods share.
+        """Set up an agent run for `invoke` and `stream`.
 
         Args:
-            agent_id: ID of the agent to invoke
-            input: User message to send to the agent
-            thread_id: Optional thread ID for conversation history
-            user_id: Optional user ID for the agent
-            model_name: Optional model name to override the default
-            model_provider: Optional model provider to override the default
-            model_config_key: Optional model config key to override the default
-            agent_config: Optional additional configuration for the agent
-            recursion_limit: Optional recursion limit for the agent
+            agent_id: ID of the agent to run.
+            input: User message for the agent.
+            thread_id: Optional conversation thread ID.
+            user_id: Optional user ID.
+            model_name: Optional replacement model name.
+            model_provider: Optional replacement model provider.
+            model_config_key: Optional replacement model configuration key.
+            agent_config: Optional agent configuration.
+            recursion_limit: Optional limit for graph recursion.
 
         Returns:
-            Tuple containing:
-                - agent: The Agent instance
-                - input_data: The properly formatted input for the agent
-                - config: The RunnableConfig for the agent
-                - run_id: The UUID for this run
+            A tuple that contains:
+                - agent: The `Agent` instance.
+                - input_data: Formatted input for the agent.
+                - config: The `RunnableConfig` for the agent.
+                - run_id: The UUID for this run.
 
         """
         agent = self.get_agent(agent_id)
@@ -284,20 +431,15 @@ class AgentExecutor:
             "user_id": user_id,
         }
 
-        # Handle model_config_key if provided (takes precedence over individual model settings)
         if model_config_key and model_config_key in settings.MODEL_CONFIGS:
-            # Store the model_config_key so agents can use it if needed
             configurable["model_config_key"] = model_config_key
 
-            # Extract basic model info for backward compatibility with agents that
-            # don't explicitly check for model_config_key
             model_config = settings.MODEL_CONFIGS[model_config_key]
             if "provider" in model_config:
                 configurable["model_provider"] = model_config["provider"]
             if "name" in model_config:
                 configurable["model_name"] = model_config["name"]
         else:
-            # Fall back to individual parameters
             if model_name:
                 configurable["model_name"] = model_name
 
@@ -305,9 +447,16 @@ class AgentExecutor:
                 configurable["model_provider"] = model_provider
 
         if agent_config:
+            reserved = {"thread_id", "user_id", "checkpoint_id", "checkpoint_ns"}
+            if reserved.intersection(agent_config) or any(key.startswith("__") for key in agent_config):
+                raise ValueError("agent_config cannot override identity or checkpoint fields")
             configurable.update(agent_config)
 
-        callback = agent.observability.get_callback_handler(update_trace=True)
+        if agent.observability is None:
+            agent.observability = EmptyObservability()
+        callback = agent.observability.get_callback_handler(
+            run_id=str(run_id), user_id=user_id, session_id=thread_id, update_trace=True
+        )
 
         config = RunnableConfig(
             configurable=configurable,
@@ -321,22 +470,15 @@ class AgentExecutor:
             },
         )
 
-        _input = input.model_dump()
+        _input = input.model_dump() if hasattr(input, "model_dump") else dict(input)
         input_data: Command | dict[str, Any]
 
-        # Check if there are any interrupts that need to be resumed
         interrupted_tasks = []
         if settings.CHECK_INTERRUPTS and agent_graph.checkpointer is not None:
-            try:
-                state = await agent_graph.aget_state(config=config)
-                interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
-            except Exception:
-                pass
+            state = await agent_graph.aget_state(config=config)
+            interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
 
         if interrupted_tasks:
-            # User input resumes an interrupted run. For HumanInTheLoopMiddleware the reply is mapped
-            # to a decision; custom interrupt() blueprints receive the raw input dict and read the
-            # field they need (e.g. resume_value["message"]).
             input_data = build_resume_command(interrupted_tasks, _input)
         else:
             if "message" in _input:
@@ -348,6 +490,7 @@ class AgentExecutor:
         return agent, input_data, config, run_id
 
     @handle_agent_errors
+    @serialize_execution
     async def invoke(
         self,
         agent_id: str,
@@ -360,21 +503,21 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> ChatMessage:
-        """Invoke an agent with a message and return the response.
+        """Run an agent with a message and return its response.
 
         Args:
-            agent_id: ID of the agent to invoke
-            input: User message to send to the agent
-            thread_id: Optional thread ID for conversation history
-            user_id: Optional user ID for the agent
-            model_name: Optional model name to override the default
-            model_provider: Optional model provider to override the default
-            model_config_key: Optional model config key to override the default
-            agent_config: Optional additional configuration for the agent
-            recursion_limit: Optional recursion limit for the agent
+            agent_id: ID of the agent to run.
+            input: User message for the agent.
+            thread_id: Optional conversation thread ID.
+            user_id: Optional user ID.
+            model_name: Optional replacement model name.
+            model_provider: Optional replacement model provider.
+            model_config_key: Optional replacement model configuration key.
+            agent_config: Optional agent configuration.
+            recursion_limit: Optional limit for graph recursion.
 
         Returns:
-            ChatMessage: The agent's response
+            The agent response as a `ChatMessage`.
 
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
@@ -389,27 +532,41 @@ class AgentExecutor:
             recursion_limit=recursion_limit,
         )
 
-        # Wrap execution in trace context
         with agent.observability.trace_context(
             run_id=run_id,
             user_id=user_id,
+            session_id=thread_id,
             input=input_data,
             agent_name=agent.name,
         ) as trace_span:
-            # Invoke the agent
-            response_events: list[tuple[str, Any]] = await agent.graph.ainvoke(
-                input=input_data,
-                config=config,
-                # stream_mode=["updates", "values"],
-                stream_mode=["values"],
-            )
+            response_type = None
+            response = None
+            pending_interrupts = []
+            seen_interrupts = set()
+            # Keep only the latest state. List-mode ainvoke retains every state.
+            async with aclosing(
+                agent.graph.astream(
+                    input=input_data,
+                    config=config,
+                    stream_mode=["values"],
+                    output_keys=agent.graph.output_channels,
+                )
+            ) as events:
+                async for response_type, response in events:
+                    if response_type != "values":
+                        continue
+                    for pending_interrupt in response.get("__interrupt__", []):
+                        key = getattr(pending_interrupt, "id", None) or id(pending_interrupt)
+                        if key not in seen_interrupts:
+                            seen_interrupts.add(key)
+                            pending_interrupts.append(pending_interrupt)
 
-            if not response_events:
+            if response_type is None:
                 raise ValueError("Agent returned no response events")
 
-            response_type, response = response_events[-1]
-
-            if response_type == "values" and "__interrupt__" not in response:
+            if pending_interrupts:
+                output = interrupts_to_chat_message(pending_interrupts)
+            elif response_type == "values" and "__interrupt__" not in response:
                 generated_message = response.get("structured_response")
                 if not generated_message:
                     messages = response.get("messages") or []
@@ -417,23 +574,16 @@ class AgentExecutor:
                         raise ValueError("Agent response contains no messages")
                     generated_message = messages[-1]
 
-                # Normal response, the agent completed successfully
                 output = langchain_to_chat_message(generated_message)
-            elif response_type == "values" and "__interrupt__" in response:
-                # The agent paused on an interrupt. ainvoke(stream_mode=["values"]) surfaces it in the
-                # final values event; return the first interrupt's value as an AIMessage.
-                output = langchain_to_chat_message(
-                    AIMessage(content=interrupt_value_to_content(response["__interrupt__"][0].value))
-                )
             else:
                 raise ValueError(f"Unexpected response type: {response_type}")
 
             output.run_id = str(run_id)
-            # Record the final output on the trace; the Langfuse v4 callback no longer sets it.
             agent.observability.update_trace(trace_span, output=output.content)
             return output
 
     @handle_agent_errors
+    @serialize_execution
     async def stream(
         self,
         agent_id: str,
@@ -447,22 +597,22 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
     ) -> AsyncGenerator[str | ChatMessage, None]:
-        """Stream an agent's response to a message, yielding either tokens or messages.
+        """Stream an agent response as tokens or messages.
 
         Args:
-            agent_id: ID of the agent to invoke
-            input: User message to send to the agent
-            thread_id: Optional thread ID for conversation history
-            user_id: Optional user ID for the agent
-            model_name: Optional model name to override the default
-            model_provider: Optional model provider to override the default
-            model_config_key: Optional model config key to override the default
-            stream_tokens: Whether to stream individual tokens
-            agent_config: Optional additional configuration for the agent
-            recursion_limit: Optional recursion limit for the agent
+            agent_id: ID of the agent to run.
+            input: User message for the agent.
+            thread_id: Optional conversation thread ID.
+            user_id: Optional user ID.
+            model_name: Optional replacement model name.
+            model_provider: Optional replacement model provider.
+            model_config_key: Optional replacement model configuration key.
+            stream_tokens: Stream individual tokens when true.
+            agent_config: Optional agent configuration.
+            recursion_limit: Optional limit for graph recursion.
 
         Yields:
-            Either ChatMessage objects for full messages or strings for token chunks
+            Full `ChatMessage` objects or token strings.
 
         """
         agent, input_data, config, run_id = await self._setup_agent_execution(
@@ -477,133 +627,131 @@ class AgentExecutor:
             recursion_limit=recursion_limit,
         )
 
-        # Wrap execution in trace context
         with agent.observability.trace_context(
             run_id=run_id,
             user_id=user_id,
+            session_id=thread_id,
             input=input_data,
             agent_name=agent.name,
         ) as trace_span:
-            # Stream from the agent with appropriate modes
             stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
             final_output: str | None = None
+            pending_interrupts = []
+            seen_interrupts = set()
 
-            async for stream_event in agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode):
-                if not isinstance(stream_event, tuple):
-                    continue
+            # Close graph tasks and checkpoint writes before releasing the conversation.
+            async with aclosing(
+                agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode)
+            ) as events:
+                async for stream_event in events:
+                    if not isinstance(stream_event, tuple):
+                        continue
 
-                stream_mode, event = stream_event
-                new_messages = []
+                    stream_mode, event = stream_event
+                    new_messages = []
 
-                if stream_mode == "updates":
-                    for node, updates in event.items():
-                        # A simple approach to handle agent interrupts.
-                        # In a more sophisticated implementation, we could add
-                        # some structured ChatMessage type to return the interrupt value.
-                        if node == "__interrupt__":
-                            interrupt: Interrupt
-                            for interrupt in updates:
-                                new_messages.append(AIMessage(content=interrupt_value_to_content(interrupt.value)))
+                    if stream_mode == "updates":
+                        for node, updates in event.items():
+                            # Summary updates replace context and can contain retained answers.
+                            if node == "SummarizationMiddleware.before_model":
+                                continue
+                            if node == "__interrupt__":
+                                for pending_interrupt in updates:
+                                    key = getattr(pending_interrupt, "id", None) or id(pending_interrupt)
+                                    if key not in seen_interrupts:
+                                        seen_interrupts.add(key)
+                                        pending_interrupts.append(pending_interrupt)
+                                continue
+
+                            update_messages = (updates or {}).get("messages", [])
+
+                            if node == "supervisor":
+                                ai_messages = [msg for msg in update_messages if isinstance(msg, AIMessage)]
+                                if ai_messages:
+                                    update_messages = [ai_messages[-1]]
+
+                            if node in ("research_expert", "math_expert"):
+                                if update_messages:
+                                    msg = ToolMessage(
+                                        content=update_messages[0].content,
+                                        name=node,
+                                        tool_call_id="",
+                                    )
+                                    update_messages = [msg]
+                            new_messages.extend(update_messages)
+
+                            structured_response = (updates or {}).get("structured_response")
+                            if structured_response is not None:
+                                new_messages.append(structured_response)
+
+                    elif stream_mode == "custom":
+                        new_messages = [event]
+
+                    elif stream_mode == "messages" and stream_tokens:
+                        msg, metadata = event
+                        if "skip_stream" in metadata.get("tags", []) or metadata.get("lc_source") == "summarization":
                             continue
+                        if not isinstance(msg, AIMessageChunk):
+                            continue
+                        content = remove_tool_calls(msg.content)
+                        if content:
+                            yield convert_message_content_to_string(content)
 
-                        update_messages = (updates or {}).get("messages", [])
+                    processed_messages = []
+                    current_message: dict[str, Any] = {}
+                    for msg in new_messages:
+                        if isinstance(msg, tuple):
+                            key, value = msg
+                            current_message[key] = value
+                        else:
+                            if current_message:
+                                processed_messages.append(create_ai_message(current_message))
+                                current_message = {}
+                            processed_messages.append(msg)
 
-                        # Special case for supervisor agent
-                        if node == "supervisor":
-                            # Get only the last AIMessage since supervisor includes all previous messages
-                            ai_messages = [msg for msg in update_messages if isinstance(msg, AIMessage)]
-                            if ai_messages:
-                                update_messages = [ai_messages[-1]]
+                    if current_message:
+                        processed_messages.append(create_ai_message(current_message))
 
-                        # Special case for expert agents
-                        if node in ("research_expert", "math_expert"):
-                            # Convert to ToolMessage so it displays in the UI as a tool response
-                            if update_messages:
-                                msg = ToolMessage(
-                                    content=update_messages[0].content,
-                                    name=node,
-                                    tool_call_id="",
+                    for msg in processed_messages:
+                        if isinstance(msg, RemoveMessage):
+                            continue
+                        try:
+                            chat_message = langchain_to_chat_message(msg)
+                            chat_message.run_id = str(run_id)
+                            if chat_message.type == "human":
+                                continue
+                            if chat_message.type == "ai" and chat_message.content:
+                                _content = chat_message.content
+                                final_output = (
+                                    _content
+                                    if isinstance(_content, str)
+                                    else convert_message_content_to_string(_content)
+                                    if isinstance(_content, list)
+                                    else str(_content)
                                 )
-                                update_messages = [msg]
-                        new_messages.extend(update_messages)
-
-                        # Surface structured output (response_format) so streaming matches invoke,
-                        # which returns structured_response. Yielded as a ChatMessage with dict content.
-                        structured_response = (updates or {}).get("structured_response")
-                        if structured_response is not None:
-                            new_messages.append(structured_response)
-
-                elif stream_mode == "custom":
-                    new_messages = [event]
-
-                elif stream_mode == "messages" and stream_tokens:
-                    msg, metadata = event
-                    if "skip_stream" in metadata.get("tags", []):
-                        continue
-                    # Skip non-LLM nodes that might send messages
-                    if not isinstance(msg, AIMessageChunk):
-                        continue
-                    content = remove_tool_calls(msg.content)
-                    if content:
-                        # Empty content in OpenAI context usually means the model is asking for a tool to be invoked
-                        yield convert_message_content_to_string(content)
-
-                # LangGraph streaming may emit tuples: (field_name, field_value)
-                # e.g. ('content', <str>), ('tool_calls', [ToolCall,...]), ('additional_kwargs', {...}), etc.
-                # We accumulate only supported fields into `parts` and skip unsupported metadata.
-                # More info at: https://langchain-ai.github.io/langgraph/cloud/how-tos/stream_messages/
-                processed_messages = []
-                current_message: dict[str, Any] = {}
-                for msg in new_messages:
-                    if isinstance(msg, tuple):
-                        key, value = msg
-                        # Store parts in temporary dict
-                        current_message[key] = value
-                    else:
-                        # Add complete message if we have one in progress
-                        if current_message:
-                            processed_messages.append(create_ai_message(current_message))
-                            current_message = {}
-                        processed_messages.append(msg)
-
-                # Add any remaining message parts
-                if current_message:
-                    processed_messages.append(create_ai_message(current_message))
-
-                for msg in processed_messages:
-                    try:
-                        chat_message = langchain_to_chat_message(msg)
-                        chat_message.run_id = str(run_id)
-                        # Don't echo human messages back in the response stream: the client already
-                        # has its input, and LangGraph can re-surface it. (The previous
-                        # `content == msg` check compared a str to a message object and never matched.)
-                        if chat_message.type == "human":
+                            yield chat_message
+                        except Exception as e:
+                            logger.error(f"Error parsing message: {e}")
                             continue
-                        # Track the latest AI message to record as the trace output
-                        if chat_message.type == "ai" and chat_message.content:
-                            _content = chat_message.content
-                            final_output = (
-                                _content
-                                if isinstance(_content, str)
-                                else convert_message_content_to_string(_content)
-                                if isinstance(_content, list)
-                                else str(_content)  # structured-output dict, etc.
-                            )
-                        yield chat_message
-                    except Exception as e:
-                        logger.error(f"Error parsing message: {e}")
-                        continue
 
-            # After streaming completes, record the final assistant output on the trace
-            # (the Langfuse v4 callback no longer sets trace-level output as v3's update_trace did).
+            if pending_interrupts:
+                chat_message = interrupts_to_chat_message(pending_interrupts)
+                chat_message.run_id = str(run_id)
+                final_output = (
+                    chat_message.content
+                    if isinstance(chat_message.content, str)
+                    else convert_message_content_to_string(chat_message.content)
+                )
+                yield chat_message
+
             agent.observability.update_trace(trace_span, output=final_output)
 
     def save(self, path: str, agent_ids: Optional[List[str]] = None) -> None:
-        """Save agents to disk using joblib.
+        """Save agents to disk with `joblib`.
 
         Args:
-            path: Directory path where to save agents
-            agent_ids: List of agent IDs to save. If None, saves all agents.
+            path: Directory path for the agent files.
+            agent_ids: Agent IDs to save. Save all agents when this is `None`.
 
         """
         _path = Path(path)
@@ -617,10 +765,10 @@ class AgentExecutor:
             joblib.dump(agent, _path / f"{agent_id}.joblib")
 
     def load_saved_agents(self, path: str) -> None:
-        """Load saved agents from disk using joblib.
+        """Load agents from `joblib` files on disk.
 
         Args:
-            path: Directory path from which to load agents
+            path: Directory path for the agent files.
 
         """
         for filename in os.listdir(path):

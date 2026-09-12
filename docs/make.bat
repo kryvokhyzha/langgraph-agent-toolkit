@@ -1,35 +1,37 @@
 @ECHO OFF
+setlocal EnableExtensions DisableDelayedExpansion
+pushd "%~dp0"
+if errorlevel 1 exit /b 1
 
-pushd %~dp0
+REM Use the installed locked environment. Keep caller overrides.
+if not defined SPHINXBUILD set "SPHINXBUILD=uv run --no-sync sphinx-build"
+if not defined SPHINXAPIDOC set "SPHINXAPIDOC=uv run --no-sync sphinx-apidoc"
+if not defined SPHINXOPTS set "SPHINXOPTS=-W --keep-going"
+set "SOURCEDIR=."
+set "BUILDDIR=_build"
+set "DOC_TARGET=%~1"
+if not defined DOC_TARGET set "DOC_TARGET=help"
 
-REM Command file for Sphinx documentation
-
-if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=sphinx-build
-)
-set SOURCEDIR=.
-set BUILDDIR=_build
-
-%SPHINXBUILD% >NUL 2>NUL
-if errorlevel 9009 (
-	echo.
-	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
-	echo.installed, then set the SPHINXBUILD environment variable to point
-	echo.to the full path of the 'sphinx-build' executable. Alternatively you
-	echo.may add the Sphinx directory to PATH.
-	echo.
-	echo.If you don't have Sphinx installed, grab it from
-	echo.https://www.sphinx-doc.org/
-	exit /b 1
+if /I "%DOC_TARGET%" == "api" goto api
+if /I "%DOC_TARGET%" == "html" (
+    set "DOC_TARGET=html"
+    call :generate_api
+    if errorlevel 1 goto end
 )
 
-if "%1" == "" goto help
-
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+call %SPHINXBUILD% -M "%DOC_TARGET%" "%SOURCEDIR%" "%BUILDDIR%" %SPHINXOPTS% %O%
 goto end
 
-:help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+:api
+call :generate_api
+goto end
+
+:generate_api
+REM Generate the API root and remove pages for deleted modules.
+call %SPHINXAPIDOC% -f -e -M --remove-old -o generated ../langgraph_agent_toolkit --doc-project="API Reference"
+exit /b %ERRORLEVEL%
 
 :end
+set "DOC_EXIT_CODE=%ERRORLEVEL%"
 popd
+endlocal & exit /b %DOC_EXIT_CODE%

@@ -1,160 +1,135 @@
-# Contributing to Langgraph Agent Toolkit
+# Contributing to LangGraph Agent Toolkit
 
-First off, thank you for considering contributing to `Langgraph Agent Toolkit`!
+Read [CLAUDE.md](CLAUDE.md) for the package architecture and project rules. Use
+the [quickstart](docs/quickstart.rst) to run the first API example with a fake
+model. It needs no provider credentials.
 
-## Development Setup
+## Development setup
 
-1. Make sure you have Python 3.10+ installed
-2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) package
-   manager
-3. Fork the repository
-4. Clone your fork
-
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/langgraph-agent-toolkit.git
-   cd langgraph-agent-toolkit
-
-   # Add the upstream remote
-   git remote add upstream https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
-   ```
-
-5. Set up the development environment:
-
-   ```bash
-   uv sync
-   ```
-
-   That's it! The `uv sync` command will automatically create and use a virtual
-   environment.
-
-6. Install pre-commit hooks:
-
-   ```bash
-   uv run pre-commit install
-   uv run pre-commit run
-   ```
-
-   Pre-commit hooks will automatically run checks (like ruff, formatting, etc.)
-   when you make a commit, ensuring your code follows our style guidelines.
-
-### Running Commands
-
-You have two options for running commands:
-
-1. **With the virtual environment activated**:
-
-   ```bash
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-   # Then run commands directly
-   pytest
-   pre-commit run --all-files
-   ```
-
-2. **Without activating the virtual environment**:
-
-   ```bash
-   # Use uv run prefix for all commands
-   uv run pytest
-   uv run pre-commit run --all-files
-   ```
-
-Both approaches work - use whichever is more convenient for you.
-
-> **Note:** For simplicity, commands in this guide are mostly written
-> **without** the `uv run` prefix. If you haven't activated your virtual
-> environment, remember to prepend `uv run` to all python-related commands and
-> tools.
-
-### Adding Dependencies
-
-When adding new dependencies to the library:
-
-1. **Runtime dependencies** - packages needed to run the application:
-
-   ```bash
-   uv add new-package
-   ```
-
-2. **Development dependencies** - packages needed for development, testing, or
-   CI:
-
-   ```bash
-   uv add --group dev new-package
-   ```
-
-After adding dependencies, make sure to:
-
-1. Test that everything works with the new package
-2. Commit both `pyproject.toml` and `uv.lock` files:
-
-   ```bash
-   git add pyproject.toml uv.lock
-   git commit -m "Add new-package dependency"
-   ```
-
-## Development Process
-
-1. Fork the repository and set the upstream remote
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run the tests (`pytest`)
-5. Run pre-commit checks across all files (`pre-commit run --all-files`)
-6. Commit your changes (`git commit -m 'Add some amazing feature'`)
-   - Note: pre-commit will automatically run during commit for changed files
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request. Make sure the Pull Request's base branch is
-   [the original repository's](https://github.com/kryvokhyzha/langgraph-agent-toolkit/)
-   `main` branch.
-
-## Code Style
-
-We use pre-commit hooks to ensure code quality. These hooks include:
-
-- **ruff** for linting and formatting
-- **codespell** for spelling checks
-- **prettier** for formatting markdown and other non-Python files
-- Other quality checks for YAML, JSON, etc.
-
-Rather than running linting tools manually, we recommend using pre-commit:
+The package supports Python 3.11, 3.12, 3.13, and 3.14. Use Python 3.13 for
+development: the pre-commit configuration requires it. Install
+[uv](https://docs.astral.sh/uv/getting-started/installation/), then clone your
+fork:
 
 ```bash
-# Run pre-commit checks on all files
-pre-commit run --all-files
-
-# Or let it run automatically during git commits
-git commit -m "Your commit message"
+git clone https://github.com/YOUR-USERNAME/langgraph-agent-toolkit.git
+cd langgraph-agent-toolkit
+git remote add upstream https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
+uv sync --frozen --no-install-project --extra all --python 3.13
+uv run --no-sync pre-commit install
 ```
 
-## Testing
+The sync command creates `.venv` and installs the locked development groups and
+all optional features. Source imports use the repository path. Keep `--no-sync`
+on later commands to preserve the selected environment.
 
-We use pytest for testing. Please write tests for any new features and ensure
-all tests pass:
+Use `--extra all`, not `--all-extras`. The latter selects three incompatible
+Langfuse SDK versions. To work with SDK v2, add `--extra langfuse-v2` to the
+sync command. Use one selector from `langfuse-v2`, `langfuse-v3`, or
+`langfuse-v4`. These extras select the Python SDK, not a Langfuse server. See
+the [installation guide](docs/installation.rst) for smaller feature selections.
+
+Keep real credentials outside committed files. Local tests disable `.env`
+loading and use fake models or local protocol servers. Do not copy deployment
+credentials into test fixtures.
+
+## Development process
+
+1. Create a branch for one change.
+2. Implement the change and add a regression test for its behavior.
+3. Run the relevant tests, then the full local suite.
+4. Run pre-commit on all files before committing.
+5. Update the affected guide and add a changelog entry when behavior changes.
+6. Open a pull request against `main`.
+
+Describe the problem, the new behavior, and the checks that passed in the pull
+request. State any checks that could not run. Keep unrelated changes separate.
+
+## Tests and checks
+
+Run commands from the repository root:
 
 ```bash
-# Run all tests
-pytest
+uv run --no-sync pytest
+uv run --no-sync pre-commit run --all-files
 ```
 
-## Pull Request Process
+The default test suite needs no external service or model key. It covers real
+graphs, temporary SQLite databases, in-process HTTP, and local MCP subprocesses.
+PostgreSQL tests also run when `LAT_TEST_POSTGRES_DSN` is set. Use a disposable
+test database for that setting.
 
-1. Ensure your code follows the style guidelines of the project
-2. Update the README.md with details of changes if applicable
-3. The versioning scheme we use is [SemVer](http://semver.org/)
-4. Include a descriptive commit message
-5. Your pull request will be merged once it's reviewed and approved
+Process journeys require a separate opt-in:
 
-## Code of Conduct
+```bash
+uv run --no-sync pytest tests/e2e tests/service/test_worker_recovery.py --run-e2e
+```
 
-Please note we have a code of conduct, please follow it in all your interactions
-with the project.
+These tests start local API processes and check streaming, persistence, restart,
+and worker replacement. They use fake models. Worker signal tests require a
+POSIX platform. Docker checks require running test containers and
+`--run-docker`. Live Langfuse checks require `--run-langfuse` and a dedicated
+test project. Real OpenAI checks require both `--run-e2e` and `--run-llm`, plus
+explicit test credentials and a model name. They can incur provider charges. See
+the [testing guide](docs/testing.rst) for setup and test boundaries.
 
-- Be respectful and inclusive
-- Be collaborative
-- When disagreeing, try to understand why
-- A diverse community is a strong community
+Assert returned data, stored state, and failure behavior. Use mocks for external
+dependencies. Avoid tests that only repeat a mocked return value or copy the
+implementation. Remove duplicate tests only when another test preserves their
+behavioral coverage. The coverage floor combines line and branch coverage; it
+does not prove that every package path is correct.
 
-## Questions?
+## Build the documentation
 
-Don't hesitate to open an issue if you have any questions about contributing to
-Langgraph Agent Toolkit.
+From the repository root, install the locked documentation dependencies and the
+optional features needed by the API reference:
+
+```bash
+uv sync --frozen --no-install-project --extra all --group docs
+make -C docs html
+```
+
+The build regenerates `docs/generated`, then builds the full documentation.
+Sphinx warnings cause failure. Open `docs/_build/html/index.html` to review the
+result. Edit package docstrings or source guides instead of generated pages.
+
+On Windows, run the same sync command. Then use Windows Command Prompt:
+
+```bat
+docs\make.bat html
+```
+
+## Code and documentation style
+
+Use the conventions in [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md). Write
+comments, docstrings, and documentation in ASD-STE100 Simplified Technical
+English. Use short, direct sentences. Preserve technical identifiers.
+
+Pre-commit runs Ruff, codespell, Prettier, format checks, Gitleaks, credential
+checks, and lockfile validation. Fix the reported cause before committing. Keep
+secrets out of logs and test artifacts.
+
+## Dependencies
+
+Use a published extra for an optional runtime feature. Use a dependency group
+for tools needed only in a source checkout:
+
+```bash
+uv add package-name
+uv add --optional openai package-name
+uv add --group tests package-name
+uv lock
+```
+
+Choose the command for the dependency's role. The `openai` command above adds to
+an existing extra; replace it with the relevant feature extra. Review the
+version bounds and test the supported Python versions. Commit `pyproject.toml`
+and `uv.lock` together. Reinstall the selected extras before testing a changed
+dependency set.
+
+## Questions and review
+
+Open an issue for a reproducible bug or a proposed change. Include the package
+version, selected extras, relevant configuration names, and a minimal example.
+Remove credentials and private data. A maintainer reviews each pull request
+before merge. Treat other contributors with respect.

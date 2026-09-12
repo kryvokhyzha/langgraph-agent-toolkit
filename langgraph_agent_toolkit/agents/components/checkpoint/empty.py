@@ -13,24 +13,17 @@ from langgraph.checkpoint.serde.base import SerializerProtocol
 
 
 class NoOpSaver(BaseCheckpointSaver):
-    """A fake checkpointer that implements the BaseCheckpointSaver interface but doesn't actually persist anything.
-
-    All operations are no-ops.
-    This is useful for:
-    - Testing without persistence
-    - Running graphs without memory between executions
-    - Situations where you want the graph structure but no state saving
-    """
+    """A `BaseCheckpointSaver` that does not persist checkpoints."""
 
     def __init__(self, *, serde: Optional[SerializerProtocol] = None) -> None:
         super().__init__(serde=serde)
 
     def get(self, config: RunnableConfig) -> Optional[Checkpoint]:
-        """Return None - no checkpoint exists."""
+        """Return `None` because no checkpoint exists."""
         return None
 
     def get_tuple(self, config: RunnableConfig) -> Optional[CheckpointTuple]:
-        """Return None - no checkpoint tuple exists."""
+        """Return `None` because no checkpoint tuple exists."""
         return None
 
     def list(
@@ -41,7 +34,7 @@ class NoOpSaver(BaseCheckpointSaver):
         before: Optional[RunnableConfig] = None,
         limit: Optional[int] = None,
     ) -> Iterator[CheckpointTuple]:
-        """Return an empty iterator - no checkpoints exist."""
+        """Return an empty iterator because no checkpoints exist."""
         return iter([])
 
     def put(
@@ -51,14 +44,9 @@ class NoOpSaver(BaseCheckpointSaver):
         metadata: CheckpointMetadata,
         new_versions: ChannelVersions,
     ) -> RunnableConfig:
-        """Pretend to save but not actually persist anything.
-
-        Return a config with a fake checkpoint_id to satisfy the interface.
-        """
-        # Generate a fake checkpoint ID to return
+        """Return a configuration with a generated checkpoint ID."""
         fake_checkpoint_id = str(uuid.uuid4())
 
-        # Return the config with the fake checkpoint_id
         return {
             **config,
             "configurable": {
@@ -75,16 +63,15 @@ class NoOpSaver(BaseCheckpointSaver):
         task_id: str,
         task_path: str = "",
     ) -> None:
-        """Do nothing - no writes are persisted."""
+        """Do not persist writes."""
         pass
 
-    # Async versions (required for async graph execution)
     async def aget(self, config: RunnableConfig) -> Optional[Checkpoint]:
-        """Async version - always return None."""
+        """Return `None` asynchronously."""
         return None
 
     async def aget_tuple(self, config: RunnableConfig) -> Optional[CheckpointTuple]:
-        """Async version - always return None."""
+        """Return `None` asynchronously."""
         return None
 
     async def alist(
@@ -95,9 +82,9 @@ class NoOpSaver(BaseCheckpointSaver):
         before: Optional[RunnableConfig] = None,
         limit: Optional[int] = None,
     ) -> Iterator[CheckpointTuple]:
-        """Async version - always return an empty iterator."""
+        """Return an empty iterator asynchronously."""
         return
-        yield  # Makes this an async generator that yields nothing
+        yield
 
     async def aput(
         self,
@@ -106,7 +93,7 @@ class NoOpSaver(BaseCheckpointSaver):
         metadata: CheckpointMetadata,
         new_versions: ChannelVersions,
     ) -> RunnableConfig:
-        """Async version - pretend to save but not persist."""
+        """Return a configuration without persisting a checkpoint."""
         return self.put(config, checkpoint, metadata, new_versions)
 
     async def aput_writes(
@@ -116,5 +103,5 @@ class NoOpSaver(BaseCheckpointSaver):
         task_id: str,
         task_path: str = "",
     ) -> None:
-        """Async version - do nothing."""
+        """Do not persist writes asynchronously."""
         pass

@@ -17,8 +17,8 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
-from langgraph_agent_toolkit.core.models.chat_openai import ChatOpenAIPatched
 from langgraph_agent_toolkit.core.models.fake import FakeToolModel
+from langgraph_agent_toolkit.core.models.transport import configure_model_transport
 from langgraph_agent_toolkit.helper.constants import (
     DEFAULT_CONFIG_PREFIX,
     DEFAULT_CONFIGURABLE_FIELDS,
@@ -31,6 +31,29 @@ ModelT: TypeAlias = FakeToolModel | _ConfigurableModel | BaseChatModel
 
 
 class _ConfigurableModelCustom(_ConfigurableModel):
+    @classmethod
+    def _from_configurable(cls, model: _ConfigurableModel) -> "_ConfigurableModelCustom":
+        """Keep this factory when LangChain copies a configurable model."""
+        return cls(
+            default_config=dict(model._default_config),
+            configurable_fields=model._configurable_fields,
+            config_prefix=model._config_prefix,
+            queued_declarative_operations=model._queued_declarative_operations,
+        )
+
+    def __getattr__(self, name: str) -> Any:
+        attribute = super().__getattr__(name)
+        if name in ("bind_tools", "with_structured_output"):
+
+            def queue(*args: Any, **kwargs: Any) -> "_ConfigurableModelCustom":
+                return self._from_configurable(attribute(*args, **kwargs))
+
+            return queue
+        return attribute
+
+    def with_config(self, config: Optional[RunnableConfig] = None, **kwargs: Any) -> "_ConfigurableModelCustom":
+        return self._from_configurable(super().with_config(config, **kwargs))
+
     def _model(self, config: Optional[RunnableConfig] = None) -> Runnable:
         params = {**self._default_config, **self._model_params(config)}
         model = CompletionModelFactory._init_chat_model_helper(**params)
@@ -40,12 +63,16 @@ class _ConfigurableModelCustom(_ConfigurableModel):
 
 
 class CompletionModelFactory:
-    """Factory for creating model instances."""
+    """Create model instances."""
 
     @staticmethod
     def _init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
-        if model_provider == "openai":
-            return ChatOpenAIPatched(model_name=model, **kwargs)
+        kwargs = configure_model_transport(model_provider, kwargs)
+        if model_provider in {"openai", "azure_openai"}:
+            from langgraph_agent_toolkit.core.models.chat_openai import AzureChatOpenAIPatched, ChatOpenAIPatched
+
+            model_class = AzureChatOpenAIPatched if model_provider == "azure_openai" else ChatOpenAIPatched
+            return model_class(model_name=model, **kwargs)
         else:
             return _init_chat_model_helper(model, model_provider=model_provider, **kwargs)
 
@@ -95,7 +122,7 @@ class CompletionModelFactory:
         model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,
         **kwargs: Any,
     ) -> ModelT:
-        """Create and return a model instance.
+        """Create and return a model.
 
         Args:
             model_provider: The model provider to use. This should be one of the supported model providers.
@@ -120,7 +147,7 @@ class CompletionModelFactory:
         _configurable_fields = DEFAULT_CONFIGURABLE_FIELDS if configurable_fields is None else configurable_fields
         _config_prefix = DEFAULT_CONFIG_PREFIX if config_prefix is None else config_prefix
         _model_parameter_values = (
-            DEFAULT_MODEL_PARAMETER_VALUES if model_parameter_values is None else dict(model_parameter_values)
+            dict(DEFAULT_MODEL_PARAMETER_VALUES) if model_parameter_values is None else dict(model_parameter_values)
         )
 
         _model_parameter_values.update(kwargs)
@@ -159,33 +186,33 @@ class CompletionModelFactory:
         if not config:
             raise ValueError("Model configuration cannot be empty")
 
-        # Extract basic parameters
+        # Extract basic parameters.
         provider = config.get("provider", "openai")
         model_name = config.get("name") or config.get("model_name")
 
         if not model_name:
             raise ValueError("Model name must be specified in the configuration")
 
-        # Copy the config to avoid modifying the original
+        # Copy the configuration without changing the original.
         params = dict(config)
 
-        # Remove some keys that are handled separately
+        # Remove keys handled separately.
         params.pop("provider", None)
         params.pop("name", None)
         params.pop("model_name", None)
 
-        # Apply overrides
+        # Apply overrides.
         params.update(override_params)
 
         if "model_parameter_values" not in params:
             params["model_parameter_values"] = ()
 
-        # Create and return the model
+        # Create and return the model.
         return cls.create(model_provider=provider, model_name=model_name, **params)
 
 
 class EmbeddingModelFactory:
-    """Factory for creating embedding model instances."""
+    """Create embedding model instances."""
 
     @staticmethod
     def create(
@@ -194,7 +221,7 @@ class EmbeddingModelFactory:
         model_parameter_values: Optional[Tuple[Tuple[str, Any], ...]] = None,
         **kwargs: Any,
     ) -> Embeddings:
-        """Create and return an embedding model instance.
+        """Create and return an embedding model.
 
         Args:
             model_provider: The model provider to use. This should be one of the supported model providers.
@@ -224,8 +251,9 @@ class EmbeddingModelFactory:
         _model_parameter_values = {} if model_parameter_values is None else dict(model_parameter_values)
         _model_parameter_values.update(kwargs)
 
-        # Get provider string from enum if needed
+        # Get the provider string from the enum when required.
         provider_str = model_provider.value if isinstance(model_provider, ModelProvider) else str(model_provider)
+        _model_parameter_values = configure_model_transport(provider_str, _model_parameter_values, chat=False)
 
         return init_embeddings(
             model=model_name,
@@ -252,27 +280,27 @@ class EmbeddingModelFactory:
         if not config:
             raise ValueError("Model configuration cannot be empty")
 
-        # Extract basic parameters
+        # Extract basic parameters.
         provider = config.get("provider", "openai")
         model_name = config.get("name") or config.get("model_name") or config.get("model")
 
         if not model_name:
             raise ValueError("Model name must be specified in the configuration")
 
-        # Copy the config to avoid modifying the original
+        # Copy the configuration without changing the original.
         params = dict(config)
 
-        # Remove some keys that are handled separately
+        # Remove keys handled separately.
         params.pop("provider", None)
         params.pop("name", None)
         params.pop("model_name", None)
         params.pop("model", None)
 
-        # Apply overrides
+        # Apply overrides.
         params.update(override_params)
 
         if "model_parameter_values" not in params:
             params["model_parameter_values"] = ()
 
-        # Create and return the model
+        # Create and return the model.
         return cls.create(model_provider=provider, model_name=model_name, **params)

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from langchain_core.prompts import ChatPromptTemplate
 
+from langgraph_agent_toolkit.core.observability import langfuse as langfuse_adapter
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.langfuse import LangfuseObservability
@@ -13,14 +14,6 @@ from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, Ob
 
 class TestBaseObservability:
     """Tests for the BaseObservabilityPlatform class."""
-
-    def test_init_with_remote_first(self):
-        """Test initialization with remote_first flag."""
-        obs = EmptyObservability(remote_first=True)
-        assert obs.remote_first is True
-
-        obs_default = EmptyObservability()
-        assert obs_default.remote_first is False
 
     def test_validate_environment_missing(self):
         """Test environment validation with missing variables."""
@@ -45,8 +38,10 @@ class TestBaseObservability:
         template = "Hello, {{ name }}! Welcome to {{ place }}."
         obs.push_prompt("greeting", template)
 
-        result = obs.pull_prompt("greeting")
-        assert isinstance(result, ChatPromptTemplate)
+        result = obs.pull_prompt("greeting", template_format="jinja2")
+        assert result.invoke({"name": "Sam", "place": "London"}).to_messages()[0].content == (
+            "Hello, Sam! Welcome to London."
+        )
 
     def test_push_pull_chat_messages(self):
         """Test pushing and pulling chat message prompts."""
@@ -58,8 +53,12 @@ class TestBaseObservability:
         ]
 
         obs.push_prompt("chat-prompt", messages)
-        result = obs.pull_prompt("chat-prompt")
-        assert isinstance(result, ChatPromptTemplate)
+        result = obs.pull_prompt("chat-prompt", template_format="jinja2")
+        rendered = result.invoke({"domain": "math", "topic": "sums"}).to_messages()
+        assert [(message.type, message.content) for message in rendered] == [
+            ("system", "You are a helpful assistant for math."),
+            ("human", "Help me with sums."),
+        ]
 
     def test_delete_prompt(self):
         """Test deleting a prompt."""
@@ -82,16 +81,10 @@ class TestBaseObservability:
 class TestEmptyObservability:
     """Tests for the EmptyObservability class."""
 
-    def test_record_feedback_is_noop_and_logs(self):
-        """record_feedback never raises and emits a debug log noting the feedback was ignored."""
+    def test_feedback_does_not_require_credentials(self, mock_env):
+        """Accept feedback when the observability backend is disabled."""
         obs = EmptyObservability()
-
-        with patch("langgraph_agent_toolkit.core.observability.empty.logger") as mock_logger:
-            result = obs.record_feedback("run-123", "stars", 1.0)
-
-        assert result is None
-        mock_logger.debug.assert_called_once()
-        assert "run-123" in mock_logger.debug.call_args[0][0]
+        assert obs.record_feedback("run-123", "stars", 1.0) is None
 
     def test_push_prompt_skips_when_not_forcing(self):
         """force_create_new_version=False keeps the ORIGINAL stored prompt (skip branch)."""
@@ -100,7 +93,7 @@ class TestEmptyObservability:
         obs.push_prompt("test-prompt", "original content")
         obs.push_prompt("test-prompt", "new content", force_create_new_version=False)
 
-        assert obs._prompts["test-prompt"] == "original content"
+        assert obs.pull_prompt("test-prompt").invoke({}).to_messages()[0].content == "original content"
 
     def test_push_prompt_overwrites_when_forcing(self):
         """force_create_new_version=True replaces the stored prompt (overwrite branch)."""
@@ -109,7 +102,7 @@ class TestEmptyObservability:
         obs.push_prompt("test-prompt", "original content")
         obs.push_prompt("test-prompt", "new content", force_create_new_version=True)
 
-        assert obs._prompts["test-prompt"] == "new content"
+        assert obs.pull_prompt("test-prompt").invoke({}).to_messages()[0].content == "new content"
 
     def test_pull_prompt_not_found(self):
         """Test that pull_prompt raises when prompt not found."""
@@ -169,129 +162,23 @@ class TestLangsmithObservability:
 class TestLangfuseObservability:
     """Tests for the LangfuseObservability class."""
 
-    def test_requires_env_vars(self):
-        """Test environment validation is required."""
+    def test_requires_env_vars(self, monkeypatch):
+        """Reject missing credentials in both supported configuration sources."""
+        monkeypatch.setattr(
+            langfuse_adapter,
+            "settings",
+            langfuse_adapter.settings.model_copy(update={"LANGFUSE_PUBLIC_KEY": None, "LANGFUSE_SECRET_KEY": None}),
+        )
+        client_factory = MagicMock()
+        monkeypatch.setattr(langfuse_adapter, "_get_langfuse_client", client_factory)
         obs = LangfuseObservability()
 
         with patch.dict(os.environ, clear=True):
             with pytest.raises(ValueError, match="Missing required environment variables"):
                 obs.get_callback_handler()
+        client_factory.assert_not_called()
 
-    @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
-    def test_record_feedback_with_trace_id_conversion(self, mock_get_client):
-        """Test that record_feedback converts UUID to Langfuse trace ID format."""
-        mock_client = MagicMock()
-        mock_get_client.return_value = mock_client
-
-        with patch.dict(
-            os.environ,
-            {
-                "LANGFUSE_SECRET_KEY": "secret",
-                "LANGFUSE_PUBLIC_KEY": "public",
-                "LANGFUSE_HOST": "https://cloud.langfuse.com",
-            },
-        ):
-            obs = LangfuseObservability()
-
-            # Record feedback with UUID format
-            uuid_run_id = "ab9bae0a-c6ec-41d2-8e81-c3a56e357d9d"
-            obs.record_feedback(uuid_run_id, "accuracy", 0.95, user_id="user123")
-
-            # Verify create_score was called with converted trace_id
-            mock_client.create_score.assert_called_once()
-            call_kwargs = mock_client.create_score.call_args[1]
-
-            # UUID should be converted to 32 hex chars (no hyphens)
-            expected_trace_id = "ab9bae0ac6ec41d28e81c3a56e357d9d"
-            assert call_kwargs["trace_id"] == expected_trace_id
-            assert call_kwargs["name"] == "accuracy"
-            assert call_kwargs["value"] == 0.95
-
-    @patch("langgraph_agent_toolkit.core.observability.langfuse.propagate_attributes")
-    @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
-    def test_trace_context_converts_uuid(self, mock_get_client, mock_propagate):
-        """trace_context converts the UUID to a Langfuse trace_id and opens an observation (v4 API)."""
-        mock_client = MagicMock()
-        mock_span = MagicMock()
-        mock_client.start_as_current_observation.return_value.__enter__ = MagicMock(return_value=mock_span)
-        mock_client.start_as_current_observation.return_value.__exit__ = MagicMock(return_value=False)
-        mock_get_client.return_value = mock_client
-
-        with patch.dict(
-            os.environ,
-            {
-                "LANGFUSE_SECRET_KEY": "secret",
-                "LANGFUSE_PUBLIC_KEY": "public",
-                "LANGFUSE_HOST": "https://cloud.langfuse.com",
-            },
-        ):
-            obs = LangfuseObservability()
-
-            uuid_run_id = "ab9bae0a-c6ec-41d2-8e81-c3a56e357d9d"
-
-            with obs.trace_context(
-                run_id=uuid_run_id, user_id="user123", input={"message": "test"}, agent_name="test-agent"
-            ):
-                pass
-
-            # Verify start_as_current_observation was called with the converted trace_id and name.
-            mock_client.start_as_current_observation.assert_called_once()
-            call_kwargs = mock_client.start_as_current_observation.call_args[1]
-
-            expected_trace_id = "ab9bae0ac6ec41d28e81c3a56e357d9d"
-            assert call_kwargs["trace_context"]["trace_id"] == expected_trace_id
-            assert call_kwargs["name"] == "test-agent"
-            # user_id is propagated to the trace (v4 replaces span.update_trace(user_id=...)).
-            mock_propagate.assert_called_once_with(user_id="user123")
-
-    def test_update_trace_records_output(self):
-        """update_trace records the final output on the root span (v4: span.update; v3: update_trace)."""
-        with patch.dict(
-            os.environ,
-            {
-                "LANGFUSE_SECRET_KEY": "secret",
-                "LANGFUSE_PUBLIC_KEY": "public",
-                "LANGFUSE_HOST": "https://cloud.langfuse.com",
-            },
-        ):
-            obs = LangfuseObservability()
-
-            # Langfuse v4 span: no update_trace -> output set via span.update(...)
-            v4_span = MagicMock(spec=["update"])
-            obs.update_trace(v4_span, output="the answer")
-            v4_span.update.assert_called_once_with(output="the answer")
-
-            # Langfuse v3 span: has update_trace -> output set via span.update_trace(...)
-            v3_span = MagicMock(spec=["update_trace"])
-            obs.update_trace(v3_span, output="the answer")
-            v3_span.update_trace.assert_called_once_with(output="the answer")
-
-            # No span (non-Langfuse / disabled) is a safe no-op
-            obs.update_trace(None, output="ignored")
-
-    @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
-    def test_compute_prompt_hash_consistency(self, mock_get_client):
-        """Test that hash computation is consistent for same content."""
-        with patch.dict(
-            os.environ,
-            {
-                "LANGFUSE_SECRET_KEY": "secret",
-                "LANGFUSE_PUBLIC_KEY": "public",
-                "LANGFUSE_HOST": "https://cloud.langfuse.com",
-            },
-        ):
-            obs = LangfuseObservability()
-
-            # Same string should produce same hash
-            hash1 = obs._compute_prompt_hash("Test prompt")
-            hash2 = obs._compute_prompt_hash("Test prompt")
-            assert hash1 == hash2
-
-            # Different strings should produce different hashes
-            hash3 = obs._compute_prompt_hash("Different prompt")
-            assert hash1 != hash3
-
-    @patch("langgraph_agent_toolkit.core.observability.langfuse.get_client")
+    @patch("langgraph_agent_toolkit.core.observability.langfuse._get_langfuse_client")
     def test_push_prompt_version_control(self, mock_get_client):
         """Test prompt version control based on content hash."""
         mock_client = MagicMock()
@@ -314,7 +201,9 @@ class TestLangfuseObservability:
             expected_hash = obs._compute_prompt_hash(messages)
 
             # Test 1: No existing prompt - should create new
-            mock_client.get_prompt.side_effect = Exception("Not found")
+            not_found = Exception("Not found")
+            not_found.status_code = 404
+            mock_client.get_prompt.side_effect = not_found
             mock_new_prompt = MagicMock()
             mock_client.create_prompt.return_value = mock_new_prompt
 

@@ -1,5 +1,16 @@
 [run]
+branch = True
+parallel = True
+relative_files = True
+source_pkgs = langgraph_agent_toolkit
+patch = subprocess
+sigterm = True
 omit =
     examples/*
     scripts/*
     tests/*
+
+[report]
+precision = 1
+show_missing = True
+fail_under = 77

@@ -49,14 +49,20 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel | list) ->
             )
             return human_message
         case AIMessage():
+            content = message.content
+            metadata = dict(message.response_metadata)
+            refusal = message.additional_kwargs.get("refusal")
+            if isinstance(refusal, str) and refusal:
+                metadata["refusal"] = refusal
+                content = content or refusal
             ai_message = ChatMessage(
                 type="ai",
-                content=message.content,
+                content=content,
+                response_metadata=metadata,
+                usage_metadata=message.usage_metadata,
             )
             if message.tool_calls:
                 ai_message.tool_calls = message.tool_calls
-            if message.response_metadata:
-                ai_message.response_metadata = message.response_metadata
             return ai_message
         case ToolMessage():
             tool_message = ChatMessage(
@@ -93,42 +99,33 @@ def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]
     """Remove tool calls from content."""
     if isinstance(content, str):
         return content
-    # Currently only Anthropic models stream tool calls, using content item type tool_use.
+    # Anthropic models currently stream tool calls with the `tool_use` content type.
     return [
         content_item for content_item in content if isinstance(content_item, str) or content_item["type"] != "tool_use"
     ]
 
 
 def sanitize_chat_history(messages: list[BaseMessage]) -> list[BaseMessage]:
-    """Sanitize chat history so tool calls and tool results are consistently paired.
+    """Keep paired tool calls and tool results in chat history.
 
-    Fixes both directions of broken pairing, which providers reject:
-    - AIMessages whose ``tool_calls`` have no corresponding ToolMessage (the call was never
-      answered) — the dangling tool calls are stripped.
-    - ToolMessages whose ``tool_call_id`` has no requesting AIMessage tool call (the result is
-      orphaned) — the ToolMessage is dropped.
-
-    This is useful when:
-    - A previous execution was interrupted before tool responses were added
-    - Trimming or summarization removed an AIMessage but kept its ToolMessage (or vice versa)
-    - Chat history was corrupted or a connection was lost during tool execution
+    Remove an `AIMessage` tool call without a `ToolMessage` response.
+    Remove a `ToolMessage` without a requesting `AIMessage` tool call.
 
     Args:
-        messages: List of messages to sanitize
+        messages: Messages to sanitize.
 
     Returns:
-        Sanitized list of messages where every remaining AIMessage tool call has a ToolMessage and
-        every remaining ToolMessage has a requesting AIMessage tool call
+        Messages with paired `AIMessage` tool calls and `ToolMessage` results.
 
     """
     if not messages:
         return messages
 
-    # tool_call_ids that actually have a ToolMessage response
+    # Collect `tool_call_id` values with `ToolMessage` responses.
     tool_message_ids: set[str] = {
         msg.tool_call_id for msg in messages if isinstance(msg, ToolMessage) and msg.tool_call_id
     }
-    # tool_call_ids that some AIMessage requested
+    # Collect `tool_call_id` values requested by an `AIMessage`.
     ai_tool_call_ids: set[str] = {
         call.get("id")
         for msg in messages
@@ -140,7 +137,7 @@ def sanitize_chat_history(messages: list[BaseMessage]) -> list[BaseMessage]:
     sanitized_messages: list[BaseMessage] = []
     for msg in messages:
         if isinstance(msg, AIMessage) and msg.tool_calls:
-            # Drop tool calls that never got a ToolMessage response
+            # Remove tool calls without `ToolMessage` responses.
             incomplete_calls = [call for call in msg.tool_calls if call.get("id") not in tool_message_ids]
             if incomplete_calls:
                 complete_calls = [call for call in msg.tool_calls if call.get("id") in tool_message_ids]
@@ -151,12 +148,13 @@ def sanitize_chat_history(messages: list[BaseMessage]) -> list[BaseMessage]:
                         name=msg.name,
                         tool_calls=complete_calls,
                         response_metadata=msg.response_metadata,
+                        usage_metadata=msg.usage_metadata,
                     )
                 )
             else:
                 sanitized_messages.append(msg)
         elif isinstance(msg, ToolMessage):
-            # Drop orphaned tool results whose requesting tool call is gone (e.g. after trimming)
+            # Remove results without requesting tool calls.
             if msg.tool_call_id and msg.tool_call_id in ai_tool_call_ids:
                 sanitized_messages.append(msg)
         else:
@@ -169,21 +167,21 @@ def create_ai_message(parts: dict) -> AIMessage:
     sig = inspect.signature(AIMessage)
     valid_keys = set(sig.parameters)
     filtered = {k: v for k, v in parts.items() if k in valid_keys}
-    filtered.setdefault("content", "")  # AIMessage requires content; avoid a crash on field-only parts
+    filtered.setdefault("content", "")  # `AIMessage` requires content.
     return AIMessage(**filtered)
 
 
 def read_file(file_path: Path | str, mode: str = "r", encoding: str = "utf-8", **kwargs) -> Any:
-    """Read the content of a file and return it as a string.
+    """Read a file and return its content.
 
     Args:
-        file_path (Path | str): The path to the file to read.
-        mode (str): The mode in which to open the file. Default is "r".
-        encoding (str): The encoding to use for reading the file. Default is "utf-8".
-        **kwargs: Additional arguments to pass to the open function.
+        file_path (Path | str): File path.
+        mode (str): File mode. The default is "r".
+        encoding (str): File encoding. The default is "utf-8".
+        **kwargs: Arguments for `open`.
 
     Returns:
-        Any: The content of the file as a string.
+        Any: File content.
 
     """
     with open(file_path, mode=mode, encoding=encoding, **kwargs) as file:

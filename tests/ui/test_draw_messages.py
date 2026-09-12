@@ -1,4 +1,4 @@
-"""Tests for the Streamlit draw_messages renderer (streamlit mocked)."""
+"""Test the mocked Streamlit `draw_messages` renderer."""
 
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -29,7 +29,7 @@ def _tool_call_msg():
 
 @pytest.mark.asyncio
 async def test_draw_messages_renders_hitl_interrupt_without_error():
-    """A HITL interrupt (an 'ai' message) following a tool call must render, not error."""
+    """Render an AI HITL interrupt after a tool call without an error."""
     from langgraph_agent_toolkit.ui.components import draw_message as dm
 
     st = _mock_st()
@@ -45,7 +45,7 @@ async def test_draw_messages_renders_hitl_interrupt_without_error():
 
 @pytest.mark.asyncio
 async def test_draw_messages_normal_tool_result_still_works():
-    """A normal tool call -> tool result -> answer flow renders without error."""
+    """Render a tool call, tool result, and answer without an error."""
     from langgraph_agent_toolkit.ui.components import draw_message as dm
 
     st = _mock_st()

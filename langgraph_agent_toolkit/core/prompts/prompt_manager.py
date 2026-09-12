@@ -1,16 +1,17 @@
 import asyncio
+import threading
 from pathlib import Path
 from typing import Dict, List, Optional
 
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
-from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole
+from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole, ObservabilityBackend
 from langgraph_agent_toolkit.core.prompts.chat_prompt_template import ObservabilityChatPromptTemplate
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.utils import read_file
 
 
 class PromptManager:
-    """Manages prompt templates for assistant."""
+    """Manage prompt templates for an assistant."""
 
     def __init__(
         self,
@@ -20,19 +21,23 @@ class PromptManager:
         template_format: str = "jinja2",
         load_at_runtime: bool = False,
     ):
-        """Initialize the PromptManager with configurable parameters.
+        """Initialize `PromptManager` with configurable parameters.
 
         Args:
-            observability_backend: Backend type for observability (defaults to settings.OBSERVABILITY_BACKEND)
-            prompts_dir: Directory containing prompt templates (defaults to ./prompts)
-            force_create_new_version: Whether to force creation of new prompt versions
-            template_format: Format for prompt templates (default: "jinja2")
-            load_at_runtime: Whether to load prompts at runtime (default: False for better performance)
+            observability_backend: Observability backend. The default is `settings.OBSERVABILITY_BACKEND`.
+            prompts_dir: Prompt template directory. The default is `./prompts`.
+            force_create_new_version: Force new prompt versions.
+            template_format: Prompt template format. The default is "jinja2".
+            load_at_runtime: Load prompts at runtime. The default is `False`.
 
         """
         self._prompt_cache: Dict[str, ObservabilityChatPromptTemplate] = {}
         self._observability = None
-        self._observability_backend = observability_backend or settings.OBSERVABILITY_BACKEND
+        self._cache_lock = threading.RLock()
+        self._prompt_locks = {}
+        self._observability_backend = (
+            observability_backend or settings.OBSERVABILITY_BACKEND or ObservabilityBackend.EMPTY
+        )
         self._prompts_dir = prompts_dir or (Path(__file__).parent / "prompts")
         self._force_create_new_version = force_create_new_version
         self._template_format = template_format
@@ -40,10 +45,11 @@ class PromptManager:
 
     @property
     def observability(self):
-        """Lazy-loaded observability platform."""
-        if self._observability is None:
-            self._observability = ObservabilityFactory.create(self._observability_backend)
-        return self._observability
+        """Lazily loaded observability platform."""
+        with self._cache_lock:
+            if self._observability is None:
+                self._observability = ObservabilityFactory.create(self._observability_backend)
+            return self._observability
 
     def _build_prompt_template(
         self,
@@ -115,17 +121,14 @@ class PromptManager:
         partial_variables: Optional[Dict[str, str]] = None,
     ) -> ObservabilityChatPromptTemplate:
         """Create and cache a prompt template from a file (async version)."""
-        template_content = await asyncio.to_thread(read_file, template_path)
-        prompt_template = self._build_prompt_template(template_content, has_messages_placeholder)
-
-        await asyncio.to_thread(
-            self.observability.push_prompt,
-            name=prompt_name,
-            prompt_template=prompt_template,
-            force_create_new_version=self._force_create_new_version,
+        return await asyncio.to_thread(
+            self._create_prompt_template,
+            prompt_name,
+            template_path,
+            input_variables,
+            has_messages_placeholder,
+            partial_variables,
         )
-
-        return self._cache_prompt(prompt_name, input_variables, partial_variables)
 
     def _get_or_create_prompt(
         self,
@@ -135,17 +138,20 @@ class PromptManager:
         has_messages_placeholder: bool = False,
         partial_variables: Optional[Dict[str, str]] = None,
     ) -> ObservabilityChatPromptTemplate:
-        """Get cached prompt or create it if it doesn't exist."""
-        if prompt_name not in self._prompt_cache:
-            template_path = self._prompts_dir / template_filename
-            self._create_prompt_template(
-                prompt_name=prompt_name,
-                template_path=template_path,
-                input_variables=input_variables,
-                has_messages_placeholder=has_messages_placeholder,
-                partial_variables=partial_variables,
-            )
-        return self._prompt_cache[prompt_name]
+        """Get a cached prompt or create a missing prompt."""
+        with self._cache_lock:
+            lock = self._prompt_locks.setdefault(prompt_name, threading.RLock())
+        with lock:
+            if prompt_name not in self._prompt_cache:
+                template_path = self._prompts_dir / template_filename
+                self._create_prompt_template(
+                    prompt_name=prompt_name,
+                    template_path=template_path,
+                    input_variables=input_variables,
+                    has_messages_placeholder=has_messages_placeholder,
+                    partial_variables=partial_variables,
+                )
+            return self._prompt_cache[prompt_name]
 
     async def _aget_or_create_prompt(
         self,
@@ -155,27 +161,25 @@ class PromptManager:
         has_messages_placeholder: bool = False,
         partial_variables: Optional[Dict[str, str]] = None,
     ) -> ObservabilityChatPromptTemplate:
-        """Get cached prompt or create it if it doesn't exist (async version)."""
-        if prompt_name not in self._prompt_cache:
-            template_path = self._prompts_dir / template_filename
-            await self._acreate_prompt_template(
-                prompt_name=prompt_name,
-                template_path=template_path,
-                input_variables=input_variables,
-                has_messages_placeholder=has_messages_placeholder,
-                partial_variables=partial_variables,
-            )
-        return self._prompt_cache[prompt_name]
+        """Asynchronously get a cached prompt or create a missing prompt."""
+        return await asyncio.to_thread(
+            self._get_or_create_prompt,
+            prompt_name,
+            template_filename,
+            input_variables,
+            has_messages_placeholder,
+            partial_variables,
+        )
 
     def clear_cache(self) -> None:
         """Clear the prompt cache."""
         self._prompt_cache.clear()
 
     def get_cached_prompt_names(self) -> List[str]:
-        """Get list of cached prompt names."""
+        """Get cached prompt names."""
         return list(self._prompt_cache.keys())
 
     def set_prompts_directory(self, prompts_dir: Path) -> None:
-        """Update the prompts directory and clear cache."""
+        """Update the prompt directory and clear the cache."""
         self._prompts_dir = prompts_dir
         self.clear_cache()

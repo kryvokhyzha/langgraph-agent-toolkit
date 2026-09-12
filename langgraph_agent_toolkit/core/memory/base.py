@@ -11,33 +11,33 @@ class BaseMemoryBackend(ABC):
 
     @abstractmethod
     def validate_config(self) -> bool:
-        """Validate that all necessary configuration is set.
+        """Validate required configuration.
 
         Returns:
-            True if configuration is valid
+            `True` when configuration is valid.
 
         Raises:
-            ValueError: If required configuration is missing
+            ValueError: If required configuration is missing.
 
         """
         pass
 
     @abstractmethod
     def get_checkpoint_saver(self) -> AbstractAsyncContextManager[T]:
-        """Get the checkpoint saver for the memory backend.
+        """Get the checkpoint saver for this memory backend.
 
         Returns:
-            A configured checkpoint saver
+            Configured checkpoint saver.
 
         """
         pass
 
     @abstractmethod
     def get_memory_store(self) -> AbstractAsyncContextManager[T]:
-        """Get the memory store for the memory backend.
+        """Get the memory store for this memory backend.
 
         Returns:
-            A configured memory store
+            Configured memory store.
 
         """
         pass

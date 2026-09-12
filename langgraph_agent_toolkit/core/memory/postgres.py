@@ -1,13 +1,17 @@
+import hashlib
+import json
 from collections.abc import AsyncGenerator, Callable
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from typing import TypeVar
 
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from langgraph.store.postgres.aio import AsyncPostgresStore
+from psycopg.conninfo import conninfo_to_dict, make_conninfo
 from psycopg.rows import dict_row
-from psycopg_pool import AsyncConnectionPool, PoolTimeout
+from psycopg_pool import PoolTimeout
 
 from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
+from langgraph_agent_toolkit.core.memory.coordinated_saver import CoordinatedPostgresSaver as AsyncPostgresSaver
+from langgraph_agent_toolkit.core.memory.coordinated_store import CoordinatedPostgresStore as AsyncPostgresStore
+from langgraph_agent_toolkit.core.memory.pool import CheckedAsyncConnectionPool as AsyncConnectionPool
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
@@ -16,7 +20,7 @@ T = TypeVar("T")
 
 
 class PostgresMemoryBackend(BaseMemoryBackend):
-    """PostgreSQL implementation of memory backend."""
+    """PostgreSQL memory backend."""
 
     def validate_config(self) -> bool:
         """Validate that all required PostgreSQL configuration is present."""
@@ -45,12 +49,19 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     @staticmethod
     def get_connection_string() -> str:
-        """Build and return the PostgreSQL connection string from settings."""
-        return (
-            f"postgresql://{settings.POSTGRES_USER}:"
-            f"{settings.POSTGRES_PASSWORD.get_secret_value()}@"
-            f"{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/"
-            f"{settings.POSTGRES_DB}"
+        """Build the PostgreSQL connection string from settings."""
+        return make_conninfo(
+            user=settings.POSTGRES_USER,
+            password=settings.POSTGRES_PASSWORD.get_secret_value(),
+            host=settings.POSTGRES_HOST,
+            port=settings.POSTGRES_PORT,
+            dbname=settings.POSTGRES_DB,
+            connect_timeout=settings.POSTGRES_CONNECT_TIMEOUT,
+            keepalives=1,
+            keepalives_idle=settings.POSTGRES_KEEPALIVES_IDLE,
+            keepalives_interval=settings.POSTGRES_KEEPALIVES_INTERVAL,
+            keepalives_count=settings.POSTGRES_KEEPALIVES_COUNT,
+            tcp_user_timeout=settings.POSTGRES_TCP_USER_TIMEOUT,
         )
 
     @asynccontextmanager
@@ -59,14 +70,14 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         factory_func: Callable[[AsyncConnectionPool], T],
         app_prefix: str,
     ) -> AsyncGenerator[T, None]:
-        """Yield the result of the factory function.
+        """Yield the object from the factory function.
 
         Args:
-            factory_func: Function that creates the appropriate object from the connection pool
-            app_prefix: Prefix for the application name in the connection pool
+            factory_func: Function that creates an object from the connection pool.
+            app_prefix: Application name prefix for the connection pool.
 
         Yields:
-            The object created by the factory_func
+            Object from `factory_func`.
 
         """
         application_name = f"{settings.POSTGRES_APPLICATION_NAME}-{app_prefix}"
@@ -82,7 +93,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             f"schema={settings.POSTGRES_SCHEMA}, application_name={application_name}"
         )
 
-        # Prepare connection kwargs with schema setting
+        # Prepare connection arguments with the schema setting.
         connection_kwargs = {
             "autocommit": True,
             "prepare_threshold": 0,
@@ -90,22 +101,22 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             "application_name": application_name,
         }
 
-        # Build PostgreSQL options string with timeouts and schema
+        # Build PostgreSQL options for timeouts and schema.
         pg_options = []
 
-        # Set search_path if schema is specified and not default
+        # Set `search_path` for a non-default schema.
         if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
             pg_options.append(f"-c search_path={settings.POSTGRES_SCHEMA}")
 
-        # Set statement timeout - kills queries running too long
+        # Set a timeout for long-running statements.
         if settings.POSTGRES_STATEMENT_TIMEOUT > 0:
             pg_options.append(f"-c statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}")
 
-        # Set lock timeout - prevents waiting forever for locks
+        # Set a timeout while waiting for locks.
         if settings.POSTGRES_LOCK_TIMEOUT > 0:
             pg_options.append(f"-c lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}")
 
-        # Set idle_in_transaction_session_timeout - kills idle transactions
+        # Set a timeout for idle transactions.
         if settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT > 0:
             pg_options.append(
                 f"-c idle_in_transaction_session_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}"
@@ -114,7 +125,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         if pg_options:
             connection_kwargs["options"] = " ".join(pg_options)
 
-        # Callback for logging reconnection attempts
+        # Log failed reconnection attempts.
         def on_reconnect_failed(pool: AsyncConnectionPool) -> None:
             logger.error(
                 f"Failed to reconnect to PostgreSQL. Pool stats: "
@@ -122,31 +133,36 @@ class PostgresMemoryBackend(BaseMemoryBackend):
                 f"pool_available={pool.get_stats().get('pool_available', 'N/A')}"
             )
 
-        # Use AsyncConnectionPool as an async context manager.
-        # NOTE: each gunicorn/uvicorn worker process runs its own lifespan and therefore its own
-        # pool. Total connections to Postgres are roughly (num_workers x POSTGRES_POOL_SIZE), so size
-        # POSTGRES_POOL_SIZE with the worker count in mind to stay under the server's max_connections.
+        # Use `AsyncConnectionPool` as an asynchronous context manager.
+        # Each gunicorn or uvicorn worker has its own pool.
+        # Size `POSTGRES_POOL_SIZE` with worker count below server `max_connections`.
+        conninfo = self.get_connection_string()
+        scope = hashlib.sha256(
+            json.dumps([conninfo_to_dict(conninfo), settings.POSTGRES_SCHEMA], sort_keys=True).encode()
+        ).hexdigest()
         async with AsyncConnectionPool(
-            self.get_connection_string(),
-            min_size=settings.POSTGRES_MIN_SIZE,
-            max_size=settings.POSTGRES_POOL_SIZE,
+            conninfo,
+            min_size=1 if app_prefix == "locks" else settings.POSTGRES_MIN_SIZE,
+            max_size=settings.POSTGRES_LOCK_POOL_SIZE if app_prefix == "locks" else settings.POSTGRES_POOL_SIZE,
+            max_waiting=settings.POSTGRES_POOL_MAX_WAITING,
             max_idle=settings.POSTGRES_MAX_IDLE,
             timeout=settings.POSTGRES_POOL_TIMEOUT,
             reconnect_timeout=settings.POSTGRES_RECONNECT_TIMEOUT,
-            # Maximum time a connection can live before being recycled (prevents stale connections)
+            # Recycle connections after this time.
             max_lifetime=settings.POSTGRES_MAX_LIFETIME,
-            # Number of background workers for connection maintenance
+            # Use this number of background workers for connection maintenance.
             num_workers=settings.POSTGRES_NUM_WORKERS,
-            # Automatically check connection health before returning from pool
-            check=AsyncConnectionPool.check_connection,
-            # Callback when reconnection fails
+            # Check connection health before returning it from the pool.
+            health_check_timeout=settings.POSTGRES_HEALTH_CHECK_TIMEOUT,
+            # Handle reconnection failure.
             reconnect_failed=on_reconnect_failed,
-            # Connection configuration
+            # Set connection configuration.
             kwargs=connection_kwargs,
-            # Don't open immediately, we'll open manually after setup
+            # Open the pool manually after setup.
             open=False,
         ) as pool:
-            # Open the pool and wait for min_size connections
+            pool._lat_checkpoint_scope = scope
+            # Open the pool and wait for `min_size` connections.
             await pool.open(wait=True, timeout=settings.POSTGRES_POOL_TIMEOUT)
             logger.info(
                 f"PostgreSQL connection pool opened successfully. "
@@ -157,7 +173,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             try:
                 yield factory_func(pool)
             except PoolTimeout:
-                # Log pool statistics for debugging
+                # Log pool statistics.
                 stats = pool.get_stats()
                 logger.error(
                     f"Pool timeout occurred. Pool stats: "
@@ -172,10 +188,10 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     @asynccontextmanager
     async def get_saver(self) -> AsyncGenerator[AsyncPostgresSaver, None]:
-        """Asynchronous context manager for acquiring a PostgreSQL saver.
+        """Yield a PostgreSQL saver in an asynchronous context.
 
         Yields:
-            AsyncPostgresSaver: The database saver instance
+            AsyncPostgresSaver: Database saver.
 
         """
         async with self._get_connection_context(
@@ -185,10 +201,10 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     @asynccontextmanager
     async def get_store(self) -> AsyncGenerator[AsyncPostgresStore, None]:
-        """Asynchronous context manager for acquiring a PostgreSQL store.
+        """Yield a PostgreSQL store in an asynchronous context.
 
         Yields:
-            AsyncPostgresStore: The database store instance
+            AsyncPostgresStore: Database store.
 
         """
         async with self._get_connection_context(
@@ -197,11 +213,16 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             yield store
 
     def get_checkpoint_saver(self) -> AbstractAsyncContextManager[AsyncPostgresSaver]:
-        """Initialize and return a PostgreSQL saver instance."""
+        """Initialize and return a PostgreSQL saver."""
         self.validate_config()
         return self.get_saver()
 
+    def get_lock_pool(self):
+        """Create a separate pool for long-running conversation locks."""
+        self.validate_config()
+        return self._get_connection_context(lambda pool: pool, app_prefix="locks")
+
     def get_memory_store(self) -> AbstractAsyncContextManager[AsyncPostgresStore]:
-        """Initialize and return a PostgreSQL store instance."""
+        """Initialize and return a PostgreSQL store."""
         self.validate_config()
         return self.get_store()

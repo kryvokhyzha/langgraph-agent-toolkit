@@ -2,137 +2,79 @@ name: Build and Deploy Sphinx Docs
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "docs/**"
       - ".github/workflows/sphinx.yml"
       - "langgraph_agent_toolkit/**"
       - "pyproject.toml"
-  workflow_dispatch: # Allow manual triggering
+      - "uv.lock"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/sphinx.yml"
+      - "langgraph_agent_toolkit/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  workflow_dispatch:
 
-# Add permissions to allow GitHub Actions to push to gh-pages
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: sphinx-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # Fetch all history for proper versioning
-
-      - name: Create pip cache directory
-        run: mkdir -p /home/runner/.cache/pip
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
+          persist-credentials: false
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
-          # Only enable caching if the directory exists
-          cache: "pip"
-          cache-dependency-path: "pyproject.toml"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.9.5"
+          version: "0.12.1"
+      - name: Install locked documentation and runtime dependencies
+        run:
+          uv sync --frozen --no-install-project --no-default-groups --extra all
+          --group docs
+      - name: Generate and build the complete documentation
+        run: make -C docs html SPHINXOPTS="-a -E -W --keep-going"
+      - name: Save the documentation site
+        uses: actions/upload-artifact@v7
+        with:
+          name: documentation-site
+          path: docs/_build/html
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Install dependencies with uv
-        run: |
-          # Install the package itself with all dependencies (instead of just installing the dev dependencies)
-          uv pip install -e ".[all-llms,all-backends,all-observability]"
-          uv pip install sphinx-rtd-theme sphinx-pyproject rootutils mock
-        env:
-          UV_SYSTEM_PYTHON: 1
-
-      - name: Create static directory if it doesn't exist
-        run: |
-          mkdir -p docs/_static
-
-      - name: Generate API docs
-        run: |
-          # Enhanced API documentation generation with better code documentation
-          sphinx-apidoc -f -e -o docs/generated langgraph_agent_toolkit \
-            --separate \
-            --no-toc \
-            --no-headings \
-            --module-first \
-            --doc-project="API Reference"
-        env:
-          # Environment variables to enable fake model and bypass authentication
-          USE_FAKE_MODEL: "true"
-          OPENAI_API_KEY: "sk-fake-key-for-docs-generation"
-          OPENAI_MODEL_NAME: "gpt-4-fake-model"
-          OPENAI_API_BASE_URL: "https://fake-api.openai.com/v1"
-          OPENAI_API_VERSION: "2023-05-15"
-          LANGFUSE_SECRET_KEY: "lf-sk-fake-for-docs"
-          LANGFUSE_PUBLIC_KEY: "lf-pk-fake-for-docs"
-          LANGFUSE_HOST: "http://localhost:3000"
-          MEMORY_BACKEND: "sqlite"
-          SQLITE_DB_PATH: ":memory:"
-          ANTHROPIC_API_KEY: "sk-ant-fake-key"
-          ANTHROPIC_MODEL_NAME: "claude-3-fake"
-          GOOGLE_VERTEXAI_API_KEY: "fake-vertexai-key"
-          GOOGLE_VERTEXAI_MODEL_NAME: "gemini-fake"
-          GOOGLE_GENAI_API_KEY: "fake-genai-key"
-          GOOGLE_GENAI_MODEL_NAME: "gemini-pro-fake"
-          OBSERVABILITY_BACKEND: "empty"
-
-      - name: Create autosummary template files
-        run: |
-          mkdir -p docs/_templates/autosummary
-          echo '{{ fullname | escape | underline }}
-
-          .. automodule:: {{ fullname }}
-             :members:
-             :undoc-members:
-             :show-inheritance:
-             :special-members: __init__' > docs/_templates/autosummary/module.rst
-
-          echo '{{ fullname | escape | underline }}
-
-          .. currentmodule:: {{ module }}
-
-          .. autoclass:: {{ objname }}
-             :members:
-             :show-inheritance:
-             :inherited-members:
-             :special-members: __init__
-             :undoc-members:' > docs/_templates/autosummary/class.rst
-
-      - name: Build documentation
-        run: |
-          cd docs && sphinx-build -b html -a -E -v . _build/html
-          # The -v flag provides verbose output to see any import errors
-        env:
-          # Environment variables to enable fake model and bypass authentication
-          USE_FAKE_MODEL: "true"
-          OPENAI_API_KEY: "sk-fake-key-for-docs-generation"
-          OPENAI_MODEL_NAME: "gpt-4-fake-model"
-          OPENAI_API_BASE_URL: "https://fake-api.openai.com/v1"
-          OPENAI_API_VERSION: "2023-05-15"
-          LANGFUSE_SECRET_KEY: "lf-sk-fake-for-docs"
-          LANGFUSE_PUBLIC_KEY: "lf-pk-fake-for-docs"
-          LANGFUSE_HOST: "http://localhost:3000"
-          MEMORY_BACKEND: "sqlite"
-          SQLITE_DB_PATH: ":memory:"
-          ANTHROPIC_API_KEY: "sk-ant-fake-key"
-          ANTHROPIC_MODEL_NAME: "claude-3-fake"
-          GOOGLE_VERTEXAI_API_KEY: "fake-vertexai-key"
-          GOOGLE_VERTEXAI_MODEL_NAME: "gemini-fake"
-          GOOGLE_GENAI_API_KEY: "fake-genai-key"
-          GOOGLE_GENAI_MODEL_NAME: "gemini-pro-fake"
-          # Disable all observability
-          OBSERVABILITY_BACKEND: "none"
-
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: documentation-site
+          path: docs/_build/html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/html
-          force_orphan: true # Create a single-branch gh-pages
+          force_orphan: true
           full_commit_message: "Docs: Update documentation site"
           enable_jekyll: false

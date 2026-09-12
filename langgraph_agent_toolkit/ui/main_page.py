@@ -1,4 +1,4 @@
-"""Top-level Streamlit page: wires the agent client, sidebar, message stream, and feedback widget."""
+"""Render the Streamlit chat page."""
 
 import asyncio
 import os
@@ -22,18 +22,28 @@ from langgraph_agent_toolkit.ui.utils.message import (
 )
 
 
-load_dotenv(find_dotenv(), override=True)
+load_dotenv(find_dotenv(), override=False)
 
 
 async def main_page() -> None:
-    """Render the chat page: set up the client/thread, draw history, handle input, and feedback."""
+    """Close HTTP connections before Streamlit replaces this event loop."""
+    try:
+        await _main_page()
+    finally:
+        client = st.session_state.get("agent_client")
+        if client is not None:
+            await client.aclose()
+
+
+async def _main_page() -> None:
+    """Set up the chat page, render history, handle input, and record feedback."""
     st.set_page_config(
         page_title=constants.APP_TITLE,
         page_icon=constants.APP_ICON,
         menu_items={},
     )
 
-    # Hide the streamlit upper-right chrome
+    # Hide the Streamlit upper-right controls.
     st.html(
         """
         <style>
@@ -58,47 +68,66 @@ async def main_page() -> None:
             agent_url = f"http://{host}:{port}"
         try:
             with st.spinner("Connecting to agent service..."):
-                st.session_state.agent_client = AgentClient(base_url=agent_url)
+                st.session_state.agent_client = await asyncio.to_thread(AgentClient, base_url=agent_url)
         except AgentClientError as e:
             st.error(f"Error connecting to agent service at {agent_url}: {e}")
             st.markdown("The service might be booting up. Try again in a few seconds.")
             st.stop()
     agent_client: AgentClient = st.session_state.agent_client
+    user_id = settings.DEFAULT_STREAMLIT_USER_ID if settings.AUTH_MODE == "trusted" else None
 
-    if "thread_id" not in st.session_state:
-        thread_id = st.query_params.get("thread_id")
-        if not thread_id:
-            thread_id = str(uuid.uuid4())
-            # Add welcome message to messages when creating a new thread
+    selected_agent = st.query_params.get("agent") or agent_client.info.default_agent
+    if selected_agent not in {agent.key for agent in agent_client.info.agents}:
+        st.error("The URL selects an agent that is not available.")
+        st.stop()
+    agent_client.agent = selected_agent
+
+    requested_thread = st.query_params.get("thread_id")
+    thread_id = requested_thread or str(uuid.uuid4())
+    st.session_state.thread_id = thread_id
+    st.query_params["thread_id"] = thread_id
+    st.query_params["agent"] = selected_agent
+
+    # Select the agent before loading or displaying its conversation.
+    use_streaming, stream_protocol = side_panel_component(agent_client)
+
+    conversation = (user_id, selected_agent, thread_id)
+    if st.session_state.get("conversation") != conversation:
+        if not requested_thread:
+            # Add a welcome message for a new thread.
             messages = [create_welcome_message(agent_client.agent)]
         else:
             try:
-                messages: list[ChatMessage] = agent_client.get_history(
-                    thread_id=thread_id,
-                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
-                ).messages
-            except AgentClientError:
-                st.error("No message history found for this Thread ID.")
                 messages = []
+                offset = 0
+                while True:
+                    history = await asyncio.to_thread(
+                        agent_client.get_history, thread_id=thread_id, user_id=user_id, offset=offset
+                    )
+                    messages.extend(history.messages)
+                    if history.next_offset is None:
+                        break
+                    offset = history.next_offset
+            except AgentClientError:
+                st.error("Could not load this conversation. Check the URL and try again.")
+                st.stop()
         st.session_state.messages = messages
-        st.session_state.thread_id = thread_id
+        st.session_state.conversation = conversation
+        st.session_state.last_feedback = (None, None)
 
-    # Sidebar / config options
-    use_streaming, stream_protocol = side_panel_component(agent_client)
-
-    # Draw existing messages
+    # Draw existing messages.
     messages: list[ChatMessage] = st.session_state.messages
 
-    # draw_messages() expects an async iterator over messages
+    # `draw_messages()` requires an asynchronous message iterator.
     async def amessage_iter() -> AsyncGenerator[ChatMessage, None]:
         for m in messages:
             yield m
 
     await draw_messages(amessage_iter())
 
-    # Generate new message if the user provided new input (text and/or file attachments)
+    # Generate a message when the user submits text or attachments.
     if user_input := st.chat_input(accept_file="multiple", file_type=constants.MULTIMODAL_FILE_TYPES):
-        # With accept_file set, the submission carries `.text` and `.files`.
+        # `accept_file` adds `.text` and `.files` to the submission.
         text = getattr(user_input, "text", "") or ""
         files = list(getattr(user_input, "files", None) or [])
         message = build_chat_message(text, files)
@@ -115,20 +144,19 @@ async def main_page() -> None:
             render_human_message(message)
         try:
             if use_streaming:
-                # astream (SSE) and astream_jsonl (NDJSON) share a signature and yield the same
-                # ChatMessage | str, so draw_messages handles either protocol unchanged.
+                # `astream` and `astream_jsonl` yield the same `ChatMessage | str` values.
                 astream_fn = agent_client.astream_jsonl if stream_protocol == "JSON Lines" else agent_client.astream
                 stream = astream_fn(
                     input=dict(message=message),
                     thread_id=st.session_state.thread_id,
-                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
+                    user_id=user_id,
                 )
                 await draw_messages(stream, is_new=True)
             else:
                 response = await agent_client.ainvoke(
                     input=dict(message=message),
                     thread_id=st.session_state.thread_id,
-                    user_id=settings.DEFAULT_STREAMLIT_USER_ID,
+                    user_id=user_id,
                 )
                 messages.append(response)
                 st.chat_message("assistant").write(response.content)
@@ -137,7 +165,7 @@ async def main_page() -> None:
             st.error(f"Error generating response: {e}")
             st.stop()
 
-    # If messages have been generated, show feedback widget only for AI messages
+    # Show feedback only after messages are generated.
     if len(messages) > 0 and st.session_state.last_message:
         with st.session_state.last_message:
             await handle_feedback()

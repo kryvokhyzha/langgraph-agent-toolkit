@@ -1,4 +1,4 @@
-"""Middleware that forces a direct, tool-free answer when the model-call budget is nearly used up."""
+"""Middleware that requests a direct answer near the model-call limit."""
 
 from collections.abc import Awaitable, Callable
 
@@ -9,9 +9,6 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langgraph_agent_toolkit.core.settings import settings
 
 
-# Worded to make the model *answer now from what it already has* — not as a prohibition. Phrasing it
-# as "DO NOT make tool calls" makes some models reply "I can't search", refusing instead of
-# synthesizing even when the tool results are right there in the context.
 DEFAULT_IMMEDIATE_INSTRUCTION = (
     "You have gathered enough information and reached the tool-use budget for this task. "
     "Provide your best final answer now, using the information already collected in this "
@@ -21,19 +18,11 @@ DEFAULT_IMMEDIATE_INSTRUCTION = (
 
 
 class ImmediateGenerationMiddleware(AgentMiddleware):
-    """Force a final, tool-free answer on the last allowed model call of a run.
+    """Request a direct answer on the last allowed model call.
 
-    Mirrors the custom ``create_react_agent``'s ``immediate_generation`` router: rather than running
-    out of steps mid-tool-loop (returning "need more steps" or hitting the recursion limit), the model
-    is asked to synthesize a direct answer from what it already has once it reaches the budget. The
-    tool *results* are always kept — only ``tools`` and the system message are changed — so the model
-    answers from the data it already collected.
-
-    The budget is the number of model calls already made in the current run (AI messages since the
-    latest human message), so the middleware needs no extra state. It should fire only as a graceful
-    fallback *near the recursion limit*, not cut off legitimate multi-step work, so ``model_call_limit``
-    defaults to about half the recursion limit (a model→tools cycle is ~2 steps): with the default
-    recursion limit of 64 that is 32 model calls.
+    The middleware removes tools and adds an instruction to the system message.
+    It keeps tool results so the model can use collected data. The budget counts
+    AI messages after the latest human message.
     """
 
     def __init__(self, model_call_limit: int | None = None, instruction: str | None = None) -> None:
@@ -46,7 +35,7 @@ class ImmediateGenerationMiddleware(AgentMiddleware):
         self.instruction = instruction or DEFAULT_IMMEDIATE_INSTRUCTION
 
     def _calls_made_this_run(self, messages: list[BaseMessage]) -> int:
-        """Count AI messages since the latest human message (= model calls already made this run)."""
+        """Count AI messages after the latest human message."""
         count = 0
         for message in reversed(messages):
             if isinstance(message, HumanMessage):
@@ -56,7 +45,7 @@ class ImmediateGenerationMiddleware(AgentMiddleware):
         return count
 
     def _force_immediate(self, request: ModelRequest) -> ModelRequest:
-        """Strip tools and append the synthesize-now instruction to the system message."""
+        """Remove tools and add the direct-answer instruction."""
         existing = request.system_message.content if request.system_message else ""
         merged = f"{existing}\n\n{self.instruction}".strip() if existing else self.instruction
         return request.override(tools=[], system_message=SystemMessage(content=merged))
