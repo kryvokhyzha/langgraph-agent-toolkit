@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Onboarding &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/onboarding.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation Options" href="installation.html" />
+    <link rel="prev" title="Run your first agent" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Application Onboarding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#define-the-application-integration">1. Define the application integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-and-lock-the-required-dependencies">2. Install and lock the required dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#register-agents-and-define-resource-ownership">3. Register agents and define resource ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#set-identity-and-memory-contracts">4. Set identity and memory contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connect-the-application-client">5. Connect the application client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-the-application-before-production">6. Verify the application before production</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upgrade-existing-data-and-release">7. Upgrade existing data and release</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Application Onboarding</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/onboarding.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="application-onboarding">
+<h1>Application Onboarding<a class="headerlink" href="#application-onboarding" title="Link to this heading"></a></h1>
+<p>Use this guide to add the toolkit to an application or upgrade an existing
+integration. Keep application agents, tools, and deployment files in your own
+repository. Use <a class="reference internal" href="quickstart.html"><span class="doc">Run your first agent</span></a> for a local demonstration without model keys.</p>
+<section id="define-the-application-integration">
+<h2>1. Define the application integration<a class="headerlink" href="#define-the-application-integration" title="Link to this heading"></a></h2>
+<p>Decide how the application uses the toolkit:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Application need</p></th>
+<th class="head"><p>Integration</p></th>
+<th class="head"><p>Next guide</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Call an existing agent service</p></td>
+<td><p>Use the HTTP API or <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code>. The service owns graph execution.</p></td>
+<td><p><a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Serve application agents</p></td>
+<td><p>Register importable agents through <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code>. Run the toolkit API.</p></td>
+<td><p><a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Run graphs inside another application</p></td>
+<td><p>Own graph execution, authentication, resource lifetime, and concurrency.
+HTTP service controls do not apply to direct graph calls.</p></td>
+<td><p><a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> and <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<p>Choose the smallest agent pattern that meets the requirement. Start with a
+native tool-calling agent or a fixed graph. Add MCP or Deep Agents when their
+capabilities are required. See <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> for the differences.</p>
+</section>
+<section id="install-and-lock-the-required-dependencies">
+<h2>2. Install and lock the required dependencies<a class="headerlink" href="#install-and-lock-the-required-dependencies" title="Link to this heading"></a></h2>
+<p>Select a supported Python version and only the extras that the application
+uses. Keep the toolkit requirement and the resolved application lockfile in
+version control. See <a class="reference internal" href="installation.html"><span class="doc">Installation Options</span></a> for provider, server, UI, and tool
+extras. Python 3.14 requires the conditional dependency minimums in that guide.</p>
+<p>Choose one of <code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code>, or <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> when the
+application must retain a specific SDK generation. The SDK selector does not
+select the server version. Check <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> against the
+deployed server. Source-checkout dependency groups are not published extras.</p>
+<p>For an upgrade, read <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a> before changing the application lockfile.
+Review the resulting changes to LangChain, LangGraph, Pydantic, model SDKs, and
+observability SDKs together. Preserve the previous lockfile and application
+image for rollback.</p>
+</section>
+<section id="register-agents-and-define-resource-ownership">
+<h2>3. Register agents and define resource ownership<a class="headerlink" href="#register-agents-and-define-resource-ownership" title="Link to this heading"></a></h2>
+<p>Configure <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code> with import strings and set <code class="docutils literal notranslate"><span class="pre">DEFAULT_AGENT</span></code> to a
+registered agent name. The application module must be installed or copied into
+the service image. The standard API image contains only the toolkit package.
+Use the custom-agent example in <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a>.</p>
+<p>Keep network operations out of agent imports. Use <code class="docutils literal notranslate"><span class="pre">Agent.graph_factory</span></code> to
+create concrete models and tools during each service lifespan. The service can
+then supply its managed connections and configured MCP tools. Keep
+application-owned clients and stores open until their graphs stop. Close these
+resources during application shutdown. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> and <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a>.</p>
+</section>
+<section id="set-identity-and-memory-contracts">
+<h2>4. Set identity and memory contracts<a class="headerlink" href="#set-identity-and-memory-contracts" title="Link to this heading"></a></h2>
+<p>For one service deployment per client application, keep the default
+<code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> and one <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code>. Keep the shared token in the
+trusted application backend. <code class="docutils literal notranslate"><span class="pre">user_id</span></code> is optional. That backend can supply
+a stable ID for each authenticated user. If it omits the field, the service
+uses <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code> (default: <code class="docutils literal notranslate"><span class="pre">service</span></code>). Use a separate database
+or PostgreSQL schema for each deployment.</p>
+<p>For direct access by untrusted users, use <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=token</span></code> and individual
+tokens. The service derives identity from the token. See <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a> for
+both modes and token-user feedback requirements.</p>
+<p>Keep these identifiers separate:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user_id</span></code> identifies one user across conversations. An agent can use it
+for a long-term store namespace. The agent must have a store and explicit
+memory logic. Passing this field alone does not create long-term memory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thread_id</span></code> identifies one conversation and its short-term checkpoint
+state. Save the ID returned by the first request. Reuse it for later turns.</p></li>
+<li><p>The agent name selects the graph and forms part of the checkpoint scope.
+Keep it stable when resuming existing conversations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code> identifies one execution. Use it for feedback and tracing.</p></li>
+</ul>
+<p>The API scopes checkpoints by user, agent, and public thread ID. Use the same
+values for invocation, streaming, and history. Configure <code class="docutils literal notranslate"><span class="pre">MEMORY_BACKEND</span></code> for
+durability. SQLite supplies checkpoints only. A long-term store is a separate
+resource. Clearing conversation history does not clear that store.</p>
+</section>
+<section id="connect-the-application-client">
+<h2>5. Connect the application client<a class="headerlink" href="#connect-the-application-client" title="Link to this heading"></a></h2>
+<p>Use the request and response examples in <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a>. Keep one <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code>
+open for the application lifetime. Close it during shutdown. For asynchronous
+applications, use async methods and avoid a synchronous startup request on the
+event loop.</p>
+<p>An asynchronous client must stay in one event loop until <code class="docutils literal notranslate"><span class="pre">aclose()</span></code> finishes.
+Streamlit creates a new loop on each <code class="docutils literal notranslate"><span class="pre">asyncio.run()</span></code>. Close the cached client
+in a <code class="docutils literal notranslate"><span class="pre">finally</span></code> block before each page run ends, including <code class="docutils literal notranslate"><span class="pre">st.rerun()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">st.stop()</span></code>. Keep the authenticated user’s identity separate from cached
+client connections. The included Streamlit page uses this cleanup pattern.</p>
+<p>Handle HTTP failures and streaming error events. An SSE stream succeeds only
+when the application receives a complete result and the completion marker.
+Close stream iterators when a caller stops reading. Preserve partial text
+separately from completed answers. Do not automatically retry a run that can
+have performed a tool action. Use <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for retry boundaries.</p>
+<p>History requests need an explicit <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>. Follow <code class="docutils literal notranslate"><span class="pre">next_offset</span></code> when
+reading paginated history. Token users must retain the returned
+<code class="docutils literal notranslate"><span class="pre">feedback_token</span></code> with the corresponding response. Trusted backend feedback
+keeps its existing request shape. See <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a> for the wire changes.</p>
+</section>
+<section id="verify-the-application-before-production">
+<h2>6. Verify the application before production<a class="headerlink" href="#verify-the-application-before-production" title="Link to this heading"></a></h2>
+<p>First, use deterministic models and a disposable database to check the
+application’s API contract. Then test the real deployment dependencies in a
+separate environment. The toolkit test suite verifies package behavior; it
+does not replace tests for application agents, tools, or infrastructure.</p>
+<p>Verify these application outcomes:</p>
+<ul class="simple">
+<li><p>The service becomes ready and lists the expected agents in <code class="docutils literal notranslate"><span class="pre">/info</span></code>.</p></li>
+<li><p>Invocation, streaming, history, and feedback use the correct user and agent.</p></li>
+<li><p>Two users cannot read each other’s conversations. Two threads for one user
+have separate histories. Test shared user memories only if a store exists.</p></li>
+<li><p>A restart preserves history and any pending approval that the application
+supports.</p></li>
+<li><p>Cancellation and concurrent requests release capacity and preserve ordered
+updates. Failed tools do not cause duplicate external writes.</p></li>
+<li><p>Database interruption and worker failure recover within the deployment’s
+limits. Overload responses reach the client as errors.</p></li>
+<li><p>The selected model returns valid tool calls and response formats. The
+configured observability server receives traces and feedback.</p></li>
+</ul>
+<p>Use <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for test layers, <a class="reference internal" href="live_llm_testing.html"><span class="doc">Real LLM verification</span></a> for a small real-model
+check, and <a class="reference internal" href="load_testing.html"><span class="doc">API load tests</span></a> for capacity and failure tests. Configure
+<code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> for traffic routing and <code class="docutils literal notranslate"><span class="pre">/health/live</span></code> for supervisor
+recovery. Tune worker, request, model, and database limits together. See
+<a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> and <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a>.</p>
+</section>
+<section id="upgrade-existing-data-and-release">
+<h2>7. Upgrade existing data and release<a class="headerlink" href="#upgrade-existing-data-and-release" title="Link to this heading"></a></h2>
+<p>When upgrading from raw checkpoint IDs to 0.10.x, create the ownership manifest
+described in <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a>. Verify a database backup and the migration dry
+run before applying changes. Stop all checkpoint writers during migration.
+Do not run old and new workers against the same checkpoint tables.</p>
+<p>Test the migrated conversations through their public IDs and original user
+identities. Roll out the tested application image and configuration together.
+Check readiness, error rates, request duration, database capacity, and trace
+delivery. If data migration must be rolled back, stop writers and restore the
+verified backup as described in <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Run your first agent" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

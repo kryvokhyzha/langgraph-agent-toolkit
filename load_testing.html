@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API load tests &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/load_testing.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Local pressure-test results: 2026-09-12" href="load_test_results.html" />
+    <link rel="prev" title="Testing" href="testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API load tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-tests">Run the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-conditions">Test conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-the-results">Read the results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API load tests</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/load_testing.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-load-tests">
+<h1>API load tests<a class="headerlink" href="#api-load-tests" title="Link to this heading"></a></h1>
+<p>Use <code class="docutils literal notranslate"><span class="pre">scripts/load_test.py</span></code> to measure a real local API under load. The script
+starts separate Uvicorn processes for the toolkit and an OpenAI protocol
+simulator. It uses the real OpenAI SDK, the selected HTTP transport, and the
+configured checkpointer. It disables environment files and external tracing.
+It does not call a paid model provider.</p>
+<p>These tests measure local API behavior. They do not measure provider quotas,
+internet latency, a production proxy, or live Langfuse ingestion. Run a separate
+deployment test with those components before you set production capacity.</p>
+<section id="run-the-tests">
+<h2>Run the tests<a class="headerlink" href="#run-the-tests" title="Link to this heading"></a></h2>
+<p>Run the harness on Linux or macOS. It uses POSIX process groups and signals.
+The <code class="docutils literal notranslate"><span class="pre">ps</span></code> command is required for worker ownership checks. Install <code class="docutils literal notranslate"><span class="pre">lsof</span></code>
+to include file-descriptor counts. Missing resource measurements are omitted.</p>
+<p>Install the locked dependencies from a source checkout:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/load_test.py<span class="w"> </span>--quick<span class="o">=</span>True
+</pre></div>
+</div>
+<p>The quick run checks the harness with SQLite. A full run adds higher concurrency,
+constant arrival traffic, provider faults, slow readers, and history checks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/load_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--duration<span class="o">=</span><span class="m">10</span><span class="w"> </span>--soak_seconds<span class="o">=</span><span class="m">120</span><span class="w"> </span>--output<span class="o">=</span>data/load-test
+</pre></div>
+</div>
+<p>To include PostgreSQL and two workers, use a disposable local database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--detach<span class="w"> </span>--name<span class="w"> </span>lat-load-postgres<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cpus<span class="o">=</span><span class="m">2</span><span class="w"> </span>--memory<span class="o">=</span>512m<span class="w"> </span>--publish<span class="o">=</span><span class="m">127</span>.0.0.1:18516:5432<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env<span class="w"> </span><span class="nv">POSTGRES_USER</span><span class="o">=</span>lat_load<span class="w"> </span>--env<span class="w"> </span><span class="nv">POSTGRES_DB</span><span class="o">=</span>lat_load<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env<span class="w"> </span><span class="nv">POSTGRES_HOST_AUTH_METHOD</span><span class="o">=</span>trust<span class="w"> </span>postgres:16
+
+<span class="nv">LAT_LOAD_TEST_DATABASE</span><span class="o">=</span>yes<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/load_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--postgres_dsn<span class="o">=</span>postgresql://lat_load@127.0.0.1:18516/lat_load<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--duration<span class="o">=</span><span class="m">10</span><span class="w"> </span>--soak_seconds<span class="o">=</span><span class="m">120</span><span class="w"> </span>--output<span class="o">=</span>data/load-test
+
+docker<span class="w"> </span>rm<span class="w"> </span>--force<span class="w"> </span>--volumes<span class="w"> </span>lat-load-postgres
+</pre></div>
+</div>
+<p>Wait until PostgreSQL accepts connections before starting the test. The script
+requires both <code class="docutils literal notranslate"><span class="pre">LAT_LOAD_TEST_DATABASE=yes</span></code> and a literal loopback database
+address. It creates a separate schema for each configuration and removes it
+after the service stops. It terminates only sessions with that configuration’s
+unique application name. It binds every test HTTP service to loopback.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--configuration_names=postgres-httpx-2</span></code> to select one configuration.
+Use <code class="docutils literal notranslate"><span class="pre">--phase_names=worker-kill,soak</span></code> to select measured phases. Warm-up still
+runs. PostgreSQL selections require <code class="docutils literal notranslate"><span class="pre">--postgres_dsn</span></code>. Use a new output
+directory for each run. <code class="docutils literal notranslate"><span class="pre">results.json</span></code> and process logs are saved there.</p>
+<p>The default <code class="docutils literal notranslate"><span class="pre">--timeout_profile=normal</span></code> allows more time for API and database
+operations. Use <code class="docutils literal notranslate"><span class="pre">--timeout_profile=aggressive</span></code> to repeat the earlier tests
+with short failure deadlines:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/load_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--timeout_profile<span class="o">=</span>aggressive<span class="w"> </span>--output<span class="o">=</span>data/load-test-aggressive
+</pre></div>
+</div>
+<p>Both profiles are explicit test configurations. Their values differ from the
+package’s production defaults. Compare runs with the same profile unless the
+timeout difference is the subject of the test.</p>
+<p>The default <code class="docutils literal notranslate"><span class="pre">--client_pool=slots</span></code> gives each active load slot its own persistent
+HTTPX client. A bounded FIFO queue loans these clients to requests. Each client
+has one connection. All clients share one SSL context. This avoids contention
+inside a single HTTPX connection pool. Use <code class="docutils literal notranslate"><span class="pre">--client_pool=shared</span></code> only when
+you want to investigate that pool behavior. The load client still counts queue
+waiting in request latency and the request deadline.</p>
+<p>The load clients expire idle connections after one second, below Uvicorn’s
+five-second server keepalive. This margin reduces races when an idle connection
+closes just as the client reuses it. Use <code class="docutils literal notranslate"><span class="pre">--client_keepalive_expiry=5</span></code> to
+investigate equal client/server idle deadlines. This setting applies to the
+load driver, not the model transport. Connection failures are never retried.</p>
+<p>The phase duration is limited to 1–60 seconds. The soak duration is limited to
+1–600 seconds. Each phase also has a request limit. A closed-loop phase can
+reach that limit before its time limit when the server rejects requests fast.
+The JSON report includes the actual send window and completed request count.</p>
+</section>
+<section id="test-conditions">
+<h2>Test conditions<a class="headerlink" href="#test-conditions" title="Link to this heading"></a></h2>
+<p>The simulator delays the first stream token by 50 ms. It sends four more chunks
+at 10 ms intervals. Its nonstream response delay is 100 ms. The test graph uses
+upstream streaming by default for both invoke and stream API routes.</p>
+<p>Each worker permits eight active requests. Only <code class="docutils literal notranslate"><span class="pre">postgres-queue-1</span></code> permits
+admission waiters: up to eight requests can wait for up to 250 ms. The other
+configurations have no admission waiters. These limits apply to both timeout
+profiles.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Timeout profiles, in seconds</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 60.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">normal</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">aggressive</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code></p></td>
+<td><p>15</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">THREAD_QUEUE_TIMEOUT</span></code></p></td>
+<td><p>10</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_POOL_TIMEOUT</span></code></p></td>
+<td><p>10</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_CONNECT_TIMEOUT</span></code></p></td>
+<td><p>10</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_HEALTH_CHECK_TIMEOUT</span></code></p></td>
+<td><p>5</p></td>
+<td><p>0.5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">THREAD_LOCK_HEARTBEAT_TIMEOUT</span></code></p></td>
+<td><p>5</p></td>
+<td><p>0.5</p></td>
+</tr>
+<tr class="row-even"><td><p>Load-client request deadline</p></td>
+<td><p>20</p></td>
+<td><p>10</p></td>
+</tr>
+</tbody>
+</table>
+<p>The response send deadline remains one second in both profiles. Provider
+connection and pool waits remain one second. The provider read timeout remains
+two seconds. The SDK permits one retry. Conversation-lock heartbeat checks run
+every 0.2 seconds; the table gives the timeout for each check.
+The Uvicorn worker heartbeat allowance is ten seconds. Worker replacement tests
+allow time for both failure detection and fresh worker startup.</p>
+<p>Warm-up requires a complete, correct agent response from every worker PID.
+The client checks final message identity, thread identity, and run metadata
+before it counts a response. The script also requires a managed transport pool
+in each worker and checks that work has drained. It records warm-up attempts,
+successful response counts by PID, and warm-up duration separately.</p>
+<p>After the worker replacement phase, the script repeats this verification before
+the steady-state soak. A healthy PID or an initialized transport pool alone does
+not complete warm-up. Do not compare a cold worker with a warm worker.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Phase</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Invoke concurrency sweep</p></td>
+<td><p>Compare one request, full configured capacity, and overload.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nonstream upstream</p></td>
+<td><p>Compare complete provider responses with upstream streaming. Check
+actual TCP connection counts for each HTTP transport.</p></td>
+</tr>
+<tr class="row-even"><td><p>SSE and JSON Lines</p></td>
+<td><p>Check stream framing, first data, final message identity, and cleanup.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Constant arrival traffic</p></td>
+<td><p>Offer 128 requests per second. Record unsent arrivals and scheduler lag.</p></td>
+</tr>
+<tr class="row-even"><td><p>Shared conversation</p></td>
+<td><p>Send 40 turns with four concurrent callers. Read history and check each
+human message and its final reply. Cross-worker ordering is not FIFO.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Client disconnects</p></td>
+<td><p>Close after the first token. Check that API and provider work drains.</p></td>
+</tr>
+<tr class="row-even"><td><p>Slow readers</p></td>
+<td><p>Stop consuming response bodies with small receive buffers. Use large
+streams to exercise socket backpressure and the response send deadline.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Provider faults</p></td>
+<td><p>Inject rate limits, stalled responses, and dropped response connections.
+Restore the provider and check recovery.</p></td>
+</tr>
+<tr class="row-even"><td><p>Database faults</p></td>
+<td><p>Hold a checkpoint table lock for two seconds. Terminate tagged lock
+and saver connections during traffic. Check bounded failures and recovery.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Worker replacement</p></td>
+<td><p>Kill one owned worker during traffic. Check that the supervisor starts
+a replacement and that both workers return complete, correct replies.
+Requests affected by the failure can lose their connection or return
+503/504. They are not replayed automatically.</p></td>
+</tr>
+<tr class="row-even"><td><p>Soak</p></td>
+<td><p>Offer 80 JSON Lines requests per second to two PostgreSQL workers.
+Compare tasks, memory, file descriptors, and database sessions.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="read-the-results">
+<h2>Read the results<a class="headerlink" href="#read-the-results" title="Link to this heading"></a></h2>
+<p>Successful goodput counts complete, correct responses per second. Successful
+latency excludes overload rejections and failed requests. A stream with HTTP
+200 and an error event is a failed stream. Intentional disconnects have their
+own count. The client does not retry API requests.</p>
+<p>The script fails when responses have incorrect identities, malformed streams,
+unexpected errors, incomplete history, or retained work. It also fails when an
+injected fault was not observed or a killed worker was not replaced. Expected
+overload rejections are reported separately. Passing these checks does not
+establish a throughput or latency service-level objective.</p>
+<p>Constant arrival tests report latency from the scheduled arrival as well as
+from the actual send time. They cap in-flight requests and count dropped
+arrivals. This prevents a slow load generator from silently reducing the
+offered rate. Check scheduler lag before drawing a capacity conclusion.</p>
+<p>The report also contains HTTPcore trace timing and driver event-loop lag.
+Up to five exception examples record classes, numeric error codes, and transport
+stages without messages, headers, URLs, or credentials.
+Compare request-to-send time with send-to-response time. Pre-send time includes
+client-pool waiting, connection setup, and request encoding. It is not a direct
+measurement of server work. Local diagnostics found delays in the shared HTTPX
+pool before requests reached the API. The default slot pool removes that shared
+pool contention. Use the optional shared mode to reproduce the comparison.
+Check these driver measurements before attributing client timeouts to the API.</p>
+<p>HTTP 503 under overload is expected when bounded capacity is full. Compare it
+with goodput and successful latency. Persistent HTTP connections can distribute
+unevenly between Uvicorn workers. A total concurrency of 16 does not guarantee
+eight requests reach each worker. Streaming cleanup can briefly overlap with
+the next request from the same client. Queue capacity can absorb these bursts.</p>
+<p>Samples include worker activity, queue depth, event-loop lag, current resident
+memory, process CPU averages, and model connection counts. File descriptors
+are counted before and after each phase. The <code class="docutils literal notranslate"><span class="pre">ps</span></code> CPU value is a process
+average. It is not an instantaneous CPU measurement. Health requests run
+during load. Readiness can fail if a database pool is exhausted, while liveness
+continues to pass.
+Provider connection counts are observed distinct client address/port pairs.
+Long runs can reuse source ports, so this is not an exact lifetime connection
+counter. The recovery duration starts after the phase’s requests finish. It is
+a drain check, not the duration of a provider or database outage.</p>
+<p>Recovery requires zero active requests, zero waiters, zero stalled cleanups,
+zero active provider calls, and successful readiness and liveness checks.
+Compare post-drain task and connection counts with the baseline. A short soak
+can expose growth. It cannot prove the absence of a slow memory leak.</p>
+<p>In the tested OpenAI 3.13.0 SDK, HTTPX streaming stops at <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code> before
+HTTP EOF. The HTTPX connection then closes. Reusing a managed client does not
+prove TCP reuse on this path. The local tests compare streamed and nonstream
+calls and record distinct provider connections. The aiohttp transport reused
+TCP connections for these streams. Recheck this behavior after SDK upgrades.</p>
+<p>Run the load-generator checks separately:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/load<span class="w"> </span>--no-cov
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="load_test_results.html"><span class="doc">Local pressure-test results: 2026-09-12</span></a> for the dated measurements and investigated failures,
+<a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for production settings, and <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for the functional,
+database, worker, and telemetry test layers.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="testing.html" class="btn btn-neutral float-left" title="Testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="load_test_results.html" class="btn btn-neutral float-right" title="Local pressure-test results: 2026-09-12" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

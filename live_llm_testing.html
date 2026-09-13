@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real LLM verification &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/live_llm_testing.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Local pressure-test results: 2026-09-12" href="load_test_results.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Real LLM verification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-a-small-live-check">Run a small live check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-the-live-test-checks">What the live test checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verification-on-2026-09-12">Verification on 2026-09-12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#offline-edge-cases">Offline edge cases</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Real LLM verification</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/live_llm_testing.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="real-llm-verification">
+<h1>Real LLM verification<a class="headerlink" href="#real-llm-verification" title="Link to this heading"></a></h1>
+<p>The pressure tests use a local OpenAI protocol simulator. They exercise the real
+SDK and transport without provider traffic. The separate live test calls a real
+OpenAI model through the toolkit’s HTTP API, graph, model factory, and SQLite
+checkpointer. It does not replace the model response with a test value.</p>
+<section id="run-a-small-live-check">
+<h2>Run a small live check<a class="headerlink" href="#run-a-small-live-check" title="Link to this heading"></a></h2>
+<p>Install the locked dependencies from a source checkout:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all
+</pre></div>
+</div>
+<p>Provide <code class="docutils literal notranslate"><span class="pre">LAT_TEST_OPENAI_API_KEY</span></code> through your environment or CI secret manager.
+Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_OPENAI_MODEL</span></code> to the model that you want to verify. If your key
+is already exported as <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">LAT_TEST_OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$OPENAI_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="nv">LAT_TEST_OPENAI_MODEL</span><span class="o">=</span>gpt-5.4<span class="w"> </span><span class="se">\</span>
+<span class="nv">LAT_TEST_OPENAI_MODEL_KWARGS</span><span class="o">=</span><span class="s1">&#39;{&quot;reasoning_effort&quot;:&quot;none&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/e2e/test_llm_live.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--run-e2e<span class="w"> </span>--run-llm<span class="w"> </span>--no-cov<span class="w"> </span>-x<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--basetemp<span class="o">=</span>data/live-llm-tests
+</pre></div>
+</div>
+<p>Use a new <code class="docutils literal notranslate"><span class="pre">--basetemp</span></code> directory for each report you want to retain. Pytest
+clears its selected temporary directory. The test does not load a repository
+<code class="docutils literal notranslate"><span class="pre">.env</span></code> file. Ordinary tests replace <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code> with a fake value;
+the explicit <code class="docutils literal notranslate"><span class="pre">LAT_TEST_OPENAI_API_KEY</span></code> is passed only to the live child service.
+Both live flags and both required variables must be present. Normal test runs
+skip this test, even when normal provider credentials are configured.</p>
+<p><code class="docutils literal notranslate"><span class="pre">LAT_TEST_OPENAI_MODEL_KWARGS</span></code> can set only <code class="docutils literal notranslate"><span class="pre">reasoning_effort</span></code> and
+<code class="docutils literal notranslate"><span class="pre">temperature</span></code>. Use values supported by the selected model. The documented
+GPT-5.4 configuration supports <code class="docutils literal notranslate"><span class="pre">reasoning_effort=none</span></code>; see the
+<a class="reference external" href="https://developers.openai.com/api/docs/models/gpt-5.4">official model reference</a>.
+The endpoint is fixed to <code class="docutils literal notranslate"><span class="pre">https://api.openai.com/v1</span></code>. This suite does not test
+Azure deployments, third-party proxies, or other providers.</p>
+<p>Each of the two transport cases has a six-call budget checked before model
+invocation. SDK retries are disabled. Every request uses <code class="docutils literal notranslate"><span class="pre">n=1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">store=False</span></code>, and <code class="docutils literal notranslate"><span class="pre">max_completion_tokens=256</span></code>. The token cap includes
+reasoning tokens as well as visible output; see the
+<a class="reference external" href="https://developers.openai.com/api/reference/python/resources/chat/subresources/completions/methods/create">Chat Completions reference</a>.
+The default suite therefore starts at most twelve model requests. It uses only
+short synthetic prompts and a local arithmetic tool. API charges can apply.</p>
+</section>
+<section id="what-the-live-test-checks">
+<h2>What the live test checks<a class="headerlink" href="#what-the-live-test-checks" title="Link to this heading"></a></h2>
+<p>For each of HTTPX and aiohttp, the test runs one journey:</p>
+<ol class="arabic simple">
+<li><p>Request a real <code class="docutils literal notranslate"><span class="pre">add</span></code> tool call with arguments 2 and 5. Execute the local
+tool and request a final model reply. Check the tool ID, arguments, result,
+token usage, and saved history. This uses two model requests.</p></li>
+<li><p>Run SSE and JSON Lines responses concurrently on separate threads. Check
+first tokens, final AI messages, thread/run IDs, token counts, and framing.
+This uses two model requests.</p></li>
+<li><p>Close a longer SSE response after its first token. Wait for model work,
+admission slots, and cleanup to drain. Record whether model cancellation was
+observed. A fast provider can finish before cancellation reaches the model.</p></li>
+<li><p>Send another request on that same thread. Check its actual reply, usage,
+health probes, and resource counters. Total model attempts must remain six.</p></li>
+</ol>
+<p>Each child uses a fresh local SQLite database and a loopback HTTP listener.
+External telemetry and external tools are disabled. The test stops its own
+service after the journey. <code class="docutils literal notranslate"><span class="pre">live-result.json</span></code> in each case directory records
+model/transport names, request counts, usage, timings, and cleanup evidence.
+It contains no credentials or request headers. A failure keeps the partial report
+and stops the run when <code class="docutils literal notranslate"><span class="pre">-x</span></code> is used.</p>
+<p>Do not infer total billed usage from a cancelled response. Its final usage chunk
+may never arrive. Recorded token counts cover the completed model responses.
+A passing small run checks real-provider compatibility; it does not establish
+production throughput, quota headroom, response quality, or long-term stability.
+Use <a class="reference internal" href="load_testing.html"><span class="doc">API load tests</span></a> for controlled pressure and failure injection.</p>
+</section>
+<section id="verification-on-2026-09-12">
+<h2>Verification on 2026-09-12<a class="headerlink" href="#verification-on-2026-09-12" title="Link to this heading"></a></h2>
+<p>The offline regression suite passed 861 tests with 12 skips and 80.64% combined
+line/branch coverage after the usage, refusal, and SSE completion fixes. The live
+journey then sent one real request to the configured <code class="docutils literal notranslate"><span class="pre">gpt-5.4</span></code> model. OpenAI
+rejected the configured credential with HTTP 401 and <code class="docutils literal notranslate"><span class="pre">invalid_api_key</span></code>. No
+model response was generated. The test stopped without retries, with zero active
+model calls, admission slots, waiters, or stalled cleanups remaining.</p>
+<p>This is a failed live verification, not evidence that either transport passed
+against a real model. A valid test credential is required to complete the live
+journeys. Replace credentials locally and rerun explicitly; do not retry an
+unchanged rejected key. The two-transport live contract remains unverified until
+both journeys finish successfully.</p>
+<p>The rejected credential also exposed a generic API error and unsafe provider
+error logging. The fix now returns HTTP 503 with
+<code class="docutils literal notranslate"><span class="pre">error_code=model_authentication_failed</span></code> from <code class="docutils literal notranslate"><span class="pre">/invoke</span></code>. Streams return a
+fixed error message after headers are sent. Toolkit logs omit provider error
+text and tracebacks for authentication failures in all environment modes.
+Twelve offline cases check OpenAI and Azure across invoke, SSE, and JSON Lines
+in production and development. The final focused suite passed 154 tests, with
+the two live transport cases skipped. This fix has not been checked in another
+live request.</p>
+</section>
+<section id="offline-edge-cases">
+<h2>Offline edge cases<a class="headerlink" href="#offline-edge-cases" title="Link to this heading"></a></h2>
+<p>The deterministic tests cover cases that should not depend on a live provider
+returning a particular failure:</p>
+<ul class="simple">
+<li><p>Empty choices and usage-only chunks; Unicode text; output limits.</p></li>
+<li><p>Interleaved streamed tool arguments and stable tool-call IDs.</p></li>
+<li><p>Refusal-only responses, including streamed refusal fragments.</p></li>
+<li><p>Cancellation during an active stream, response closure, and no partial retry.</p></li>
+<li><p>SSE EOF without <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code>, including EOF after a final message.</p></li>
+<li><p>Usage preservation through API output, history import, and SQLite reopen.</p></li>
+<li><p>Provider authentication failure, safe responses and logs, and no SDK retry.</p></li>
+<li><p>Live-test activation, concurrent call budgets, cancellation accounting, and
+rejection of configuration that could bypass request limits.</p></li>
+</ul>
+<p>The public <code class="docutils literal notranslate"><span class="pre">ChatMessage.usage_metadata</span></code> field is optional. <code class="docutils literal notranslate"><span class="pre">null</span></code> means the
+provider did not supply counts, not zero usage. Refusal text is retained in
+<code class="docutils literal notranslate"><span class="pre">response_metadata[&quot;refusal&quot;]</span></code> and supplies public content when the provider
+content is empty. The client raises <code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> if an SSE stream ends
+without its completion marker. A caller can still close its own stream early.
+JSON Lines does not use the SSE completion marker.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/core/test_llm_edge_cases.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/client/test_stream_completion.py<span class="w"> </span>tests/service/test_usage_metadata.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/service/test_provider_errors.py<span class="w"> </span>tests/core/test_live_llm_guard.py
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for the full test layers and <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for production
+connection and timeout settings.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="load_test_results.html" class="btn btn-neutral float-left" title="Local pressure-test results: 2026-09-12" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

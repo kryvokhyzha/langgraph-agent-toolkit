@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.models.transport &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/models/transport.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.models.transport</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.models.transport</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Own HTTP connections for OpenAI and Azure model calls.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="n">_manager</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">LLMTransportManager</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;llm_transport_manager&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">_CLIENT_FIELDS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;http_client&quot;</span><span class="p">,</span> <span class="s2">&quot;http_async_client&quot;</span><span class="p">,</span> <span class="s2">&quot;client&quot;</span><span class="p">,</span> <span class="s2">&quot;async_client&quot;</span><span class="p">,</span> <span class="s2">&quot;root_client&quot;</span><span class="p">,</span> <span class="s2">&quot;root_async_client&quot;</span><span class="p">)</span>
+<span class="n">_CONNECTION_FIELDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;api_key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;openai_api_key&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;base_url&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;openai_api_base&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;organization&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;openai_organization&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_headers&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_query&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;azure_endpoint&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;azure_deployment&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;deployment_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;api_version&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;openai_api_version&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;azure_ad_token&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;azure_ad_token_provider&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;azure_ad_async_token_provider&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;openai_proxy&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">_CONNECTION_ENV</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_BASE_URL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_ORG_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_ORGANIZATION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_PROJECT_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_CUSTOM_HEADERS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_ADMIN_KEY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_PROXY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AZURE_OPENAI_API_KEY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AZURE_OPENAI_ENDPOINT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AZURE_OPENAI_API_VERSION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OPENAI_API_VERSION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AZURE_OPENAI_AD_TOKEN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LANGSMITH_GATEWAY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LANGSMITH_GATEWAY_API_KEY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LANGSMITH_API_KEY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HTTP_PROXY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HTTPS_PROXY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ALL_PROXY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NO_PROXY&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;http_proxy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;https_proxy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;all_proxy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;no_proxy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SSL_CERT_FILE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SSL_CERT_DIR&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="LLMTransportConfig">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMTransportConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set connection limits for each endpoint and credential configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+
+    <span class="n">async_transport</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;httpx&quot;</span><span class="p">,</span> <span class="s2">&quot;aiohttp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;httpx&quot;</span>
+    <span class="c1"># Match OpenAI SDK 3.13.0 defaults without importing this optional dependency.</span>
+    <span class="n">max_connections</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">max_keepalive_connections</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">keepalive_expiry</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">connect_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">read_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">write_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pool_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">shutdown_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">max_pools</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LLMTransportConfig.validate_limits">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportConfig.validate_limits">[docs]</a>
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMTransportConfig</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_keepalive_connections</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_connections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_keepalive_connections must not exceed max_connections&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_http_library</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the public HTTP library that matches the installed OpenAI SDK.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;httpx2&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">openai</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="s2">&quot;httpx&quot;</span>
+    <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_identity</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep equal connection settings together without evaluating token providers.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">_identity</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_identity</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Model connection settings must contain hashable values or mappings&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_stream_usage</span><span class="p">(</span><span class="n">provider</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep LangChain&#39;s automatic usage reporting when we inject HTTP clients.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;openai_proxy&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_PROXY&quot;</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base_url&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;openai_api_base&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">provider</span> <span class="o">==</span> <span class="s2">&quot;openai&quot;</span> <span class="ow">and</span> <span class="n">base_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_BASE&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">base_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">provider</span> <span class="o">==</span> <span class="s2">&quot;azure_openai&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">gateway</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LANGSMITH_GATEWAY&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">gateway</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;OPENAI_BASE_URL&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+
+
+<div class="viewcode-block" id="LLMTransportManager">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMTransportManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reuse HTTP clients inside one worker and one event loop.</span>
+
+<span class="sd">    Enter this manager before model construction. Bind it during graph startup</span>
+<span class="sd">    and each request. Close it after all model calls finish. Explicit clients</span>
+<span class="sd">    and explicit socket options keep the caller&#39;s existing behavior.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LLMTransportManager.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">LLMTransportConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">LLMTransportConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">AbstractEventLoop</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="LLMTransportManager.from_settings">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager.from_settings">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_settings</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMTransportManager</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;LLM_HTTP_</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">LLMTransportConfig</span><span class="o">.</span><span class="n">model_fields</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">LLMTransportConfig</span><span class="p">(</span><span class="o">**</span><span class="n">values</span><span class="p">))</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMTransportManager</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LLM transport manager cannot be entered again&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LLM transport manager is not open&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current_loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="c1"># LangChain copies context into threads for synchronous model calls.</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">current_loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LLM transport manager belongs to another event loop&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LLMTransportManager.bind">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager.bind">[docs]</a>
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">LLMTransportManager</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_owner</span><span class="p">()</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">_manager</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">_manager</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LLMTransportManager.configure">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager.configure">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">chat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add owned clients without changing credentials or explicit clients.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">provider</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;openai&quot;</span><span class="p">,</span> <span class="s2">&quot;azure_openai&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_CLIENT_FIELDS</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http_socket_options&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_owner</span><span class="p">()</span>
+
+        <span class="c1"># The SDK transport types are optional dependencies. Import them on use.</span>
+        <span class="n">httpx</span> <span class="o">=</span> <span class="n">_http_library</span><span class="p">()</span>
+
+        <span class="n">configured</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;timeout&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configured</span> <span class="ow">and</span> <span class="s2">&quot;request_timeout&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configured</span><span class="p">:</span>
+            <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Timeout</span><span class="p">(</span>
+                <span class="n">connect</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">connect_timeout</span><span class="p">,</span>
+                <span class="n">read</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">read_timeout</span><span class="p">,</span>
+                <span class="n">write</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">write_timeout</span><span class="p">,</span>
+                <span class="n">pool</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pool_timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">configured</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;max_retries&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_retries</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chat</span> <span class="ow">and</span> <span class="n">configured</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stream_usage&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_default_stream_usage</span><span class="p">(</span><span class="n">provider</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+            <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;stream_usage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">provider</span><span class="p">,</span>
+            <span class="nb">tuple</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">_identity</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)))</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_CONNECTION_FIELDS</span><span class="p">),</span>
+            <span class="nb">tuple</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_CONNECTION_ENV</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_owner</span><span class="p">()</span>
+            <span class="n">pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pair</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_pools</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LLM HTTP pool limit reached; increase LLM_HTTP_MAX_POOLS&quot;</span><span class="p">)</span>
+                <span class="n">pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_clients</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;openai_proxy&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_PROXY&quot;</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;http_client&quot;</span><span class="p">],</span> <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;http_async_client&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;openai_proxy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">chat</span><span class="p">:</span>
+            <span class="c1"># Our transports already contain the socket options.</span>
+            <span class="n">configured</span><span class="p">[</span><span class="s2">&quot;http_socket_options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">return</span> <span class="n">configured</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_clients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultAioHttpClient</span><span class="p">,</span> <span class="n">DefaultAsyncHttpxClient</span><span class="p">,</span> <span class="n">DefaultHttpxClient</span>
+
+        <span class="n">httpx</span> <span class="o">=</span> <span class="n">_http_library</span><span class="p">()</span>
+        <span class="n">limits</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Limits</span><span class="p">(</span>
+            <span class="n">max_connections</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_connections</span><span class="p">,</span>
+            <span class="n">max_keepalive_connections</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_keepalive_connections</span><span class="p">,</span>
+            <span class="n">keepalive_expiry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keepalive_expiry</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">client_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;limits&quot;</span><span class="p">:</span> <span class="n">limits</span><span class="p">}</span>
+        <span class="n">socket_options</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai.chat_models._client_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                <span class="n">_resolve_socket_options</span><span class="p">,</span>
+                <span class="n">_should_bypass_socket_options_for_proxy_env</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_should_bypass_socket_options_for_proxy_env</span><span class="p">(</span>
+                <span class="n">http_socket_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">http_client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">http_async_client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">openai_proxy</span><span class="o">=</span><span class="n">proxy</span>
+            <span class="p">):</span>
+                <span class="n">socket_options</span> <span class="o">=</span> <span class="n">_resolve_socket_options</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="c1"># Network phase timeouts still apply if LangChain moves this helper.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;LangChain socket defaults are unavailable; use HTTP transport defaults&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">kwargs_for</span><span class="p">(</span><span class="n">async_client</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">client_kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">socket_options</span><span class="p">:</span>
+                <span class="n">transport_type</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncHTTPTransport</span> <span class="k">if</span> <span class="n">async_client</span> <span class="k">else</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPTransport</span>
+                <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;limits&quot;</span><span class="p">:</span> <span class="n">limits</span><span class="p">,</span> <span class="s2">&quot;socket_options&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">socket_options</span><span class="p">)}</span>
+                <span class="k">if</span> <span class="n">proxy</span><span class="p">:</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s2">&quot;proxy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Proxy</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mounts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;all://&quot;</span><span class="p">:</span> <span class="n">transport_type</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;transport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transport_type</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">proxy</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s2">&quot;proxy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">sync_client</span> <span class="o">=</span> <span class="n">DefaultHttpxClient</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs_for</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">async_transport</span> <span class="o">==</span> <span class="s2">&quot;aiohttp&quot;</span><span class="p">:</span>
+                <span class="n">async_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">client_kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">proxy</span><span class="p">:</span>
+                    <span class="n">async_kwargs</span><span class="p">[</span><span class="s2">&quot;proxy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+                <span class="n">async_client</span> <span class="o">=</span> <span class="n">DefaultAioHttpClient</span><span class="p">(</span><span class="o">**</span><span class="n">async_kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">async_client</span> <span class="o">=</span> <span class="n">DefaultAsyncHttpxClient</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs_for</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">sync_client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+        <span class="k">return</span> <span class="n">sync_client</span><span class="p">,</span> <span class="n">async_client</span>
+
+<div class="viewcode-block" id="LLMTransportManager.aclose">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager.aclose">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">aclose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close all owned clients within the configured shutdown deadline.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_owner</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pools</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">operation</span> <span class="k">for</span> <span class="n">sync</span><span class="p">,</span> <span class="n">asynchronous</span> <span class="ow">in</span> <span class="n">pairs</span> <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_close_sync</span><span class="p">(</span><span class="n">sync</span><span class="p">),</span> <span class="n">asynchronous</span><span class="o">.</span><span class="n">aclose</span><span class="p">())</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">operations</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">operations</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">shutdown_timeout</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;An LLM HTTP client did not close&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_close_sync</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep a stalled close operation out of the default executor.&quot;&quot;&quot;</span>
+        <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="n">completed</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">create_future</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">completed</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                <span class="c1"># Store the error as a value if shutdown no longer awaits it.</span>
+                <span class="n">completed</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">exc</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">loop</span><span class="o">.</span><span class="n">call_soon_threadsafe</span><span class="p">(</span><span class="n">finish</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># The worker event loop has already stopped.</span>
+
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">close</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;llm-http-close&quot;</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="k">await</span> <span class="n">completed</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span></div>
+
+
+
+<div class="viewcode-block" id="current_llm_transport_manager">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.current_llm_transport_manager">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">current_llm_transport_manager</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">LLMTransportManager</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the manager bound to the current request.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_manager</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="configure_model_transport">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.configure_model_transport">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure_model_transport</span><span class="p">(</span><span class="n">provider</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">chat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">current_llm_transport_manager</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">manager</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">provider</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">chat</span><span class="o">=</span><span class="n">chat</span><span class="p">)</span> <span class="k">if</span> <span class="n">manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

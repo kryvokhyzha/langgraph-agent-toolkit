@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connections and High Traffic &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/reliability.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Migrate authentication and checkpoint storage" href="migration.html" />
+    <link rel="prev" title="Deployment and Recovery" href="deployment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Connections and High Traffic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#choose-deployment-limits">Choose Deployment Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checkpoint-persistence">Checkpoint Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#request-admission">Request Admission</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#managed-openai-and-azure-connections">Managed OpenAI and Azure Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-fault-handling">Database Fault Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-coordination-and-library-responsibilities">Memory Coordination and Library Responsibilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#capacity-planning-and-verification">Capacity Planning and Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Connections and High Traffic</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/reliability.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="connections-and-high-traffic">
+<h1>Connections and High Traffic<a class="headerlink" href="#connections-and-high-traffic" title="Link to this heading"></a></h1>
+<p>The service bounds concurrent requests, connection pools, and network waits.
+Tune these limits together. Larger pools cannot remove provider rate limits or
+database capacity limits.</p>
+<section id="choose-deployment-limits">
+<h2>Choose Deployment Limits<a class="headerlink" href="#choose-deployment-limits" title="Link to this heading"></a></h2>
+<p>The defaults provide bounded behavior. They do not guarantee capacity or latency
+for every workload. Keep deployment configuration limited to required credentials,
+backend choices, and deliberate overrides. The settings listed in this guide are
+reference values; most do not need an explicit environment variable.</p>
+<p>Tune these limits first:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 32.0%" />
+<col style="width: 25.0%" />
+<col style="width: 43.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Control</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Tuning input</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">REQUEST_MAX_CONCURRENT</span></code> and worker count</p></td>
+<td><p>8 active requests per worker</p></td>
+<td><p>Peak concurrent runs, CPU, memory, model calls per run, and provider quotas.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code> and client/proxy timeouts</p></td>
+<td><p>300 seconds at the API</p></td>
+<td><p>Longest valid run, time without streamed output, and cleanup time.
+Client read defaults are 60 seconds for invoke and 120 seconds for streams.</p></td>
+</tr>
+<tr class="row-even"><td><p>PostgreSQL pool sizes</p></td>
+<td><p>20 checkpoint and 10 lock connections per worker</p></td>
+<td><p>Available database connections across all workers, replicas, stores,
+and other applications. These are maximum sizes, not initial allocations.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Request and conversation queues</p></td>
+<td><p>0 admission waiters; 32 waiters per conversation</p></td>
+<td><p>Whether excess requests should receive a busy response or wait.
+Conversation waiters can occupy active HTTP request slots.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">REQUEST_MAX_BYTES</span></code></p></td>
+<td><p>20 MiB per request</p></td>
+<td><p>Actual text, file, and image sizes. Eight maximum-size bodies alone use
+160 MiB before parsing and graph-state overhead.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Total workers means workers per replica multiplied by replicas. At eight workers,
+the default HTTP limit permits 64 active requests. The two default PostgreSQL
+pools can use 240 connections before separately opened stores or other services.
+Check this budget before increasing worker count. See <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a>.</p>
+<p>Keep TCP keepalive, connection recycling, pool maintenance, heartbeat, and HTTP
+phase limits at their defaults until a measurement identifies a problem. These
+controls remain useful for other providers, databases, and deployment sizes.
+Some controls apply only on selected paths. <code class="docutils literal notranslate"><span class="pre">REQUEST_QUEUE_TIMEOUT</span></code> controls
+admission waiting only when that queue is enabled. The aiohttp adapter does not
+apply the HTTPX write timeout or maximum idle-connection count. MCP, telemetry,
+and store controls apply only when those features are used.</p>
+<p>Measure p95 response time, time to first token, memory, pool waits, checkpoint
+duration, and 429/503 responses. Tune one constraint at a time. Load tests must
+include bursts and slow requests, not only average traffic. See <a class="reference internal" href="load_testing.html"><span class="doc">API load tests</span></a>.</p>
+</section>
+<section id="checkpoint-persistence">
+<h2>Checkpoint Persistence<a class="headerlink" href="#checkpoint-persistence" title="Link to this heading"></a></h2>
+<p>A successful model response and a durable checkpoint are separate events.
+Configure the storage backend and graph before relying on saved history.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration</p></th>
+<th class="head"><p>Persistence boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PostgreSQL</p></td>
+<td><p>Saved checkpoints survive worker replacement. Database storage, backups,
+and failover configuration remain deployment responsibilities.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SQLite file</p></td>
+<td><p>Saved checkpoints survive process restarts when the same file remains
+available. Mount persistent storage when the API runs in a container.
+The default Compose files mount PostgreSQL data, not an API SQLite file.</p></td>
+</tr>
+<tr class="row-even"><td><p>No <code class="docutils literal notranslate"><span class="pre">MEMORY_BACKEND</span></code> or an explicit <code class="docutils literal notranslate"><span class="pre">MemorySaver</span></code></p></td>
+<td><p>Checkpoints stay in one worker’s memory. Other workers cannot read them.
+Worker exit removes them.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SQLite <code class="docutils literal notranslate"><span class="pre">:memory:</span></code></p></td>
+<td><p>Checkpoints disappear when the connection closes.</p></td>
+</tr>
+<tr class="row-even"><td><p>Explicit <code class="docutils literal notranslate"><span class="pre">NoOpSaver</span></code> or <code class="docutils literal notranslate"><span class="pre">checkpointer=False</span></code></p></td>
+<td><p>The agent intentionally does not save checkpoints. This is not a database
+failure. Existing <code class="docutils literal notranslate"><span class="pre">NoOpSaver</span></code> behavior remains unchanged.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The service logs warnings for volatile storage. It retains
+an explicit graph checkpointer. A configured PostgreSQL backend does not replace
+an agent’s explicit <code class="docutils literal notranslate"><span class="pre">NoOpSaver</span></code> or custom saver. Verify custom savers separately.</p>
+<p><code class="docutils literal notranslate"><span class="pre">CHECKPOINT_DURABILITY</span></code> controls when graph execution waits for checkpoint
+writes. It does not select a synchronous database driver. The executor defaults
+to <code class="docutils literal notranslate"><span class="pre">sync</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CHECKPOINT_DURABILITY</span><span class="o">=</span><span class="n">sync</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">sync</span></code>, each super-step’s checkpoint must finish before the next
+super-step starts. This reduces the progress that a hard worker failure can
+lose. The executor still uses async graph and database methods. The current
+run waits with <code class="docutils literal notranslate"><span class="pre">await</span></code>; other requests can run on the event loop during
+this wait. This adds waiting time to the current run.</p>
+<p>Choose a different mode when the application needs a different balance between
+step latency and recovery:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">async</span></code> lets the next super-step run while the previous checkpoint saves.
+This can reduce latency. A hard worker failure can lose pending progress.
+The graph still waits for pending saves before successful completion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exit</span></code> saves at graph exit. A hard process failure during execution can lose
+progress since the preceding run.</p></li>
+</ul>
+<p>No mode makes a running node or its external actions atomic. An existing
+<code class="docutils literal notranslate"><span class="pre">CHECKPOINT_DURABILITY=async</span></code> environment value keeps that mode after an
+upgrade. Remove the override or set it to <code class="docutils literal notranslate"><span class="pre">sync</span></code> to use the new default.</p>
+<p>These are LangGraph’s <a class="reference external" href="https://docs.langchain.com/oss/python/langgraph/checkpointers#durability-modes">durability modes</a>. The setting
+applies to <code class="docutils literal notranslate"><span class="pre">AgentExecutor</span></code> runs. Applications that call graphs directly must
+select their own durability mode. It cannot make in-memory storage durable.
+Both <code class="docutils literal notranslate"><span class="pre">sync</span></code> and <code class="docutils literal notranslate"><span class="pre">async</span></code> propagate checkpoint write errors. The main
+difference is whether the next step can start before that write finishes.
+An explicit <code class="docutils literal notranslate"><span class="pre">NoOpSaver</span></code> remains a valid choice for a stateless agent.</p>
+<p>Tokens and full message events can arrive before the final checkpoint write.
+Treat them as provisional until the stream finishes without an error. For SSE,
+require <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code> and no preceding error event. An HTTP 200 alone does not prove
+that a streamed run completed. JSON Lines uses the response body end as its
+terminator; it has no independent completion marker. Prefer SSE when explicit
+completion detection is required.</p>
+<p>For a persistent agent, invoke returns its successful result after graph execution
+and checkpoint cleanup. A write error propagates to the caller. Unsupported streamed output
+also fails visibly instead of being skipped. No success signal makes a disabled
+or volatile saver durable.</p>
+<p>Cancellation preserves completed checkpoints when the backend remains
+available. A running node can remain unfinished. A hard worker termination can
+stop any in-flight operation. Checkpoints do not resume accepted HTTP requests
+automatically or provide exactly-once external tool actions. Use idempotency keys
+and a durable job system for work that must continue after the client disconnects.</p>
+<p>The history API returns messages, not a complete checkpoint backup. Other state
+channels, pending tasks, and external tool data require their own backup or
+recovery process. The toolkit’s view-only trimming middleware changes model
+context without deleting saved messages. Custom reducers, summarization, or
+<code class="docutils literal notranslate"><span class="pre">RemoveMessage</span></code> updates can deliberately replace saved state.</p>
+<p>Sending a custom stream event does not save it in graph state. Return data in a
+declared state channel or write it to a durable store when it must survive the
+run. The background-task example emits progress events without saving those
+events as history. A configured PostgreSQL checkpointer cannot save data that
+the graph never puts in its state or pending writes.</p>
+<p>Long-term store writes and checkpoints are separate operations. They do not
+share a transaction. Coordinate changes to the same user-memory key across
+threads. Use an application transaction or an outbox when separate systems must
+record one business operation together. Telemetry is also separate: an unavailable
+observability service or a bounded shutdown flush can lose pending traces.</p>
+<p>After a client error, read saved history before retrying. The server can have
+committed progress before the connection failed. With <code class="docutils literal notranslate"><span class="pre">async</span></code> durability, a
+later step can run and save data before an earlier checkpoint failure reaches
+the caller. A failed run does not roll back all of its writes. The included UI keeps the
+failed input separate, reloads saved history, and does not automatically resend
+the request. Browser session state is not a durable conversation archive. Keep
+public thread IDs and ownership records when users must discover previous chats.</p>
+</section>
+<section id="request-admission">
+<h2>Request Admission<a class="headerlink" href="#request-admission" title="Link to this heading"></a></h2>
+<p>Each worker accepts eight active HTTP requests by default. The limit covers body
+buffering, conversation-lock waiting, graph execution, response sending, and
+cleanup. It applies to invocation, SSE, JSON Lines, history, and feedback.
+Health probes remain accessible during overload.
+Probe requests must not contain a body.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">REQUEST_MAX_CONCURRENT</span><span class="o">=</span><span class="s">8</span>
+<span class="na">REQUEST_QUEUE_MAX_WAITERS</span><span class="o">=</span><span class="s">0</span>
+<span class="na">REQUEST_QUEUE_TIMEOUT</span><span class="o">=</span><span class="s">1.0</span>
+<span class="na">REQUEST_TIMEOUT</span><span class="o">=</span><span class="s">300</span>
+<span class="na">REQUEST_CLEANUP_TIMEOUT</span><span class="o">=</span><span class="s">10.0</span>
+<span class="na">RESPONSE_SEND_TIMEOUT</span><span class="o">=</span><span class="s">30.0</span>
+</pre></div>
+</div>
+<p>When capacity is full, the service returns HTTP 503 with
+<code class="docutils literal notranslate"><span class="pre">error_code=service_busy</span></code> and <code class="docutils literal notranslate"><span class="pre">Retry-After:</span> <span class="pre">1</span></code>. Rejection occurs before body
+buffering and before streaming response headers. No agent run starts for that
+rejected request. Set a small positive <code class="docutils literal notranslate"><span class="pre">REQUEST_QUEUE_MAX_WAITERS</span></code> to absorb
+short bursts. Waiters use no model or database connection. A disconnected waiter
+can occupy its queue slot until admission or <code class="docutils literal notranslate"><span class="pre">REQUEST_QUEUE_TIMEOUT</span></code>.</p>
+<p>The queue exists in one worker. It is not a persistent job queue. A worker loss
+does not transfer accepted work to another worker. Use a durable job system for
+work that must continue without the original HTTP client.</p>
+<p>The conversation queue is a separate limit. Calls for the same thread can occupy
+active request slots while waiting for that thread. Keep
+<code class="docutils literal notranslate"><span class="pre">THREAD_QUEUE_MAX_WAITERS</span></code> small, or set it to zero, if one busy conversation
+must not consume most of a worker’s capacity. Admission does not guarantee equal
+capacity for each user.</p>
+<p><code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code> covers the admitted HTTP request. A deadline before response
+headers returns 504. After headers, an error can only end the stream or close the
+connection. The service does not send a second HTTP status. A client disconnect
+cancels the active graph. Each response send has its own deadline so a client
+that stops reading cannot hold the stream indefinitely.</p>
+<p>Graph cleanup completes before its conversation lock and request slot are
+released. Direct <code class="docutils literal notranslate"><span class="pre">AgentExecutor</span></code> calls keep their execution deadline. HTTP
+calls use one deadline owner to avoid cancelling graph cleanup twice.</p>
+<p>Custom tools must cooperate with cancellation and bound their own external I/O.
+If cancellation cleanup exceeds <code class="docutils literal notranslate"><span class="pre">REQUEST_CLEANUP_TIMEOUT</span></code>, both
+<code class="docutils literal notranslate"><span class="pre">/health/live</span></code> and <code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> return 503 until cleanup finishes. The
+service retains the occupied slot and lock while work is still active. Configure
+the supervisor to replace a worker whose liveness probe keeps failing. The
+library does not kill the host process. Prefer one worker per container when
+the orchestrator probes and replaces containers; a shared multi-worker listener
+can send a probe to a different, healthy worker. See <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a>.</p>
+<p>Feedback uses a separate bounded set of daemon threads. Its capacity equals
+<code class="docutils literal notranslate"><span class="pre">REQUEST_MAX_CONCURRENT</span></code>. A cancelled HTTP caller does not free the thread slot
+until the synchronous feedback call finishes. Further feedback requests fail
+with 503 when all thread slots are occupied. Shutdown waits up to
+<code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_SHUTDOWN_TIMEOUT</span></code> for feedback, then the same limit for telemetry
+flush. Configure the process shutdown budget for both waits and resource cleanup.</p>
+</section>
+<section id="managed-openai-and-azure-connections">
+<h2>Managed OpenAI and Azure Connections<a class="headerlink" href="#managed-openai-and-azure-connections" title="Link to this heading"></a></h2>
+<p>The service owns HTTP clients for OpenAI and Azure chat and embedding models
+created through the toolkit factories. It binds the clients during agent startup
+and each request, then closes them at shutdown. Matching endpoint and credential
+configurations reuse connections. Different credentials, headers, proxies, and
+endpoints receive separate pools. Caller-supplied clients retain their ownership.</p>
+<p>The API Docker image selects the OpenAI SDK’s <code class="docutils literal notranslate"><span class="pre">DefaultAioHttpClient</span></code> by
+default. Python installations retain HTTPX as their default. To select aiohttp
+outside the image:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[openai-aiohttp]&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">LLM_HTTP_ASYNC_TRANSPORT</span><span class="o">=</span><span class="s">aiohttp</span>
+</pre></div>
+</div>
+<p>The API Docker image, <code class="docutils literal notranslate"><span class="pre">all-llms</span></code>, and <code class="docutils literal notranslate"><span class="pre">all</span></code> include the aiohttp dependency.
+Installing the dependency alone does not select the transport; the image sets
+its default in the runtime environment. Set <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=httpx</span></code>
+to override the image default. OpenAI documents aiohttp as an
+alternative for high concurrency in its
+<a class="reference external" href="https://developers.openai.com/api/reference/python">Python SDK reference</a>.
+Measure both transports with your workload before selecting one for latency.</p>
+<p>The default connection limits, keepalive expiry, phase timeouts, and retry count
+match the OpenAI Python SDK 3.13.0 baseline. These toolkit defaults do not change
+automatically when the SDK version changes. The settings below apply to each
+endpoint and credential configuration in one worker:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">LLM_HTTP_MAX_CONNECTIONS</span><span class="o">=</span><span class="s">1000</span>
+<span class="na">LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS</span><span class="o">=</span><span class="s">100</span>
+<span class="na">LLM_HTTP_KEEPALIVE_EXPIRY</span><span class="o">=</span><span class="s">5.0</span>
+<span class="na">LLM_HTTP_CONNECT_TIMEOUT</span><span class="o">=</span><span class="s">5.0</span>
+<span class="na">LLM_HTTP_READ_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_WRITE_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_POOL_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_MAX_RETRIES</span><span class="o">=</span><span class="s">2</span>
+<span class="na">LLM_HTTP_MAX_POOLS</span><span class="o">=</span><span class="s">32</span>
+<span class="na">LLM_HTTP_SHUTDOWN_TIMEOUT</span><span class="o">=</span><span class="s">10.0</span>
+</pre></div>
+</div>
+<p>Timeouts are seconds. Keepalive connections must not exceed total connections.
+These limits are upper bounds, not connections opened at startup or a target
+request rate. The separate eight-request admission default still applies.
+Sync calls have a separate HTTPX pool with the same limits, even when async calls
+use aiohttp. <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_MAX_POOLS</span></code> limits distinct configurations. Reaching this
+limit fails model construction; it does not evict a pool used by another run.
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_MAX_POOLS</span></code> and <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_SHUTDOWN_TIMEOUT</span></code> are toolkit resource
+controls. Their defaults remain 32 configurations and 10 seconds.</p>
+<p>Existing environment and model overrides retain their values. Remove old
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_*</span></code> numeric overrides to adopt these defaults. Keep transport selection
+and any deliberate deployment-specific limits. See <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a>.</p>
+<p>Explicit model <code class="docutils literal notranslate"><span class="pre">timeout</span></code> and <code class="docutils literal notranslate"><span class="pre">max_retries</span></code> values override the managed
+defaults. Caller-supplied HTTP/SDK clients or <code class="docutils literal notranslate"><span class="pre">http_socket_options</span></code> bypass
+managed injection. With LangChain, the asynchronous HTTP client parameter is
+<code class="docutils literal notranslate"><span class="pre">http_async_client</span></code>; the OpenAI <code class="docutils literal notranslate"><span class="pre">AsyncOpenAI</span></code> SDK calls it <code class="docutils literal notranslate"><span class="pre">http_client</span></code>.
+Do not pass an aiohttp async client as LangChain’s synchronous <code class="docutils literal notranslate"><span class="pre">http_client</span></code>.</p>
+<p>The tested OpenAI 3.13.0 aiohttp adapter has these differences from HTTPX:</p>
+<ul class="simple">
+<li><p>It does not enforce a separate write timeout or an idle connection count.</p></li>
+<li><p>Its pool/connect phase combines pool waiting and connection establishment.</p></li>
+<li><p>It does not use LangChain’s HTTPX TCP socket options.</p></li>
+<li><p>A dropped server socket can appear as a timeout error instead of a connection
+error. Both transports still obey the configured retry count.</p></li>
+</ul>
+<p>Read timeouts measure inactivity, not the total generation duration. Phase
+timeouts apply to each attempt. The 600-second phase defaults do not change
+<code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code>. That separate deadline starts cancellation of the whole
+admitted HTTP request after 300 seconds by default. Deployments can set a shorter
+deadline. Cleanup can continue after cancellation starts.</p>
+<p>The tested <code class="docutils literal notranslate"><span class="pre">langchain-openai</span></code> 1.6.2 has a separate <code class="docutils literal notranslate"><span class="pre">stream_chunk_timeout</span></code>.
+Its default is 120 seconds between parsed chunks in an async model stream.
+SSE keepalive comments do not reset that timer. The model option or
+<code class="docutils literal notranslate"><span class="pre">LANGCHAIN_OPENAI_STREAM_CHUNK_TIMEOUT_S</span></code> can override it. A 600-second HTTP
+read timeout does not change this guard or <code class="docutils literal notranslate"><span class="pre">AgentClient.stream_timeout</span></code>.</p>
+<p>The OpenAI SDK normally retries connection failures, 408, 409, 429, and server
+errors, with two retries by default. Increasing retries increases time and
+provider traffic. Avoid adding another graph-level retry around the same call.
+A stream that already delivered tokens is not automatically replayed.</p>
+<p>Standalone applications can use the same ownership scope:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CompletionModelFactory</span><span class="p">,</span> <span class="n">LLMTransportManager</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">answer</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">LLMTransportManager</span><span class="o">.</span><span class="n">from_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">manager</span><span class="o">.</span><span class="n">bind</span><span class="p">():</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">CompletionModelFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="s2">&quot;openai&quot;</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">OPENAI_MODEL_NAME</span><span class="p">,</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">model</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use one manager for the application lifetime, not one for every request. The
+manager belongs to one event loop. Configurable factory models created before
+startup resolve managed clients during invocation. Concrete custom models
+created before startup retain their original clients. Service startup calls
+each registered <code class="docutils literal notranslate"><span class="pre">graph_factory</span></code> to build a fresh graph with current resources.
+Factories selected for MCP receive their discovered tools in the same build.
+Graphs without a factory keep their explicit dependencies. Other providers and
+direct SDK calls keep their own connection configuration. This change does not
+impose connection limits on arbitrary tools or external model objects.</p>
+</section>
+<section id="database-fault-handling">
+<h2>Database Fault Handling<a class="headerlink" href="#database-fault-handling" title="Link to this heading"></a></h2>
+<p>PostgreSQL pool checkout includes a bounded health check. Failed connections
+are closed and replaced before ownership passes to a caller. Cancellation during
+a query closes the uncertain session. A checkpoint run cannot reconnect and
+continue writing after it loses its conversation lock.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">POSTGRES_CONNECT_TIMEOUT</span><span class="o">=</span><span class="s">10</span>
+<span class="na">POSTGRES_HEALTH_CHECK_TIMEOUT</span><span class="o">=</span><span class="s">5.0</span>
+<span class="na">POSTGRES_KEEPALIVES_IDLE</span><span class="o">=</span><span class="s">30</span>
+<span class="na">POSTGRES_KEEPALIVES_INTERVAL</span><span class="o">=</span><span class="s">10</span>
+<span class="na">POSTGRES_KEEPALIVES_COUNT</span><span class="o">=</span><span class="s">3</span>
+<span class="na">POSTGRES_TCP_USER_TIMEOUT</span><span class="o">=</span><span class="s">60000</span>
+</pre></div>
+</div>
+<p>Connection and health-check timeouts are seconds. <code class="docutils literal notranslate"><span class="pre">POSTGRES_TCP_USER_TIMEOUT</span></code>
+is milliseconds. TCP keepalive options depend on the operating system and do not
+apply to Unix sockets. <code class="docutils literal notranslate"><span class="pre">connect_timeout</span></code> applies separately to each host or IP
+attempt. See the
+<a class="reference external" href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">libpq connection parameters</a>.</p>
+<p>Keep <code class="docutils literal notranslate"><span class="pre">POSTGRES_POOL_TIMEOUT</span></code>, <code class="docutils literal notranslate"><span class="pre">POSTGRES_RECONNECT_TIMEOUT</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">POSTGRES_MAX_LIFETIME</span></code> positive. <code class="docutils literal notranslate"><span class="pre">POSTGRES_MAX_IDLE</span></code> is idle seconds before
+excess connections close, not a connection count. Zero lifetime does not disable
+recycling. Statement, SQL-lock, and idle-transaction timeouts use milliseconds;
+zero disables those server timeouts.</p>
+<p><code class="docutils literal notranslate"><span class="pre">POSTGRES_STATEMENT_TIMEOUT</span></code> limits each SQL statement. It is not a model
+generation deadline. <code class="docutils literal notranslate"><span class="pre">POSTGRES_LOCK_TIMEOUT</span></code> limits SQL lock acquisition;
+<code class="docutils literal notranslate"><span class="pre">THREAD_QUEUE_TIMEOUT</span></code> controls conversation-lock waiting. Normal model calls
+do not hold an idle SQL transaction open. Set SQL timeouts from database work,
+not model latency. The toolkit sends zero values explicitly so they disable
+inherited database or role timeouts.</p>
+<p>Pool-backed checkpoint operations no longer wait behind one saver-wide lock.
+Coordinated operations still share their conversation session. Both checkpoint
+and long-term store setup use a schema lock for concurrent worker startup. Lock
+acquisition uses nonblocking polling; a waiting SQL snapshot must not block
+concurrent index creation.</p>
+<p>SQLite rolls back failed or cancelled writes before releasing its connection
+lock. Checkpoint iterators for both databases release their cursor before
+yielding, so a consumer can make another checkpoint query without deadlocking.
+The iterators collect the selected results in memory. Set <code class="docutils literal notranslate"><span class="pre">limit</span></code> when calling
+a saver directly on a large history.
+SQLite still serializes writers. Prefer PostgreSQL for sustained concurrent
+writes across workers or hosts.</p>
+<p>Client-side cancellation can finish before PostgreSQL stops its server query.
+Keep server statement timeouts configured and monitor active queries. Neither
+database recovery nor HTTP cancellation guarantees that an external action did
+not complete. The toolkit does not replay an uncertain write or an entire graph.
+Use application idempotency keys for tools that cause external changes.</p>
+</section>
+<section id="memory-coordination-and-library-responsibilities">
+<h2>Memory Coordination and Library Responsibilities<a class="headerlink" href="#memory-coordination-and-library-responsibilities" title="Link to this heading"></a></h2>
+<p>The toolkit delegates checkpoint SQL and serialization to LangGraph.
+It delegates connection limits, replacement, recycling, and reconnect backoff
+to <code class="docutils literal notranslate"><span class="pre">psycopg_pool</span></code>. Its memory adapters cover the following gaps:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Additional behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">concurrency.py</span></code></p></td>
+<td><p>Serialize a complete conversation operation across workers. Bound
+acquisition time. Cancel active work after its PostgreSQL session fails.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coordinated_saver.py</span></code></p></td>
+<td><p>Keep checkpoint I/O on the session that owns the conversation lock.
+Allow unrelated pool connections to work concurrently.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pool.py</span></code></p></td>
+<td><p>Include health checks in the checkout deadline. Preserve cancellation
+during those checks. Close sessions with uncertain query results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coordinated_sqlite.py</span></code></p></td>
+<td><p>Finish rollback before another operation can reuse the connection.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema_lock.py</span></code> and <code class="docutils literal notranslate"><span class="pre">coordinated_store.py</span></code></p></td>
+<td><p>Coordinate schema setup when several workers start at the same time.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A checkpointer protects individual storage operations. It does not serialize
+the complete read, model call, and write sequence for one conversation.
+<code class="docutils literal notranslate"><span class="pre">asyncio.Lock</span></code> supplies this protection within one worker. PostgreSQL
+advisory locks or <code class="docutils literal notranslate"><span class="pre">filelock.AsyncFileLock</span></code> extend it across workers.
+SQLite coordination requires the same database file and lock directory on a
+filesystem with working OS file locks. It is not a distributed lock service.</p>
+<p>The PostgreSQL session retains its advisory lock without a heartbeat.
+The heartbeat detects connection loss during a long model or tool call.
+The saver uses that same session, so an old run cannot write through a new
+connection after another worker acquires the lock.</p>
+<p>The conversation queue is bounded per worker. It is not globally FIFO or
+durable. Active PostgreSQL runs and workers waiting for an advisory lock use
+connections from <code class="docutils literal notranslate"><span class="pre">POSTGRES_LOCK_POOL_SIZE</span></code>. This limit therefore affects
+both execution capacity and waiting capacity.</p>
+<p>Cancellation can arrive while cleanup is already running. The rollback and
+pool-return paths wait for cleanup before releasing shared resources, even
+after repeated cancellation. One <code class="docutils literal notranslate"><span class="pre">asyncio.shield()</span></code> call does not provide
+that guarantee by itself.</p>
+<p>The adapters use upstream hooks, including the saver <code class="docutils literal notranslate"><span class="pre">_cursor()</span></code> method and
+the connection <code class="docutils literal notranslate"><span class="pre">wait()</span></code> method. Check these contracts during dependency
+upgrades. Remove an adapter only after its fault tests pass with the upstream
+implementation. In the reviewed <code class="docutils literal notranslate"><span class="pre">psycopg_pool</span></code> 3.3.1 implementation, the
+health-check loop catches cancellation and can retry. It also does not bound
+the running check with the checkout deadline.</p>
+<p>LangGraph Agent Server provides <a class="reference external" href="https://docs.langchain.com/langsmith/double-texting">enqueue and reject policies</a>. These policies are not
+part of the OSS LangGraph framework. Using Agent Server would change the
+service deployment and API architecture.</p>
+</section>
+<section id="capacity-planning-and-verification">
+<h2>Capacity Planning and Verification<a class="headerlink" href="#capacity-planning-and-verification" title="Link to this heading"></a></h2>
+<p>Start with the default admission limit below the lock-pool size: eight active
+requests and ten lock connections per worker leave headroom for health checks.
+Keep headroom when changing either limit. Readiness can return 503 for pool
+saturation as well as a database outage; liveness does not query the database.</p>
+<p>For four workers, the default request limit permits 32 active HTTP requests.
+The database upper bound is 4 * (20 checkpoint + 10 lock) = 120 connections,
+plus separately created stores and other services. Parallel graph branches can
+make several model calls per HTTP request. Set graph concurrency and provider
+quotas as well as HTTP pool limits. LangGraph’s internal token queue is not
+strictly bounded by these settings; send deadlines and cancellation stop a slow
+consumer from keeping its producer alive indefinitely.</p>
+<p>Align caller and ingress timeouts with the intended workload. <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code>
+defaults to a 60-second normal read timeout and a 120-second stream inactivity
+timeout. Set its <code class="docutils literal notranslate"><span class="pre">timeout</span></code> and <code class="docutils literal notranslate"><span class="pre">stream_timeout</span></code> arguments for longer work.
+An earlier client or proxy timeout can disconnect and cancel the server request
+before <code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code> expires.</p>
+<p>Set the caller’s idle connection expiry below the server or proxy keepalive
+timeout, with room for scheduler and network delays. Equal idle deadlines can
+race: the server closes a connection while the client is about to reuse it.
+For example, with a five-second server keepalive, a caller can supply an
+<code class="docutils literal notranslate"><span class="pre">httpx.AsyncClient(limits=httpx.Limits(keepalive_expiry=1.0))</span></code> through
+<code class="docutils literal notranslate"><span class="pre">AgentClient(async_http_client=...)</span></code> and close that client at shutdown.
+Use the same comparison for <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_KEEPALIVE_EXPIRY</span></code> when an upstream idle
+timeout is known. An expiry margin reduces this race; it cannot prevent every
+connection failure. Do not replay an agent POST automatically after an ambiguous
+transport failure, because its work may already have started.</p>
+<p>Measure admitted throughput, first-token and completion latency, 429/503 rates,
+retries, pool waiting, database locks, process memory, and file descriptors.
+Increase limits gradually against representative prompts and tools. Local tests
+verify reuse, bounded work, fault recovery, and cleanup. They do not establish a
+production throughput number or prove that aiohttp is faster for your provider.
+See <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for the fault tests and process journeys.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="deployment.html" class="btn btn-neutral float-left" title="Deployment and Recovery" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="migration.html" class="btn btn-neutral float-right" title="Migrate authentication and checkpoint storage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

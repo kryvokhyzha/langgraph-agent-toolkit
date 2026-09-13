@@ -1,0 +1,356 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment and Recovery &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/deployment.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Connections and High Traffic" href="reliability.html" />
+    <link rel="prev" title="Langfuse compatibility" href="langfuse_compatibility.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment and Recovery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api-image-and-model-transport">API Image and Model Transport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#startup-and-worker-supervision">Startup and Worker Supervision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#postgresql-connection-budget">PostgreSQL Connection Budget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conversation-ordering">Conversation Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#failure-and-retry-boundaries">Failure and Retry Boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nested-calls-and-shutdown">Nested Calls and Shutdown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#client-and-azure-resource-cleanup">Client and Azure Resource Cleanup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deployment and Recovery</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/deployment.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deployment-and-recovery">
+<h1>Deployment and Recovery<a class="headerlink" href="#deployment-and-recovery" title="Link to this heading"></a></h1>
+<p>Run the service under a process manager. Configure the health probes and a
+persistent checkpoint backend before increasing the number of workers.
+See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for request admission, LLM pools, and database fault handling.</p>
+<section id="api-image-and-model-transport">
+<h2>API Image and Model Transport<a class="headerlink" href="#api-image-and-model-transport" title="Link to this heading"></a></h2>
+<p>The API Dockerfile installs <code class="docutils literal notranslate"><span class="pre">openai-aiohttp</span></code> and sets
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=aiohttp</span></code>. This selects aiohttp for managed async
+OpenAI and Azure calls without a runtime override:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>docker/api/Dockerfile<span class="w"> </span>-t<span class="w"> </span>toolkit-api<span class="w"> </span>.
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:8080<span class="w"> </span>--env-file<span class="w"> </span>.env<span class="w"> </span>toolkit-api
+</pre></div>
+</div>
+<p>Rebuild older images and recreate the API container to use the new default.
+Docker and Compose environment overrides take precedence over the image. If an
+existing <code class="docutils literal notranslate"><span class="pre">.env</span></code> sets <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=httpx</span></code>, remove that line or
+change it to <code class="docutils literal notranslate"><span class="pre">aiohttp</span></code>. The example <code class="docutils literal notranslate"><span class="pre">.env</span></code> leaves the selection unset.
+The toolkit’s <code class="docutils literal notranslate"><span class="pre">LANGGRAPH_LLM_HTTP_ASYNC_TRANSPORT</span></code> override also takes
+precedence when configured.
+To select HTTPX, set <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=httpx</span></code> and recreate the container.
+Changing this override does not need an image rebuild.</p>
+<p>The choice favors connection reuse for streamed model responses. In the tested
+SDK, aiohttp reused streaming connections while HTTPX closed them at the final
+stream marker. Both passed local fault and cleanup checks. The shared-host load
+tests do not establish a general latency or throughput ranking. See
+<a class="reference internal" href="load_test_results.html"><span class="doc">Local pressure-test results: 2026-09-12</span></a> for the measured behavior and limits.</p>
+<p>Synchronous model calls still use HTTPX. Caller-supplied model clients keep
+their own transport. Python installations outside this image retain HTTPX as
+the default. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for timeout differences and limits.</p>
+</section>
+<section id="startup-and-worker-supervision">
+<h2>Startup and Worker Supervision<a class="headerlink" href="#startup-and-worker-supervision" title="Link to this heading"></a></h2>
+<p>Service startup must complete before a worker serves requests. A failure to
+load an agent or initialize its checkpoint backend now fails startup. The
+worker does not remain alive with an unusable executor.</p>
+<p>Use Uvicorn’s import-string factory for multiple workers:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>uvicorn<span class="w"> </span>langgraph_agent_toolkit.service.handler:create_app<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--factory<span class="w"> </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span><span class="w"> </span>--workers<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--timeout-worker-healthcheck<span class="w"> </span><span class="m">10</span>
+</pre></div>
+</div>
+<p>Configure <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code> in the environment for this entry point. Supply the
+credentials required by the selected model and authentication mode. Settings are
+process-wide: configure one service per worker before startup. Do not change
+<code class="docutils literal notranslate"><span class="pre">ServiceRunner(custom_settings=...)</span></code> per request or use it to host services
+with different settings in the same process. The
+<code class="docutils literal notranslate"><span class="pre">run_api.py</span></code> entry point also uses the configured agent paths.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run_uvicorn</span></code> defaults <code class="docutils literal notranslate"><span class="pre">timeout_worker_healthcheck</span></code> to 10
+seconds. Factory imports are deferred until the application is created to reduce
+startup work. Spawned workers can import launcher modules before starting their
+heartbeat thread. If these imports need more time, supply a larger value, such as
+<code class="docutils literal notranslate"><span class="pre">ServiceRunner().run_uvicorn(workers=2,</span> <span class="pre">timeout_worker_healthcheck=30)</span></code>.
+An explicit value replaces the default. Direct <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> commands use
+Uvicorn’s own default unless this option is supplied.</p>
+<p>If a worker stops during a heartbeat check, detection can wait for the full
+heartbeat timeout. Replacement also needs time for the supervisor’s next check
+and the new worker’s startup. Checks for multiple unresponsive workers run in
+sequence, so their waits can add. The heartbeat timeout is not a limit on total
+recovery time.</p>
+<p>Uvicorn’s heartbeat is not an HTTP health check. Its separate thread can answer
+while the application’s event loop is blocked. Configure an external HTTP
+health probe and a supervisor that restarts the affected process or container
+when that probe fails.
+Prefer one worker per container when the orchestrator probes a shared port.
+With multiple workers, a healthy worker can answer a probe for a stalled worker.</p>
+<p>Uvicorn and Gunicorn supervise their worker processes. Local subprocess tests
+started two workers, terminated one worker with <code class="docutils literal notranslate"><span class="pre">SIGKILL</span></code>, and verified that
+a replacement worker served requests. This verifies recovery from a terminated
+worker. It does not verify every deployment failure or detect every worker
+that remains alive but cannot serve requests.</p>
+<p>An in-flight request can fail when its worker stops. The process manager does
+not replay that request. Set graceful shutdown periods long enough for the
+expected workload. Use a service manager or container orchestrator to restart
+the parent process if it exits.</p>
+<p>Gunicorn’s <code class="docutils literal notranslate"><span class="pre">timeout</span></code> measures worker silence for the async worker class. Use
+<code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code> to limit one API request. <code class="docutils literal notranslate"><span class="pre">graceful_timeout</span></code> limits the
+time allowed to drain requests after a restart signal. Workers that remain
+after that limit can be stopped forcibly. See the
+<a class="reference external" href="https://gunicorn.org/reference/settings/">Gunicorn settings</a>.</p>
+<p>The toolkit image currently sets <code class="docutils literal notranslate"><span class="pre">graceful_timeout</span></code> to 30 seconds, while the
+API request limit defaults to 300 seconds. This does not let every permitted
+request finish during deployment. Set the worker drain period from the maximum
+supported request duration plus cleanup time. Set the container termination
+grace period above that drain period. A Docker health check alone does not set
+this budget. Verify the chosen limits during a rolling deployment.</p>
+<p>Use the probe endpoints for their separate purposes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/health/startup</span></code> confirms that initialization has completed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> checks initialization and live checkpoint/lock database connections.
+It returns 503 during a database outage and recovers when connections work again.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/health/live</span></code> checks whether the worker can respond and cancellation cleanup
+is progressing. Stalled cleanup returns 503 for supervisor recovery.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/health/db</span></code> reports checkpoint-pool state.</p></li>
+</ul>
+<p>A listening port or a response from <code class="docutils literal notranslate"><span class="pre">/health</span></code> alone does not prove that agents
+are ready. Configure a request timeout at the ingress and monitor worker exit,
+startup failure, request failure, and database connection metrics.</p>
+</section>
+<section id="postgresql-connection-budget">
+<h2>PostgreSQL Connection Budget<a class="headerlink" href="#postgresql-connection-budget" title="Link to this heading"></a></h2>
+<p>Each worker creates its own checkpoint pool and conversation-lock pool. With
+the default settings, one worker can use up to 20 checkpoint connections and
+10 lock connections. A service with four workers can therefore use up to
+120 connections before other applications or separately created stores are
+counted.</p>
+<p>Set these limits together:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_POOL_SIZE</span></code>: maximum checkpoint connections per worker; default 20.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_LOCK_POOL_SIZE</span></code>: maximum lock connections per worker; default 10.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POSTGRES_POOL_MAX_WAITING</span></code>: maximum queued pool requests; default 100.</p></li>
+</ul>
+<p>Leave database capacity for administration, monitoring, migrations, and other
+services. Increasing the worker count does not increase PostgreSQL’s connection
+limit. It also multiplies model concurrency and each worker’s local queue
+capacity.</p>
+</section>
+<section id="conversation-ordering">
+<h2>Conversation Ordering<a class="headerlink" href="#conversation-ordering" title="Link to this heading"></a></h2>
+<p>Operations on one conversation wait for a lock. The lock covers invocation,
+streaming, and history changes. Different conversations can run concurrently.</p>
+<p>These locks protect short-term checkpoint state. Two conversations for the same
+<code class="docutils literal notranslate"><span class="pre">user_id</span></code> can still run concurrently and access the same long-term store.
+Use atomic writes or a separate conflict strategy when custom memory logic reads
+and then replaces a shared user record. A thread lock does not protect that update
+from another thread. Clearing a thread does not clear the user’s long-term store.</p>
+<p>The local queue is bounded. <code class="docutils literal notranslate"><span class="pre">THREAD_QUEUE_MAX_WAITERS</span></code> defaults to 32 waiting
+operations for one conversation in each worker. <code class="docutils literal notranslate"><span class="pre">THREAD_QUEUE_TIMEOUT</span></code> limits
+lock waiting and defaults to 60 seconds. Queue admission or wait failures return
+an error so the caller can retry. These are per-worker admission limits, not a
+single durable queue shared by all replicas.</p>
+<p>PostgreSQL uses session advisory locks to coordinate workers. A dedicated pool
+holds these sessions. While a conversation lock is held, checkpoint SQL uses
+the same database session as that lock. It does not switch to another pooled
+connection after losing the lock. Checkpoint operations outside a locked run
+use the normal checkpoint pool.</p>
+<p>A heartbeat checks the lock connection. If that session
+is lost, the service cancels the operation instead of continuing without its
+lock. Cancellation, failure, and stream closure release lock resources.</p>
+<p>The service injects its checkpointer only when a graph has no explicit checkpointer.
+Built-in agents leave this choice to the service. An explicit custom checkpointer
+keeps its own persistence behavior. Custom savers for another database need
+matching coordination; the service does not redirect them to its default database.
+With no persistent backend, histories remain local to one process and are lost
+on restart. Do not use that mode for shared multi-worker conversations.</p>
+<p>SQLite uses operating-system file locks. Workers must share the same database
+file and the same local filesystem. Do not use separate container-local SQLite
+files for one shared service. Network filesystems can have different locking
+semantics; use PostgreSQL for deployments across hosts.</p>
+</section>
+<section id="failure-and-retry-boundaries">
+<h2>Failure and Retry Boundaries<a class="headerlink" href="#failure-and-retry-boundaries" title="Link to this heading"></a></h2>
+<p>Checkpoint persistence and locks do not provide exactly-once tool execution.
+A tool can complete an external action before a worker loses its connection or
+stops. A retry can repeat that action. Give external actions their own
+idempotency keys when repetition is unacceptable.</p>
+<p>Database failover can interrupt a checkpoint write or release an advisory lock.
+After recovery, a caller can retry from the available checkpoint, but the
+service does not automatically replay incomplete HTTP requests. Review the
+application’s recovery rules for interrupted runs and external side effects.</p>
+<p>No Redis queue or background job broker is added by this change. Requests still
+run in the worker that accepts them. Use a durable job system if work must
+survive the loss of that worker independently of a connected client.</p>
+</section>
+<section id="nested-calls-and-shutdown">
+<h2>Nested Calls and Shutdown<a class="headerlink" href="#nested-calls-and-shutdown" title="Link to this heading"></a></h2>
+<p>Do not call a coordinated executor or history operation from inside another
+active coordinated operation. The inner call can wait for its own parent or
+form a cycle with another thread. These calls now raise <code class="docutils literal notranslate"><span class="pre">NestedConversationError</span></code>
+immediately. The HTTP API returns 409. Retrying the same nested call does not
+resolve the programming error. Compose agents with LangGraph subgraphs instead;
+subgraphs use the enclosing run’s checkpoint session.</p>
+<p>PostgreSQL checkpoint-history iteration releases its cursor before yielding
+results. This permits another checkpoint query while consuming the iterator.
+An ambiguous or cancelled advisory-lock acquisition discards its database
+connection. The pool cannot reuse a session with an unknown lock state.</p>
+<p><code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_SHUTDOWN_TIMEOUT</span></code> limits the wait for a synchronous telemetry
+flush. Its default is 10 seconds. If the deadline expires, shutdown continues
+and pending telemetry can be lost. A daemon thread performs the flush so a stuck
+SDK cannot make the event loop wait for its default executor during worker exit.
+Set the process manager’s graceful shutdown period above this deadline and the
+expected database cleanup time.</p>
+</section>
+<section id="client-and-azure-resource-cleanup">
+<h2>Client and Azure Resource Cleanup<a class="headerlink" href="#client-and-azure-resource-cleanup" title="Link to this heading"></a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">AgentClient(...)</span></code> for owned synchronous connections. Use
+<code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span> <span class="pre">AgentClient(...)</span></code> or <code class="docutils literal notranslate"><span class="pre">await</span> <span class="pre">client.aclose()</span></code> for asynchronous
+connections. Close the async client before its event loop stops. A client pool
+must not move between event loops. The caller retains ownership of injected
+HTTPX clients.</p>
+<p>The Azure Functions runner uses the Azure SDK ASGI adapter. It starts the
+application lifespan before serving requests. Call <code class="docutils literal notranslate"><span class="pre">await</span> <span class="pre">runner.aclose()</span></code>
+before stopping that runner’s event loop so the application can release its
+checkpoint and observability resources.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langfuse_compatibility.html" class="btn btn-neutral float-left" title="Langfuse compatibility" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reliability.html" class="btn btn-neutral float-right" title="Connections and High Traffic" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

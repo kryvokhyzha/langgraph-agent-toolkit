@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Related projects and source review &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/related_projects.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="generated/modules.html" />
+    <link rel="prev" title="Dependency update review" href="dependency_updates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Related projects and source review</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#projects-reviewed">Projects reviewed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requested-agent-service-toolkit-commits">Requested Agent Service Toolkit commits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#corrections-from-this-review">Corrections from this review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recommended-next-work">Recommended next work</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Related projects and source review</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/related_projects.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="related-projects-and-source-review">
+<h1>Related projects and source review<a class="headerlink" href="#related-projects-and-source-review" title="Link to this heading"></a></h1>
+<p>Reviewed on 2026-09-13. The review compares source code and selected regression
+cases. It does not compare production latency, throughput, or model quality.
+The package and the projects below have different deployment goals.</p>
+<section id="projects-reviewed">
+<h2>Projects reviewed<a class="headerlink" href="#projects-reviewed" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/tree/18d76e919b357e448f60b97c50e704db79456096">Agent Service Toolkit</a>
+is a complete application template. Its current source has AG-UI support,
+voice interaction, conversation navigation, and an operator model allowlist.
+This package provides more explicit controls for database connections,
+admission limits, cancellation, conversation isolation, and Langfuse versions.
+Those controls do not establish a performance advantage without comparable
+load tests. The reviewed commit is <code class="docutils literal notranslate"><span class="pre">18d76e919b357e448f60b97c50e704db79456096</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langserve">LangServe</a> is a Runnable HTTP
+adapter. Its schema discovery, typed client errors, and feedback tokens are
+useful design references. The project is deprecated and was archived on
+2026-05-05. This review does not recommend adding it as a dependency.
+The reviewed commit is <code class="docutils literal notranslate"><span class="pre">27e57afeda13007a7f4e007c5d1f5e8489963aa4</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/chat-langchain/tree/f90060d55de772f543564696b56ffee7be3945b8">Chat LangChain</a>
+is a documentation application. Its current design uses Managed Deep Agents,
+managed identity and checkpoints, MCP documentation tools, and a Next.js UI.
+Its search, page-reading, and citation patterns fit a specialized agent.
+They do not require replacing this package’s FastAPI service or Streamlit UI.
+The reviewed commit is <code class="docutils literal notranslate"><span class="pre">f90060d55de772f543564696b56ffee7be3945b8</span></code>.</p></li>
+</ul>
+</section>
+<section id="requested-agent-service-toolkit-commits">
+<h2>Requested Agent Service Toolkit commits<a class="headerlink" href="#requested-agent-service-toolkit-commits" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 30.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Commit</p></th>
+<th class="head"><p>Change</p></th>
+<th class="head"><p>Decision for this package</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/0aaf73f72a7982128d4f5478f6cc893fded7a56f">0aaf73f</a></p></td>
+<td><p>Add thread listing and Previous Chats.</p></td>
+<td><p>Useful next feature. Build an authenticated conversation catalog with
+public thread IDs and update timestamps. Do not copy checkpoint scans.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/54d5e89b6717f41c67b024c730c1512250404823">54d5e89</a></p></td>
+<td><p>Check stored thread ownership.</p></td>
+<td><p>Do not port. The check was ineffective and upstream reverted it.
+Keep this package’s authenticated storage identity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/5544508a16bdd867b2b9f9cbdf7edc1a9174d1aa">5544508</a></p></td>
+<td><p>Restore the URL-selected agent and improve resume links.</p></td>
+<td><p>Adapted. Validate the agent before loading history. Update the URL for
+new chats and agent changes. Keep user identity out of the link.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/cfa9e16bc06aef73ed7c4ad2fa436fbfd607e544">cfa9e16</a></p></td>
+<td><p>Make history requests agent-aware.</p></td>
+<td><p>Already supported by the API and Python client. Corrected the UI call
+order. Keep the existing GET interface and history pagination.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/c69b888a500bd68550c1513d3bad19c748a943fe">c69b888</a></p></td>
+<td><p>Use the public Streamlit URL API.</p></td>
+<td><p>Adapted. Use <code class="docutils literal notranslate"><span class="pre">st.context.url</span></code>, preserve the path and scheme, and encode
+query values. Report an unavailable URL without inspecting other sessions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/186b491640a435442a89dc6d3f9420418f87a5cf">186b491</a></p></td>
+<td><p>Add Python 3.14 and remove a direct <code class="docutils literal notranslate"><span class="pre">grpcio</span></code> constraint.</p></td>
+<td><p>Added in a follow-up after compatibility tests. The package needs
+conditional Pydantic and Studio requirements. See <a class="reference internal" href="dependency_updates.html"><span class="doc">Dependency update review</span></a>.
+It has no equivalent direct <code class="docutils literal notranslate"><span class="pre">grpcio</span></code> constraint to remove.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The ownership change needs particular care. It read <code class="docutils literal notranslate"><span class="pre">user_id</span></code> from checkpoint
+configuration. A real graph reproduction showed that the configuration contains
+checkpoint identifiers, while user metadata can change on later writes.
+Upstream confirmed the failed check and reverted it in
+<a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/commit/a561c88fbac4b1914ea08c6ff113b32437fbcd9c">a561c88</a>.
+This package computes storage keys from authenticated user, agent, and public
+thread ID. It does not use caller-written checkpoint metadata as proof of access.</p>
+<p>The current upstream
+<a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/blob/18d76e919b357e448f60b97c50e704db79456096/src/service/threads.py#L19-L109">thread listing implementation</a>
+selects creation checkpoints, then reads each candidate’s latest checkpoint.
+An old but recently active conversation can fall outside the candidate scan.
+Sequential reads also increase database work. A catalog should query indexed
+ownership and update fields directly. The package’s hashed storage keys cannot
+be converted back into public thread IDs.</p>
+</section>
+<section id="corrections-from-this-review">
+<h2>Corrections from this review<a class="headerlink" href="#corrections-from-this-review" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Feedback ownership.</strong> The API previously accepted a supplied run ID after
+authenticating the caller. That did not prove run ownership. Token-user
+feedback now requires server-signed proof for the user, agent, and run.
+The server uses a separate signing secret. Trusted backend feedback keeps its
+existing flow. See <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a>. LangServe documents
+<a class="reference external" href="https://github.com/langchain-ai/langserve/blob/27e57afeda13007a7f4e007c5d1f5e8489963aa4/langserve/server.py#L316-L324">scoped feedback tokens</a>.</p></li>
+<li><p><strong>Conversation navigation.</strong> Streamlit now loads the selected agent’s history,
+handles another URL in the same session, and starts a new conversation after
+an agent change. Resume links preserve deployment paths and do not grant
+another user’s identity. See <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a>.</p></li>
+<li><p><strong>Client failure details.</strong> <code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> retains optional HTTP status,
+service error code, and <code class="docutils literal notranslate"><span class="pre">Retry-After</span></code>. Existing exception text stays
+compatible. Reads of rejected stream bodies have size and time limits.
+LangServe preserves
+<a class="reference external" href="https://github.com/langchain-ai/langserve/blob/27e57afeda13007a7f4e007c5d1f5e8489963aa4/langserve/client.py#L157-L180">HTTP status exceptions</a>.</p></li>
+<li><p><strong>SSE proxy behavior.</strong> SSE responses now request no caching and no proxy
+buffering. This follows the headers in the
+<a class="reference external" href="https://github.com/sysid/sse-starlette/blob/v1.3.0/sse_starlette/sse.py">response implementation used by LangServe</a>.
+Proxy configuration can override these headers. Idle heartbeats are a separate
+change because stream cancellation must preserve graph cleanup.</p></li>
+<li><p><strong>Knowledge-base inputs.</strong> Content-block messages previously reached a text
+retriever as lists. The retriever raised an error, which became an empty
+result. Retrieval now uses text blocks only and skips media-only questions.
+Chat LangChain also separates
+<a class="reference external" href="https://github.com/langchain-ai/chat-langchain/blob/f90060d55de772f543564696b56ffee7be3945b8/src/middleware/guardrails_middleware.py#L257">text from other content</a>.</p></li>
+<li><p><strong>Knowledge-base sources.</strong> Bedrock source locations and nested metadata now
+reach the augmented prompt. Existing custom sources and titles keep their
+precedence. The mapping follows the
+<a class="reference external" href="https://docs.aws.amazon.com/bedrock/latest/APIReference/API_agent-runtime_RetrievalResultLocation.html">Bedrock location contract</a>.
+Chat LangChain similarly preserves source information in
+<a class="reference external" href="https://github.com/langchain-ai/chat-langchain/blob/f90060d55de772f543564696b56ffee7be3945b8/src/tools/pylon_tools.py#L296">retrieved articles</a>.</p></li>
+</ul>
+</section>
+<section id="recommended-next-work">
+<h2>Recommended next work<a class="headerlink" href="#recommended-next-work" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Add the authenticated conversation catalog and Previous Chats UI. Use indexed
+pagination and test updates, deletion, restart, and isolation on real SQLite
+and PostgreSQL stores.</p></li>
+<li><p>Add an optional operator model allowlist. Restrict per-request model/provider
+overrides when callers are less trusted. Upstream enforces its
+<a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/blob/18d76e919b357e448f60b97c50e704db79456096/src/service/utils.py#L19-L26">available-model selection</a>.
+Preserve unrestricted selection for deployments that explicitly require it.</p></li>
+<li><p>Add early stream metadata and configurable idle heartbeats with a documented
+protocol version. Today, a client that needs the thread ID after an early
+disconnect should supply it before streaming. LangServe emits
+<a class="reference external" href="https://github.com/langchain-ai/langserve/blob/27e57afeda13007a7f4e007c5d1f5e8489963aa4/langserve/api_handler.py#L1188-L1207">run metadata before data</a>.
+Test slow readers and same-task graph cleanup before changing the producer.</p></li>
+<li><p>Add a separate documentation research blueprint if applications need it.
+Bound search/read rounds, retain source IDs, and test source-supported answers.
+Chat LangChain provides useful
+<a class="reference external" href="https://github.com/langchain-ai/chat-langchain/blob/f90060d55de772f543564696b56ffee7be3945b8/instructions.md#L270">research instructions</a>
+and explicit
+<a class="reference external" href="https://github.com/langchain-ai/chat-langchain/blob/f90060d55de772f543564696b56ffee7be3945b8/agent.py#L40">summarization settings</a>.
+Network link checks need bounded caches, host restrictions, and redirect rules.</p></li>
+<li><p>Add AG-UI or per-agent schema discovery when a consumer needs those interfaces.
+Keep authentication, admission limits, and persistence in the existing service.
+Review upstream
+<a class="reference external" href="https://github.com/JoshuaC215/agent-service-toolkit/blob/18d76e919b357e448f60b97c50e704db79456096/src/service/agui.py#L74-L115">AG-UI event filtering</a>
+and LangServe’s
+<a class="reference external" href="https://github.com/langchain-ai/langserve/blob/27e57afeda13007a7f4e007c5d1f5e8489963aa4/langserve/server.py#L630-L704">schema endpoints</a>.</p></li>
+</ol>
+<p>The fixes use deterministic graphs, Streamlit AppTest, synthetic Bedrock
+responses, and local HTTP transports. No competitor application was executed.
+No real model calls were needed. See <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for broader test boundaries.
+The full local run with <code class="docutils literal notranslate"><span class="pre">--run-e2e</span></code> completed with 938 tests passed and 36
+skipped. Live provider checks were not part of this review.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dependency_updates.html" class="btn btn-neutral float-left" title="Dependency update review" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/modules.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.observability.base module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.observability.base.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.observability.empty module" href="langgraph_agent_toolkit.core.observability.empty.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.core.observability package" href="langgraph_agent_toolkit.core.observability.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.observability.html">langgraph_agent_toolkit.core.observability package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.observability.base module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.observability.base.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core.observability.base">
+<span id="langgraph-agent-toolkit-core-observability-base-module"></span><h1>langgraph_agent_toolkit.core.observability.base module<a class="headerlink" href="#module-langgraph_agent_toolkit.core.observability.base" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.observability.base.</span></span><span class="sig-name descname"><span class="pre">BaseObservabilityPlatform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L30-L256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Base class for observability platforms.</p>
+<p>Provides shared utilities without disk I/O.
+This prevents blocking in asynchronous contexts.</p>
+<p>Initialize the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>remote_first</strong> (<em>bool</em>) – Prioritize remote prompts over the local cache.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remote_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L37-L45"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>remote_first</strong> (<em>bool</em>) – Prioritize remote prompts over the local cache.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.remote_first">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">remote_first</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.remote_first" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.required_vars">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">required_vars</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.required_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.validate_environment">
+<span class="sig-name descname"><span class="pre">validate_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.validate_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L59-L64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.validate_environment" title="Link to this definition"></a></dt>
+<dd><p>Validate that required environment variables are set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.requires_env_vars">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">requires_env_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.requires_env_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L66-L75"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.requires_env_vars" title="Link to this definition"></a></dt>
+<dd><p>Validate environment variables before calling a method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>Callable</em><em>[</em><em>[</em><em>...</em><em>]</em><em>, </em><em>T</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Callable</em>[[…], <em>T</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.get_callback_handler">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_callback_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.get_callback_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L77-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.get_callback_handler" title="Link to this definition"></a></dt>
+<dd><p>Get the callback handler for the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Any</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.before_shutdown">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">before_shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.before_shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L82-L85"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.before_shutdown" title="Link to this definition"></a></dt>
+<dd><p>Perform any necessary cleanup before shutdown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.record_feedback">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">record_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.record_feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L87-L90"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.record_feedback" title="Link to this definition"></a></dt>
+<dd><p>Record feedback for a run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>score</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.push_prompt">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">push_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_create_new_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.push_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L92-L101"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.push_prompt" title="Link to this definition"></a></dt>
+<dd><p>Push a prompt to the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>prompt_template</strong> (<em>str</em><em> | </em><em>List</em><em>[</em><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ChatMessageDict" title="langgraph_agent_toolkit.core.observability.types.ChatMessageDict"><em>ChatMessageDict</em></a><em>]</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>force_create_new_version</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.pull_prompt">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pull_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f-string'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.pull_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L103-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.pull_prompt" title="Link to this definition"></a></dt>
+<dd><p>Pull a prompt from the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>template_format</strong> (<em>Literal</em><em>[</em><em>'f-string'</em><em>, </em><em>'mustache'</em><em>, </em><em>'jinja2'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ChatPromptTemplate</em> | str | dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.apull_prompt">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">apull_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f-string'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.apull_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L113-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.apull_prompt" title="Link to this definition"></a></dt>
+<dd><p>Asynchronously run <cite>pull_prompt</cite> in a thread pool.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>template_format</strong> (<em>Literal</em><em>[</em><em>'f-string'</em><em>, </em><em>'mustache'</em><em>, </em><em>'jinja2'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ChatPromptTemplate</em> | str | dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.delete_prompt">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delete_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.delete_prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L122-L125"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.delete_prompt" title="Link to this definition"></a></dt>
+<dd><p>Delete a prompt from the observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.trace_context">
+<span class="sig-name descname"><span class="pre">trace_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.trace_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.trace_context" title="Link to this definition"></a></dt>
+<dd><p>Create an execution trace context.</p>
+<p>Subclasses provide platform-specific implementations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_id</strong> (<em>str</em>) – Run ID to use as trace ID.</p></li>
+<li><p><strong>**kwargs</strong> – Context parameters, such as <cite>user_id</cite> and <cite>input</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>None</cite> or a platform-specific context object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.update_trace">
+<span class="sig-name descname"><span class="pre">update_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/observability/base.html#BaseObservabilityPlatform.update_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/observability/base.py#L143-L149"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform.update_trace" title="Link to this definition"></a></dt>
+<dd><p>Set attributes on a trace from <cite>trace_context</cite>.</p>
+<p>Call this after the run to record output.
+Platforms without a trace object do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace</strong> (<em>Any</em>)</p></li>
+<li><p><strong>attributes</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.core.observability.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.core.observability package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.observability.empty.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.observability.empty module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

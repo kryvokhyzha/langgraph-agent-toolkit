@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LangGraph Agent Toolkit &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/index.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Run your first agent" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="#">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LangGraph Agent Toolkit</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/index.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="langgraph-agent-toolkit">
+<h1>LangGraph Agent Toolkit<a class="headerlink" href="#langgraph-agent-toolkit" title="Link to this heading"></a></h1>
+<p>Serve LangGraph agents through an authenticated HTTP API. Add streaming,
+persistent conversation history, managed model connections, and optional tools
+and observability. Use your own client or the included Streamlit interface.</p>
+<section id="start-here">
+<h2>Start here<a class="headerlink" href="#start-here" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Follow <a class="reference internal" href="quickstart.html"><span class="doc">Run your first agent</span></a> to run a local API without a model key.</p></li>
+<li><p>Follow <a class="reference internal" href="onboarding.html"><span class="doc">Application Onboarding</span></a> to integrate the toolkit into an application.</p></li>
+<li><p>Use <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> to choose an agent pattern and tool integration.</p></li>
+<li><p>Read <a class="reference internal" href="migration.html"><span class="doc">Migrate authentication and checkpoint storage</span></a> before upgrading an existing deployment to 0.10.x.</p></li>
+<li><p>Use <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> and <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> to configure a deployed service.</p></li>
+</ul>
+<p>The toolkit supports Python 3.11–3.14. Optional extras select providers,
+observability SDKs, MCP tools, Deep Agents, and the UI. See <a class="reference internal" href="installation.html"><span class="doc">Installation Options</span></a>.</p>
+<p>Memory has two scopes. <code class="docutils literal notranslate"><span class="pre">thread_id</span></code> identifies short-term conversation state.
+<code class="docutils literal notranslate"><span class="pre">user_id</span></code> identifies the user scope for long-term stores. Passing a user ID
+does not create a store. See <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a> and <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> for the contracts.</p>
+<p>The running service exposes its HTTP schema at <code class="docutils literal notranslate"><span class="pre">/docs</span></code> and <code class="docutils literal notranslate"><span class="pre">/openapi.json</span></code>.
+The generated reference below describes the Python package.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#prepare-a-fresh-checkout">Prepare a fresh checkout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#start-and-call-the-api">Start and call the API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#stream-and-read-history">Stream and read history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#use-the-python-client">Use the Python client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#add-the-optional-ui">Add the optional UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#select-a-real-model-or-another-agent">Select a real model or another agent</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#define-the-application-integration">1. Define the application integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#install-and-lock-the-required-dependencies">2. Install and lock the required dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#register-agents-and-define-resource-ownership">3. Register agents and define resource ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#set-identity-and-memory-contracts">4. Set identity and memory contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#connect-the-application-client">5. Connect the application client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#verify-the-application-before-production">6. Verify the application before production</a></li>
+<li class="toctree-l2"><a class="reference internal" href="onboarding.html#upgrade-existing-data-and-release">7. Upgrade existing data and release</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#provider-and-backend-extras">Provider and Backend Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#agent-integrations">Agent Integrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#ui-and-development-server">UI and Development Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#minimal-frontend-from-source">Minimal Frontend from Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#development-and-deployment">Development and Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#configuration-sources">Configuration sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#authentication-and-identity">Authentication and identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#model-providers">Model providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#named-model-configurations">Named model configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#persistence">Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#observability">Observability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment_setup.html#optional-compose-services">Optional Compose services</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#connect-to-a-running-service">Connect to a running service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#authentication-and-memory-identity">Authentication and memory identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#call-the-http-api">Call the HTTP API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#use-the-synchronous-client">Use the synchronous client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#stream-responses">Stream responses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#read-and-change-history">Read and change history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#interpret-metadata-and-failures">Interpret metadata and failures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#resume-a-conversation-in-the-ui">Resume a conversation in the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#register-a-custom-agent">Register a custom agent</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integrations.html#agent-patterns">Agent patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrations.html#concrete-use-cases">Concrete use cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrations.html#mcp-and-direct-tools">MCP and direct tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrations.html#memory-and-persistence">Memory and persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integrations.html#observe-and-test-the-selected-combination">Observe and test the selected combination</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#configure-an-http-server">Configure an HTTP server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#configure-a-local-process">Configure a local process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#select-agents-and-settings">Select agents and settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#resume-a-request-for-user-input">Resume a request for user input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#add-mcp-tools-to-a-custom-agent">Add MCP tools to a custom agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mcp.html#verify-a-deployment">Verify a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#run-the-example">Run the example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#use-the-http-service">Use the HTTP service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#what-it-adds">What it adds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#add-tools-and-subagents">Add tools and subagents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#advantages-and-tradeoffs">Advantages and tradeoffs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#memory-boundaries">Memory boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#tools-and-permissions">Tools and permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deepagents.html#operate-long-tasks">Operate long tasks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langfuse_compatibility.html#supported-combinations">Supported combinations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langfuse_compatibility.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langfuse_compatibility.html#adapter-behavior">Adapter behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="langfuse_compatibility.html#verification-and-server-upgrades">Verification and server upgrades</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#api-image-and-model-transport">API Image and Model Transport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#startup-and-worker-supervision">Startup and Worker Supervision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#postgresql-connection-budget">PostgreSQL Connection Budget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#conversation-ordering">Conversation Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#failure-and-retry-boundaries">Failure and Retry Boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#nested-calls-and-shutdown">Nested Calls and Shutdown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#client-and-azure-resource-cleanup">Client and Azure Resource Cleanup</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#choose-deployment-limits">Choose Deployment Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#checkpoint-persistence">Checkpoint Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#request-admission">Request Admission</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#managed-openai-and-azure-connections">Managed OpenAI and Azure Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#database-fault-handling">Database Fault Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#memory-coordination-and-library-responsibilities">Memory Coordination and Library Responsibilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reliability.html#capacity-planning-and-verification">Capacity Planning and Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#keep-the-two-memory-types-separate">Keep the two memory types separate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#choose-an-authentication-mode">Choose an authentication mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#authorize-feedback-from-token-users">Authorize feedback from token users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#update-clients-and-process-configuration">Update clients and process configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#check-existing-persistence">Check existing persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#prepare-the-migration">Prepare the migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#preview-and-apply">Preview and apply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#remove-inactive-conversation-history">Remove inactive conversation history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#provider-messages-and-stream-completion">Provider messages and stream completion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dependency_updates.html#changes-that-affect-this-package">Changes that affect this package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dependency_updates.html#install-and-verify">Install and verify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dependency_updates.html#python-3-14-and-ci-follow-up">Python 3.14 and CI follow-up</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="related_projects.html#projects-reviewed">Projects reviewed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_projects.html#requested-agent-service-toolkit-commits">Requested Agent Service Toolkit commits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_projects.html#corrections-from-this-review">Corrections from this review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_projects.html#recommended-next-work">Recommended next work</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+</div>
+</section>
+<section id="indices">
+<h2>Indices<a class="headerlink" href="#indices" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Run your first agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.agents.components.checkpoint.empty module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.agents.components.checkpoint.empty.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.agents.components.creators package" href="langgraph_agent_toolkit.agents.components.creators.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.agents.components.checkpoint package" href="langgraph_agent_toolkit.agents.components.checkpoint.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.agents.components.html">langgraph_agent_toolkit.agents.components package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.agents.components.checkpoint.html">langgraph_agent_toolkit.agents.components.checkpoint package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.agents.components.checkpoint.empty module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.agents.components.checkpoint.empty.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.agents.components.checkpoint.empty">
+<span id="langgraph-agent-toolkit-agents-components-checkpoint-empty-module"></span><h1>langgraph_agent_toolkit.agents.components.checkpoint.empty module<a class="headerlink" href="#module-langgraph_agent_toolkit.agents.components.checkpoint.empty" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.agents.components.checkpoint.empty.</span></span><span class="sig-name descname"><span class="pre">NoOpSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L15-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCheckpointSaver</span></code></p>
+<p>A <cite>BaseCheckpointSaver</cite> that does not persist checkpoints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serde</strong> (<em>SerializerProtocol</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L18-L19"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serde</strong> (<em>SerializerProtocol</em><em> | </em><em>None</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L21-L23"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>None</cite> because no checkpoint exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Checkpoint</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_tuple">
+<span class="sig-name descname"><span class="pre">get_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.get_tuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L25-L27"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.get_tuple" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>None</cite> because no checkpoint tuple exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>CheckpointTuple</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L29-L38"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.list" title="Link to this definition"></a></dt>
+<dd><p>Return an empty iterator because no checkpoints exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>filter</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>before</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>limit</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Iterator</em>[<em>CheckpointTuple</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_versions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L40-L57"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put" title="Link to this definition"></a></dt>
+<dd><p>Return a configuration with a generated checkpoint ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>checkpoint</strong> (<em>Checkpoint</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>CheckpointMetadata</em>)</p></li>
+<li><p><strong>new_versions</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em> | </em><em>int</em><em> | </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>RunnableConfig</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put_writes">
+<span class="sig-name descname"><span class="pre">put_writes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.put_writes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L59-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.put_writes" title="Link to this definition"></a></dt>
+<dd><p>Do not persist writes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>writes</strong> (<em>Sequence</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>task_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>task_path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L69-L71"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>None</cite> asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Checkpoint</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_tuple">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aget_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aget_tuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L73-L75"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aget_tuple" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>None</cite> asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>RunnableConfig</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>CheckpointTuple</em> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.alist">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">alist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.alist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L77-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.alist" title="Link to this definition"></a></dt>
+<dd><p>Return an empty iterator asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>filter</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>before</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>limit</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Iterator</em>[<em>CheckpointTuple</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_versions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L89-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput" title="Link to this definition"></a></dt>
+<dd><p>Return a configuration without persisting a checkpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>checkpoint</strong> (<em>Checkpoint</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>CheckpointMetadata</em>)</p></li>
+<li><p><strong>new_versions</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em> | </em><em>int</em><em> | </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>RunnableConfig</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput_writes">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aput_writes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/agents/components/checkpoint/empty.html#NoOpSaver.aput_writes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/components/checkpoint/empty.py#L99-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.agents.components.checkpoint.empty.NoOpSaver.aput_writes" title="Link to this definition"></a></dt>
+<dd><p>Do not persist writes asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<em>RunnableConfig</em>)</p></li>
+<li><p><strong>writes</strong> (<em>Sequence</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>task_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>task_path</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.agents.components.checkpoint.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.agents.components.checkpoint package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.agents.components.creators.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.agents.components.creators package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

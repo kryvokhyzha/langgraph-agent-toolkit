@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core package &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.memory package" href="langgraph_agent_toolkit.core.memory.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.client.client module" href="langgraph_agent_toolkit.client.client.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core">
+<span id="langgraph-agent-toolkit-core-package"></span><h1>langgraph_agent_toolkit.core package<a class="headerlink" href="#module-langgraph_agent_toolkit.core" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.html">langgraph_agent_toolkit.core.memory package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html">langgraph_agent_toolkit.core.memory.base module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html#langgraph_agent_toolkit.core.memory.base.BaseMemoryBackend"><code class="docutils literal notranslate"><span class="pre">BaseMemoryBackend</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html">langgraph_agent_toolkit.core.memory.concurrency module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationBusyError"><code class="docutils literal notranslate"><span class="pre">ConversationBusyError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.NestedConversationError"><code class="docutils literal notranslate"><span class="pre">NestedConversationError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationLockLostError"><code class="docutils literal notranslate"><span class="pre">ConversationLockLostError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">ConversationCoordinator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.SQLiteConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">SQLiteConversationCoordinator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">PostgresConversationCoordinator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.serialize_execution"><code class="docutils literal notranslate"><span class="pre">serialize_execution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html">langgraph_agent_toolkit.core.memory.coordinated_saver module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html#langgraph_agent_toolkit.core.memory.coordinated_saver.CoordinatedPostgresSaver"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresSaver</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html">langgraph_agent_toolkit.core.memory.coordinated_sqlite module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html#langgraph_agent_toolkit.core.memory.coordinated_sqlite.CoordinatedSqliteSaver"><code class="docutils literal notranslate"><span class="pre">CoordinatedSqliteSaver</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html">langgraph_agent_toolkit.core.memory.coordinated_store module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.factory.html">langgraph_agent_toolkit.core.memory.factory module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.factory.html#langgraph_agent_toolkit.core.memory.factory.MemoryFactory"><code class="docutils literal notranslate"><span class="pre">MemoryFactory</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html">langgraph_agent_toolkit.core.memory.migration module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry"><code class="docutils literal notranslate"><span class="pre">MigrationEntry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.load_manifest"><code class="docutils literal notranslate"><span class="pre">load_manifest()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_sqlite"><code class="docutils literal notranslate"><span class="pre">migrate_sqlite()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_postgres"><code class="docutils literal notranslate"><span class="pre">migrate_postgres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_sqlite"><code class="docutils literal notranslate"><span class="pre">retain_sqlite()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_postgres"><code class="docutils literal notranslate"><span class="pre">retain_postgres()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html">langgraph_agent_toolkit.core.memory.pool module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CancellableAsyncConnection"><code class="docutils literal notranslate"><span class="pre">CancellableAsyncConnection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CheckedAsyncConnectionPool"><code class="docutils literal notranslate"><span class="pre">CheckedAsyncConnectionPool</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html">langgraph_agent_toolkit.core.memory.postgres module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.schema_lock.html">langgraph_agent_toolkit.core.memory.schema_lock module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.schema_lock.html#langgraph_agent_toolkit.core.memory.schema_lock.schema_setup_lock"><code class="docutils literal notranslate"><span class="pre">schema_setup_lock()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html">langgraph_agent_toolkit.core.memory.sqlite module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html#langgraph_agent_toolkit.core.memory.sqlite.SQLiteMemoryBackend"><code class="docutils literal notranslate"><span class="pre">SQLiteMemoryBackend</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html">langgraph_agent_toolkit.core.memory.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html#langgraph_agent_toolkit.core.memory.types.MemoryBackends"><code class="docutils literal notranslate"><span class="pre">MemoryBackends</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.models.html">langgraph_agent_toolkit.core.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.models.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.models.chat_openai.html">langgraph_agent_toolkit.core.models.chat_openai module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.chat_openai.html#langgraph_agent_toolkit.core.models.chat_openai.AzureChatOpenAIPatched"><code class="docutils literal notranslate"><span class="pre">AzureChatOpenAIPatched</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.chat_openai.html#langgraph_agent_toolkit.core.models.chat_openai.ChatOpenAIPatched"><code class="docutils literal notranslate"><span class="pre">ChatOpenAIPatched</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.models.factory.html">langgraph_agent_toolkit.core.models.factory module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.factory.html#langgraph_agent_toolkit.core.models.factory.CompletionModelFactory"><code class="docutils literal notranslate"><span class="pre">CompletionModelFactory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.factory.html#langgraph_agent_toolkit.core.models.factory.EmbeddingModelFactory"><code class="docutils literal notranslate"><span class="pre">EmbeddingModelFactory</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.models.fake.html">langgraph_agent_toolkit.core.models.fake module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.fake.html#langgraph_agent_toolkit.core.models.fake.FakeToolModel"><code class="docutils literal notranslate"><span class="pre">FakeToolModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.models.transport.html">langgraph_agent_toolkit.core.models.transport module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportConfig"><code class="docutils literal notranslate"><span class="pre">LLMTransportConfig</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.LLMTransportManager"><code class="docutils literal notranslate"><span class="pre">LLMTransportManager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.current_llm_transport_manager"><code class="docutils literal notranslate"><span class="pre">current_llm_transport_manager()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.models.transport.html#langgraph_agent_toolkit.core.models.transport.configure_model_transport"><code class="docutils literal notranslate"><span class="pre">configure_model_transport()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.html">langgraph_agent_toolkit.core.observability package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html">langgraph_agent_toolkit.core.observability.base module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform"><code class="docutils literal notranslate"><span class="pre">BaseObservabilityPlatform</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.empty.html">langgraph_agent_toolkit.core.observability.empty module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.empty.html#langgraph_agent_toolkit.core.observability.empty.EmptyObservability"><code class="docutils literal notranslate"><span class="pre">EmptyObservability</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.factory.html">langgraph_agent_toolkit.core.observability.factory module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.factory.html#langgraph_agent_toolkit.core.observability.factory.ObservabilityFactory"><code class="docutils literal notranslate"><span class="pre">ObservabilityFactory</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.langfuse.html">langgraph_agent_toolkit.core.observability.langfuse module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability"><code class="docutils literal notranslate"><span class="pre">LangfuseObservability</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.langsmith.html">langgraph_agent_toolkit.core.observability.langsmith module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.langsmith.html#langgraph_agent_toolkit.core.observability.langsmith.LangsmithObservability"><code class="docutils literal notranslate"><span class="pre">LangsmithObservability</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html">langgraph_agent_toolkit.core.observability.types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ObservabilityBackend"><code class="docutils literal notranslate"><span class="pre">ObservabilityBackend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.MessageRole"><code class="docutils literal notranslate"><span class="pre">MessageRole</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ChatMessageDict"><code class="docutils literal notranslate"><span class="pre">ChatMessageDict</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.html">langgraph_agent_toolkit.core.prompts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.chat_prompt_template.html">langgraph_agent_toolkit.core.prompts.chat_prompt_template module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate"><code class="docutils literal notranslate"><span class="pre">ObservabilityChatPromptTemplate</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.prompt_manager.html">langgraph_agent_toolkit.core.prompts.prompt_manager module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.prompts.prompt_manager.html#langgraph_agent_toolkit.core.prompts.prompt_manager.PromptManager"><code class="docutils literal notranslate"><span class="pre">PromptManager</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.execution.html">langgraph_agent_toolkit.core.execution module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.execution.html#langgraph_agent_toolkit.core.execution.request_deadline_scope"><code class="docutils literal notranslate"><span class="pre">request_deadline_scope()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.execution.html#langgraph_agent_toolkit.core.execution.execution_timeout"><code class="docutils literal notranslate"><span class="pre">execution_timeout()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html">langgraph_agent_toolkit.core.mcp module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.model_config"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.transport"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.transport</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.url"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.command"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.args"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.headers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers_env"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.headers_env</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.env"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.env</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.env_env"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.env_env</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.mode"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.mode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.timeout"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.timeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.tool_allowlist"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.tool_allowlist</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.validate_transport"><code class="docutils literal notranslate"><span class="pre">MCPServerConfig.validate_transport()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.merge_tools"><code class="docutils literal notranslate"><span class="pre">merge_tools()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.load_mcp_tools"><code class="docutils literal notranslate"><span class="pre">load_mcp_tools()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.configure_mcp_agents"><code class="docutils literal notranslate"><span class="pre">configure_mcp_agents()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.settings.html">langgraph_agent_toolkit.core.settings module</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.client.client.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.client.client module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.memory.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.memory package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

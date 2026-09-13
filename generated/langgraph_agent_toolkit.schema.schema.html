@@ -1,0 +1,1271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.schema.schema module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.schema.schema.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.schema.task_data module" href="langgraph_agent_toolkit.schema.task_data.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.schema.models module" href="langgraph_agent_toolkit.schema.models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.schema.schema module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.schema.schema.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.schema.schema">
+<span id="langgraph-agent-toolkit-schema-schema-module"></span><h1>langgraph_agent_toolkit.schema.schema module<a class="headerlink" href="#module-langgraph_agent_toolkit.schema.schema" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AgentInfo">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">AgentInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#AgentInfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L13-L23"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AgentInfo" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Information about an available agent.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>description</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AgentInfo.key">
+<span class="sig-name descname"><span class="pre">key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AgentInfo.key" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AgentInfo.description">
+<span class="sig-name descname"><span class="pre">description</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AgentInfo.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AgentInfo.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AgentInfo.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ServiceMetadata">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ServiceMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">agents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ServiceMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L26-L35"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ServiceMetadata" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Service metadata, including available agents and models.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agents</strong> (<em>list</em><em>[</em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.AgentInfo" title="langgraph_agent_toolkit.schema.schema.AgentInfo"><em>AgentInfo</em></a><em>]</em>)</p></li>
+<li><p><strong>default_agent</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ServiceMetadata.agents">
+<span class="sig-name descname"><span class="pre">agents</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.AgentInfo" title="langgraph_agent_toolkit.schema.schema.AgentInfo"><span class="pre">AgentInfo</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ServiceMetadata.agents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ServiceMetadata.default_agent">
+<span class="sig-name descname"><span class="pre">default_agent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ServiceMetadata.default_agent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ServiceMetadata.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ServiceMetadata.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserComplexInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">UserComplexInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#UserComplexInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L38-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>User input for an agent with dynamic fields.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>extra_data</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserComplexInput.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserComplexInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'allow'}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">UserInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_config_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursion_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#UserInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L110-L163"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>User input for an agent.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput" title="langgraph_agent_toolkit.schema.schema.UserComplexInput"><em>UserComplexInput</em></a>)</p></li>
+<li><p><strong>model_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>model_provider</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>model_config_key</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>agent_config</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>recursion_limit</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.input">
+<span class="sig-name descname"><span class="pre">input</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput" title="langgraph_agent_toolkit.schema.schema.UserComplexInput"><span class="pre">UserComplexInput</span></a></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.model_name">
+<span class="sig-name descname"><span class="pre">model_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.model_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.model_provider">
+<span class="sig-name descname"><span class="pre">model_provider</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.model_provider" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.model_config_key">
+<span class="sig-name descname"><span class="pre">model_config_key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.model_config_key" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.agent_config">
+<span class="sig-name descname"><span class="pre">agent_config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.agent_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.recursion_limit">
+<span class="sig-name descname"><span class="pre">recursion_limit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.recursion_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UserInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UserInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">StreamInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_config_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursion_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#StreamInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L166-L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UserInput" title="langgraph_agent_toolkit.schema.schema.UserInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserInput</span></code></a></p>
+<p>User input for streaming an agent response.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UserComplexInput" title="langgraph_agent_toolkit.schema.schema.UserComplexInput"><em>UserComplexInput</em></a>)</p></li>
+<li><p><strong>model_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>model_provider</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>model_config_key</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>agent_config</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>recursion_limit</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>stream_tokens</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamInput.stream_tokens">
+<span class="sig-name descname"><span class="pre">stream_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamInput.stream_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ToolCall">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ToolCall</span></span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ToolCall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L175-L184"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ToolCall" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Tool call request.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ToolCall.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ToolCall.name" title="Link to this definition"></a></dt>
+<dd><p>Tool name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ToolCall.args">
+<span class="sig-name descname"><span class="pre">args</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ToolCall.args" title="Link to this definition"></a></dt>
+<dd><p>Tool call arguments.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ToolCall.id">
+<span class="sig-name descname"><span class="pre">id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ToolCall.id" title="Link to this definition"></a></dt>
+<dd><p>Tool call identifier.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ToolCall.type">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NotRequired</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool_call'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ToolCall.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">UsageMetadata</span></span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#UsageMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L187-L194"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Provider token counts in the LangChain usage format.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata.input_tokens">
+<span class="sig-name descname"><span class="pre">input_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata.input_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata.output_tokens">
+<span class="sig-name descname"><span class="pre">output_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata.output_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata.total_tokens">
+<span class="sig-name descname"><span class="pre">total_tokens</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata.total_tokens" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata.input_token_details">
+<span class="sig-name descname"><span class="pre">input_token_details</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NotRequired</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata.input_token_details" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.UsageMetadata.output_token_details">
+<span class="sig-name descname"><span class="pre">output_token_details</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">NotRequired</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata.output_token_details" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ChatMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_calls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_call_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedback_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ChatMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L197-L253"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Chat message.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>Literal</em><em>[</em><em>'human'</em><em>, </em><em>'ai'</em><em>, </em><em>'tool'</em><em>, </em><em>'custom'</em><em>]</em>)</p></li>
+<li><p><strong>content</strong> (<em>str</em><em> | </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>List</em><em>[</em><em>str</em><em> | </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>tool_calls</strong> (<em>list</em><em>[</em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ToolCall" title="langgraph_agent_toolkit.schema.schema.ToolCall"><em>ToolCall</em></a><em>]</em>)</p></li>
+<li><p><strong>tool_call_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>run_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>feedback_token</strong> (<em>Annotated</em><em>[</em><em>str</em><em> | </em><em>None</em><em>, </em><em>MaxLen</em><em>(</em><em>max_length=128</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>response_metadata</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>usage_metadata</strong> (<a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata" title="langgraph_agent_toolkit.schema.schema.UsageMetadata"><em>UsageMetadata</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>custom_data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.type">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'human'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ai'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'custom'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.content">
+<span class="sig-name descname"><span class="pre">content</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.tool_calls">
+<span class="sig-name descname"><span class="pre">tool_calls</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ToolCall" title="langgraph_agent_toolkit.schema.schema.ToolCall"><span class="pre">ToolCall</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.tool_calls" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.tool_call_id">
+<span class="sig-name descname"><span class="pre">tool_call_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.tool_call_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.run_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.feedback_token">
+<span class="sig-name descname"><span class="pre">feedback_token</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.feedback_token" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.response_metadata">
+<span class="sig-name descname"><span class="pre">response_metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.response_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.usage_metadata">
+<span class="sig-name descname"><span class="pre">usage_metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata" title="langgraph_agent_toolkit.schema.schema.UsageMetadata"><span class="pre">UsageMetadata</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.usage_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.custom_data">
+<span class="sig-name descname"><span class="pre">custom_data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.custom_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_repr">
+<span class="sig-name descname"><span class="pre">pretty_repr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ChatMessage.pretty_repr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L242-L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_repr" title="Link to this definition"></a></dt>
+<dd><p>Get a readable message representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_print">
+<span class="sig-name descname"><span class="pre">pretty_print</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ChatMessage.pretty_print"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L252-L253"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_print" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatMessage.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatMessage.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamChunk">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">StreamChunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#StreamChunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L256-L266"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamChunk" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>One JSON Lines (NDJSON) chunk from an agent stream.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">/stream/jsonl</span></code> endpoint emits one <cite>StreamChunk</cite> per line.
+<cite>type=”token”</cite> contains an incremental token string.
+<cite>type=”message”</cite> contains a complete <cite>ChatMessage</cite>.
+<cite>type=”error”</cite> contains an error description string.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>Literal</em><em>[</em><em>'token'</em><em>, </em><em>'message'</em><em>, </em><em>'error'</em><em>]</em>)</p></li>
+<li><p><strong>content</strong> (<em>str</em><em> | </em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ChatMessage" title="langgraph_agent_toolkit.schema.schema.ChatMessage"><em>ChatMessage</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamChunk.type">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'token'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'message'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'error'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamChunk.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamChunk.content">
+<span class="sig-name descname"><span class="pre">content</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ChatMessage" title="langgraph_agent_toolkit.schema.schema.ChatMessage"><span class="pre">ChatMessage</span></a></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamChunk.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StreamChunk.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StreamChunk.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ErrorResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ErrorResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ErrorResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L269-L273"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ErrorResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Standard error response from service exception handlers.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detail</strong> (<em>str</em>)</p></li>
+<li><p><strong>error_code</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ErrorResponse.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ErrorResponse.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ErrorResponse.error_code">
+<span class="sig-name descname"><span class="pre">error_code</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ErrorResponse.error_code" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ErrorResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ErrorResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">Feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedback_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#Feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L276-L305"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Feedback for the configured observability platform.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>feedback_token</strong> (<em>Annotated</em><em>[</em><em>str</em><em> | </em><em>None</em><em>, </em><em>MaxLen</em><em>(</em><em>max_length=128</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>key</strong> (<em>str</em>)</p></li>
+<li><p><strong>score</strong> (<em>float</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.run_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.feedback_token">
+<span class="sig-name descname"><span class="pre">feedback_token</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.feedback_token" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.key">
+<span class="sig-name descname"><span class="pre">key</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.key" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.Feedback.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.Feedback.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.FeedbackResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">FeedbackResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'success'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Feedback</span> <span class="pre">recorded</span> <span class="pre">successfully.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#FeedbackResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L308-L319"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.FeedbackResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response after feedback is recorded.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'success'</em><em>]</em>)</p></li>
+<li><p><strong>run_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.FeedbackResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'success'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.FeedbackResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.FeedbackResponse.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.FeedbackResponse.run_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.FeedbackResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.FeedbackResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.FeedbackResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.FeedbackResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">MessageInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_call_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_calls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#MessageInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L322-L350"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Input for a chat history message.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> (<em>Literal</em><em>[</em><em>'human'</em><em>, </em><em>'ai'</em><em>, </em><em>'tool'</em><em>, </em><em>'custom'</em><em>]</em>)</p></li>
+<li><p><strong>content</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>custom_data</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>tool_call_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>tool_calls</strong> (<em>list</em><em>[</em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ToolCall" title="langgraph_agent_toolkit.schema.schema.ToolCall"><em>ToolCall</em></a><em>]</em>)</p></li>
+<li><p><strong>usage_metadata</strong> (<a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata" title="langgraph_agent_toolkit.schema.schema.UsageMetadata"><em>UsageMetadata</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>response_metadata</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.type">
+<span class="sig-name descname"><span class="pre">type</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'human'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ai'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'custom'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.content">
+<span class="sig-name descname"><span class="pre">content</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.custom_data">
+<span class="sig-name descname"><span class="pre">custom_data</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.custom_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.tool_call_id">
+<span class="sig-name descname"><span class="pre">tool_call_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.tool_call_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.tool_calls">
+<span class="sig-name descname"><span class="pre">tool_calls</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ToolCall" title="langgraph_agent_toolkit.schema.schema.ToolCall"><span class="pre">ToolCall</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.tool_calls" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.usage_metadata">
+<span class="sig-name descname"><span class="pre">usage_metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.UsageMetadata" title="langgraph_agent_toolkit.schema.schema.UsageMetadata"><span class="pre">UsageMetadata</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.usage_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.response_metadata">
+<span class="sig-name descname"><span class="pre">response_metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.response_metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.validate_tool_message">
+<span class="sig-name descname"><span class="pre">validate_tool_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#MessageInput.validate_tool_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L339-L350"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.validate_tool_message" title="Link to this definition"></a></dt>
+<dd><p>Require the call ID for tool responses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.MessageInput" title="langgraph_agent_toolkit.schema.schema.MessageInput"><em>MessageInput</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.MessageInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.MessageInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">AddMessagesInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#AddMessagesInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L353-L380"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Input for adding chat history messages.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.MessageInput" title="langgraph_agent_toolkit.schema.schema.MessageInput"><em>MessageInput</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesInput.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesInput.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesInput.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesInput.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesInput.messages">
+<span class="sig-name descname"><span class="pre">messages</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.MessageInput" title="langgraph_agent_toolkit.schema.schema.MessageInput"><span class="pre">MessageInput</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesInput.messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">AddMessagesResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'success'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Messages</span> <span class="pre">added</span> <span class="pre">successfully.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#AddMessagesResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L383-L400"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response after chat history messages are added.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'success'</em><em>]</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'success'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.AddMessagesResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ClearHistoryInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ClearHistoryInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L403-L415"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Input for clearing one thread’s checkpoints without changing long-term memory.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryInput.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryInput.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ClearHistoryResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'success'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Messages</span> <span class="pre">cleared</span> <span class="pre">successfully.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ClearHistoryResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L418-L435"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response after chat history messages are cleared.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'success'</em><em>]</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'success'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ChatHistoryInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ChatHistoryInput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L438-L452"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Input for retrieving chat history.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_id</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>offset</strong> (<em>Annotated</em><em>[</em><em>int</em><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>limit</strong> (<em>Annotated</em><em>[</em><em>int</em><em>, </em><em>Ge</em><em>(</em><em>ge=1</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1000</em><em>)</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.offset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput.limit">
+<span class="sig-name descname"><span class="pre">limit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistoryInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistory">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ChatHistory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ChatHistory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L455-L458"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>list</em><em>[</em><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ChatMessage" title="langgraph_agent_toolkit.schema.schema.ChatMessage"><em>ChatMessage</em></a><em>]</em>)</p></li>
+<li><p><strong>next_offset</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>total</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistory.messages">
+<span class="sig-name descname"><span class="pre">messages</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#langgraph_agent_toolkit.schema.schema.ChatMessage" title="langgraph_agent_toolkit.schema.schema.ChatMessage"><span class="pre">ChatMessage</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistory.messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistory.next_offset">
+<span class="sig-name descname"><span class="pre">next_offset</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistory.next_offset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistory.total">
+<span class="sig-name descname"><span class="pre">total</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistory.total" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ChatHistory.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ChatHistory.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.HealthCheck">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">HealthCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#HealthCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L461-L473"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.HealthCheck" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response model for a health check.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> (<em>str</em>)</p></li>
+<li><p><strong>version</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.HealthCheck.content">
+<span class="sig-name descname"><span class="pre">content</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.HealthCheck.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.HealthCheck.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.HealthCheck.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.HealthCheck.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.HealthCheck.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.LivenessResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">LivenessResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#LivenessResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L476-L486"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.LivenessResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response model for a liveness probe.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'alive'</em><em>, </em><em>'unhealthy'</em><em>]</em>)</p></li>
+<li><p><strong>version</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.LivenessResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'alive'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'unhealthy'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.LivenessResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.LivenessResponse.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.LivenessResponse.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.LivenessResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.LivenessResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">ReadinessResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_agents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#ReadinessResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L489-L509"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response model for a readiness probe.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'ready'</em><em>, </em><em>'not_ready'</em><em>]</em>)</p></li>
+<li><p><strong>version</strong> (<em>str</em>)</p></li>
+<li><p><strong>initialized_agents</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ready'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'not_ready'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse.initialized_agents">
+<span class="sig-name descname"><span class="pre">initialized_agents</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse.initialized_agents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.ReadinessResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.ReadinessResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StartupResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">StartupResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#StartupResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L512-L527"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StartupResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response model for a startup probe.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'started'</em><em>, </em><em>'starting'</em><em>]</em>)</p></li>
+<li><p><strong>version</strong> (<em>str</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StartupResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'started'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'starting'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StartupResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StartupResponse.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StartupResponse.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StartupResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StartupResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.StartupResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.StartupResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.schema.schema.</span></span><span class="sig-name descname"><span class="pre">DatabaseHealthResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_available</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requests_waiting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connections_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/schema/schema.html#DatabaseHealthResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/schema/schema.py#L530-L556"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Response model for a database health check.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>Literal</em><em>[</em><em>'healthy'</em><em>, </em><em>'exhausted'</em><em>, </em><em>'no_pool'</em><em>, </em><em>'error'</em><em>]</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pool_size</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pool_available</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>requests_waiting</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>connections_num</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'healthy'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exhausted'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'no_pool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'error'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_size">
+<span class="sig-name descname"><span class="pre">pool_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_available">
+<span class="sig-name descname"><span class="pre">pool_available</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_available" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.requests_waiting">
+<span class="sig-name descname"><span class="pre">requests_waiting</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.requests_waiting" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.connections_num">
+<span class="sig-name descname"><span class="pre">connections_num</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.connections_num" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.schema.models.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.schema.models module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.schema.task_data.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.schema.task_data module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.mcp module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.mcp.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.settings module" href="langgraph_agent_toolkit.core.settings.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.core.execution module" href="langgraph_agent_toolkit.core.execution.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.mcp module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.mcp.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core.mcp">
+<span id="langgraph-agent-toolkit-core-mcp-module"></span><h1>langgraph_agent_toolkit.core.mcp module<a class="headerlink" href="#module-langgraph_agent_toolkit.core.mcp" title="Link to this heading"></a></h1>
+<p>Configure MCP tools without importing the optional client at module load.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.mcp.</span></span><span class="sig-name descname"><span class="pre">MCPServerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'http'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_allowlist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/mcp.html#MCPServerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/mcp.py#L25-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Describe one operator-configured MCP server and its credentials.</p>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transport</strong> (<em>Literal</em><em>[</em><em>'http'</em><em>, </em><em>'stdio'</em><em>]</em>)</p></li>
+<li><p><strong>url</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>command</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>args</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>headers</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>SecretStr</em><em>]</em>)</p></li>
+<li><p><strong>headers_env</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>env</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>SecretStr</em><em>]</em>)</p></li>
+<li><p><strong>env_env</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>'auto'</em><em>, </em><em>'legacy'</em><em>]</em>)</p></li>
+<li><p><strong>timeout</strong> (<em>Annotated</em><em>[</em><em>float</em><em>, </em><em>Gt</em><em>(</em><em>gt=0</em><em>)</em><em>, </em><em>_PydanticGeneralMetadata</em><em>(</em><em>allow_inf_nan=False</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>tool_allowlist</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'hide_input_in_errors':</span> <span class="pre">True}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.transport">
+<span class="sig-name descname"><span class="pre">transport</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'http'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'stdio'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.transport" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.url">
+<span class="sig-name descname"><span class="pre">url</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.command">
+<span class="sig-name descname"><span class="pre">command</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.command" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.args">
+<span class="sig-name descname"><span class="pre">args</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers">
+<span class="sig-name descname"><span class="pre">headers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers_env">
+<span class="sig-name descname"><span class="pre">headers_env</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.headers_env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.env">
+<span class="sig-name descname"><span class="pre">env</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.env_env">
+<span class="sig-name descname"><span class="pre">env_env</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.env_env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.mode">
+<span class="sig-name descname"><span class="pre">mode</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'auto'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'legacy'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.timeout">
+<span class="sig-name descname"><span class="pre">timeout</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.timeout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.tool_allowlist">
+<span class="sig-name descname"><span class="pre">tool_allowlist</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.tool_allowlist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.MCPServerConfig.validate_transport">
+<span class="sig-name descname"><span class="pre">validate_transport</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/mcp.html#MCPServerConfig.validate_transport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/mcp.py#L42-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig.validate_transport" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig" title="langgraph_agent_toolkit.core.mcp.MCPServerConfig"><em>MCPServerConfig</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.merge_tools">
+<span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.mcp.</span></span><span class="sig-name descname"><span class="pre">merge_tools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_tools</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_tools</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/mcp.html#merge_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/mcp.py#L70-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.merge_tools" title="Link to this definition"></a></dt>
+<dd><p>Reject duplicate names before a graph can replace a tool silently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_tools</strong> (<em>Sequence</em><em>[</em><em>BaseTool</em><em>]</em>)</p></li>
+<li><p><strong>extra_tools</strong> (<em>Sequence</em><em>[</em><em>BaseTool</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[BaseTool]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.load_mcp_tools">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.mcp.</span></span><span class="sig-name descname"><span class="pre">load_mcp_tools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">servers</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">discovery_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/mcp.html#load_mcp_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/mcp.py#L111-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.load_mcp_tools" title="Link to this definition"></a></dt>
+<dd><p>Discover namespaced tools. Each tool opens and closes its own connection context.</p>
+<p>The SDK can share a connection between overlapping calls. No connection stays
+open after the last call exits. Restart the worker to refresh tool schemas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>servers</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="#langgraph_agent_toolkit.core.mcp.MCPServerConfig" title="langgraph_agent_toolkit.core.mcp.MCPServerConfig"><em>MCPServerConfig</em></a><em>]</em>)</p></li>
+<li><p><strong>discovery_timeout</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, list[BaseTool]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.mcp.configure_mcp_agents">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.mcp.</span></span><span class="sig-name descname"><span class="pre">configure_mcp_agents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">executor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebuild_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/mcp.html#configure_mcp_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/mcp.py#L164-L197"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.mcp.configure_mcp_agents" title="Link to this definition"></a></dt>
+<dd><p>Build MCP graphs and optionally refresh all graphs for a new service lifespan.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executor</strong> (<a class="reference internal" href="langgraph_agent_toolkit.agents.agent_executor.html#langgraph_agent_toolkit.agents.agent_executor.AgentExecutor" title="langgraph_agent_toolkit.agents.agent_executor.AgentExecutor"><em>AgentExecutor</em></a>)</p></li>
+<li><p><strong>settings</strong> (<em>Settings</em>)</p></li>
+<li><p><strong>rebuild_all</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.core.execution.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.core.execution module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.settings.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.settings module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

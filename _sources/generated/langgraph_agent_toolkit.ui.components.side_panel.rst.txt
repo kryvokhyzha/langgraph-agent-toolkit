@@ -1,0 +1,7 @@
+langgraph\_agent\_toolkit.ui.components.side\_panel module
+==========================================================
+
+.. automodule:: langgraph_agent_toolkit.ui.components.side_panel
+   :members:
+   :show-inheritance:
+   :undoc-members:

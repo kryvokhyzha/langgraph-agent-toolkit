@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migrate authentication and checkpoint storage &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/migration.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Dependency update review" href="dependency_updates.html" />
+    <link rel="prev" title="Connections and High Traffic" href="reliability.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Migrate authentication and checkpoint storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#keep-the-two-memory-types-separate">Keep the two memory types separate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#choose-an-authentication-mode">Choose an authentication mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#optional-mode-for-direct-user-access">Optional mode for direct user access</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#authorize-feedback-from-token-users">Authorize feedback from token users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update-clients-and-process-configuration">Update clients and process configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-existing-persistence">Check existing persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prepare-the-migration">Prepare the migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preview-and-apply">Preview and apply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remove-inactive-conversation-history">Remove inactive conversation history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#provider-messages-and-stream-completion">Provider messages and stream completion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Migrate authentication and checkpoint storage</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/migration.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="migrate-authentication-and-checkpoint-storage">
+<h1>Migrate authentication and checkpoint storage<a class="headerlink" href="#migrate-authentication-and-checkpoint-storage" title="Link to this heading"></a></h1>
+<p>This release binds each stored conversation to a user and an agent. The public
+<code class="docutils literal notranslate"><span class="pre">thread_id</span></code> can stay the same. The database uses a new <code class="docutils literal notranslate"><span class="pre">lat:v1:</span></code> storage key.
+Existing raw thread IDs need an explicit migration before the service can read
+them through the new API.</p>
+<section id="keep-the-two-memory-types-separate">
+<h2>Keep the two memory types separate<a class="headerlink" href="#keep-the-two-memory-types-separate" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">thread_id</span></code> selects short-term memory: the messages and graph state of one
+conversation. A checkpointer stores this state. <code class="docutils literal notranslate"><span class="pre">user_id</span></code> identifies the user
+whose long-term memories can be shared across conversations in a separate store.
+This follows the <a class="reference external" href="https://docs.langchain.com/oss/python/concepts/memory">LangGraph memory model</a>.</p>
+<p>For example, requests with <code class="docutils literal notranslate"><span class="pre">user_id=&quot;user-1&quot;</span></code> and different thread IDs have
+separate conversation histories. An agent can share that user’s saved preferences
+through a store namespace such as <code class="docutils literal notranslate"><span class="pre">(&quot;users&quot;,</span> <span class="pre">&quot;user-1&quot;,</span> <span class="pre">&quot;memories&quot;)</span></code>. Do not
+include <code class="docutils literal notranslate"><span class="pre">thread_id</span></code> in that namespace when memories must span conversations.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">lat:v1:</span></code> key scopes checkpoint access to the user, agent, and thread.
+It does not merge the two memory types or change the user ID passed to the agent.
+The agent still receives the stable ID in <code class="docutils literal notranslate"><span class="pre">config[&quot;configurable&quot;][&quot;user_id&quot;]</span></code>.
+Custom agents retain their configured store.</p>
+<p>History reads, additions, and clearing operate on short-term checkpoints only.
+They require a <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>. Clearing one conversation does not delete the user’s
+long-term memories. The migration and retention commands below also affect only
+checkpoint tables. They do not rename user IDs or change long-term store namespaces.</p>
+<p>The service initializes its configured checkpointer. Long-term memory requires
+an agent with a configured store and explicit logic to read and write memories.
+Supplying <code class="docutils literal notranslate"><span class="pre">user_id</span></code> alone does not create a memory store. The PostgreSQL backend
+exposes <code class="docutils literal notranslate"><span class="pre">get_memory_store()</span></code> for this use. The SQLite backend provides checkpoints
+only. Keep a custom store and its connections open for the lifetime of its agents.</p>
+</section>
+<section id="choose-an-authentication-mode">
+<h2>Choose an authentication mode<a class="headerlink" href="#choose-an-authentication-mode" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">AUTH_MODE</span></code> is an API worker environment setting. Do not add it to REST
+request bodies or headers. The code default is <code class="docutils literal notranslate"><span class="pre">trusted</span></code>. This preserves
+0.9.2 shared bearer-token authentication. The example <code class="docutils literal notranslate"><span class="pre">.env</span></code> uses the same
+mode. An existing deployment can keep only its shared <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code>.</p>
+<p>For a separate deployment for each client, keep one shared bearer token. The
+client’s trusted application can supply user IDs for the users it serves:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AUTH_MODE</span><span class="o">=</span><span class="n">trusted</span>
+<span class="n">AUTH_SECRET</span><span class="o">=</span><span class="n">CHANGE_ME</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">CHANGE_ME</span></code> with your deployment secret. Set <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> in the
+shell that runs curl. No per-user token list is required. <code class="docutils literal notranslate"><span class="pre">user_id</span></code> remains
+optional. This request works before and after the upgrade:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span><span class="n">chatbot</span><span class="o">-</span><span class="n">agent</span><span class="o">/</span><span class="n">invoke</span> \
+  <span class="o">-</span><span class="n">H</span> <span class="s2">&quot;Authorization: Bearer $</span><span class="si">{AUTH_SECRET}</span><span class="s2">&quot;</span> \
+  <span class="o">-</span><span class="n">H</span> <span class="s1">&#39;Content-Type: application/json&#39;</span> \
+  <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;input&quot;:{&quot;message&quot;:&quot;Hello&quot;},&quot;thread_id&quot;:&quot;conversation-1&quot;}&#39;</span>
+</pre></div>
+</div>
+<p>To select a user’s memory identity, the trusted application can still supply
+<code class="docutils literal notranslate"><span class="pre">&quot;user_id&quot;:&quot;user-1&quot;</span></code> in the same JSON body.</p>
+<p>The shared token authorizes that client application to supply <code class="docutils literal notranslate"><span class="pre">user_id</span></code>. The
+service scopes each stored conversation by user, agent, and public thread ID.
+Every request for the same conversation must use the same user and agent IDs.
+If <code class="docutils literal notranslate"><span class="pre">user_id</span></code> is omitted, the service uses <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code> (default:
+<code class="docutils literal notranslate"><span class="pre">service</span></code>). Do not switch between omitted and explicit IDs for one conversation.
+Use a separate database or PostgreSQL schema for each client deployment. Process
+isolation alone does not isolate deployments that share checkpoint tables.</p>
+<p>If the deployment explicitly sets <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=token</span></code>, remove that override or
+set it to <code class="docutils literal notranslate"><span class="pre">trusted</span></code> on every worker. An explicit value takes precedence over
+the default. The new storage keys still require the database migration below.
+Keep the shared token inside the trusted client application. Possession of
+this token grants access to all user identities in that deployment.</p>
+<section id="optional-mode-for-direct-user-access">
+<h3>Optional mode for direct user access<a class="headerlink" href="#optional-mode-for-direct-user-access" title="Link to this heading"></a></h3>
+<p>If untrusted users connect directly to the API, use individual tokens instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AUTH_MODE</span><span class="o">=</span><span class="n">token</span>
+<span class="n">AUTH_USERS</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user-1&quot;</span><span class="p">:</span><span class="s2">&quot;replace-with-user-token&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The server derives the user from that token. A supplied <code class="docutils literal notranslate"><span class="pre">user_id</span></code> must match.
+<code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> in token mode identifies only <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code>; it does
+not authorize arbitrary user IDs. Individual <code class="docutils literal notranslate"><span class="pre">AUTH_USERS</span></code> tokens keep these
+restrictions even when a deployment enables trusted mode.</p>
+<p>Production startup requires configured credentials. Unauthenticated operation
+is limited to development mode.</p>
+</section>
+</section>
+<section id="authorize-feedback-from-token-users">
+<h2>Authorize feedback from token users<a class="headerlink" href="#authorize-feedback-from-token-users" title="Link to this heading"></a></h2>
+<p>Earlier feedback requests authenticated the caller but did not verify the
+owner of <code class="docutils literal notranslate"><span class="pre">run_id</span></code>. Token users now need a <code class="docutils literal notranslate"><span class="pre">feedback_token</span></code> from the
+corresponding invoke, SSE, or JSON Lines response. The proof binds the user,
+agent, and run. Submit feedback to that same agent.</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">FEEDBACK_SIGNING_SECRET</span></code> to a separate random value with at least 32
+characters. Store it only on the server. Do not use <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> or an
+<code class="docutils literal notranslate"><span class="pre">AUTH_USERS</span></code> bearer token: callers know those values and could forge proof.
+Use the same signing secret across workers, replicas, and restarts.
+Use a different signing secret for each client deployment.
+Changing the signing secret invalidates previously issued feedback tokens.</p>
+<p>This requirement applies to every non-trusted principal. It includes
+<code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> in token mode and <code class="docutils literal notranslate"><span class="pre">AUTH_USERS</span></code> tokens in either mode.
+The shared <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> with <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> keeps its existing
+feedback request shape and does not require a signing secret.</p>
+<p>Before this change, a token user could send:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;run_id&quot;</span><span class="p">:</span><span class="s2">&quot;returned-run-id&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;quality&quot;</span><span class="p">,</span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="mf">1.0</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>After this change, the token user sends the proof returned with that run:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;run_id&quot;</span><span class="p">:</span><span class="s2">&quot;returned-run-id&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;quality&quot;</span><span class="p">,</span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="mf">1.0</span><span class="p">,</span><span class="nt">&quot;feedback_token&quot;</span><span class="p">:</span><span class="s2">&quot;returned-feedback-token&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>With the Python client:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reply</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello&quot;</span><span class="p">},</span> <span class="n">thread_id</span><span class="o">=</span><span class="s2">&quot;conversation-1&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">create_feedback</span><span class="p">(</span>
+    <span class="n">run_id</span><span class="o">=</span><span class="n">reply</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span>
+    <span class="n">key</span><span class="o">=</span><span class="s2">&quot;quality&quot;</span><span class="p">,</span>
+    <span class="n">score</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">feedback_token</span><span class="o">=</span><span class="n">reply</span><span class="o">.</span><span class="n">feedback_token</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The client does not cache proof. Pass it explicitly to <code class="docutils literal notranslate"><span class="pre">create_feedback()</span></code>
+or <code class="docutils literal notranslate"><span class="pre">acreate_feedback()</span></code>. The included UI sends it from the generated message.
+A missing server secret returns 503 for token-user feedback. Missing, altered,
+or mismatched proof returns 403. Invocation and streaming still work when the
+signing secret is unset.</p>
+<p>Saved history and imported messages do not receive new feedback proof. Old
+responses without proof cannot authorize token-user feedback. Keep the proof
+with a response if feedback must be submitted later. A trusted backend can
+continue its existing feedback flow. Feedback <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> cannot override the
+target run, user, trace, observation, or provider record ID. Comments and
+ordinary metadata remain supported.</p>
+</section>
+<section id="update-clients-and-process-configuration">
+<h2>Update clients and process configuration<a class="headerlink" href="#update-clients-and-process-configuration" title="Link to this heading"></a></h2>
+<p>The endpoint paths and HTTP methods remain available. This does not mean that
+all 0.9.2 behavior is unchanged. Trusted mode preserves the shared-token invoke,
+stream, and ordinary feedback request shapes. It does not disable the history,
+validation, error-handling, or storage changes below.</p>
+<p>The following changes require a client review before deployment:</p>
+<ul class="simple">
+<li><p>Supply <code class="docutils literal notranslate"><span class="pre">thread_id</span></code> for history reads, message additions, and history clearing.
+A user ID alone no longer selects a conversation. Use the same agent ID that
+owns the conversation.</p></li>
+<li><p>Invocation can create a public thread ID when the request omits it. Save the
+<code class="docutils literal notranslate"><span class="pre">thread_id</span></code> from the response and send it with subsequent requests.</p></li>
+<li><p>History reads return a page of 100 messages by default. Use <code class="docutils literal notranslate"><span class="pre">offset</span></code> and
+<code class="docutils literal notranslate"><span class="pre">limit</span></code> to read later pages. The maximum limit is 1000, or the smaller value
+set by <code class="docutils literal notranslate"><span class="pre">HISTORY_MAX_PAGE_SIZE</span></code>. Continue with <code class="docutils literal notranslate"><span class="pre">next_offset</span></code> until it is null.</p></li>
+<li><p>Clearing history deletes all stored checkpoint versions and pending writes
+for the selected conversation. It does not only empty the latest message list.
+Back up data that must remain available.</p></li>
+<li><p>SSE and JSON Lines error events raise <code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> in the client.
+Handle this exception separately from model text. Do not store an error event
+as an assistant reply.</p></li>
+</ul>
+<p>The default <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> keeps the existing trusted-backend request
+shape. The included Streamlit UI is suitable for a single-user or private
+deployment. It does not provide a multiuser login system.
+Do not use one backend token as a substitute for user authentication in a public
+Streamlit deployment.</p>
+<p>ASGI workers have separate process state. Set authentication and other settings
+for every worker before it imports the service. A Python setting changed in one
+process does not update the other processes. The service factory validates
+<code class="docutils literal notranslate"><span class="pre">custom_settings</span></code> values before it starts a backend. Use the same configuration
+for all workers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">CHECKPOINT_DURABILITY</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">sync</span></code>. Each checkpoint must finish
+before the next graph step starts. Database calls still use async methods.
+An explicit <code class="docutils literal notranslate"><span class="pre">async</span></code> override keeps overlapping saves and graph steps. Remove
+that override or set it to <code class="docutils literal notranslate"><span class="pre">sync</span></code> to use the new default. Both modes report
+write errors. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for recovery limits and tuning guidance.</p>
+</section>
+<section id="check-existing-persistence">
+<h2>Check existing persistence<a class="headerlink" href="#check-existing-persistence" title="Link to this heading"></a></h2>
+<p>The migration can move only checkpoints that exist in the selected database.
+Earlier built-in agents with <code class="docutils literal notranslate"><span class="pre">MemorySaver</span></code> kept state inside each worker even
+when a service database was configured. Those checkpoints cannot be recovered
+from the database after the worker stops. Export any required live history before
+shutdown. Importing messages does not reconstruct pending tools or interrupted
+subgraphs. Plan those runs separately before upgrading.</p>
+</section>
+<section id="prepare-the-migration">
+<h2>Prepare the migration<a class="headerlink" href="#prepare-the-migration" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Stop every service worker and background job that can write checkpoints.
+Do not run old and new workers against the database at the same time.</p></li>
+<li><p>Back up the database. For SQLite, use the SQLite backup API or stop all
+connections before copying the database and any required WAL files. Verify
+that you can restore the backup.</p></li>
+<li><p>Create a JSON manifest. Use the actual owner and agent for each conversation.
+The migration does not infer ownership from checkpoint content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;old_thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;conversation-1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="s2">&quot;alice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="s2">&quot;chatbot-agent&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;old_thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;legacy-conversation-2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="s2">&quot;chatbot-agent&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;conversation-2&quot;</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">thread_id</span></code> is the public ID after migration. If you omit it, the public ID is
+<code class="docutils literal notranslate"><span class="pre">old_thread_id</span></code>. Each source must have checkpoints. A source cannot map to more
+than one owner or agent. Duplicate destinations, existing destination rows, and
+overlapping source and destination IDs cause the whole operation to fail.</p>
+</section>
+<section id="preview-and-apply">
+<h2>Preview and apply<a class="headerlink" href="#preview-and-apply" title="Link to this heading"></a></h2>
+<p>The command performs a dry run unless you set <code class="docutils literal notranslate"><span class="pre">--apply=true</span></code>. The report shows
+the mappings and row counts. It does not print checkpoint content or database
+credentials.</p>
+<p>Preview SQLite migration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">langgraph_agent_toolkit</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">migration</span> \
+  <span class="o">--</span><span class="n">backend</span><span class="o">=</span><span class="n">sqlite</span> <span class="o">--</span><span class="n">sqlite</span><span class="o">-</span><span class="n">path</span><span class="o">=</span><span class="n">checkpoints</span><span class="o">.</span><span class="n">db</span> <span class="o">--</span><span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>Review the report. Apply the same manifest while all workers remain stopped:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">langgraph_agent_toolkit</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">migration</span> \
+  <span class="o">--</span><span class="n">backend</span><span class="o">=</span><span class="n">sqlite</span> <span class="o">--</span><span class="n">sqlite</span><span class="o">-</span><span class="n">path</span><span class="o">=</span><span class="n">checkpoints</span><span class="o">.</span><span class="n">db</span> <span class="o">--</span><span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="o">.</span><span class="n">json</span> \
+  <span class="o">--</span><span class="n">apply</span><span class="o">=</span><span class="n">true</span>
+</pre></div>
+</div>
+<p>For PostgreSQL, put a libpq connection string in an environment variable through
+your normal secret management process. Do not put a password in command arguments.
+The default variable name is <code class="docutils literal notranslate"><span class="pre">DATABASE_URL</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">langgraph_agent_toolkit</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">migration</span> \
+  <span class="o">--</span><span class="n">backend</span><span class="o">=</span><span class="n">postgres</span> <span class="o">--</span><span class="n">postgres</span><span class="o">-</span><span class="n">env</span><span class="o">=</span><span class="n">DATABASE_URL</span> <span class="o">--</span><span class="n">schema</span><span class="o">=</span><span class="n">public</span> \
+  <span class="o">--</span><span class="n">manifest</span><span class="o">=</span><span class="n">manifest</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">--apply=true</span></code> only after you review the dry run. Set <code class="docutils literal notranslate"><span class="pre">--schema</span></code> to the
+schema that the checkpoint saver uses.</p>
+<p>Each apply operation validates the current database again. It runs in one
+transaction. SQLite updates <code class="docutils literal notranslate"><span class="pre">checkpoints</span></code> and <code class="docutils literal notranslate"><span class="pre">writes</span></code>. PostgreSQL updates
+<code class="docutils literal notranslate"><span class="pre">checkpoints</span></code>, <code class="docutils literal notranslate"><span class="pre">checkpoint_blobs</span></code>, and <code class="docutils literal notranslate"><span class="pre">checkpoint_writes</span></code>. All checkpoint
+namespaces move together. Missing write tables are permitted for older schemas.
+The checkpoint table is required. PostgreSQL also requires the blob table.
+Other missing tables or SQL errors are not ignored.</p>
+<p>After the transaction commits, start only the new workers. Verify a migrated
+conversation through its original public ID and the correct user identity. Use
+the shared deployment token in trusted mode. Verify that a different user ID
+selects a separate conversation. Keep the backup until validation is complete.
+For rollback, stop all workers and restore the verified backup. Do not attempt
+to repair ownership by editing storage hashes manually.</p>
+</section>
+<section id="remove-inactive-conversation-history">
+<h2>Remove inactive conversation history<a class="headerlink" href="#remove-inactive-conversation-history" title="Link to this heading"></a></h2>
+<p>Retention is explicit maintenance. It is not an automatic background deletion
+policy. Stop all checkpoint writers and make a verified backup before this work.
+Use <code class="docutils literal notranslate"><span class="pre">--before</span></code> instead of <code class="docutils literal notranslate"><span class="pre">--manifest</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">langgraph_agent_toolkit</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">migration</span> \
+  <span class="o">--</span><span class="n">backend</span><span class="o">=</span><span class="n">sqlite</span> <span class="o">--</span><span class="n">sqlite</span><span class="o">-</span><span class="n">path</span><span class="o">=</span><span class="n">checkpoints</span><span class="o">.</span><span class="n">db</span> \
+  <span class="o">--</span><span class="n">before</span><span class="o">=</span><span class="mi">2025</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="n">Z</span>
+</pre></div>
+</div>
+<p>Review the candidate thread IDs and row counts. Repeat with <code class="docutils literal notranslate"><span class="pre">--apply=true</span></code> to
+delete those threads. PostgreSQL uses the same flags as migration, with
+<code class="docutils literal notranslate"><span class="pre">--before</span></code> in place of <code class="docutils literal notranslate"><span class="pre">--manifest</span></code>.</p>
+<p>The cutoff must include a timezone. A thread is eligible only when its latest
+checkpoint across all namespaces is older than the cutoff. Only canonical
+<code class="docutils literal notranslate"><span class="pre">lat:v1:</span></code> storage IDs are eligible. Legacy raw IDs remain untouched. The command
+deletes whole threads, including blobs and pending writes, in one transaction.
+It does not compact checkpoints inside active threads.</p>
+<p>Age refers to the saved checkpoint timestamp. It does not prove that an external
+job or a human approval is complete. Review these cases before applying retention.
+Missing or invalid timestamps stop the operation. SQLite scans the complete
+stored history for eligible storage IDs. It reads JSON and msgpack timestamps
+without constructing serialized Python objects. Other encodings require a
+separate reviewed conversion. PostgreSQL aggregates timestamps in the database.
+Plan a maintenance window that permits this scan.
+Connection and Admission Limits
+——————————-</p>
+<p>Version 0.10.0 accepts eight active HTTP requests per worker by default. Excess
+requests receive 503 with <code class="docutils literal notranslate"><span class="pre">error_code=service_busy</span></code> and <code class="docutils literal notranslate"><span class="pre">Retry-After:</span> <span class="pre">1</span></code>
+before an agent run starts. Tune <code class="docutils literal notranslate"><span class="pre">REQUEST_MAX_CONCURRENT</span></code> with the worker,
+database, and provider limits. The optional waiting queue defaults to zero.
+Clients must handle overload responses on streaming endpoints before parsing
+stream events.</p>
+<p>Managed OpenAI and Azure model calls use connection limits, keepalive expiry,
+phase timeouts, and a retry count from the OpenAI Python SDK 3.13.0 baseline:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">LLM_HTTP_MAX_CONNECTIONS</span><span class="o">=</span><span class="s">1000</span>
+<span class="na">LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS</span><span class="o">=</span><span class="s">100</span>
+<span class="na">LLM_HTTP_KEEPALIVE_EXPIRY</span><span class="o">=</span><span class="s">5.0</span>
+<span class="na">LLM_HTTP_CONNECT_TIMEOUT</span><span class="o">=</span><span class="s">5.0</span>
+<span class="na">LLM_HTTP_READ_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_WRITE_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_POOL_TIMEOUT</span><span class="o">=</span><span class="s">600.0</span>
+<span class="na">LLM_HTTP_MAX_RETRIES</span><span class="o">=</span><span class="s">2</span>
+</pre></div>
+</div>
+<p>Timeouts are seconds. These are fixed toolkit defaults. They do not change
+automatically when the SDK version changes. Existing environment overrides
+retain their values. Remove old numeric <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_*</span></code> overrides to adopt these
+defaults, or keep deliberate deployment-specific limits. Explicit model timeouts
+and retry counts still take precedence. <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_MAX_POOLS=32</span></code> and
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_SHUTDOWN_TIMEOUT=10.0</span></code> remain unchanged.</p>
+<p>If an existing <code class="docutils literal notranslate"><span class="pre">LLM_HTTP_MAX_CONNECTIONS</span></code> override is below 100, also set
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS</span></code> at or below that limit. The new idle
+default of 100 otherwise fails configuration validation.</p>
+<p>The read timeout measures inactivity for each provider attempt. It is not the
+total API request deadline. <code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code> remains 300 seconds by default
+and can be lower in a deployment. A 600-second provider timeout does not extend
+that API deadline. Client and ingress timeouts require separate configuration.</p>
+<p>The API Docker image installs and selects the OpenAI SDK’s aiohttp adapter.
+Rebuild the image and recreate the container. Remove any explicit <code class="docutils literal notranslate"><span class="pre">httpx</span></code>
+transport setting to inherit the new image default. Keep that setting to retain
+HTTPX. The example <code class="docutils literal notranslate"><span class="pre">.env</span></code> no longer sets a transport. Python installations
+outside the image retain HTTPX; install <code class="docutils literal notranslate"><span class="pre">openai-aiohttp</span></code> and set
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=aiohttp</span></code> to select the same adapter there.
+The tested SDK 3.13.0 aiohttp adapter does not enforce the separate HTTPX write
+timeout or maximum idle-connection count. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for its other
+transport differences.</p>
+<p>Service startup rebuilds agents that register a <code class="docutils literal notranslate"><span class="pre">graph_factory</span></code>. The factory
+must create the graph and its concrete model clients for the current lifespan.
+MCP tools are passed to that same build. Graphs without factories retain their
+explicit dependencies and resource ownership.</p>
+<p>Configure <code class="docutils literal notranslate"><span class="pre">/health/live</span></code> to trigger supervisor recovery for stalled request
+cleanup. <code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> remains a traffic-routing check and can fail during
+database saturation. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for the settings and cleanup limits.</p>
+</section>
+<section id="provider-messages-and-stream-completion">
+<h2>Provider messages and stream completion<a class="headerlink" href="#provider-messages-and-stream-completion" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code> now includes optional <code class="docutils literal notranslate"><span class="pre">usage_metadata</span></code> with input, output, and
+total token counts. <code class="docutils literal notranslate"><span class="pre">null</span></code> means counts are unavailable. AI history imports
+accept the same field and <code class="docutils literal notranslate"><span class="pre">response_metadata</span></code>. Clients that reject unknown
+response fields must allow <code class="docutils literal notranslate"><span class="pre">usage_metadata</span></code>.</p>
+<p>Refusal text is preserved in <code class="docutils literal notranslate"><span class="pre">response_metadata[&quot;refusal&quot;]</span></code>. If the provider
+returns empty content with a refusal, the public message uses that refusal text
+as its content. Ordinary nonempty model content remains unchanged.</p>
+<p><code class="docutils literal notranslate"><span class="pre">AgentClient.stream</span></code> and <code class="docutils literal notranslate"><span class="pre">astream</span></code> now raise <code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> when an SSE
+response reaches EOF without <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code>. This includes a stream that sent an AI
+message but did not complete its framing. Existing toolkit SSE routes already
+send this marker. A caller can still close a stream early. The JSON Lines
+protocol does not use <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code>.</p>
+<p>Rejected model-provider credentials now return HTTP 503 with
+<code class="docutils literal notranslate"><span class="pre">error_code=model_authentication_failed</span></code> from <code class="docutils literal notranslate"><span class="pre">/invoke</span></code>. This is a service
+configuration failure. The caller’s API authentication is separate. Streams
+that have sent headers emit a fixed error message. Correct the provider
+credential before retrying. Toolkit responses and logs omit provider error
+text and tracebacks for these authentication failures in all environment modes.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reliability.html" class="btn btn-neutral float-left" title="Connections and High Traffic" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dependency_updates.html" class="btn btn-neutral float-right" title="Dependency update review" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

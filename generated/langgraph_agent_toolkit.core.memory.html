@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.memory package &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.memory.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.memory.base module" href="langgraph_agent_toolkit.core.memory.base.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.core package" href="langgraph_agent_toolkit.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.memory package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.memory.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core.memory">
+<span id="langgraph-agent-toolkit-core-memory-package"></span><h1>langgraph_agent_toolkit.core.memory package<a class="headerlink" href="#module-langgraph_agent_toolkit.core.memory" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html">langgraph_agent_toolkit.core.memory.base module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html#langgraph_agent_toolkit.core.memory.base.BaseMemoryBackend"><code class="docutils literal notranslate"><span class="pre">BaseMemoryBackend</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html#langgraph_agent_toolkit.core.memory.base.BaseMemoryBackend.validate_config"><code class="docutils literal notranslate"><span class="pre">BaseMemoryBackend.validate_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html#langgraph_agent_toolkit.core.memory.base.BaseMemoryBackend.get_checkpoint_saver"><code class="docutils literal notranslate"><span class="pre">BaseMemoryBackend.get_checkpoint_saver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.base.html#langgraph_agent_toolkit.core.memory.base.BaseMemoryBackend.get_memory_store"><code class="docutils literal notranslate"><span class="pre">BaseMemoryBackend.get_memory_store()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html">langgraph_agent_toolkit.core.memory.concurrency module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationBusyError"><code class="docutils literal notranslate"><span class="pre">ConversationBusyError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.NestedConversationError"><code class="docutils literal notranslate"><span class="pre">NestedConversationError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationLockLostError"><code class="docutils literal notranslate"><span class="pre">ConversationLockLostError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession.connection"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession.connection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession.scope"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession.scope</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession.lock"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession.lock</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession.active"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession.active</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession.__init__"><code class="docutils literal notranslate"><span class="pre">PostgresLockSession.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">ConversationCoordinator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator.__init__"><code class="docutils literal notranslate"><span class="pre">ConversationCoordinator.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator.lock"><code class="docutils literal notranslate"><span class="pre">ConversationCoordinator.lock()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.SQLiteConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">SQLiteConversationCoordinator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.SQLiteConversationCoordinator.__init__"><code class="docutils literal notranslate"><span class="pre">SQLiteConversationCoordinator.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresConversationCoordinator"><code class="docutils literal notranslate"><span class="pre">PostgresConversationCoordinator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresConversationCoordinator.__init__"><code class="docutils literal notranslate"><span class="pre">PostgresConversationCoordinator.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.serialize_execution"><code class="docutils literal notranslate"><span class="pre">serialize_execution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html">langgraph_agent_toolkit.core.memory.coordinated_saver module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html#langgraph_agent_toolkit.core.memory.coordinated_saver.CoordinatedPostgresSaver"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresSaver</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html#langgraph_agent_toolkit.core.memory.coordinated_saver.CoordinatedPostgresSaver.__init__"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresSaver.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html#langgraph_agent_toolkit.core.memory.coordinated_saver.CoordinatedPostgresSaver.setup"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresSaver.setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_saver.html#langgraph_agent_toolkit.core.memory.coordinated_saver.CoordinatedPostgresSaver.alist"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresSaver.alist()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html">langgraph_agent_toolkit.core.memory.coordinated_sqlite module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html#langgraph_agent_toolkit.core.memory.coordinated_sqlite.CoordinatedSqliteSaver"><code class="docutils literal notranslate"><span class="pre">CoordinatedSqliteSaver</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html#langgraph_agent_toolkit.core.memory.coordinated_sqlite.CoordinatedSqliteSaver.__init__"><code class="docutils literal notranslate"><span class="pre">CoordinatedSqliteSaver.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_sqlite.html#langgraph_agent_toolkit.core.memory.coordinated_sqlite.CoordinatedSqliteSaver.alist"><code class="docutils literal notranslate"><span class="pre">CoordinatedSqliteSaver.alist()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html">langgraph_agent_toolkit.core.memory.coordinated_store module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.setup"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.pipe"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.pipe</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.lock"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.lock</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.supports_pipeline"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.supports_pipeline</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.index_config"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.index_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.embeddings"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.embeddings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.coordinated_store.html#langgraph_agent_toolkit.core.memory.coordinated_store.CoordinatedPostgresStore.ttl_config"><code class="docutils literal notranslate"><span class="pre">CoordinatedPostgresStore.ttl_config</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.factory.html">langgraph_agent_toolkit.core.memory.factory module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.factory.html#langgraph_agent_toolkit.core.memory.factory.MemoryFactory"><code class="docutils literal notranslate"><span class="pre">MemoryFactory</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.factory.html#langgraph_agent_toolkit.core.memory.factory.MemoryFactory.create"><code class="docutils literal notranslate"><span class="pre">MemoryFactory.create()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html">langgraph_agent_toolkit.core.memory.migration module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry"><code class="docutils literal notranslate"><span class="pre">MigrationEntry</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.model_config"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.old_thread_id"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.old_thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.user_id"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.agent_id"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.agent_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.thread_id"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.public_thread_id"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.public_thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry.destination"><code class="docutils literal notranslate"><span class="pre">MigrationEntry.destination</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.load_manifest"><code class="docutils literal notranslate"><span class="pre">load_manifest()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_sqlite"><code class="docutils literal notranslate"><span class="pre">migrate_sqlite()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_postgres"><code class="docutils literal notranslate"><span class="pre">migrate_postgres()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_sqlite"><code class="docutils literal notranslate"><span class="pre">retain_sqlite()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_postgres"><code class="docutils literal notranslate"><span class="pre">retain_postgres()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html">langgraph_agent_toolkit.core.memory.pool module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CancellableAsyncConnection"><code class="docutils literal notranslate"><span class="pre">CancellableAsyncConnection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CancellableAsyncConnection.wait"><code class="docutils literal notranslate"><span class="pre">CancellableAsyncConnection.wait()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CheckedAsyncConnectionPool"><code class="docutils literal notranslate"><span class="pre">CheckedAsyncConnectionPool</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CheckedAsyncConnectionPool.__init__"><code class="docutils literal notranslate"><span class="pre">CheckedAsyncConnectionPool.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.pool.html#langgraph_agent_toolkit.core.memory.pool.CheckedAsyncConnectionPool.getconn"><code class="docutils literal notranslate"><span class="pre">CheckedAsyncConnectionPool.getconn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html">langgraph_agent_toolkit.core.memory.postgres module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.validate_config"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.validate_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_connection_string"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_connection_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_saver"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_saver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_store"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_store()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_checkpoint_saver"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_checkpoint_saver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_lock_pool"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_lock_pool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.postgres.html#langgraph_agent_toolkit.core.memory.postgres.PostgresMemoryBackend.get_memory_store"><code class="docutils literal notranslate"><span class="pre">PostgresMemoryBackend.get_memory_store()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.schema_lock.html">langgraph_agent_toolkit.core.memory.schema_lock module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.schema_lock.html#langgraph_agent_toolkit.core.memory.schema_lock.schema_setup_lock"><code class="docutils literal notranslate"><span class="pre">schema_setup_lock()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html">langgraph_agent_toolkit.core.memory.sqlite module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html#langgraph_agent_toolkit.core.memory.sqlite.SQLiteMemoryBackend"><code class="docutils literal notranslate"><span class="pre">SQLiteMemoryBackend</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html#langgraph_agent_toolkit.core.memory.sqlite.SQLiteMemoryBackend.validate_config"><code class="docutils literal notranslate"><span class="pre">SQLiteMemoryBackend.validate_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html#langgraph_agent_toolkit.core.memory.sqlite.SQLiteMemoryBackend.get_checkpoint_saver"><code class="docutils literal notranslate"><span class="pre">SQLiteMemoryBackend.get_checkpoint_saver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.sqlite.html#langgraph_agent_toolkit.core.memory.sqlite.SQLiteMemoryBackend.get_memory_store"><code class="docutils literal notranslate"><span class="pre">SQLiteMemoryBackend.get_memory_store()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html">langgraph_agent_toolkit.core.memory.types module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html#langgraph_agent_toolkit.core.memory.types.MemoryBackends"><code class="docutils literal notranslate"><span class="pre">MemoryBackends</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html#langgraph_agent_toolkit.core.memory.types.MemoryBackends.POSTGRES"><code class="docutils literal notranslate"><span class="pre">MemoryBackends.POSTGRES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.core.memory.types.html#langgraph_agent_toolkit.core.memory.types.MemoryBackends.SQLITE"><code class="docutils literal notranslate"><span class="pre">MemoryBackends.SQLITE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.core.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.memory.base.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.memory.base module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

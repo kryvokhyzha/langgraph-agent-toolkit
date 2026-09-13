@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service.exception_handlers &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/service/exception_handlers.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service.exception_handlers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.service.exception_handlers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ModelAuthenticationError</span><span class="p">,</span>
+    <span class="n">ModelConnectionError</span><span class="p">,</span>
+    <span class="n">ModelRateLimitError</span><span class="p">,</span>
+    <span class="n">ModelTimeoutError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">OperationalError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg_pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">PoolTimeout</span><span class="p">,</span> <span class="n">TooManyRequests</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.memory.concurrency</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConversationBusyError</span><span class="p">,</span>
+    <span class="n">ConversationLockLostError</span><span class="p">,</span>
+    <span class="n">NestedConversationError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AgentToolkitError</span><span class="p">,</span>
+    <span class="n">AuthenticationError</span><span class="p">,</span>
+    <span class="n">AuthorizationError</span><span class="p">,</span>
+    <span class="n">FeedbackError</span><span class="p">,</span>
+    <span class="n">InputValidationError</span><span class="p">,</span>
+    <span class="n">ModelConfigurationError</span><span class="p">,</span>
+    <span class="n">ModelNotFoundError</span><span class="p">,</span>
+    <span class="n">RateLimitError</span><span class="p">,</span>
+    <span class="n">ServiceUnavailableError</span><span class="p">,</span>
+    <span class="n">ToolExecutionError</span><span class="p">,</span>
+    <span class="n">ToolNotFoundError</span><span class="p">,</span>
+    <span class="n">UnsupportedMessageTypeError</span><span class="p">,</span>
+    <span class="n">ValidationError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvironmentMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.service.admission</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceBusyError</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_expose_error_detail</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return whether clients can receive internal error details.</span>
+
+<span class="sd">    Return `True` outside production.</span>
+<span class="sd">    Production clients receive a general message.</span>
+<span class="sd">    The service logs full errors on the server.</span>
+<span class="sd">    Read `settings.ENV_MODE` for each request.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">ENV_MODE</span> <span class="o">!=</span> <span class="n">EnvironmentMode</span><span class="o">.</span><span class="n">PRODUCTION</span>
+
+
+<div class="viewcode-block" id="register_exception_handlers">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.exception_handlers.html#langgraph_agent_toolkit.service.exception_handlers.register_exception_handlers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_exception_handlers</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Register exception handlers on the FastAPI app.&quot;&quot;&quot;</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelAuthenticationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_authentication_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelAuthenticationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model provider credentials were rejected&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The model provider credentials were rejected&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;model_authentication_failed&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelRateLimitError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_rate_limit_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelRateLimitError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model provider rate limit was exceeded&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">429</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The model provider rate limit was exceeded&quot;</span><span class="p">,</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;model_rate_limit&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelConnectionError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_connection_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelConnectionError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model provider is unavailable&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The model provider is unavailable&quot;</span><span class="p">,</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;model_unavailable&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelTimeoutError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_timeout_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelTimeoutError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model provider request timed out&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">504</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The model provider request timed out&quot;</span><span class="p">,</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;model_timeout&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ServiceBusyError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">service_busy_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ServiceBusyError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Worker request capacity is full&quot;</span><span class="p">,</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;service_busy&quot;</span><span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">OperationalError</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">PoolTimeout</span><span class="p">)</span>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">TooManyRequests</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">database_unavailable_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Database operation failed&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Database temporarily unavailable&quot;</span><span class="p">})</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">NestedConversationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">nested_conversation_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">NestedConversationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">409</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="s2">&quot;nested_conversation&quot;</span><span class="p">})</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ConversationBusyError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">conversation_busy_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ConversationBusyError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">409</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)},</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">})</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ConversationLockLostError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">conversation_lock_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ConversationLockLostError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The database conversation lock was lost&quot;</span><span class="p">})</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="ne">TimeoutError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request_timeout_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">504</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;The request time limit expired&quot;</span><span class="p">})</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">AuthenticationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authentication_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">AuthenticationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle authentication errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Authentication error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">AuthorizationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authorization_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">AuthorizationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle authorization errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Authorization error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ValidationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">validation_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ValidationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle validation errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">InputValidationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">input_validation_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">InputValidationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle input validation errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input validation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_422_UNPROCESSABLE_CONTENT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">UnsupportedMessageTypeError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unsupported_message_type_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">UnsupportedMessageTypeError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle unsupported message type errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported message type: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;message_type&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">message_type</span><span class="p">,</span> <span class="s2">&quot;supported_types&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">supported_types</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;traceback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_422_UNPROCESSABLE_CONTENT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelNotFoundError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_not_found_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelNotFoundError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle model not found errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model not found: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">model_name</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">provider</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;provider&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">provider</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ModelConfigurationError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_configuration_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ModelConfigurationError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle model configuration errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model configuration error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span>
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;traceback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ToolNotFoundError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tool_not_found_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ToolNotFoundError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle tool not found errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool not found: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;tool_name&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">tool_name</span><span class="p">,</span> <span class="s2">&quot;available_tools&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">available_tools</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ToolExecutionError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tool_execution_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ToolExecutionError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle tool execution errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool execution error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span> <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;Tool execution failed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tool_name&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">tool_name</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;traceback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">RateLimitError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">rate_limit_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">RateLimitError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle rate limit errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rate limit exceeded: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;resource&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">resource</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">limit</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">reset_time</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;reset_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">reset_time</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_429_TOO_MANY_REQUESTS</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">ServiceUnavailableError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">service_unavailable_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">ServiceUnavailableError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle service unavailable errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service unavailable: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">service</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_503_SERVICE_UNAVAILABLE</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">FeedbackError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">feedback_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">FeedbackError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle feedback operation errors.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feedback error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;run_id&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span> <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">operation</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">reason</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;reason&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">reason</span>
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;traceback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">AgentToolkitError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">agent_toolkit_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">AgentToolkitError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle `AgentToolkitError` and its subclasses.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent toolkit error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;error_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">error_code</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">details</span>
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;traceback&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="n">HTTPException</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">http_exception_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">HTTPException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle an `HTTPException` and log it.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTPException: </span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">detail</span><span class="si">}</span><span class="s2"> (status </span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">detail</span><span class="p">}</span>
+
+        <span class="c1"># Include response headers when provided.</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">value_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle an unexpected `ValueError`.</span>
+
+<span class="sd">        Client validation must raise `InputValidationError` or `ValidationError`.</span>
+<span class="sd">        The service logs the full error.</span>
+<span class="sd">        Only non-production clients receive the error message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ValueError: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;traceback&quot;</span><span class="p">:</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request&quot;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">exception_handler</span><span class="p">(</span><span class="ne">Exception</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">global_exception_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle an unexpected exception.</span>
+
+<span class="sd">        The service logs the exception type, message, and traceback.</span>
+<span class="sd">        Non-production clients receive the message and type.</span>
+<span class="sd">        Production clients receive a general message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error_detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exc</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent error: </span><span class="si">{</span><span class="n">error_detail</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_expose_error_detail</span><span class="p">():</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;traceback&quot;</span><span class="p">:</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error&quot;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

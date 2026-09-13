@@ -1,0 +1,467 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.memory.concurrency &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/memory/concurrency.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.memory.concurrency</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.memory.concurrency</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Bound concurrent conversation operations and release locks after failures.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">aclosing</span><span class="p">,</span> <span class="n">asynccontextmanager</span><span class="p">,</span> <span class="n">suppress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.execution</span><span class="w"> </span><span class="kn">import</span> <span class="n">execution_timeout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+
+<div class="viewcode-block" id="ConversationBusyError">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationBusyError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConversationBusyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The conversation queue is full or its wait time has expired.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="NestedConversationError">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.NestedConversationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedConversationError</span><span class="p">(</span><span class="n">ConversationBusyError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An active operation tried to acquire another conversation lock.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConversationLockLostError">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationLockLostError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConversationLockLostError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The database session that owns the conversation lock was lost.&quot;&quot;&quot;</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Entry</span><span class="p">:</span>
+    <span class="n">lock</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">)</span>
+    <span class="n">users</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ConversationLease</span><span class="p">:</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="n">_conversation_lease</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">_ConversationLease</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;conversation_lease&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PostgresLockSession">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresLockSession">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostgresLockSession</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind checkpoint I/O to the session that owns its advisory lock.&quot;&quot;&quot;</span>
+
+    <span class="n">connection</span><span class="p">:</span> <span class="nb">object</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">lock</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">)</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<span class="n">postgres_lock_session</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">PostgresLockSession</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;postgres_lock_session&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConversationCoordinator">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConversationCoordinator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize operations on one thread in this process.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ConversationCoordinator.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_waiters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span> <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">settings</span><span class="o">.</span><span class="n">THREAD_QUEUE_TIMEOUT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_waiters</span> <span class="o">=</span> <span class="n">max_waiters</span> <span class="k">if</span> <span class="n">max_waiters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">settings</span><span class="o">.</span><span class="n">THREAD_QUEUE_MAX_WAITERS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_Entry</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_external_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">yield</span>
+
+<div class="viewcode-block" id="ConversationCoordinator.lock">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.ConversationCoordinator.lock">[docs]</a>
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">_conversation_lease</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">parent</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NestedConversationError</span><span class="p">(</span>
+                <span class="s2">&quot;Nested conversation operations are not supported. Compose agents with LangGraph subgraphs.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_Entry</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">users</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_waiters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConversationBusyError</span><span class="p">(</span><span class="s2">&quot;The conversation queue is full. Retry later.&quot;</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">users</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">acquired</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">deadline</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout_at</span><span class="p">(</span><span class="n">deadline</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="n">entry</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                    <span class="n">acquired</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConversationBusyError</span><span class="p">(</span><span class="s2">&quot;The conversation queue wait expired. Retry later.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="n">lease</span> <span class="o">=</span> <span class="n">_ConversationLease</span><span class="p">()</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">_conversation_lease</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lease</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_lock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">deadline</span><span class="p">):</span>
+                    <span class="k">yield</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="c1"># Child tasks inherit this object. They must see when the run ends.</span>
+                <span class="n">lease</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># Async generator finalization can run in a different context.</span>
+                <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+                    <span class="n">_conversation_lease</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">acquired</span><span class="p">:</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">users</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">users</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SQLiteConversationCoordinator">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.SQLiteConversationCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SQLiteConversationCoordinator</span><span class="p">(</span><span class="n">ConversationCoordinator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use OS file locks to coordinate workers that share one SQLite file.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SQLiteConversationCoordinator.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.SQLiteConversationCoordinator.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.conversation-locks&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_external_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">filelock</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncFileLock</span>
+
+        <span class="c1"># Fixed stripes bound the number of files. Collisions only add waiting.</span>
+        <span class="n">stripe</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;big&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="mi">256</span>
+        <span class="c1"># Nonblocking OS acquisition must finish before cancellation can release it.</span>
+        <span class="n">lock</span> <span class="o">=</span> <span class="n">AsyncFileLock</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stripe</span><span class="si">}</span><span class="s2">.lock&quot;</span><span class="p">),</span> <span class="n">thread_local</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">run_in_executor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout_at</span><span class="p">(</span><span class="n">deadline</span><span class="p">):</span>
+                <span class="n">acquired</span> <span class="o">=</span> <span class="k">await</span> <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConversationBusyError</span><span class="p">(</span><span class="s2">&quot;The conversation queue wait expired. Retry later.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">acquired</span><span class="p">:</span>
+            <span class="k">yield</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_PostgresLease</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire, monitor, and release one PostgreSQL conversation lock.&quot;&quot;&quot;</span>
+
+    <span class="n">session</span><span class="p">:</span> <span class="n">PostgresLockSession</span>
+    <span class="n">lock_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">owner</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span>
+    <span class="n">acquired</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">acquisition_pending</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">heartbeat</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">stop_heartbeat</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">)</span>
+    <span class="n">lost</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout_at</span><span class="p">(</span><span class="n">deadline</span><span class="p">):</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquired</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_pending</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">cursor</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;SELECT pg_try_advisory_lock(</span><span class="si">%s</span><span class="s2">) AS acquired&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_id</span><span class="p">,)</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">acquired</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">())[</span><span class="s2">&quot;acquired&quot;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_pending</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquired</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConversationBusyError</span><span class="p">(</span><span class="s2">&quot;The conversation queue wait expired. Retry later.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop_heartbeat</span><span class="o">.</span><span class="n">wait</span><span class="p">(),</span> <span class="n">settings</span><span class="o">.</span><span class="n">THREAD_LOCK_HEARTBEAT</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># Checkpoint I/O has its own query and request time limits.</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_heartbeat</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                        <span class="k">return</span>
+                    <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">THREAD_LOCK_HEARTBEAT_TIMEOUT</span><span class="p">):</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT 1&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost</span> <span class="o">=</span> <span class="n">exc</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_heartbeat</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">finish_monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heartbeat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># Do not cancel a healthy query during normal run cleanup.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_heartbeat</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">THREAD_LOCK_HEARTBEAT_TIMEOUT</span><span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">heartbeat</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lost</span> <span class="o">=</span> <span class="n">exc</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="c1"># The owner was cancelled again during cleanup.</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_error</span><span class="p">:</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">finish_monitor</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquired</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">THREAD_LOCK_HEARTBEAT_TIMEOUT</span><span class="p">):</span>
+                    <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_advisory_unlock(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_id</span><span class="p">,))</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1"># Closing the session releases locks even after cancellation.</span>
+                <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">active_error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">):</span>
+                        <span class="k">raise</span>
+                    <span class="k">raise</span> <span class="n">ConversationLockLostError</span><span class="p">(</span><span class="s2">&quot;The database conversation lock was lost.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">acquisition_pending</span><span class="p">:</span>
+            <span class="c1"># The server can acquire the lock before cancellation reaches the client.</span>
+            <span class="c1"># Do not return this session to the pool with an unknown lock state.</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">active_error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConversationLockLostError</span><span class="p">(</span><span class="s2">&quot;The database conversation lock was lost.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">self.lost</span>
+
+
+<div class="viewcode-block" id="PostgresConversationCoordinator">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresConversationCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostgresConversationCoordinator</span><span class="p">(</span><span class="n">ConversationCoordinator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hold a session advisory lock in a separate, bounded connection pool.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PostgresConversationCoordinator.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.PostgresConversationCoordinator.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pool</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span></div>
+
+
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_external_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deadline</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">lock_id</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">],</span> <span class="s2">&quot;big&quot;</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">remaining</span> <span class="o">=</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">remaining</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConversationBusyError</span><span class="p">(</span><span class="s2">&quot;The conversation queue wait expired. Retry later.&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">remaining</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">PostgresLockSession</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">,</span> <span class="s2">&quot;_lat_checkpoint_scope&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">lease</span> <span class="o">=</span> <span class="n">_PostgresLease</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">())</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">lease</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="n">deadline</span><span class="p">)</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">postgres_lock_session</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+                <span class="n">lease</span><span class="o">.</span><span class="n">heartbeat</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">lease</span><span class="o">.</span><span class="n">monitor</span><span class="p">())</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">lease</span><span class="o">.</span><span class="n">lost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ConversationLockLostError</span><span class="p">(</span><span class="s2">&quot;The database conversation lock was lost.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">lease.lost</span>
+                    <span class="k">raise</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">active_error</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+                        <span class="n">postgres_lock_session</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">lease</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">active_error</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="serialize_execution">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.concurrency.html#langgraph_agent_toolkit.core.memory.concurrency.serialize_execution">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">serialize_execution</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hold a conversation lock through execution and stream cleanup.&quot;&quot;&quot;</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">bound</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+        <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">bound</span>
+
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isasyncgenfunction</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">bound</span> <span class="o">=</span> <span class="n">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">concurrency</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">]):</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">execution_timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_TIMEOUT</span><span class="p">):</span>
+                    <span class="k">async</span> <span class="k">with</span> <span class="n">aclosing</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">bound</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">bound</span><span class="o">.</span><span class="n">kwargs</span><span class="p">))</span> <span class="k">as</span> <span class="n">generator</span><span class="p">:</span>
+                        <span class="k">async</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+                            <span class="k">yield</span> <span class="n">item</span>
+
+        <span class="k">return</span> <span class="n">stream</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">concurrency</span><span class="o">.</span><span class="n">lock</span><span class="p">(</span><span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">]):</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">execution_timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_TIMEOUT</span><span class="p">):</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">bound</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">bound</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">invoke</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

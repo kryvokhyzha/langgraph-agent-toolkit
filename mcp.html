@@ -1,0 +1,459 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP tools &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/mcp.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deep Agents" href="deepagents.html" />
+    <link rel="prev" title="Choose an agent integration" href="integrations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MCP tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-an-http-server">Configure an HTTP server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-a-local-process">Configure a local process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#select-agents-and-settings">Select agents and settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resume-a-request-for-user-input">Resume a request for user input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-mcp-tools-to-a-custom-agent">Add MCP tools to a custom agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-a-deployment">Verify a deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MCP tools</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/mcp.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mcp-tools">
+<h1>MCP tools<a class="headerlink" href="#mcp-tools" title="Link to this heading"></a></h1>
+<p>Agents can call tools from Model Context Protocol (MCP) servers.
+The toolkit uses <code class="docutils literal notranslate"><span class="pre">langchain.mcp.MCPAdapter</span></code> and FastMCP.
+It discovers tools during service startup and adds them to selected agents.
+The service API does not need a new endpoint.</p>
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Link to this heading"></a></h2>
+<p>Add the optional dependency to an application:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;langgraph-agent-toolkit[mcp]&#39;</span>
+</pre></div>
+</div>
+<p>For a source checkout, install the MCP extra with the required service extras:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>mcp<span class="w"> </span>--extra<span class="w"> </span>uvicorn-backend<span class="w"> </span>--extra<span class="w"> </span>openai
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra and the backend Docker image include MCP support.
+The base package does not install FastMCP.
+No MCP connections start when the package or a blueprint is imported.</p>
+<p>LangChain added its built-in MCP integration in version 1.4.0.
+This namespace is in beta.
+The toolkit limits LangChain to <code class="docutils literal notranslate"><span class="pre">&lt;1.5</span></code> and FastMCP to <code class="docutils literal notranslate"><span class="pre">&lt;4.1</span></code>.
+See the <a class="reference external" href="https://www.langchain.com/blog/mcp-in-langchain-stateless-protocol-elicitation-and-more">LangChain announcement</a>.</p>
+<p>The older <code class="docutils literal notranslate"><span class="pre">langchain-mcp-adapters</span></code> package has a separate migration path.
+Use the <a class="reference external" href="https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters">official migration guide</a> for an
+application that imports it.
+The <a class="reference external" href="https://github.com/langchain-ai/langchain-mcp-adapters">adapter repository</a> contains the old API.
+The <a class="reference external" href="https://pypi.org/project/langchain-mcp/">langchain-mcp package on PyPI</a> is a separate third-party package.
+It is not required by this integration.</p>
+</section>
+<section id="configure-an-http-server">
+<h2>Configure an HTTP server<a class="headerlink" href="#configure-an-http-server" title="Link to this heading"></a></h2>
+<p>Set these values in the service environment or its <code class="docutils literal notranslate"><span class="pre">.env</span></code> file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MCP_SERVERS=&#39;{&quot;documents&quot;:{&quot;transport&quot;:&quot;http&quot;,&quot;url&quot;:&quot;https://documents.example.com/mcp&quot;,&quot;headers_env&quot;:{&quot;Authorization&quot;:&quot;DOCUMENTS_MCP_AUTH&quot;},&quot;tool_allowlist&quot;:[&quot;search&quot;]}}&#39;
+MCP_AGENT_SERVERS=&#39;{&quot;create-agent&quot;:[&quot;documents&quot;]}&#39;
+MCP_DISCOVERY_TIMEOUT=30
+</pre></div>
+</div>
+<p>Replace the example URL with your server URL.
+Set <code class="docutils literal notranslate"><span class="pre">DOCUMENTS_MCP_AUTH</span></code> in the process environment through your secret manager.
+Its value must contain the complete header value, such as <code class="docutils literal notranslate"><span class="pre">Bearer</span> <span class="pre">&lt;mcp-token&gt;</span></code>.
+<code class="docutils literal notranslate"><span class="pre">headers_env</span></code> maps an HTTP header name to an environment variable name.
+The toolkit does not add <code class="docutils literal notranslate"><span class="pre">Bearer</span></code> to the value.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tool_allowlist</span></code> contains the original tool names from the server.
+This example exposes <code class="docutils literal notranslate"><span class="pre">search</span></code> to the agent as <code class="docutils literal notranslate"><span class="pre">documents_search</span></code>.
+Omit <code class="docutils literal notranslate"><span class="pre">tool_allowlist</span></code> to expose all tools from that server.
+Use an empty list to expose no tools.
+A missing tool name stops startup.</p>
+<p>Each server has its own credentials.
+The toolkit does not forward the API’s <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> or <code class="docutils literal notranslate"><span class="pre">user_id</span></code> to MCP.
+Conversation ownership and user memory scopes remain separate from MCP access.
+Set the permissions for each MCP credential in the remote service.</p>
+</section>
+<section id="configure-a-local-process">
+<h2>Configure a local process<a class="headerlink" href="#configure-a-local-process" title="Link to this heading"></a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">stdio</span></code> for an MCP server that runs as a child process:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MCP_SERVERS=&#39;{&quot;catalog&quot;:{&quot;transport&quot;:&quot;stdio&quot;,&quot;command&quot;:&quot;python&quot;,&quot;args&quot;:[&quot;/app/mcp/catalog_server.py&quot;],&quot;env_env&quot;:{&quot;CATALOG_API_KEY&quot;:&quot;CATALOG_MCP_API_KEY&quot;},&quot;tool_allowlist&quot;:[&quot;lookup&quot;]}}&#39;
+MCP_AGENT_SERVERS=&#39;{&quot;create-agent&quot;:[&quot;catalog&quot;]}&#39;
+</pre></div>
+</div>
+<p>Install the command and script in the service environment or container.
+The toolkit passes <code class="docutils literal notranslate"><span class="pre">args</span></code> as separate arguments.
+It does not start a shell to interpret the command.
+<code class="docutils literal notranslate"><span class="pre">env_env</span></code> maps a child-process variable name to a service environment variable.
+Direct values can use <code class="docutils literal notranslate"><span class="pre">env</span></code>.</p>
+<p>The transport uses <code class="docutils literal notranslate"><span class="pre">keep_alive=False</span></code>.
+It stops the child process after the last active connection context closes.
+Concurrent calls can share a connection while their contexts overlap.
+Use an HTTP server when repeated process startup is too expensive.
+Store durable server state outside the child process.</p>
+</section>
+<section id="select-agents-and-settings">
+<h2>Select agents and settings<a class="headerlink" href="#select-agents-and-settings" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MCP_AGENT_SERVERS</span></code> maps agent names to server aliases.
+These built-in agents accept configured MCP tools:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">deep-agent</span></code> (requires the <code class="docutils literal notranslate"><span class="pre">deepagents</span></code> extra; see <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">create-agent</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">create-agent-structured</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hitl-agent</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">react-agent</span></code></p></li>
+</ul>
+<p>The selected agent must be loaded through <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">MCP_AGENT_SERVERS</span></code> is empty, the resolved default agent receives all
+configured servers.
+An explicit mapping selects only the listed agents and servers.
+An empty server list removes MCP tools from that selected agent.
+Unknown agents, unknown servers, and duplicate assignments stop startup.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Server configuration</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transport</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http</span></code> or <code class="docutils literal notranslate"><span class="pre">stdio</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">http</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">url</span></code></p></td>
+<td><p>Required for HTTP. Use the Streamable HTTP MCP endpoint.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">command</span></code>, <code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
+<td><p>The executable and argument list for stdio.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">headers</span></code>, <code class="docutils literal notranslate"><span class="pre">headers_env</span></code></p></td>
+<td><p>Direct HTTP headers or references to environment variables.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">env</span></code>, <code class="docutils literal notranslate"><span class="pre">env_env</span></code></p></td>
+<td><p>Direct stdio environment values or references to service variables.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auto</span></code> negotiates the protocol. <code class="docutils literal notranslate"><span class="pre">legacy</span></code> forces the older protocol.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">timeout</span></code></p></td>
+<td><p>Positive timeout in seconds for each client’s requests and initialization.
+The default is 30.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tool_allowlist</span></code></p></td>
+<td><p>Original tool names to expose. The default permits every discovered tool.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Server aliases must start with a letter.
+They can contain letters, digits, underscores, and hyphens.
+Their maximum length is 32 characters.
+The final <code class="docutils literal notranslate"><span class="pre">server_tool</span></code> name must have at most 64 characters.
+It can contain letters, digits, underscores, and hyphens.
+Duplicate final tool names stop startup.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MCP_DISCOVERY_TIMEOUT</span></code> limits the complete discovery operation in seconds.
+Its default is 30.
+Workers discover only the servers assigned to agents.
+Each worker builds its own graphs after discovery succeeds.
+A connection error or timeout stops startup before readiness succeeds.</p>
+<p>Tools retain their discovered schemas for the worker’s lifetime.
+Restart workers after a server changes its tool names or schemas.
+Tool calls do not refresh the complete catalog on each request.
+Each call manages its connection context.
+Calls that need no user input do not retain a connection between agent runs.</p>
+<p>The built-in retry middleware retries local tools only.
+It does not retry a failed MCP write automatically.
+A remote tool can finish a write before its connection fails.
+Use server-side idempotency keys when a caller can retry that operation.</p>
+</section>
+<section id="resume-a-request-for-user-input">
+<h2>Resume a request for user input<a class="headerlink" href="#resume-a-request-for-user-input" title="Link to this heading"></a></h2>
+<p>Modern MCP elicitation lets a tool request missing information.
+The adapter converts this request to a LangGraph interrupt.
+Keep <code class="docutils literal notranslate"><span class="pre">CHECK_INTERRUPTS=true</span></code>.
+Configure a checkpointer before using elicitation.
+Use PostgreSQL or a persistent SQLite database when a run must survive a worker
+restart.</p>
+<p>The HTTP response keeps each interrupt in <code class="docutils literal notranslate"><span class="pre">custom_data.interrupts</span></code>.
+Each entry contains an <code class="docutils literal notranslate"><span class="pre">id</span></code> and its original <code class="docutils literal notranslate"><span class="pre">value</span></code>.
+For MCP elicitation, <code class="docutils literal notranslate"><span class="pre">value.type</span></code> is <code class="docutils literal notranslate"><span class="pre">mcp_elicitation</span></code>.
+<code class="docutils literal notranslate"><span class="pre">value.requests</span></code> contains the question keys and form schemas or URLs.
+The <code class="docutils literal notranslate"><span class="pre">content</span></code> field also contains text for display.
+SSE and JSON Lines message events preserve the same <code class="docutils literal notranslate"><span class="pre">custom_data</span></code> object.</p>
+<p>For one pending interrupt, put the answers in <code class="docutils literal notranslate"><span class="pre">input.responses</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>http://localhost:8080/create-agent/invoke<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;thread_id&quot;: &quot;conversation-1&quot;,</span>
+<span class="s1">    &quot;user_id&quot;: &quot;user-1&quot;,</span>
+<span class="s1">    &quot;input&quot;: {</span>
+<span class="s1">      &quot;responses&quot;: {</span>
+<span class="s1">        &quot;destination&quot;: {</span>
+<span class="s1">          &quot;action&quot;: &quot;accept&quot;,</span>
+<span class="s1">          &quot;content&quot;: {&quot;folder&quot;: &quot;reports&quot;}</span>
+<span class="s1">        }</span>
+<span class="s1">      }</span>
+<span class="s1">    }</span>
+<span class="s1">  }&#39;</span>
+</pre></div>
+</div>
+<p>This example assumes <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code>.
+Set <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> in the caller’s environment to the deployment’s shared secret.
+Use the same agent, <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>, <code class="docutils literal notranslate"><span class="pre">user_id</span></code>, and authentication as the paused run.
+Replace <code class="docutils literal notranslate"><span class="pre">destination</span></code> with the key from the actual question.
+Match <code class="docutils literal notranslate"><span class="pre">content</span></code> to the requested form schema.
+Answer every request key in that interrupt.</p>
+<p>For multiple pending interrupts, put the answers in <code class="docutils literal notranslate"><span class="pre">input.resume</span></code>.
+Use every actual interrupt ID as a key:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;thread_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;conversation-1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;user_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;input&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;resume&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;interrupt-id-1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;responses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;destination&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;accept&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;folder&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reports&quot;</span><span class="p">}</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;interrupt-id-2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;responses&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;confirmation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;decline&quot;</span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Use either <code class="docutils literal notranslate"><span class="pre">input.responses</span></code> or <code class="docutils literal notranslate"><span class="pre">input.resume</span></code> in one request.
+An answer’s <code class="docutils literal notranslate"><span class="pre">action</span></code> can be <code class="docutils literal notranslate"><span class="pre">accept</span></code>, <code class="docutils literal notranslate"><span class="pre">decline</span></code>, or <code class="docutils literal notranslate"><span class="pre">cancel</span></code>.
+Send <code class="docutils literal notranslate"><span class="pre">content</span></code> only for an accepted form request.
+For a URL request, complete the server’s URL flow before sending <code class="docutils literal notranslate"><span class="pre">accept</span></code>.
+Do not send form content for a URL request.</p>
+<p>Resuming elicitation repeats the remote tool call with the supplied answers.
+The server must make any work before elicitation safe to repeat.
+This is separate from retrying an ordinary transport failure.
+See the elicitation example in the <a class="reference external" href="https://www.langchain.com/blog/mcp-in-langchain-stateless-protocol-elicitation-and-more">LangChain announcement</a>.</p>
+<p>Legacy MCP tool calls are supported.
+Legacy server-pushed elicitation is not supported by this integration.
+Use the modern input-required protocol for interrupt and resume.</p>
+</section>
+<section id="add-mcp-tools-to-a-custom-agent">
+<h2>Add MCP tools to a custom agent<a class="headerlink" href="#add-mcp-tools-to-a-custom-agent" title="Link to this heading"></a></h2>
+<p>A custom <code class="docutils literal notranslate"><span class="pre">Agent</span></code> must provide <code class="docutils literal notranslate"><span class="pre">graph_factory</span></code> to use service configuration.
+The factory receives the MCP tools assigned to that agent.
+Combine them with local tools through <code class="docutils literal notranslate"><span class="pre">merge_tools</span></code>.
+It rejects duplicate names before the graph can replace a tool silently.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.language_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseChatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTool</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.components.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">add</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.mcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_tools</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_agent</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">BaseChatModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_graph</span><span class="p">(</span><span class="n">extra_tools</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">]</span> <span class="o">=</span> <span class="p">()):</span>
+        <span class="k">return</span> <span class="n">create_agent</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="n">merge_tools</span><span class="p">([</span><span class="n">add</span><span class="p">],</span> <span class="n">extra_tools</span><span class="p">),</span>
+            <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Agent</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom-agent&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;An agent with local and MCP tools.&quot;</span><span class="p">,</span>
+        <span class="n">graph</span><span class="o">=</span><span class="n">build_graph</span><span class="p">(),</span>
+        <span class="n">graph_factory</span><span class="o">=</span><span class="n">build_graph</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Call <code class="docutils literal notranslate"><span class="pre">make_agent</span></code> with your model.
+Register the returned <code class="docutils literal notranslate"><span class="pre">Agent</span></code> object through <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code>.
+The service attaches the configured checkpointer after it builds the graph.</p>
+<p>For direct Python use, discover tools explicitly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.mcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServerConfig</span><span class="p">,</span> <span class="n">load_mcp_tools</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_document_tools</span><span class="p">():</span>
+    <span class="n">servers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;documents&quot;</span><span class="p">:</span> <span class="n">MCPServerConfig</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://documents.example.com/mcp&quot;</span><span class="p">,</span>
+            <span class="n">headers_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;DOCUMENTS_MCP_AUTH&quot;</span><span class="p">},</span>
+            <span class="n">tool_allowlist</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;search&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">tools_by_server</span> <span class="o">=</span> <span class="k">await</span> <span class="n">load_mcp_tools</span><span class="p">(</span><span class="n">servers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tools_by_server</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Call the resulting graph with <code class="docutils literal notranslate"><span class="pre">ainvoke</span></code> or <code class="docutils literal notranslate"><span class="pre">astream</span></code>.
+MCP tools use asynchronous operations.
+Direct Python callers must supply a checkpointer for elicitation.</p>
+<p>The service configuration does not start an interactive OAuth flow.
+Use a custom <code class="docutils literal notranslate"><span class="pre">fastmcp.Client</span></code> and <code class="docutils literal notranslate"><span class="pre">MCPAdapter</span></code> in application code for advanced
+authentication, custom transports, or client callbacks.
+MCP resource and prompt APIs remain separate from tool discovery.
+This integration does not add remote resources or prompts to an agent implicitly.</p>
+</section>
+<section id="verify-a-deployment">
+<h2>Verify a deployment<a class="headerlink" href="#verify-a-deployment" title="Link to this heading"></a></h2>
+<p>Start the service with its MCP configuration.
+Check <code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> after startup.
+Then send a request that needs an allowed MCP tool.
+Check the remote service’s result and the agent response.
+Readiness confirms startup discovery; it does not poll remote MCP servers after
+startup.</p>
+<p>The MCP tests use local MCP servers and scripted models.
+They do not call a production MCP server or a live model provider.
+The Langfuse SDK matrix also installs the MCP extra.
+Use a staging MCP server to verify deployment credentials and remote permissions.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="integrations.html" class="btn btn-neutral float-left" title="Choose an agent integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deepagents.html" class="btn btn-neutral float-right" title="Deep Agents" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.mcp &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/mcp.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.mcp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.mcp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Configure MCP tools without importing the optional client at module load.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">HttpUrl</span><span class="p">,</span> <span class="n">SecretStr</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">,</span> <span class="n">TypeAdapter</span><span class="p">,</span> <span class="n">model_validator</span>
+
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTool</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent_executor</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentExecutor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core._base_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">Settings</span>
+
+
+<span class="n">ServerName</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StringConstraints</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[A-Za-z][A-Za-z0-9_-]{0,31}$&quot;</span><span class="p">)]</span>
+
+
+<div class="viewcode-block" id="MCPServerConfig">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MCPServerConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Describe one operator-configured MCP server and its credentials.&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">,</span> <span class="n">hide_input_in_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">transport</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;stdio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;http&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">headers_env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">env_env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;legacy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">tool_allowlist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MCPServerConfig.validate_transport">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.MCPServerConfig.validate_transport">[docs]</a>
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MCPServerConfig</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_env</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;An HTTP MCP server needs url and cannot use command, args, env, or env_env.&quot;</span><span class="p">)</span>
+            <span class="n">parsed</span> <span class="o">=</span> <span class="n">TypeAdapter</span><span class="p">(</span><span class="n">HttpUrl</span><span class="p">)</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">parsed</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Use MCP headers or headers_env for credentials, not URL user information.&quot;</span><span class="p">)</span>
+            <span class="n">header_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">headers_env</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">header_names</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_names</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP header names must be unique across headers and headers_env, ignoring case.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[!#$%&amp;&#39;*+.^_`|~0-9a-z-]+&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">header_names</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP headers must use valid HTTP header names.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers_env</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A stdio MCP server needs command and cannot use url, headers, or headers_env.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_env</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP env and env_env must use different variable names.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mapping</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">headers_env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_env</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Za-z_][A-Za-z0-9_]*&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP environment references must contain valid environment variable names.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool_allowlist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool_allowlist</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_allowlist</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_allowlist</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP tool_allowlist must contain distinct, nonempty upstream tool names.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="merge_tools">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.merge_tools">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_tools</span><span class="p">(</span><span class="n">local_tools</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">],</span> <span class="n">extra_tools</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject duplicate names before a graph can replace a tool silently.&quot;&quot;&quot;</span>
+    <span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">local_tools</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_tools</span><span class="p">]</span>
+    <span class="n">names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tool</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate agent tool name: </span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tools</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_values</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SecretStr</span><span class="p">],</span> <span class="n">references</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">resolved</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">references</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP environment variable </span><span class="si">{</span><span class="n">variable</span><span class="si">!r}</span><span class="s2"> is missing or empty.&quot;</span><span class="p">)</span>
+        <span class="n">resolved</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">resolved</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_client</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MCPServerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Client</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp.client.transports</span><span class="w"> </span><span class="kn">import</span> <span class="n">StdioTransport</span><span class="p">,</span> <span class="n">StreamableHttpTransport</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">transport</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">_resolve_values</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">headers_env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">key</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="n">key</span> <span class="o">+</span> <span class="n">value</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="se">\r\n\x00</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MCP headers cannot contain empty names, line breaks, or NUL characters.&quot;</span><span class="p">)</span>
+        <span class="n">transport</span> <span class="o">=</span> <span class="n">StreamableHttpTransport</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">transport</span> <span class="o">=</span> <span class="n">StdioTransport</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">_resolve_values</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">env_env</span><span class="p">),</span>
+            <span class="c1"># The default keeps subprocesses alive after a tool or interrupt exits.</span>
+            <span class="n">keep_alive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">Client</span><span class="p">(</span><span class="n">transport</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">init_timeout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_mcp_tools">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.load_mcp_tools">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">load_mcp_tools</span><span class="p">(</span>
+    <span class="n">servers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">discovery_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Discover namespaced tools. Each tool opens and closes its own connection context.</span>
+
+<span class="sd">    The SDK can share a connection between overlapping calls. No connection stays</span>
+<span class="sd">    open after the last call exits. Restart the worker to refresh tool schemas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">servers</span> <span class="o">=</span> <span class="n">TypeAdapter</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">ServerName</span><span class="p">,</span> <span class="n">MCPServerConfig</span><span class="p">])</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">servers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">servers</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">langchain.mcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPAdapter</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;MCP servers are configured. Install langgraph-agent-toolkit[mcp] to use them.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+
+    <span class="c1"># Resolve every credential before starting any connection or subprocess.</span>
+    <span class="n">clients</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">_create_client</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">servers</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">discover</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MCPServerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tools</span> <span class="o">=</span> <span class="k">await</span> <span class="n">MCPAdapter</span><span class="p">(</span><span class="n">clients</span><span class="p">[</span><span class="n">name</span><span class="p">])</span><span class="o">.</span><span class="n">list_tools</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># Transport errors can include request headers or credential-bearing URLs.</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP discovery failed for server </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">tool_allowlist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">tool_allowlist</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP server </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> does not provide these tools: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">tool</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span> <span class="k">if</span> <span class="n">tool</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">tool_allowlist</span><span class="p">]</span>
+        <span class="n">namespaced</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+            <span class="n">public_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Za-z0-9_-]{1,64}&quot;</span><span class="p">,</span> <span class="n">public_name</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP server </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> has a tool name that exceeds the supported name format.&quot;</span><span class="p">)</span>
+            <span class="c1"># Copy the LangChain wrapper. Its callback keeps the upstream name.</span>
+            <span class="c1"># A ClientGroup would also refresh its routing catalog on each call.</span>
+            <span class="n">namespaced</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">public_name</span><span class="p">}))</span>
+        <span class="k">return</span> <span class="n">merge_tools</span><span class="p">([],</span> <span class="n">namespaced</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">discovery_timeout</span><span class="p">):</span>
+        <span class="c1"># Wait for all contexts to close before reporting a discovery failure.</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">(</span><span class="n">discover</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">servers</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">result</span>
+    <span class="n">loaded</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">servers</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">merge_tools</span><span class="p">([],</span> <span class="p">[</span><span class="n">tool</span> <span class="k">for</span> <span class="n">tools</span> <span class="ow">in</span> <span class="n">loaded</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">loaded</span></div>
+
+
+
+<div class="viewcode-block" id="configure_mcp_agents">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.mcp.html#langgraph_agent_toolkit.core.mcp.configure_mcp_agents">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">configure_mcp_agents</span><span class="p">(</span><span class="n">executor</span><span class="p">:</span> <span class="n">AgentExecutor</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rebuild_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build MCP graphs and optionally refresh all graphs for a new service lifespan.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_SERVERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_AGENT_SERVERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rebuild_all</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_agent</span>
+
+    <span class="n">selections</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_AGENT_SERVERS</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="p">{</span><span class="n">get_default_agent</span><span class="p">():</span> <span class="nb">list</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MCP_SERVERS</span><span class="p">)}</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_SERVERS</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="p">)</span>
+    <span class="n">agents</span> <span class="o">=</span> <span class="p">{</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">executor</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">executor</span><span class="o">.</span><span class="n">get_all_agent_info</span><span class="p">()}</span>
+    <span class="k">for</span> <span class="n">agent_name</span><span class="p">,</span> <span class="n">server_names</span> <span class="ow">in</span> <span class="n">selections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">agent_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP_AGENT_SERVERS refers to an unloaded agent: </span><span class="si">{</span><span class="n">agent_name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">agents</span><span class="p">[</span><span class="n">agent_name</span><span class="p">]</span><span class="o">.</span><span class="n">graph_factory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent </span><span class="si">{</span><span class="n">agent_name</span><span class="si">!r}</span><span class="s2"> needs a graph_factory to use configured MCP tools.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">server_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">server_names</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP_AGENT_SERVERS has duplicate servers for agent </span><span class="si">{</span><span class="n">agent_name</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">server_names</span><span class="p">)</span> <span class="o">-</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_SERVERS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MCP_AGENT_SERVERS refers to an unknown server for agent </span><span class="si">{</span><span class="n">agent_name</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">needed</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span> <span class="k">for</span> <span class="n">names</span> <span class="ow">in</span> <span class="n">selections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">}</span>
+    <span class="n">loaded</span> <span class="o">=</span> <span class="k">await</span> <span class="n">load_mcp_tools</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">config</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">MCP_SERVERS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">needed</span><span class="p">},</span>
+        <span class="n">discovery_timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MCP_DISCOVERY_TIMEOUT</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Build all graphs before replacing any executor-local graph.</span>
+    <span class="n">graphs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph_factory</span><span class="p">([</span><span class="n">tool</span> <span class="k">for</span> <span class="n">server</span> <span class="ow">in</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">loaded</span><span class="p">[</span><span class="n">server</span><span class="p">]])</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">graph_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rebuild_all</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">graph</span> <span class="ow">in</span> <span class="n">graphs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">agents</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MCPServerConfig&quot;</span><span class="p">,</span> <span class="s2">&quot;configure_mcp_agents&quot;</span><span class="p">,</span> <span class="s2">&quot;load_mcp_tools&quot;</span><span class="p">,</span> <span class="s2">&quot;merge_tools&quot;</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

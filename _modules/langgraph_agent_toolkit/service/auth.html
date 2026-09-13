@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service.auth &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/service/auth.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service.auth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.service.auth</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Bind conversation storage to authenticated callers.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+
+<div class="viewcode-block" id="Principal">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.Principal">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Principal</span><span class="p">:</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">trusted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="validate_auth_configuration">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.validate_auth_configuration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_auth_configuration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject ambiguous credentials and unauthenticated production startup.&quot;&quot;&quot;</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">secret</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">for</span> <span class="n">secret</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USERS</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">user</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USERS</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">token</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AUTH_USERS requires nonempty user IDs and tokens&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tokens</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Each AUTH_USERS token must identify exactly one user&quot;</span><span class="p">)</span>
+    <span class="n">shared</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SECRET</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SECRET</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">shared</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AUTH_SECRET must differ from each AUTH_USERS token&quot;</span><span class="p">)</span>
+    <span class="n">signing_secret</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">FEEDBACK_SIGNING_SECRET</span>
+    <span class="k">if</span> <span class="n">signing_secret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">signing_value</span> <span class="o">=</span> <span class="n">signing_secret</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signing_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">32</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FEEDBACK_SIGNING_SECRET must contain at least 32 characters&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signing_value</span> <span class="o">==</span> <span class="n">shared</span> <span class="ow">or</span> <span class="n">signing_value</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FEEDBACK_SIGNING_SECRET must differ from all client bearer tokens&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">is_dev</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">tokens</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">shared</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Production requires AUTH_SECRET or AUTH_USERS&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="authenticate">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.authenticate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Principal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a bearer token to one principal.&quot;&quot;&quot;</span>
+    <span class="n">matched</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">secret</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USERS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">secrets</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">((</span><span class="n">token</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">secret</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()):</span>
+            <span class="n">matched</span> <span class="o">=</span> <span class="n">Principal</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">matched</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">matched</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SECRET</span> <span class="ow">and</span> <span class="n">secrets</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">token</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SECRET</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="n">Principal</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SERVICE_USER_ID</span><span class="p">,</span> <span class="n">trusted</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_MODE</span> <span class="o">==</span> <span class="s2">&quot;trusted&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTH_SECRET</span> <span class="ow">and</span> <span class="n">settings</span><span class="o">.</span><span class="n">is_dev</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Principal</span><span class="p">(</span><span class="s2">&quot;anonymous&quot;</span><span class="p">,</span> <span class="n">trusted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span> <span class="s2">&quot;Missing or invalid bearer token&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="storage_thread_id">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.storage_thread_id">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">storage_thread_id</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scope short-term checkpoints to their owner, agent, and public thread.</span>
+
+<span class="sd">    This key does not replace the user ID used by long-term memory stores.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">identity</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">],</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s2">&quot;lat:v1:&quot;</span> <span class="o">+</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">identity</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="authenticated_user_id">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.authenticated_user_id">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">authenticated_user_id</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the stable user identity for memory access and observability.&quot;&quot;&quot;</span>
+    <span class="n">principal</span><span class="p">:</span> <span class="n">Principal</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">principal</span>
+    <span class="k">if</span> <span class="n">principal</span><span class="o">.</span><span class="n">trusted</span><span class="p">:</span>
+        <span class="n">owner</span> <span class="o">=</span> <span class="n">user_id</span> <span class="ow">or</span> <span class="n">principal</span><span class="o">.</span><span class="n">user_id</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user_id</span> <span class="o">!=</span> <span class="n">principal</span><span class="o">.</span><span class="n">user_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="s2">&quot;user_id must match the authenticated user&quot;</span><span class="p">)</span>
+        <span class="n">owner</span> <span class="o">=</span> <span class="n">principal</span><span class="o">.</span><span class="n">user_id</span>
+    <span class="k">return</span> <span class="n">owner</span></div>
+
+
+
+<div class="viewcode-block" id="conversation_identity">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.conversation_identity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">conversation_identity</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">create</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the caller and return public, owner, and storage identifiers.&quot;&quot;&quot;</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">authenticated_user_id</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+    <span class="n">public_id</span> <span class="o">=</span> <span class="n">thread_id</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span> <span class="k">if</span> <span class="n">create</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">public_id</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="s2">&quot;thread_id is required&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">public_id</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">256</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">owner</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">256</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="s2">&quot;Conversation identifiers must not exceed 256 characters&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">public_id</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">storage_thread_id</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">public_id</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="execution_input">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.execution_input">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">execution_input</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create execution input with authenticated storage identifiers.&quot;&quot;&quot;</span>
+    <span class="n">public_id</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">conversation_identity</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">forbidden</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;checkpoint_id&quot;</span><span class="p">,</span> <span class="s2">&quot;checkpoint_ns&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">forbidden</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">agent_config</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">agent_config</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="s2">&quot;agent_config cannot override identity or checkpoint fields&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">recursion_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">value</span><span class="o">.</span><span class="n">recursion_limit</span> <span class="o">&lt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_RECURSION_LIMIT</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="mi">422</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;recursion_limit must be between 1 and </span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_RECURSION_LIMIT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">public_id</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">owner</span><span class="p">})</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

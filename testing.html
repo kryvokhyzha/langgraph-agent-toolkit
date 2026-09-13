@@ -1,0 +1,596 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/testing.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API load tests" href="load_testing.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate authentication and checkpoint storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#test-layers">Test layers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#component-tests">Component tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-process-journeys">API process journeys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#container-checks">Container checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#postgresql-integration">PostgreSQL integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langfuse-sdk-compatibility">Langfuse SDK compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#live-langfuse-servers">Live Langfuse servers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#live-verification-on-2026-09-12">Live verification on 2026-09-12</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#real-model-requests">Real model requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connection-and-overload-tests">Connection and overload tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependency-update-review">Dependency update review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coverage-and-test-review">Coverage and test review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-3-14-verification">Python 3.14 verification</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Testing</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/testing.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h1>
+<p>Use the smallest test layer that can detect the failure. Keep a regression test
+for each corrected contract. Run the full local suite before release.</p>
+<p>Install the locked dependencies and run the local suite:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest
+</pre></div>
+</div>
+<p>To test Python 3.14 without replacing the main environment, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">UV_PROJECT_ENVIRONMENT</span><span class="o">=</span>.venv-py314<span class="w"> </span>uv<span class="w"> </span>sync<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.14<span class="w"> </span>--frozen<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--extra<span class="w"> </span>all<span class="w"> </span>--no-install-project
+<span class="nv">UV_PROJECT_ENVIRONMENT</span><span class="o">=</span>.venv-py314<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>--run-e2e<span class="w"> </span>--cov
+</pre></div>
+</div>
+<p>Keep <code class="docutils literal notranslate"><span class="pre">UV_PROJECT_ENVIRONMENT</span></code> on both commands. This selects the same
+interpreter and dependencies for installation and tests.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">all</span></code> instead of the earlier <code class="docutils literal notranslate"><span class="pre">--all-extras</span></code> flag. The <code class="docutils literal notranslate"><span class="pre">all</span></code>
+extra includes the complete feature set. It avoids selecting the incompatible
+<code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code>, and <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> alternatives together.
+To test all features with another SDK generation, add one selector, such as
+<code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">all</span> <span class="pre">--extra</span> <span class="pre">langfuse-v2</span></code>. The dependencies must resolve together.</p>
+<p>The local suite needs no external service or model credentials. It includes
+temporary SQLite databases, in-process HTTP transports, and local MCP stdio
+processes. Test setup disables loading credentials and database paths from
+<code class="docutils literal notranslate"><span class="pre">.env</span></code>. PostgreSQL tests also run when <code class="docutils literal notranslate"><span class="pre">LAT_TEST_POSTGRES_DSN</span></code> is set.
+Test setup also ignores exported <code class="docutils literal notranslate"><span class="pre">LANGFUSE_*</span></code> and
+<code class="docutils literal notranslate"><span class="pre">LANGGRAPH_LANGFUSE_*</span></code> project settings. Live Langfuse tests use only the
+explicit <code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_*</span></code> configuration.</p>
+<section id="test-layers">
+<h2>Test layers<a class="headerlink" href="#test-layers" title="Link to this heading"></a></h2>
+<p>Use <a class="reference internal" href="load_testing.html"><span class="doc">API load tests</span></a> for repeatable HTTP pressure tests, provider faults,
+database faults, worker replacement during traffic, and bounded soak tests.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 50.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Layer</p></th>
+<th class="head"><p>Contract</p></th>
+<th class="head"><p>Location</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Focused tests</p></td>
+<td><p>Validation, error mapping, configuration, middleware, and message formats.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/core</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/agents</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/client</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/helper</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tests/service</span></code>, and <code class="docutils literal notranslate"><span class="pre">tests/ui</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Component integration</p></td>
+<td><p>Real graphs, tools, HTTP protocols, persistence, and dependency SDKs.
+Fakes replace model providers and external services.</p></td>
+<td><p>Tests beside their components and <code class="docutils literal notranslate"><span class="pre">tests/integration</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>API process journeys</p></td>
+<td><p>A real service process, HTTP client, SQLite database, restart, and resume.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/e2e</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/service/test_worker_recovery.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Container checks</p></td>
+<td><p>Built images, model transports, readiness, chat history, and HTML.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tests/integration/test_docker_e2e.py</span></code> and
+<code class="docutils literal notranslate"><span class="pre">tests/integration/docker_transport_smoke.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>External service integration</p></td>
+<td><p>PostgreSQL locking and recovery; Langfuse ingestion and stored results.</p></td>
+<td><p>PostgreSQL and Langfuse live tests in <code class="docutils literal notranslate"><span class="pre">tests/integration</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The directories name the component under test. They do not always identify a
+test layer. For example, <code class="docutils literal notranslate"><span class="pre">tests/service/test_stream_integration.py</span></code> uses an in-process
+ASGI transport. The <code class="docutils literal notranslate"><span class="pre">tests/e2e</span></code> tests use a separate service process and TCP.</p>
+</section>
+<section id="component-tests">
+<h2>Component tests<a class="headerlink" href="#component-tests" title="Link to this heading"></a></h2>
+<p>Native graph tests use the production builders. They check local tool results,
+structured output, bounded local retries, and remote calls without automatic
+retries. The offline import test starts a fresh Python process and blocks
+network connections. It imports every built-in blueprint and assigns a saver.</p>
+<p>Deep Agents integration tests use the optional <code class="docutils literal notranslate"><span class="pre">deepagents</span></code> extra. They check
+planning, virtual file isolation, SQLite recovery, subagent context, approval
+resume, and MCP connection closure. A process test also reads a virtual file
+after a forced API restart. Langfuse SDK tests export a real Deep Agent run
+through each supported SDK generation. Internal summarization must stay out
+of the user-facing stream.</p>
+<p>MCP tests use real FastMCP and LangChain adapters. They cover tool discovery,
+HTTP credentials, stdio, cancellation, timeouts, connection closure, and
+elicitation. HTTP tests replace the network transport with an in-process
+server. They retain the actual protocol and client setup.</p>
+<p>Regression tests also check minimal-package imports, SSE comment and keepalive
+frames, and history queries with omitted optional values. These checks protect
+interfaces that can fail even when a mocked client returns a valid response.
+SQLite service tests check both StateGraph and Functional API history. They
+read existing checkpoints, append messages, stream one new answer, reopen the
+database, and clear the conversation. Functional API history reads LangGraph’s
+private saved-state channel. Keep these tests when upgrading LangGraph.</p>
+</section>
+<section id="api-process-journeys">
+<h2>API process journeys<a class="headerlink" href="#api-process-journeys" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/e2e<span class="w"> </span>tests/service/test_worker_recovery.py<span class="w"> </span>--run-e2e
+</pre></div>
+</div>
+<p>These tests start the service on a local port. They check shared-client
+authentication, separate user memory and thread history, SSE and JSON Lines,
+safe error responses, and concurrent updates. They restart the process and
+check durable history and a pending interrupt. The worker tests kill a worker
+and check replacement under Uvicorn and Gunicorn. They require POSIX signals.</p>
+<p>CI runs these journeys on Python 3.11, 3.12, 3.13, and 3.14. The model is deterministic.
+These tests do not measure model quality or simulate a production load.</p>
+</section>
+<section id="container-checks">
+<h2>Container checks<a class="headerlink" href="#container-checks" title="Link to this heading"></a></h2>
+<p>Start the backend with the fake model and a persistent checkpointer. Start the
+frontend and set <code class="docutils literal notranslate"><span class="pre">AGENT_URL</span></code>, <code class="docutils literal notranslate"><span class="pre">APP_URL</span></code>, and <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> for the tests.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/integration/test_docker_e2e.py<span class="w"> </span>--run-docker
+</pre></div>
+</div>
+<p>CI builds both images before this check. Tests call readiness, invoke, stream,
+history, and clear-history endpoints. They check the frontend health endpoint
+and HTML response. They do not control a browser or test Streamlit interaction.
+An unavailable requested container causes failure.</p>
+<p>The API image also has a separate transport check. It runs with the image’s
+runtime dependencies and no test packages. Build the image, then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>docker/api/Dockerfile<span class="w"> </span>-t<span class="w"> </span>toolkit-api<span class="w"> </span>.
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--network<span class="w"> </span>none<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--mount<span class="w"> </span><span class="s2">&quot;type=bind,source=</span><span class="nv">$PWD</span><span class="s2">/tests/integration/docker_transport_smoke.py,target=/tmp/docker_transport_smoke.py,readonly&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>toolkit-api<span class="w"> </span>python<span class="w"> </span>/tmp/docker_transport_smoke.py
+</pre></div>
+</div>
+<p>This check verifies the image’s aiohttp default and an explicit HTTPX override.
+It checks actual SDK requests, streaming, usage, shared clients, and client closure. A local server
+returns synthetic model responses. The test uses a dummy key and has no external
+network access. CI runs it after building the default API image. It verifies the
+installed transport dependencies; it does not verify a live model provider.</p>
+</section>
+<section id="postgresql-integration">
+<h2>PostgreSQL integration<a class="headerlink" href="#postgresql-integration" title="Link to this heading"></a></h2>
+<p>Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_POSTGRES_DSN</span></code> to a disposable test database. The tests create
+and remove test schemas and records.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/integration/test_postgres_reliability.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/integration/test_postgres_migration.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/core/test_concurrency.py<span class="w"> </span>tests/core/test_deadlocks.py<span class="w"> </span>--run-postgres
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--run-postgres</span></code> fails when the DSN is missing. Tests check migration,
+checkpoint recovery, lock release, cancellation, connection loss, and bounded
+connection pools. CI supplies a PostgreSQL 16 service for this job.</p>
+</section>
+<section id="langfuse-sdk-compatibility">
+<h2>Langfuse SDK compatibility<a class="headerlink" href="#langfuse-sdk-compatibility" title="Link to this heading"></a></h2>
+<p>CI installs SDK 2.60.10, 3.15.0, and 4.15.2 separately on Python 3.11, 3.12,
+3.13, and 3.14. Each installation selects the matching <code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code>,
+or <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> extra and pins the exact SDK baseline. Each environment also
+resolves the MCP and Deep Agents extras. Compatibility tests check callbacks,
+prompts, feedback, configuration, and dependency contracts.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/integration/test_langfuse_sdk.py</span></code> uses the installed SDK. It runs real
+graph callbacks and checks serialized HTTP requests and OpenTelemetry exports.
+The receiving transport is controlled by the test. SDK tests therefore verify
+the output protocol; live tests verify server ingestion and stored records.</p>
+<p>Use a separate environment to test another SDK without changing the main one:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>.venv-langfuse
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--python<span class="w"> </span>.venv-langfuse/bin/python<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">&#39;.[langfuse-v2,openai,mcp,deepagents]&#39;</span><span class="w"> </span><span class="s1">&#39;langfuse==2.60.10&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>pytest<span class="w"> </span>pytest-asyncio<span class="w"> </span>pytest-env
+uv<span class="w"> </span>pip<span class="w"> </span>check<span class="w"> </span>--python<span class="w"> </span>.venv-langfuse/bin/python
+uv<span class="w"> </span>run<span class="w"> </span>--no-project<span class="w"> </span>--python<span class="w"> </span>.venv-langfuse/bin/python<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/core/test_langfuse_compatibility.py<span class="w"> </span>tests/core/test_langfuse_settings.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/core/test_observability.py<span class="w"> </span>tests/core/test_dependency_contracts.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/integration/test_langfuse_sdk.py<span class="w"> </span>tests/integration/test_deepagents.py
+</pre></div>
+</div>
+<p>Change both the selector and the exact SDK pin for another matrix entry.
+Use <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code> with <code class="docutils literal notranslate"><span class="pre">langfuse==3.15.0</span></code> or <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> with
+<code class="docutils literal notranslate"><span class="pre">langfuse==4.15.2</span></code>. The selectors are published package extras. The exact pin
+reproduces the CI baseline; it is optional for ordinary application installs.
+See <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> for SDK and server selection.</p>
+</section>
+<section id="live-langfuse-servers">
+<h2>Live Langfuse servers<a class="headerlink" href="#live-langfuse-servers" title="Link to this heading"></a></h2>
+<p>Use a dedicated test project. Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_BASE_URL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_PUBLIC_KEY</span></code>, <code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_SECRET_KEY</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_SERVER_VERSION</span></code>. The version must match the exact server
+version from its health endpoint. Use <code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_TIMEOUT</span></code> to change
+the ingestion wait limit from its 90-second default.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-project<span class="w"> </span>--python<span class="w"> </span>.venv-langfuse/bin/python<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/integration/test_langfuse_live.py<span class="w"> </span>--run-langfuse
+</pre></div>
+</div>
+<p>The tests run native <code class="docutils literal notranslate"><span class="pre">create_agent</span></code> and Deep Agent graphs with scripted
+models and real local tools. The Deep Agent delegates a calculation to a
+subagent. Tests read prompt versions, completed graph and model records, tool
+inputs and outputs, parent links, user and session IDs, and feedback from the
+server. They wait for ingestion to finish. Trace and score records keep
+<code class="docutils literal notranslate"><span class="pre">lat-test-</span></code> names. SDK v2 can also leave test prompts. Missing configuration,
+an incorrect server version, or missing records causes failure.</p>
+<p>The manual <code class="docutils literal notranslate"><span class="pre">langfuse-live.yml</span></code> workflow tests SDK v2 with server v2, all three
+SDK generations with server v3, and SDK v4 with server v4. Configure the repository
+environments <code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code>, and <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code>. Each needs
+variables <code class="docutils literal notranslate"><span class="pre">LANGFUSE_TEST_URL</span></code> and <code class="docutils literal notranslate"><span class="pre">LANGFUSE_TEST_VERSION</span></code>, plus secrets
+<code class="docutils literal notranslate"><span class="pre">LANGFUSE_TEST_PUBLIC_KEY</span></code> and <code class="docutils literal notranslate"><span class="pre">LANGFUSE_TEST_SECRET_KEY</span></code>. Server v3 must be
+at least 3.63.0 for SDK v3 and v4. A passing SDK matrix does not replace this
+live-server result.</p>
+<p>The manual workflow omits SDK v3 with server v4. Use the command above to test
+this supported but deprecated combination. Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_LANGFUSE_TIMEOUT=1200</span></code>.
+This allows for the server’s delayed processing of legacy SDK observations.</p>
+<section id="live-verification-on-2026-09-12">
+<h3>Live verification on 2026-09-12<a class="headerlink" href="#live-verification-on-2026-09-12" title="Link to this heading"></a></h3>
+<p>The following checks ran for release <code class="docutils literal notranslate"><span class="pre">0.10.0</span></code>. Each server used a disposable
+database and test project. Each row passed both the native and Deep Agent tests
+described above. These server tests use scripted models and real local tools.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Completed live server checks</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 35.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Langfuse Server</p></th>
+<th class="head"><p>Python SDK</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2.95.11</p></td>
+<td><p>2.60.10</p></td>
+<td><p>2 passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>3.225.7</p></td>
+<td><p>2.60.10</p></td>
+<td><p>2 passed</p></td>
+</tr>
+<tr class="row-even"><td><p>3.225.7</p></td>
+<td><p>3.15.0</p></td>
+<td><p>2 passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>3.225.7</p></td>
+<td><p>4.15.2</p></td>
+<td><p>2 passed</p></td>
+</tr>
+<tr class="row-even"><td><p>4.35.0</p></td>
+<td><p>4.15.2</p></td>
+<td><p>2 passed on the second attempt</p></td>
+</tr>
+</tbody>
+</table>
+<p>The first server v4 attempt failed both cases. A prompt read timed out before
+the native graph ran. The Deep Agent ran, but trace export timed out and the
+stored-record check exceeded its 180-second limit. The records and feedback
+became available later. During this attempt, the disposable server’s worker
+and ClickHouse were heavily CPU throttled. Ingestion jobs lost their worker
+locks and were requeued automatically. No container ran out of memory or
+restarted. Web health remained successful, so health alone did not establish
+that ingestion was ready.</p>
+<p>The second v4 attempt passed in 133.08 seconds after the worker limit changed
+from 1 to 2 CPUs and the ClickHouse limit changed from 1.5 to 2 CPUs. Memory
+limits stayed the same. The 10-second HTTP timeout and 180-second ingestion
+limit also stayed the same. The v4 reader now combines duplicate observation
+IDs only when all returned fields match. Conflicting rows fail the test.
+The v4 checks also require user and session IDs on every observation,
+including model calls and subagents.</p>
+<p>SDK v3 with server v4 and server v4 migration modes were not checked in this
+run. All v4 checks used the default <code class="docutils literal notranslate"><span class="pre">events_only</span></code> mode.</p>
+<p>Azure OpenAI <code class="docutils literal notranslate"><span class="pre">gpt-4o-mini-2024-07-18</span></code> also ran through
+<code class="docutils literal notranslate"><span class="pre">CompletionModelFactory</span></code> with real model calls. The native agent called
+<code class="docutils literal notranslate"><span class="pre">multiply</span></code> and returned 42. The Deep Agent called <code class="docutils literal notranslate"><span class="pre">multiply</span></code>, wrote a report,
+delegated review through <code class="docutils literal notranslate"><span class="pre">task</span></code>, and read the report. A new graph and SQLite
+connection then read the saved report. These graph checks used 12 model calls
+and 29,179 reported tokens. A separate connection probe used 18 tokens.</p>
+<p>The built <code class="docutils literal notranslate"><span class="pre">0.10.0</span></code> wheel was also installed in a clean environment with the
+locked <code class="docutils literal notranslate"><span class="pre">deepagents</span></code>, <code class="docutils literal notranslate"><span class="pre">openai</span></code>, and <code class="docutils literal notranslate"><span class="pre">langfuse</span></code> extras. Its dependency check
+passed. The production app ran through its ASGI API with Azure, a temporary
+SQLite database, and server v4. Invocation, JSON Lines streaming, virtual-file
+retrieval, history, and feedback passed. This used four model calls and 13,413
+reported tokens. This check used an in-process HTTP transport; worker process
+replacement is covered by the separate E2E tests.</p>
+<p>That combined run logged Langfuse export timeouts and its first trace read
+timed out. The harness used one-observation batches and the toolkit’s default
+5-second Langfuse timeout. The v4 server also timed out on later diagnostic
+reads after the successful compatibility test. Thus, the passing matrix does
+not establish consistent responsiveness in this resource-limited environment.
+A separate read-only check retried the same API trace IDs 19 times within
+180 seconds and also failed with read timeouts. The API flow is verified, but
+complete stored tracing and token totals for that combined run are not
+verified. No extra model calls were made for these read retries.
+Later diagnostics could read the first API trace with either field selection.
+The final complete-record check reached the server after teardown had started
+and could not run. That connection failure does not indicate a package defect.</p>
+<p>These checks verify tool execution, checkpoint recovery, and stored tracing
+contracts. The scripted server tests do not verify model token accounting.
+These checks do not measure general model quality or production load.</p>
+</section>
+</section>
+<section id="real-model-requests">
+<h2>Real model requests<a class="headerlink" href="#real-model-requests" title="Link to this heading"></a></h2>
+<p>The opt-in OpenAI journey uses the real provider with both HTTPX and aiohttp.
+It checks tools, concurrent streaming, usage, cancellation, and recovery with at
+most twelve model requests. It is separate from the offline SDK and load tests.
+See <a class="reference internal" href="live_llm_testing.html"><span class="doc">Real LLM verification</span></a> for configuration, budgets, and the exact scope.</p>
+</section>
+<section id="connection-and-overload-tests">
+<h2>Connection and overload tests<a class="headerlink" href="#connection-and-overload-tests" title="Link to this heading"></a></h2>
+<p>Connection and overload regressions use local HTTP endpoints and disposable
+databases. They do not call a paid model provider:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/core/test_llm_transport.py<span class="w"> </span>tests/service/test_admission.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/service/test_stream_transport_cleanup.py<span class="w"> </span>tests/service/test_blocking_feedback.py
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/integration/test_postgres_reliability.py<span class="w"> </span>--run-postgres
+</pre></div>
+</div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_POSTGRES_DSN</span></code> to a disposable PostgreSQL database for the second
+test command. The tests create temporary schemas, terminate their own sessions,
+and hold locks to verify recovery. OpenAI and Azure transport tests use the real
+SDK with a local HTTP server. They check connection reuse, pool saturation,
+bounded retries, streaming stalls, dropped sockets, cancellation, proxy and
+credential separation, embeddings, and successive application lifespans.</p>
+<p>ASGI tests check overload before body reads, mounted health probes, optional
+queue cancellation, slow sends, disconnect cleanup, and stalled-cleanup health
+signals. Real graph tests verify trace context cleanup and conversation ordering
+for both SSE and JSON Lines. Feedback tests retain a thread slot until its real
+synchronous call finishes. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for deployment limits.</p>
+<p>The initial combined reliability run on 2026-09-12 passed 695 tests, with 12
+expected skips and 80.50% combined line/branch coverage. It included PostgreSQL 16.15 fault
+tests and both Uvicorn and Gunicorn worker replacement. The skipped tests required
+live Langfuse/Docker services or a different Langfuse SDK generation.</p>
+<p>After the pressure-test fixes, the full regression suite passed 800 tests with
+12 skips. That run included real PostgreSQL faults and both worker supervisors;
+it did not collect a new coverage percentage. After the final load-driver changes,
+186 focused load, provider-transport, error-response, and factory tests passed.
+See <a class="reference internal" href="load_test_results.html"><span class="doc">Local pressure-test results: 2026-09-12</span></a> for
+the separate load measurements, failures, and follow-up runs.</p>
+<p>A separate source matrix checked SDKs 2.60.10, 3.15.0, and 4.15.2 against SDK
+tracing, executor cleanup, and both streaming formats. SDK v2 passed 36 tests.
+SDK v3 and v4 each passed 28 tests with eight version-specific skips. This matrix
+used local HTTP interception, not live Langfuse servers. A final focused rerun
+of the observability and SDK wire tests passed 20 tests on each of those three
+SDK versions. The rebuilt base wheel also passed two application lifespans, fake-model invocation, SQLite persistence,
+and resource cleanup without model-provider or Deep Agents extras.</p>
+</section>
+<section id="dependency-update-review">
+<h2>Dependency update review<a class="headerlink" href="#dependency-update-review" title="Link to this heading"></a></h2>
+<p>Dependabot checks Python and Docker updates each Tuesday. It checks GitHub
+Actions and pre-commit updates monthly. Routine updates have a seven-day
+cooldown. The open version-update PR limits are five for Python, two for
+Actions, one for Docker, and one for pre-commit.</p>
+<p>Python updates retain separate framework, observability, development-tool, and
+general dependency groups. Major upgrades remain separate. Hook revisions share
+one group without a semantic-version filter. Some hook tags have a <code class="docutils literal notranslate"><span class="pre">v</span></code> prefix
+that the updater cannot classify for a minor/patch group. Review major hook
+changes within the grouped PR.</p>
+<p>Security updates use a separate schedule and do not wait for the routine
+cooldown. Compatible Python security updates share a separate group. Major
+security updates remain separate. These settings do not enable Dependabot
+alerts or security updates in repository settings. Keep those features enabled.
+See the <a class="reference external" href="https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference">Dependabot options reference</a>.</p>
+<p>Lower PR limits do not close existing PRs. A PR that already exists can occupy
+a slot until it is merged or closed. Review obsolete PRs after a manual upgrade
+or a dependency-group change. Do not merge an old lockfile across a package
+refactor. Rebase the PR or let Dependabot create an update from the current base.</p>
+<p>Check the complete CI matrix before merging a dependency update. A green wheel
+import or lint job does not establish API, database, or Python-version
+compatibility. Reproduce failures with the PR’s exact <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and
+<code class="docutils literal notranslate"><span class="pre">uv.lock</span></code> in an isolated environment. Run the failing job with coverage when
+CI uses coverage. A short timing test can behave differently with that overhead.</p>
+<p>The pull-request hook job runs the revisions in <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>.
+It stages the PR changes in its disposable checkout because Gitleaks and the
+file-size hook inspect staged changes. It then runs the configured hooks on
+those files. This preparation does not change the files or other CI jobs.</p>
+<p>When hook configuration changes, an additional smoke check uses representative
+Python, YAML, and TOML files. A YAML-only PR would otherwise skip Python hooks.
+This checks hook installation and execution. The smoke check does not replace
+a complete repository review after a major formatter or linter upgrade.
+Hook failures and automatic formatting changes fail the job.</p>
+</section>
+<section id="coverage-and-test-review">
+<h2>Coverage and test review<a class="headerlink" href="#coverage-and-test-review" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>--cov<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+</pre></div>
+</div>
+<p>Coverage includes the whole package, including blueprints, UI, and legacy
+creators. Subprocess coverage is enabled. The 77% minimum combines executed
+lines and branch destinations. It is not a 77% branch-coverage requirement.
+Read line and branch totals separately when reviewing the report.</p>
+<p>CI collects coverage from the package tests and API process journeys on each
+supported Python version. Each job enforces the 77% minimum and retains its
+test and coverage reports. Codecov receives one complete Python 3.13 report.
+This avoids combining repeated uploads from the Python matrix. Codecov fails
+a project decrease of more than two percentage points. Patch coverage remains
+informational. Upload failures fail trusted CI runs. Fork and Dependabot runs
+still enforce the local coverage minimum when an upload is unavailable.</p>
+<p>If tokenless uploads are disabled, configure <code class="docutils literal notranslate"><span class="pre">CODECOV_TOKEN</span></code> as both an
+Actions secret and a Dependabot secret. Fork pull requests do not receive these
+secrets. Keep the Codecov GitHub integration enabled for remote status checks.</p>
+<p>Prefer assertions on returned data, stored state, resource closure, and failure
+behavior. Keep focused unit tests where they explain a boundary. Remove a
+duplicate only when another test checks the same contract. Avoid tests that
+copy a production implementation, assert only a mock return value, or check
+incidental wording. Test production builders directly. Use a fresh process
+when the contract concerns module import behavior.</p>
+<p>Coverage does not establish complete correctness. Live Langfuse checks require
+configured servers. Browser interaction, other model/provider combinations,
+and sustained production load need separate verification.</p>
+</section>
+<section id="python-3-14-verification">
+<h2>Python 3.14 verification<a class="headerlink" href="#python-3-14-verification" title="Link to this heading"></a></h2>
+<p>On 2026-09-13, the full local suite on CPython 3.14.3 passed 938 tests with
+36 skips and 82.08% combined line/branch coverage. The run included API process
+journeys, worker replacement, SQLite persistence, MCP, Deep Agents, and both
+OpenAI HTTP transports. It used synthetic model responses. External service
+tests were not enabled.</p>
+<p>Separate Langfuse SDK checks used both Pydantic 2.13.0 and 2.13.4. For each
+Pydantic version, SDK v2 passed 46 tests with one skip. SDK v3 and v4 each passed
+39 tests with eight skips. Those skips select contracts for another SDK
+generation. Pydantic 2.12.5 reproduced the legacy SDK import failure on Python
+3.14. The conditional dependency minimum prevents that installation.</p>
+<p>A separate Python 3.14 run passed 43 PostgreSQL 16 fault, migration, concurrency,
+and deadlock tests. The database used a disposable container, which was removed
+after the tests. A fresh wheel passed base-service and UI checks outside the
+source checkout. The complete frozen <code class="docutils literal notranslate"><span class="pre">all</span></code> installation also passed. The
+actual Studio development server passed readiness, assistant discovery, and a
+deterministic graph run. These checks used no live model or Langfuse service.</p>
+<p>The exact CI dependency set and test command also passed on CPython 3.13.12:
+938 tests passed, 36 skipped, and 82.16% combined line/branch coverage. This
+check included process journeys and generated the canonical Codecov XML report.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="load_testing.html" class="btn btn-neutral float-right" title="API load tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>
