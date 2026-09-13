@@ -18,6 +18,8 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import SecretStr
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.components.checkpoint.empty import NoOpSaver
+from langgraph_agent_toolkit.core._base_settings import Settings
 from langgraph_agent_toolkit.core.memory.sqlite import SQLiteMemoryBackend
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
@@ -33,8 +35,9 @@ BOB = {"Authorization": "Bearer test-bob-token"}
 
 
 @pytest.fixture
-def configured_service(monkeypatch, tmp_path):
+def configured_service(monkeypatch, tmp_path, mock_env):
     calls = []
+    defaults = Settings(_env_file=None)
 
     async def reply(state):
         message = state["messages"][-1].content
@@ -53,7 +56,7 @@ def configured_service(monkeypatch, tmp_path):
     database = tmp_path / "history.sqlite"
     for key, value in {
         "ENV_MODE": EnvironmentMode.PRODUCTION,
-        "AUTH_MODE": "token",
+        "AUTH_MODE": defaults.AUTH_MODE,
         "AUTH_SECRET": None,
         "AUTH_USERS": {"alice": SecretStr("test-alice-token"), "bob": SecretStr("test-bob-token")},
         "MEMORY_BACKEND": MemoryBackends.SQLITE,
@@ -116,6 +119,20 @@ def test_agent_namespaces_are_separate_with_shared_sqlite_saver(live_service):
     assert invoke(client, "Second agent private", agent="second").status_code == 200
     assert contents(history(client)) == ["First agent private", "reply to First agent private"]
     assert contents(history(client, agent="second")) == ["Second agent private", "reply to Second agent private"]
+
+
+def test_stateless_agent_remains_valid_with_a_configured_service_backend(configured_service):
+    configured_service.module.first.graph.checkpointer = NoOpSaver()
+    with TestClient(configured_service.app, raise_server_exceptions=False) as client:
+        response = client.post(
+            "/first/history/add_messages",
+            headers=ALICE,
+            json={"thread_id": "stateless", "messages": [{"type": "human", "content": "stateless input"}]},
+        )
+        assert response.status_code == 201, response.text
+        assert contents(history(client, thread_id="stateless")) == []
+        assert invoke(client, "stateless run", thread_id="stateless").status_code == 200
+        assert contents(history(client, thread_id="stateless")) == []
 
 
 @pytest.mark.parametrize("endpoint", ["invoke", "stream", "stream/jsonl"])
@@ -318,30 +335,40 @@ def test_unauthenticated_production_configuration_aborts_before_database(configu
     assert configured_service.app.state.ready is False
 
 
+def test_unauthenticated_development_configuration_keeps_optional_user_id(configured_service, monkeypatch):
+    monkeypatch.setattr(settings, "ENV_MODE", EnvironmentMode.DEVELOPMENT)
+    monkeypatch.setattr(settings, "AUTH_USERS", {})
+    with TestClient(configured_service.app) as client:
+        response = invoke(client, "local request", headers={})
+        assert response.status_code == 200, response.text
+        assert contents(history(client, headers={})) == ["local request", "reply to local request"]
+
+
 @pytest.mark.parametrize("endpoint", ["invoke", "stream", "stream/jsonl"])
 def test_one_client_token_can_supply_distinct_user_ids(configured_service, monkeypatch, endpoint):
-    """A trusted client keeps its existing bearer token and request shape."""
-    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
+    """The default accepts the existing bearer token and optional user ID."""
     monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("client-deployment-token"))
     monkeypatch.setattr(settings, "AUTH_USERS", {})
     headers = {"Authorization": "Bearer client-deployment-token"}
     with TestClient(configured_service.app) as client:
-        for user_id in ("user-1", "user-2"):
+        for user_id in (None, "user-1", "user-2"):
+            identity = {} if user_id is None else {"user_id": user_id}
+            message = user_id or "shared service"
             response = client.post(
                 f"/first/{endpoint}",
                 headers=headers,
-                json={"input": {"message": user_id}, "thread_id": "same-public-id", "user_id": user_id},
+                json={"input": {"message": message}, "thread_id": "same-public-id", **identity},
             )
             assert response.status_code == 200, response.text
-        for user_id in ("user-1", "user-2"):
-            response = history(client, headers=headers, thread_id="same-public-id", user_id=user_id)
-            assert contents(response) == [user_id, "reply to " + user_id]
-        assert history(client, headers={"Authorization": "Bearer another-client-token"}).status_code == 401
+        for user_id in (None, "user-1", "user-2"):
+            identity = {} if user_id is None else {"user_id": user_id}
+            message = user_id or "shared service"
+            response = history(client, headers=headers, thread_id="same-public-id", **identity)
+            assert contents(response) == [message, "reply to " + message]
 
 
 def test_shared_token_defaults_to_one_service_user(configured_service, monkeypatch):
     """Omitted user IDs use one stable identity for a single client deployment."""
-    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
     monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("client-deployment-token"))
     monkeypatch.setattr(settings, "AUTH_USERS", {})
     headers = {"Authorization": "Bearer client-deployment-token"}
@@ -352,6 +379,53 @@ def test_shared_token_defaults_to_one_service_user(configured_service, monkeypat
         explicit = history(client, headers=headers, user_id=settings.AUTH_SERVICE_USER_ID)
         assert implicit.json() == explicit.json()
         assert contents(implicit) == ["hello", "reply to hello"]
+        added = client.post(
+            "/first/history/add_messages",
+            headers=headers,
+            json={"thread_id": "shared", "messages": [{"type": "human", "content": "service note"}]},
+        )
+        assert added.status_code == 201, added.text
+        assert contents(history(client, headers=headers)) == ["hello", "reply to hello", "service note"]
+        assert contents(history(client, headers=headers, user_id="user-1")) == []
+        cleared = client.request("DELETE", "/first/history/clear", headers=headers, json={"thread_id": "shared"})
+        assert cleared.status_code == 200, cleared.text
+        assert contents(history(client, headers=headers)) == []
+
+
+@pytest.mark.parametrize("endpoint", ["invoke", "stream", "stream/jsonl", "history"])
+@pytest.mark.parametrize("headers", [{}, {"Authorization": "Bearer another-client-token"}])
+def test_default_shared_token_auth_rejects_missing_or_invalid_credentials(
+    configured_service, monkeypatch, endpoint, headers
+):
+    monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("client-deployment-token"))
+    monkeypatch.setattr(settings, "AUTH_USERS", {})
+    with TestClient(configured_service.app) as client:
+        if endpoint == "history":
+            response = history(client, headers=headers)
+        else:
+            response = client.post(f"/first/{endpoint}", headers=headers, json={"input": {"message": "denied"}})
+        assert response.status_code == 401, response.text
+        assert response.headers["www-authenticate"] == "Bearer"
+        assert response.headers["content-type"].startswith("application/json")
+        assert configured_service.calls == []
+
+
+@pytest.mark.parametrize("endpoint", ["invoke", "stream", "stream/jsonl"])
+def test_token_mode_remains_an_explicit_identity_bound_option(configured_service, monkeypatch, endpoint):
+    monkeypatch.setattr(settings, "AUTH_MODE", "token")
+    monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("client-deployment-token"))
+    monkeypatch.setattr(settings, "AUTH_USERS", {})
+    headers = {"Authorization": "Bearer client-deployment-token"}
+    with TestClient(configured_service.app) as client:
+        denied = client.post(
+            f"/first/{endpoint}",
+            headers=headers,
+            json={"input": {"message": "denied"}, "user_id": "other-user"},
+        )
+        assert denied.status_code == 403, denied.text
+        assert configured_service.calls == []
+        allowed = client.post(f"/first/{endpoint}", headers=headers, json={"input": {"message": "allowed"}})
+        assert allowed.status_code == 200, allowed.text
 
 
 @pytest.mark.parametrize("endpoint", ["invoke", "stream", "stream/jsonl"])
@@ -375,7 +449,6 @@ def test_user_memory_spans_threads_and_survives_history_clear(configured_service
     graph = builder.compile(store=user_store)
     configured_service.module.first = Agent("first", "User memory agent", graph)
     configured_service.module.second = Agent("second", "Another user memory agent", graph)
-    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
     monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("client-deployment-token"))
     monkeypatch.setattr(settings, "AUTH_USERS", {})
     headers = {"Authorization": "Bearer client-deployment-token"}

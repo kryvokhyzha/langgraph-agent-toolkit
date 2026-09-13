@@ -32,6 +32,8 @@ async def draw_messages(
     # Store intermediate streaming tokens.
     streaming_content = ""
     streaming_placeholder = None
+    pending_tool_calls = set()
+    tool_statuses = {}
 
     # Use `None` to terminate the stream. An empty token is valid.
     while True:
@@ -78,7 +80,9 @@ async def draw_messages(
                 with st.session_state.last_message:
                     # Write message content and reset streaming data.
                     if msg.content:
-                        if streaming_placeholder:
+                        if pending_tool_calls and not msg.tool_calls and not streaming_placeholder:
+                            st.warning(msg.content)
+                        elif streaming_placeholder:
                             streaming_placeholder.write(msg.content)
                             streaming_content = ""
                             streaming_placeholder = None
@@ -86,64 +90,46 @@ async def draw_messages(
                             st.write(msg.content)
 
                     if msg.tool_calls:
-                        # Map each tool call ID to its status container.
-                        call_results = {}
-
                         for tool_call in msg.tool_calls:
+                            pending_tool_calls.add(tool_call["id"])
                             if st.session_state.display_tools_execution:
                                 status = st.status(
                                     f"""Tool Call: {tool_call["name"]}""",
                                     state="running" if is_new else "complete",
                                 )
-                                call_results[tool_call["id"]] = status
+                                tool_statuses[tool_call["id"]] = status
                                 status.write("Input:")
                                 status.write(tool_call["args"])
 
-                        # Read one `ToolMessage` for each tool call unless the run pauses.
-                        for _ in range(len(msg.tool_calls)):
-                            tool_result: ChatMessage | str | None = await anext(messages_agen, None)
-
-                            # Stop when the next item is not a `ToolMessage`.
-                            # A human-in-the-loop run can emit an AI interrupt prompt before a tool runs.
-                            # A token at this point is invalid.
-                            if not isinstance(tool_result, ChatMessage) or tool_result.type != "tool":
-                                if isinstance(tool_result, ChatMessage):
-                                    if is_new:
-                                        st.session_state.messages.append(tool_result)
-                                    if tool_result.content:
-                                        st.warning(tool_result.content)
-                                elif tool_result is not None:
-                                    st.error(
-                                        f"Unexpected stream chunk while waiting for a tool result: {type(tool_result)}"
-                                    )
-                                    st.stop()
-                                break
-
-                            # Store new results and update the matching status container.
-                            if is_new:
-                                st.session_state.messages.append(tool_result)
-
-                            if st.session_state.display_tools_execution:
-                                # Use a standalone status when `tool_call_id` is missing.
-                                status = call_results.get(tool_result.tool_call_id)
-                                if status is None:
-                                    status = st.status("Tool Result", state="complete")
-                                status.write("Output:")
-                                # Render plain tool output in a code block.
-                                status.code(str(tool_result.content))
-                                status.update(state="complete")
+            case "tool":
+                # Progress events can arrive between a tool call and its result.
+                if is_new:
+                    st.session_state.messages.append(msg)
+                pending_tool_calls.discard(msg.tool_call_id)
+                status = tool_statuses.pop(msg.tool_call_id, None)
+                last_message_type = "tool"
+                if st.session_state.display_tools_execution:
+                    if status is None:
+                        status = st.status("Tool Result", state="complete")
+                    status.write("Output:")
+                    status.code(str(msg.content))
+                    status.update(state="complete")
 
             case "custom":
                 # The `bg-task-agent` uses `CustomData` for task data.
-                try:
-                    task_data: TaskData = TaskData.model_validate(msg.custom_data)
-                except ValidationError:
-                    st.error("Unexpected CustomData message received from agent")
-                    st.write(msg.custom_data)
-                    st.stop()
-
                 if is_new:
                     st.session_state.messages.append(msg)
+                try:
+                    task_data: TaskData | None = TaskData.model_validate(msg.custom_data)
+                except ValidationError:
+                    task_data = None
+                if task_data is None or msg.custom_data.keys() - TaskData.model_fields.keys():
+                    # Keep payloads from agents that use a different progress schema.
+                    last_message_type = "custom"
+                    st.session_state.last_message = st.chat_message(name="task", avatar=":material/manufacturing:")
+                    with st.session_state.last_message:
+                        st.write(msg.custom_data)
+                    continue
 
                 if last_message_type != "task":
                     last_message_type = "task"

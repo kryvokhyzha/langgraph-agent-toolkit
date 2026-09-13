@@ -81,10 +81,12 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
         """
         application_name = f"{settings.POSTGRES_APPLICATION_NAME}-{app_prefix}"
+        min_size = 1 if app_prefix == "locks" else settings.POSTGRES_MIN_SIZE
+        max_size = settings.POSTGRES_LOCK_POOL_SIZE if app_prefix == "locks" else settings.POSTGRES_POOL_SIZE
 
         logger.info(
-            f"Creating PostgreSQL connection pool: min_size={settings.POSTGRES_MIN_SIZE}, "
-            f"max_size={settings.POSTGRES_POOL_SIZE}, max_idle={settings.POSTGRES_MAX_IDLE}, "
+            f"Creating PostgreSQL connection pool: min_size={min_size}, "
+            f"max_size={max_size}, max_idle={settings.POSTGRES_MAX_IDLE}, "
             f"timeout={settings.POSTGRES_POOL_TIMEOUT}s, reconnect_timeout={settings.POSTGRES_RECONNECT_TIMEOUT}s, "
             f"max_lifetime={settings.POSTGRES_MAX_LIFETIME}s, "
             f"statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}ms, "
@@ -108,22 +110,15 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
             pg_options.append(f"-c search_path={settings.POSTGRES_SCHEMA}")
 
-        # Set a timeout for long-running statements.
-        if settings.POSTGRES_STATEMENT_TIMEOUT > 0:
-            pg_options.append(f"-c statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}")
-
-        # Set a timeout while waiting for locks.
-        if settings.POSTGRES_LOCK_TIMEOUT > 0:
-            pg_options.append(f"-c lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}")
-
-        # Set a timeout for idle transactions.
-        if settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT > 0:
-            pg_options.append(
-                f"-c idle_in_transaction_session_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}"
-            )
-
-        if pg_options:
-            connection_kwargs["options"] = " ".join(pg_options)
+        # Send zero explicitly to disable an inherited database or role timeout.
+        pg_options.extend(
+            [
+                f"-c statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}",
+                f"-c lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}",
+                f"-c idle_in_transaction_session_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}",
+            ]
+        )
+        connection_kwargs["options"] = " ".join(pg_options)
 
         # Log failed reconnection attempts.
         def on_reconnect_failed(pool: AsyncConnectionPool) -> None:
@@ -142,8 +137,8 @@ class PostgresMemoryBackend(BaseMemoryBackend):
         ).hexdigest()
         async with AsyncConnectionPool(
             conninfo,
-            min_size=1 if app_prefix == "locks" else settings.POSTGRES_MIN_SIZE,
-            max_size=settings.POSTGRES_LOCK_POOL_SIZE if app_prefix == "locks" else settings.POSTGRES_POOL_SIZE,
+            min_size=min_size,
+            max_size=max_size,
             max_waiting=settings.POSTGRES_POOL_MAX_WAITING,
             max_idle=settings.POSTGRES_MAX_IDLE,
             timeout=settings.POSTGRES_POOL_TIMEOUT,
@@ -195,7 +190,8 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
         """
         async with self._get_connection_context(
-            lambda pool: AsyncPostgresSaver(conn=pool), app_prefix="saver"
+            lambda pool: AsyncPostgresSaver(conn=pool),
+            app_prefix="saver",
         ) as saver:
             yield saver
 
@@ -208,7 +204,8 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
         """
         async with self._get_connection_context(
-            lambda pool: AsyncPostgresStore(conn=pool), app_prefix="store"
+            lambda pool: AsyncPostgresStore(conn=pool),
+            app_prefix="store",
         ) as store:
             yield store
 
@@ -220,7 +217,10 @@ class PostgresMemoryBackend(BaseMemoryBackend):
     def get_lock_pool(self):
         """Create a separate pool for long-running conversation locks."""
         self.validate_config()
-        return self._get_connection_context(lambda pool: pool, app_prefix="locks")
+        return self._get_connection_context(
+            lambda pool: pool,
+            app_prefix="locks",
+        )
 
     def get_memory_store(self) -> AbstractAsyncContextManager[AsyncPostgresStore]:
         """Initialize and return a PostgreSQL store."""

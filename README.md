@@ -13,7 +13,7 @@ persistent conversation history, managed model connections, and optional tools
 and observability. Use your own client or the included Streamlit interface.
 
 **Python 3.11–3.14.** The API image uses Python 3.13. Existing deployments
-should read the [0.10.0 migration guide](docs/migration.rst) and
+should read the [0.10.x migration guide](docs/migration.rst) and
 [changelog](CHANGELOG.md) before upgrading.
 
 [Quickstart](#quickstart) · [Integrations](#choose-an-integration) ·
@@ -133,10 +133,20 @@ a store. SQLite supplies checkpoints but has no long-term store.
 The service separates conversation storage by authenticated user, agent, and
 public thread ID. Keep these values consistent when reading or updating history.
 
-For one deployment per client, use one `AUTH_SECRET`. With `AUTH_MODE=trusted`,
-your trusted application backend supplies the end user's `user_id`. That backend
-must authenticate the end user. With `AUTH_MODE=token`, the token identifies the
-user. The service rejects a different supplied user ID. See the
+For one deployment per client, keep one `AUTH_SECRET`. The default
+`AUTH_MODE=trusted` preserves 0.9.2 shared bearer-token authentication.
+`user_id` is optional. Your trusted application can supply an end user's ID. If
+it omits the field, the service uses `AUTH_SERVICE_USER_ID` (default:
+`service`). Keep that identity stable for each conversation.
+
+No new auth header or per-user token is required. If an existing deployment sets
+`AUTH_MODE=token`, remove that override or set it to `trusted` to use the
+compatible behavior. Token mode remains available as an explicit option.
+`AUTH_USERS` tokens always identify one user, in either mode. The service
+rejects a different supplied user ID for those tokens.
+
+Authentication compatibility does not remove the history pagination, checkpoint
+migration, or validation changes. See the
 [authentication and migration guide](docs/migration.rst) for curl examples and
 existing checkpoint migration.
 

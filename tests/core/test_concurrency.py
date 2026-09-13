@@ -192,6 +192,63 @@ async def test_sqlite_cancellation_releases_file_lock(tmp_path):
 
 
 @pytest.mark.asyncio
+async def test_cancelled_sqlite_waiter_does_not_keep_a_file_lock(tmp_path):
+    path = str(tmp_path / "cancel-waiter.sqlite")
+    holder_entered = asyncio.Event()
+    waiter_started = asyncio.Event()
+    release_holder = asyncio.Event()
+    coordinator = SQLiteConversationCoordinator(path, timeout=1)
+
+    async def hold():
+        async with SQLiteConversationCoordinator(path, timeout=1).lock("shared"):
+            holder_entered.set()
+            await release_holder.wait()
+
+    async def wait():
+        waiter_started.set()
+        async with coordinator.lock("shared"):
+            pytest.fail("The cancelled waiter acquired the held lock")
+
+    holder = asyncio.create_task(hold())
+    waiter = None
+    try:
+        await holder_entered.wait()
+        waiter = asyncio.create_task(wait())
+        await waiter_started.wait()
+        waiter.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await waiter
+        assert not coordinator._entries
+        # Cancellation must not release the other worker's lock.
+        with pytest.raises(ConversationBusyError):
+            async with SQLiteConversationCoordinator(path, timeout=0.02).lock("shared"):
+                pass
+    finally:
+        if waiter is not None and not waiter.done():
+            waiter.cancel()
+            with suppress(asyncio.CancelledError):
+                await waiter
+        release_holder.set()
+        await holder
+    async with coordinator.lock("shared"):
+        pass
+
+
+@pytest.mark.asyncio
+async def test_sqlite_body_timeout_is_preserved_and_releases_file_lock(tmp_path):
+    path = str(tmp_path / "body-timeout.sqlite")
+    coordinator = SQLiteConversationCoordinator(path, timeout=1)
+    error = TimeoutError("The agent operation timed out")
+    with pytest.raises(TimeoutError) as caught:
+        async with coordinator.lock("shared"):
+            raise error
+    assert caught.value is error
+    assert not coordinator._entries
+    async with SQLiteConversationCoordinator(path, timeout=1).lock("shared"):
+        pass
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("stream", [False, True])
 async def test_executor_timeout_stops_node_and_releases_conversation(monkeypatch, stream):
     monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.5)

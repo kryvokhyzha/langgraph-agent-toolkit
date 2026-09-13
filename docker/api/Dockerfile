@@ -57,8 +57,8 @@ EXPOSE 8080
 # Gunicorn worker settings. See `run_api.py`.
 # `--workers`: set the number of worker processes.
 # `--preload_app`: load the app before forking workers.
-# `--timeout`: stop a worker that exceeds the timeout.
-# `--graceful_timeout`: let in-flight requests finish before a worker stops.
+# `--timeout`: stop a silent worker. This is not the async request deadline.
+# `--graceful_timeout`: bound request draining before a worker is forced to stop.
 # `--max_requests[_jitter]`: recycle workers to limit memory growth.
 CMD ["python", "langgraph_agent_toolkit/run_api.py", \
     "--runner_type", "gunicorn", \

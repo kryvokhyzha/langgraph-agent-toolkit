@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 import socket
 import sys
 import threading
@@ -19,6 +20,7 @@ from pydantic import SecretStr
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.core._base_settings import Settings
 from langgraph_agent_toolkit.core.models import (
     CompletionModelFactory,
     EmbeddingModelFactory,
@@ -169,6 +171,29 @@ def model(server, provider="openai", **kwargs):
         params["base_url"] = server.url + "/v1"
     params.update(kwargs)
     return CompletionModelFactory.create(provider, "local-model", model_parameter_values=(), **params)
+
+
+@pytest.mark.parametrize("transport", ["httpx", "aiohttp"])
+@pytest.mark.parametrize("provider", ["openai", "azure_openai"])
+async def test_managed_defaults_match_openai_sdk(model_server, monkeypatch, transport, provider):
+    from openai import DEFAULT_CONNECTION_LIMITS, DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT
+
+    for name in tuple(os.environ):
+        if name.startswith(("LLM_HTTP_", "LANGGRAPH_LLM_HTTP_")):
+            monkeypatch.delenv(name)
+    selected = Settings(_env_file=None, LLM_HTTP_ASYNC_TRANSPORT=transport)
+    async with LLMTransportManager.from_settings(selected) as manager:
+        assert manager.config == LLMTransportConfig(async_transport=transport)
+        assert manager.config.max_connections == DEFAULT_CONNECTION_LIMITS.max_connections
+        assert manager.config.max_keepalive_connections == DEFAULT_CONNECTION_LIMITS.max_keepalive_connections
+        assert manager.config.keepalive_expiry == DEFAULT_CONNECTION_LIMITS.keepalive_expiry
+        with manager.bind():
+            concrete = model(model_server, provider)._model()
+            assert concrete.request_timeout == DEFAULT_TIMEOUT
+            assert concrete.max_retries == DEFAULT_MAX_RETRIES
+            for client in (concrete.root_client, concrete.root_async_client):
+                assert client.timeout == DEFAULT_TIMEOUT
+                assert client.max_retries == DEFAULT_MAX_RETRIES
 
 
 @pytest.mark.parametrize("transport", ["httpx", "aiohttp"])

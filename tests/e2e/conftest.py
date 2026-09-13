@@ -55,7 +55,6 @@ class ApiProcess:
             PYTHONUNBUFFERED="1",
             PYTHON_DOTENV_DISABLED="1",
             ENV_MODE="production",
-            AUTH_MODE="trusted",
             AUTH_SECRET=self.secret,
             AUTH_USERS="{}",
             USE_FAKE_MODEL="true",

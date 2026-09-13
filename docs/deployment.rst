@@ -90,6 +90,19 @@ not replay that request. Set graceful shutdown periods long enough for the
 expected workload. Use a service manager or container orchestrator to restart
 the parent process if it exits.
 
+Gunicorn's ``timeout`` measures worker silence for the async worker class. Use
+``REQUEST_TIMEOUT`` to limit one API request. ``graceful_timeout`` limits the
+time allowed to drain requests after a restart signal. Workers that remain
+after that limit can be stopped forcibly. See the
+`Gunicorn settings <https://gunicorn.org/reference/settings/>`_.
+
+The toolkit image currently sets ``graceful_timeout`` to 30 seconds, while the
+API request limit defaults to 300 seconds. This does not let every permitted
+request finish during deployment. Set the worker drain period from the maximum
+supported request duration plus cleanup time. Set the container termination
+grace period above that drain period. A Docker health check alone does not set
+this budget. Verify the chosen limits during a rolling deployment.
+
 Use the probe endpoints for their separate purposes:
 
 - ``/health/startup`` confirms that initialization has completed.

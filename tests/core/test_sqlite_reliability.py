@@ -105,3 +105,73 @@ async def test_repeated_cancellation_keeps_sqlite_lock_until_rollback(tmp_path, 
         monkeypatch.setattr(saver.conn, "commit", original_commit)
         assert not saver.lock.locked()
         assert await saver.aget_tuple(config) is None
+
+
+async def test_cancellation_during_failed_write_rollback_is_preserved(tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "SQLITE_DB_PATH", str(tmp_path / "cancel-rollback.db"))
+    async with SQLiteMemoryBackend().get_checkpoint_saver() as saver:
+        config = {"configurable": {"thread_id": "failed", "checkpoint_ns": ""}}
+        saved = await saver.aput(config, empty_checkpoint(), {}, {})
+        await saver.conn.execute(
+            "CREATE TRIGGER reject_write BEFORE INSERT ON writes WHEN NEW.channel = 'reject' "
+            "BEGIN SELECT RAISE(ABORT, 'rejected write'); END"
+        )
+        await saver.conn.commit()
+        before_rollback = asyncio.Event()
+        release_rollback = asyncio.Event()
+        original_rollback = saver.conn.rollback
+
+        async def delayed_rollback():
+            before_rollback.set()
+            await release_rollback.wait()
+            await original_rollback()
+
+        monkeypatch.setattr(saver.conn, "rollback", delayed_rollback)
+        pending = asyncio.create_task(
+            saver.aput_writes(saved, [("accepted", "partial"), ("reject", "failure")], "failed-task")
+        )
+        try:
+            await asyncio.wait_for(before_rollback.wait(), 1)
+            pending.cancel()
+            await asyncio.sleep(0)
+            assert saver.lock.locked()
+            assert not pending.done()
+        finally:
+            release_rollback.set()
+            with pytest.raises(asyncio.CancelledError):
+                await asyncio.wait_for(pending, 1)
+
+        assert pending.cancelled()
+        assert not saver.lock.locked()
+        await saver.aput_writes(saved, [("accepted", "complete")], "successful-task")
+        checkpoint = await saver.aget_tuple(config)
+        assert checkpoint.pending_writes == [("successful-task", "accepted", "complete")]
+
+
+@pytest.mark.parametrize("operation", ["write", "clear"])
+async def test_failed_sqlite_checkpoint_change_keeps_saved_history(tmp_path, monkeypatch, operation):
+    monkeypatch.setattr(settings, "SQLITE_DB_PATH", str(tmp_path / "failure.sqlite"))
+    async with SQLiteMemoryBackend().get_checkpoint_saver() as saver:
+        config = {"configurable": {"thread_id": "retained", "checkpoint_ns": ""}}
+        checkpoint = empty_checkpoint()
+        checkpoint["channel_values"]["messages"] = ["saved message"]
+        saved = await saver.aput(config, checkpoint, {}, {})
+        await saver.aput_writes(saved, [("messages", "saved pending write")], "completed-task")
+        before = await saver.aget_tuple(config)
+        event, table = ("INSERT", "checkpoints") if operation == "write" else ("DELETE", "writes")
+        await saver.conn.execute(
+            f"CREATE TRIGGER reject_change BEFORE {event} ON {table} "
+            "BEGIN SELECT RAISE(ABORT, 'rejected checkpoint change'); END"
+        )
+        await saver.conn.commit()
+        with pytest.raises(sqlite3.IntegrityError, match="rejected checkpoint change"):
+            if operation == "write":
+                await saver.aput(saved, empty_checkpoint(), {}, {})
+            else:
+                await saver.adelete_thread("retained")
+        after = await saver.aget_tuple(config)
+        assert after == before
+        await saver.conn.execute("DROP TRIGGER reject_change")
+        await saver.conn.commit()
+        await saver.adelete_thread("retained")
+        assert await saver.aget_tuple(config) is None

@@ -34,8 +34,6 @@ def validate_auth_configuration() -> None:
             raise ValueError("FEEDBACK_SIGNING_SECRET must contain at least 32 characters")
         if signing_value == shared or signing_value in tokens:
             raise ValueError("FEEDBACK_SIGNING_SECRET must differ from all client bearer tokens")
-    if settings.AUTH_MODE == "trusted" and not shared:
-        raise ValueError("AUTH_MODE=trusted requires AUTH_SECRET")
     if not settings.is_dev() and not tokens and not shared:
         raise ValueError("Production requires AUTH_SECRET or AUTH_USERS")
 

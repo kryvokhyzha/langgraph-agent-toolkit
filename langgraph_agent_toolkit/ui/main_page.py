@@ -92,6 +92,10 @@ async def _main_page() -> None:
     use_streaming, stream_protocol = side_panel_component(agent_client)
 
     conversation = (user_id, selected_agent, thread_id)
+    failed_submission = st.session_state.get("failed_submission")
+    if failed_submission is not None and failed_submission["conversation"] != conversation:
+        st.session_state.pop("failed_submission")
+        failed_submission = None
     if st.session_state.get("conversation") != conversation:
         if not requested_thread:
             # Add a welcome message for a new thread.
@@ -125,6 +129,11 @@ async def _main_page() -> None:
 
     await draw_messages(amessage_iter())
 
+    if failed_submission is not None:
+        st.warning("The previous request did not complete. Check the saved history before sending it again.")
+        with st.expander("Previous input"):
+            render_human_message(failed_submission["content"])
+
     # Generate a message when the user submits text or attachments.
     if user_input := st.chat_input(accept_file="multiple", file_type=constants.MULTIMODAL_FILE_TYPES):
         # `accept_file` adds `.text` and `.files` to the submission.
@@ -139,6 +148,7 @@ async def _main_page() -> None:
                 st.error(f"Too many attachments ({n_media}); the limit is {max_attachments}.")
                 st.stop()
 
+        confirmed_count = len(messages)
         messages.append(ChatMessage(type="human", content=message))
         with st.chat_message("user"):
             render_human_message(message)
@@ -160,9 +170,15 @@ async def _main_page() -> None:
                 )
                 messages.append(response)
                 st.chat_message("assistant").write(response.content)
+            st.session_state.pop("failed_submission", None)
             st.rerun()  # Clear stale containers
         except AgentClientError as e:
+            # Reload checkpoints on the next page run. The remote outcome can be uncertain.
+            del messages[confirmed_count:]
+            st.session_state.pop("conversation", None)
+            st.session_state.failed_submission = {"conversation": conversation, "content": message}
             st.error(f"Error generating response: {e}")
+            st.warning("This request may have saved partial progress. Reload the page before sending it again.")
             st.stop()
 
     # Show feedback only after messages are generated.

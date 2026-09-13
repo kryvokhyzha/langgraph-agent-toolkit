@@ -67,10 +67,12 @@ resources during application shutdown. See :doc:`reliability` and :doc:`mcp`.
 4. Set identity and memory contracts
 ------------------------------------
 
-For one service deployment per client application, use ``AUTH_MODE=trusted``
-and one ``AUTH_SECRET``. Keep the shared token in the trusted application
-backend. That backend authenticates each end user and supplies a stable
-``user_id``. Use a separate database or PostgreSQL schema for each deployment.
+For one service deployment per client application, keep the default
+``AUTH_MODE=trusted`` and one ``AUTH_SECRET``. Keep the shared token in the
+trusted application backend. ``user_id`` is optional. That backend can supply
+a stable ID for each authenticated user. If it omits the field, the service
+uses ``AUTH_SERVICE_USER_ID`` (default: ``service``). Use a separate database
+or PostgreSQL schema for each deployment.
 
 For direct access by untrusted users, use ``AUTH_MODE=token`` and individual
 tokens. The service derives identity from the token. See :doc:`migration` for
@@ -149,7 +151,7 @@ recovery. Tune worker, request, model, and database limits together. See
 7. Upgrade existing data and release
 ------------------------------------
 
-When upgrading from raw checkpoint IDs to 0.10.0, create the ownership manifest
+When upgrading from raw checkpoint IDs to 0.10.x, create the ownership manifest
 described in :doc:`migration`. Verify a database backup and the migration dry
 run before applying changes. Stop all checkpoint writers during migration.
 Do not run old and new workers against the same checkpoint tables.

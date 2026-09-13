@@ -367,6 +367,49 @@ of the observability and SDK wire tests passed 20 tests on each of those three
 SDK versions. The rebuilt base wheel also passed two application lifespans, fake-model invocation, SQLite persistence,
 and resource cleanup without model-provider or Deep Agents extras.
 
+Dependency update review
+------------------------
+
+Dependabot checks Python and Docker updates each Tuesday. It checks GitHub
+Actions and pre-commit updates monthly. Routine updates have a seven-day
+cooldown. The open version-update PR limits are five for Python, two for
+Actions, one for Docker, and one for pre-commit.
+
+Python updates retain separate framework, observability, development-tool, and
+general dependency groups. Major upgrades remain separate. Hook revisions share
+one group without a semantic-version filter. Some hook tags have a ``v`` prefix
+that the updater cannot classify for a minor/patch group. Review major hook
+changes within the grouped PR.
+
+Security updates use a separate schedule and do not wait for the routine
+cooldown. Compatible Python security updates share a separate group. Major
+security updates remain separate. These settings do not enable Dependabot
+alerts or security updates in repository settings. Keep those features enabled.
+See the `Dependabot options reference
+<https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference>`_.
+
+Lower PR limits do not close existing PRs. A PR that already exists can occupy
+a slot until it is merged or closed. Review obsolete PRs after a manual upgrade
+or a dependency-group change. Do not merge an old lockfile across a package
+refactor. Rebase the PR or let Dependabot create an update from the current base.
+
+Check the complete CI matrix before merging a dependency update. A green wheel
+import or lint job does not establish API, database, or Python-version
+compatibility. Reproduce failures with the PR's exact ``pyproject.toml`` and
+``uv.lock`` in an isolated environment. Run the failing job with coverage when
+CI uses coverage. A short timing test can behave differently with that overhead.
+
+The pull-request hook job runs the revisions in ``.pre-commit-config.yaml``.
+It stages the PR changes in its disposable checkout because Gitleaks and the
+file-size hook inspect staged changes. It then runs the configured hooks on
+those files. This preparation does not change the files or other CI jobs.
+
+When hook configuration changes, an additional smoke check uses representative
+Python, YAML, and TOML files. A YAML-only PR would otherwise skip Python hooks.
+This checks hook installation and execution. The smoke check does not replace
+a complete repository review after a major formatter or linter upgrade.
+Hook failures and automatic formatting changes fail the job.
+
 Coverage and test review
 ------------------------
 

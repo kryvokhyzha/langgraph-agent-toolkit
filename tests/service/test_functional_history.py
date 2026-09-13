@@ -192,3 +192,34 @@ async def test_invalid_functional_history_is_rejected_without_replacing_the_chec
         after = await saver.aget_tuple(config)
         assert after.config == before.config
         assert after.checkpoint == before.checkpoint
+
+
+async def test_append_preserves_history_without_a_messages_reducer(tmp_path):
+    from typing import TypedDict
+
+    class State(TypedDict):
+        messages: list
+        retained_field: str
+
+    builder = StateGraph(State)
+    builder.add_node("reply", lambda state: state)
+    builder.add_edge(START, "reply")
+    builder.add_edge("reply", END)
+    config = {"configurable": {"thread_id": "replace-channel"}}
+    database = str(tmp_path / "replace-channel.sqlite")
+    async with AsyncSqliteSaver.from_conn_string(database) as saver:
+        graph = builder.compile(checkpointer=saver)
+        await graph.ainvoke(
+            {
+                "messages": [HumanMessage("original", id="old"), HumanMessage("keep", id="keep")],
+                "retained_field": "keep",
+            },
+            config,
+        )
+        await add_graph_history(graph, config, [HumanMessage("edited", id="old"), HumanMessage("new", id="new")])
+
+    async with AsyncSqliteSaver.from_conn_string(database) as saver:
+        graph = builder.compile(checkpointer=saver)
+        assert [message.content for message in await get_graph_history(graph, config)] == ["edited", "keep", "new"]
+        state = await graph.aget_state(config)
+        assert state.values["retained_field"] == "keep"
