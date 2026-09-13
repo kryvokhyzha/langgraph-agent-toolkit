@@ -39,6 +39,11 @@ only. Keep a custom store and its connections open for the lifetime of its agent
 Choose an authentication mode
 -----------------------------
 
+``AUTH_MODE`` is an API worker environment setting. Do not add it to REST
+request bodies or headers. The code default is ``trusted``. This preserves
+0.9.2 shared bearer-token authentication. The example ``.env`` uses the same
+mode. An existing deployment can keep only its shared ``AUTH_SECRET``.
+
 For a separate deployment for each client, keep one shared bearer token. The
 client's trusted application can supply user IDs for the users it serves::
 
@@ -46,13 +51,16 @@ client's trusted application can supply user IDs for the users it serves::
    AUTH_SECRET=CHANGE_ME
 
 Replace ``CHANGE_ME`` with your deployment secret. Set ``AUTH_SECRET`` in the
-shell that runs curl. No per-user token list is required. The existing request
-stays the same before and after this change::
+shell that runs curl. No per-user token list is required. ``user_id`` remains
+optional. This request works before and after the upgrade::
 
    curl http://localhost:8080/chatbot-agent/invoke \
      -H "Authorization: Bearer ${AUTH_SECRET}" \
      -H 'Content-Type: application/json' \
-     -d '{"input":{"message":"Hello"},"thread_id":"conversation-1","user_id":"user-1"}'
+     -d '{"input":{"message":"Hello"},"thread_id":"conversation-1"}'
+
+To select a user's memory identity, the trusted application can still supply
+``"user_id":"user-1"`` in the same JSON body.
 
 The shared token authorizes that client application to supply ``user_id``. The
 service scopes each stored conversation by user, agent, and public thread ID.
@@ -62,11 +70,11 @@ If ``user_id`` is omitted, the service uses ``AUTH_SERVICE_USER_ID`` (default:
 Use a separate database or PostgreSQL schema for each client deployment. Process
 isolation alone does not isolate deployments that share checkpoint tables.
 
-Set ``AUTH_MODE=trusted`` explicitly in each worker's environment. The code
-keeps ``token`` as its default so a shared secret cannot silently grant authority
-to assert user IDs. The new storage keys still require the database migration
-below. Keep the shared token inside the trusted client application. Possession
-of this token grants access to all user identities in that deployment.
+If the deployment explicitly sets ``AUTH_MODE=token``, remove that override or
+set it to ``trusted`` on every worker. An explicit value takes precedence over
+the default. The new storage keys still require the database migration below.
+Keep the shared token inside the trusted client application. Possession of
+this token grants access to all user identities in that deployment.
 
 Optional mode for direct user access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,6 +152,11 @@ ordinary metadata remain supported.
 Update clients and process configuration
 ----------------------------------------
 
+The endpoint paths and HTTP methods remain available. This does not mean that
+all 0.9.2 behavior is unchanged. Trusted mode preserves the shared-token invoke,
+stream, and ordinary feedback request shapes. It does not disable the history,
+validation, error-handling, or storage changes below.
+
 The following changes require a client review before deployment:
 
 * Supply ``thread_id`` for history reads, message additions, and history clearing.
@@ -161,9 +174,9 @@ The following changes require a client review before deployment:
   Handle this exception separately from model text. Do not store an error event
   as an assistant reply.
 
-``AUTH_MODE=trusted`` keeps the existing trusted-backend request shape. It must
-be an explicit deployment choice. The included Streamlit UI is suitable for a
-single-user or private deployment. It does not provide a multiuser login system.
+The default ``AUTH_MODE=trusted`` keeps the existing trusted-backend request
+shape. The included Streamlit UI is suitable for a single-user or private
+deployment. It does not provide a multiuser login system.
 Do not use one backend token as a substitute for user authentication in a public
 Streamlit deployment.
 
@@ -172,6 +185,12 @@ for every worker before it imports the service. A Python setting changed in one
 process does not update the other processes. The service factory validates
 ``custom_settings`` values before it starts a backend. Use the same configuration
 for all workers.
+
+``CHECKPOINT_DURABILITY`` defaults to ``sync``. Each checkpoint must finish
+before the next graph step starts. Database calls still use async methods.
+An explicit ``async`` override keeps overlapping saves and graph steps. Remove
+that override or set it to ``sync`` to use the new default. Both modes report
+write errors. See :doc:`reliability` for recovery limits and tuning guidance.
 
 Check existing persistence
 --------------------------
@@ -294,15 +313,45 @@ database, and provider limits. The optional waiting queue defaults to zero.
 Clients must handle overload responses on streaming endpoints before parsing
 stream events.
 
-Managed OpenAI and Azure model calls now use a 120-second read inactivity
-timeout by default. Set ``LLM_HTTP_READ_TIMEOUT`` for models that take longer
-to produce output. Explicit model timeouts still take precedence. The API Docker
-image now installs and selects the OpenAI SDK's aiohttp adapter by default.
+Managed OpenAI and Azure model calls use connection limits, keepalive expiry,
+phase timeouts, and a retry count from the OpenAI Python SDK 3.13.0 baseline:
+
+.. code-block:: ini
+
+   LLM_HTTP_MAX_CONNECTIONS=1000
+   LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS=100
+   LLM_HTTP_KEEPALIVE_EXPIRY=5.0
+   LLM_HTTP_CONNECT_TIMEOUT=5.0
+   LLM_HTTP_READ_TIMEOUT=600.0
+   LLM_HTTP_WRITE_TIMEOUT=600.0
+   LLM_HTTP_POOL_TIMEOUT=600.0
+   LLM_HTTP_MAX_RETRIES=2
+
+Timeouts are seconds. These are fixed toolkit defaults. They do not change
+automatically when the SDK version changes. Existing environment overrides
+retain their values. Remove old numeric ``LLM_HTTP_*`` overrides to adopt these
+defaults, or keep deliberate deployment-specific limits. Explicit model timeouts
+and retry counts still take precedence. ``LLM_HTTP_MAX_POOLS=32`` and
+``LLM_HTTP_SHUTDOWN_TIMEOUT=10.0`` remain unchanged.
+
+If an existing ``LLM_HTTP_MAX_CONNECTIONS`` override is below 100, also set
+``LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS`` at or below that limit. The new idle
+default of 100 otherwise fails configuration validation.
+
+The read timeout measures inactivity for each provider attempt. It is not the
+total API request deadline. ``REQUEST_TIMEOUT`` remains 300 seconds by default
+and can be lower in a deployment. A 600-second provider timeout does not extend
+that API deadline. Client and ingress timeouts require separate configuration.
+
+The API Docker image installs and selects the OpenAI SDK's aiohttp adapter.
 Rebuild the image and recreate the container. Remove any explicit ``httpx``
 transport setting to inherit the new image default. Keep that setting to retain
 HTTPX. The example ``.env`` no longer sets a transport. Python installations
 outside the image retain HTTPX; install ``openai-aiohttp`` and set
 ``LLM_HTTP_ASYNC_TRANSPORT=aiohttp`` to select the same adapter there.
+The tested SDK 3.13.0 aiohttp adapter does not enforce the separate HTTPX write
+timeout or maximum idle-connection count. See :doc:`reliability` for its other
+transport differences.
 
 Service startup rebuilds agents that register a ``graph_factory``. The factory
 must create the graph and its concrete model clients for the current lifespan.

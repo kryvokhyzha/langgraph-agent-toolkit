@@ -41,6 +41,11 @@ excludes the root ``.env`` and the service environment files listed below.
 Authentication and identity
 ---------------------------
 
+``AUTH_MODE`` is an API server setting. It is not a request field or a client
+constructor argument. The code defaults to ``trusted`` when the setting is
+absent. This preserves 0.9.2 shared bearer-token authentication. The example
+``.env`` uses the same mode. Installing the package does not copy that file.
+
 For one trusted client application, configure:
 
 .. code-block:: bash
@@ -49,11 +54,22 @@ For one trusted client application, configure:
    AUTH_SECRET=replace-with-a-private-shared-secret
    AUTH_SERVICE_USER_ID=service
 
-The client sends ``Authorization: Bearer <AUTH_SECRET>``. In this mode, the
-client application supplies ``user_id`` for its users. A missing ``user_id``
-uses ``AUTH_SERVICE_USER_ID``. Keep the shared secret in that trusted
-application. Use ``AUTH_MODE=token`` and ``AUTH_USERS`` when users connect to
-the API directly. See :doc:`migration` for both request formats.
+The client sends ``Authorization: Bearer <AUTH_SECRET>``. ``user_id`` is
+optional. The trusted application can supply a user's ID. A missing
+``user_id`` uses ``AUTH_SERVICE_USER_ID`` (default: ``service``). Keep the
+shared secret in that application. No new request header or per-user token
+is required for an existing shared-token deployment.
+
+An explicit ``AUTH_MODE=token`` overrides the default. Remove it or set
+``AUTH_MODE=trusted`` on every API worker to use the compatible behavior.
+Apply the same settings to every worker before service import.
+
+Use ``AUTH_MODE=token`` and ``AUTH_USERS`` when users connect to the API
+directly. In token mode, the shared secret identifies
+``AUTH_SERVICE_USER_ID`` only. A different supplied ``user_id`` receives 403.
+An ``AUTH_USERS`` token remains bound to its configured user in either mode.
+See :doc:`migration` for both request formats and the separate history,
+validation, and checkpoint storage changes.
 
 To accept feedback from token users, set ``FEEDBACK_SIGNING_SECRET`` to a
 separate server-only random value with at least 32 characters. Use the same

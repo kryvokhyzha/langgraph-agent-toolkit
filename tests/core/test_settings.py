@@ -34,6 +34,8 @@ def test_settings_default_values():
         assert settings.HOST == "0.0.0.0"
         assert settings.PORT == 8080
         assert settings.USE_FAKE_MODEL is False
+        assert settings.AUTH_MODE == "trusted"
+        assert settings.CHECKPOINT_DURABILITY == "sync"
 
 
 def test_settings_with_compatible_key():

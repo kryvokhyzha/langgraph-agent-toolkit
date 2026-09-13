@@ -40,6 +40,45 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  pre-commit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Install the configured hook runner
+        run: uv sync --frozen --only-group lint
+      - name: Stage the pull request changes in this disposable checkout
+        id: changes
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          comparison_base=$(git merge-base "$PR_BASE_SHA" HEAD)
+          if git diff --quiet "$comparison_base" HEAD -- .pre-commit-config.yaml; then
+            echo "hooks_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "hooks_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+          # Gitleaks and file-size checks inspect the staged changes.
+          # Keep the tested files at HEAD. Change only the index comparison base.
+          git reset --soft "$comparison_base"
+      - name: Run configured hooks on the pull request changes
+        run: uv run --no-sync pre-commit run --show-diff-on-failure
+      - name: Exercise updated hooks with Python, YAML, and TOML files
+        if: steps.changes.outputs.hooks_changed == 'true'
+        run: >-
+          uv run --no-sync pre-commit run --show-diff-on-failure --files
+          .pre-commit-config.yaml pyproject.toml scripts/ci/verify_base_wheel.py
+
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10

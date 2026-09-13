@@ -6,6 +6,48 @@ This file uses the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 format. The project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1]
+
+### Changed
+
+- Match managed LLM connection limits, phase timeouts, and retries to OpenAI SDK
+  3.13.0 defaults. Allow 1,000 connections and 100 idle connections per pool.
+  Use a 5-second idle expiry and connect timeout. Use 600-second read, write,
+  and pool timeouts. Keep the separate API request deadline.
+- Default `AUTH_MODE` to `trusted` to preserve 0.9.2 shared-token
+  authentication. Keep `user_id` optional. Accept a supplied user ID with
+  `AUTH_SECRET`. Keep strict identity binding available through
+  `AUTH_MODE=token`.
+- Reduce Dependabot version-update PR limits and group all hook revisions. Check
+  Actions and hooks monthly. Keep Python and Docker checks weekly. Keep security
+  updates separate from the routine schedule and cooldown.
+- Run configured pre-commit hooks on pull requests. Exercise Python hooks when
+  only hook configuration changes. Prepare feedback routes before testing a
+  short request timeout under coverage.
+- Add `CHECKPOINT_DURABILITY` with the default `sync`. Finish each checkpoint
+  before the next graph step starts. Use `async` to overlap saves and graph
+  steps when the larger crash window is acceptable. Both modes use async
+  database methods and propagate checkpoint write errors.
+- Delegate SQLite lock polling to `filelock.AsyncFileLock`. Separate PostgreSQL
+  lock acquisition, monitoring, and cleanup. Preserve cancellation received
+  during SQLite rollback after a database error.
+
+### Fixed
+
+- Apply zero PostgreSQL timeout values explicitly to disable inherited limits.
+  Report the actual minimum and maximum sizes for each database pool.
+- Preserve prior messages when importing into a graph without a message reducer.
+  Report unsupported streamed output instead of silently skipping it.
+- Preserve interleaved progress and tool-result events in the UI. Keep failed
+  input separate from saved history and reload checkpoints after a client error.
+
+### Documentation
+
+- Explain the `AUTH_MODE` default and shared-token migration settings.
+- Explain checkpoint durability modes and their recovery limits.
+- Separate workload tuning from advanced settings. Clarify SQL timeout scope,
+  connection budgets across replicas, and request shutdown limits.
+
 ## [0.10.0]
 
 ### Changed

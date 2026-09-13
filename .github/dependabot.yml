@@ -4,7 +4,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Europe/Kyiv"
+    cooldown:
+      default-days: 7
     groups:
       actions-minor-and-patch:
         patterns:
@@ -12,7 +16,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     labels:
       - "dependencies"
       - "github-actions"
@@ -22,8 +26,21 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "Europe/Kyiv"
+    cooldown:
+      default-days: 7
     groups:
-      # Review major upgrades separately. Security updates remain separate.
+      # Keep security fixes separate from routine updates.
+      python-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Review major upgrades separately.
       agent-framework:
         patterns:
           - "langchain*"
@@ -61,7 +78,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "python"
@@ -72,6 +89,11 @@ updates:
       - "/docker/app"
     schedule:
       interval: "weekly"
+      day: "tuesday"
+      time: "09:30"
+      timezone: "Europe/Kyiv"
+    cooldown:
+      default-days: 7
     groups:
       # Keep both application images on the same base image versions.
       application-images:
@@ -80,21 +102,24 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - "dependencies"
 
   - package-ecosystem: "pre-commit"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+      time: "09:30"
+      timezone: "Europe/Kyiv"
+    cooldown:
+      default-days: 7
     groups:
-      hooks-minor-and-patch:
+      # Group hook revisions without a semantic-version filter.
+      # Review major tool changes in this PR. CI runs the configured hooks.
+      hooks:
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - "dependencies"

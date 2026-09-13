@@ -29,13 +29,16 @@ class _TransactionLock(asyncio.Lock):
                         raise
 
                 cleanup = asyncio.create_task(rollback())
+                cancelled = False
                 while not cleanup.done():
                     try:
                         await asyncio.shield(cleanup)
                     except asyncio.CancelledError:
                         # Keep the lock until rollback finishes after repeated cancellation.
-                        continue
+                        cancelled = True
                 cleanup.result()
+                if cancelled:
+                    raise asyncio.CancelledError from exc
         finally:
             await super().__aexit__(exc_type, exc, traceback)
 

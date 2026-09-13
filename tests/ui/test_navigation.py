@@ -244,3 +244,40 @@ def test_feedback_sends_the_proof_from_the_generated_message(page, monkeypatch):
     ]
     app.run()
     assert len(feedback_calls) == 1
+
+
+@pytest.mark.parametrize("received_message", [False, True])
+def test_failed_send_reloads_saved_history_and_keeps_input_separate(page, monkeypatch, received_message):
+    app, client = page
+    app.query_params.update(thread_id="saved-thread")
+    app.run()
+    before = list(app.session_state.messages)
+
+    async def failed_stream(**kwargs):
+        assert kwargs["input"]["message"] == "Unconfirmed question"
+        if received_message:
+            yield ChatMessage(type="ai", content="Unconfirmed answer")
+        raise AgentClientError("Connection lost")
+
+    client.astream = failed_stream
+    app.chat_input[0].set_value("Unconfirmed question").run()
+
+    assert not app.exception
+    assert app.session_state.messages == before
+    assert "conversation" not in app.session_state
+    assert app.session_state.failed_submission["content"] == "Unconfirmed question"
+
+    saved = before + [ChatMessage(type="ai", content="Recovered from checkpoint")]
+    client.history_pages[("saved-thread", 0)] = ChatHistory(messages=saved)
+    app.run()
+
+    assert not app.exception
+    assert app.session_state.messages == saved
+    assert any("Check the saved history" in element.value for element in app.warning)
+    assert app.expander[0].label == "Previous input"
+
+    monkeypatch.setattr(settings, "DEFAULT_STREAMLIT_USER_ID", "different-user")
+    app.run()
+    assert not app.exception
+    assert "failed_submission" not in app.session_state
+    assert not app.expander

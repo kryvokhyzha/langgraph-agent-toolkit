@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     PORT: int = 8080
 
     AUTH_SECRET: SecretStr | None = None
-    AUTH_MODE: Literal["token", "trusted"] = "token"
+    AUTH_MODE: Literal["token", "trusted"] = "trusted"
     AUTH_USERS: dict[str, SecretStr] = Field(default_factory=dict)
     AUTH_SERVICE_USER_ID: str = "service"
     FEEDBACK_SIGNING_SECRET: SecretStr | None = Field(default=None, min_length=32)
@@ -55,13 +55,14 @@ class Settings(BaseSettings):
 
     # Per-worker HTTP pools for OpenAI and Azure models created by the factory.
     LLM_HTTP_ASYNC_TRANSPORT: Literal["httpx", "aiohttp"] = "httpx"
-    LLM_HTTP_MAX_CONNECTIONS: int = Field(default=100, gt=0)
-    LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS: int = Field(default=20, ge=0)
-    LLM_HTTP_KEEPALIVE_EXPIRY: float = Field(default=30.0, gt=0, allow_inf_nan=False)
-    LLM_HTTP_CONNECT_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
-    LLM_HTTP_READ_TIMEOUT: float = Field(default=120.0, gt=0, allow_inf_nan=False)
-    LLM_HTTP_WRITE_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
-    LLM_HTTP_POOL_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
+    # Match OpenAI SDK 3.13.0 defaults without importing this optional dependency.
+    LLM_HTTP_MAX_CONNECTIONS: int = Field(default=1000, gt=0)
+    LLM_HTTP_MAX_KEEPALIVE_CONNECTIONS: int = Field(default=100, ge=0)
+    LLM_HTTP_KEEPALIVE_EXPIRY: float = Field(default=5.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_CONNECT_TIMEOUT: float = Field(default=5.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_READ_TIMEOUT: float = Field(default=600.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_WRITE_TIMEOUT: float = Field(default=600.0, gt=0, allow_inf_nan=False)
+    LLM_HTTP_POOL_TIMEOUT: float = Field(default=600.0, gt=0, allow_inf_nan=False)
     LLM_HTTP_MAX_RETRIES: int = Field(default=2, ge=0)
     LLM_HTTP_SHUTDOWN_TIMEOUT: float = Field(default=10.0, gt=0, allow_inf_nan=False)
     LLM_HTTP_MAX_POOLS: int = Field(default=32, gt=0)
@@ -181,8 +182,8 @@ class Settings(BaseSettings):
     POSTGRES_LOCK_TIMEOUT: int = Field(
         default=45000,
         ge=0,
-        description="Maximum time in milliseconds to wait for a lock before giving up. "
-        "Prevents deadlocks from blocking connections. Set to 0 to disable.",
+        description="Maximum SQL lock wait in milliseconds. Set to 0 to disable. "
+        "THREAD_QUEUE_TIMEOUT controls conversation-lock waiting.",
     )
     POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: int = Field(
         default=120000,
@@ -202,6 +203,8 @@ class Settings(BaseSettings):
     DB_CONFIGS_PATH: str | None = None
 
     # Agent configuration.
+    # This controls checkpoint ordering. Database I/O still uses async methods.
+    CHECKPOINT_DURABILITY: Literal["sync", "async", "exit"] = "sync"
     # Bound service work and database lock resources.
     THREAD_QUEUE_TIMEOUT: float = Field(default=60, gt=0, allow_inf_nan=False)
     THREAD_QUEUE_MAX_WAITERS: int = Field(default=32, ge=0)

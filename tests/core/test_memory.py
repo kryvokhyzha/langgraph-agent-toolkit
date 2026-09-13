@@ -1,3 +1,4 @@
+import shlex
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -5,6 +6,7 @@ import pytest
 from psycopg.conninfo import conninfo_to_dict
 from pydantic import SecretStr
 
+from langgraph_agent_toolkit.core.memory import postgres
 from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
 from langgraph_agent_toolkit.core.memory.postgres import PostgresMemoryBackend
 from langgraph_agent_toolkit.core.memory.sqlite import SQLiteMemoryBackend
@@ -158,6 +160,56 @@ class TestPostgresAsyncFunctionality:
     def backend(self):
         """Create a PostgresMemoryBackend instance."""
         return PostgresMemoryBackend()
+
+    @pytest.mark.parametrize("app_prefix", ["saver", "store", "locks"])
+    @pytest.mark.parametrize("timeouts", [(0, 0, 0), (120000, 0, 45000)])
+    async def test_pool_options_preserve_explicit_timeout_values(self, backend, monkeypatch, app_prefix, timeouts):
+        """Forward zero timeouts to PostgreSQL for every pool type."""
+        monkeypatch.setattr(
+            postgres,
+            "settings",
+            postgres.settings.model_copy(
+                update={
+                    "POSTGRES_USER": "test-user",
+                    "POSTGRES_PASSWORD": SecretStr("test-password"),
+                    "POSTGRES_HOST": "localhost",
+                    "POSTGRES_PORT": 5432,
+                    "POSTGRES_DB": "testdb",
+                    "POSTGRES_SCHEMA": "checkpoints",
+                    "POSTGRES_MIN_SIZE": 7,
+                    "POSTGRES_POOL_SIZE": 19,
+                    "POSTGRES_LOCK_POOL_SIZE": 3,
+                    "POSTGRES_STATEMENT_TIMEOUT": timeouts[0],
+                    "POSTGRES_LOCK_TIMEOUT": timeouts[1],
+                    "POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT": timeouts[2],
+                }
+            ),
+        )
+        pool = MagicMock()
+        pool.open = AsyncMock()
+        context = AsyncMock()
+        context.__aenter__.return_value = pool
+        pool_factory = MagicMock(return_value=context)
+        monkeypatch.setattr(postgres, "AsyncConnectionPool", pool_factory)
+
+        with patch.object(postgres.logger, "info") as log:
+            async with backend._get_connection_context(lambda opened_pool: opened_pool, app_prefix) as opened_pool:
+                assert opened_pool is pool
+
+        parameters = pool_factory.call_args.kwargs
+        options = dict(
+            option.split("=", 1) for option in shlex.split(parameters["kwargs"]["options"]) if option != "-c"
+        )
+        assert options == {
+            "search_path": "checkpoints",
+            "statement_timeout": str(timeouts[0]),
+            "lock_timeout": str(timeouts[1]),
+            "idle_in_transaction_session_timeout": str(timeouts[2]),
+        }
+        minimum, maximum = (1, 3) if app_prefix == "locks" else (7, 19)
+        assert parameters["min_size"] == minimum
+        assert parameters["max_size"] == maximum
+        assert f"min_size={minimum}, max_size={maximum}," in log.call_args_list[0].args[0]
 
     @patch("langgraph_agent_toolkit.core.memory.postgres.AsyncConnectionPool")
     @patch("langgraph_agent_toolkit.core.memory.postgres.AsyncPostgresSaver")

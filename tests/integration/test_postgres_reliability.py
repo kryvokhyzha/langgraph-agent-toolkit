@@ -1,15 +1,18 @@
 """Run PostgreSQL reliability checks only with an explicit test DSN."""
 
 import asyncio
+import json
 import os
 import sys
 from contextlib import aclosing, asynccontextmanager, suppress
 from uuid import uuid4
 
+import httpx
 import psycopg
 import pytest
 import pytest_asyncio
 from langchain_core.messages import AIMessage
+from langgraph.checkpoint.base import empty_checkpoint
 from langgraph.graph import END, MessagesState, StateGraph
 from psycopg import sql
 from psycopg_pool import PoolTimeout, TooManyRequests
@@ -26,6 +29,7 @@ from langgraph_agent_toolkit.core.memory.postgres import PostgresMemoryBackend
 from langgraph_agent_toolkit.core.memory.schema_lock import schema_setup_lock
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.service.handler import create_app
 
 
 TEST_DSN = os.environ.get("LAT_TEST_POSTGRES_DSN")
@@ -485,6 +489,125 @@ async def test_checkpoint_iteration_allows_a_second_query(backend, locked):
                 async for checkpoint in checkpoints:
                     async with asyncio.timeout(1):
                         assert await saver.aget_tuple(checkpoint.config) is not None
+
+
+@pytest.mark.parametrize("locked", [False, True])
+@pytest.mark.parametrize("operation", ["write", "clear"])
+async def test_failed_checkpoint_change_keeps_saved_history(backend, locked, operation):
+    @asynccontextmanager
+    async def no_lock():
+        yield
+
+    async with backend.get_checkpoint_saver() as saver, backend.get_lock_pool() as pool:
+        await saver.setup()
+        thread = uuid4().hex
+        config = {"configurable": {"thread_id": thread, "checkpoint_ns": ""}}
+        checkpoint = empty_checkpoint()
+        checkpoint["channel_values"]["messages"] = ["saved message"]
+        checkpoint["channel_versions"]["messages"] = "1"
+        saved = await saver.aput(config, checkpoint, {}, {"messages": "1"})
+        await saver.aput_writes(saved, [("messages", "saved pending write")], "completed-task")
+        before = await saver.aget_tuple(config)
+        event, table = ("INSERT", "checkpoints") if operation == "write" else ("DELETE", "checkpoint_blobs")
+        async with saver._cursor() as cursor:
+            await cursor.execute(
+                "CREATE FUNCTION reject_checkpoint_change() RETURNS trigger LANGUAGE plpgsql AS $$ "
+                "BEGIN RAISE EXCEPTION 'rejected checkpoint change'; END $$"
+            )
+            await cursor.execute(
+                f"CREATE TRIGGER reject_change BEFORE {event} ON {table} "
+                "FOR EACH ROW EXECUTE FUNCTION reject_checkpoint_change()"
+            )
+        coordinator = PostgresConversationCoordinator(pool, timeout=2)
+        async with coordinator.lock(thread) if locked else no_lock():
+            with pytest.raises(psycopg.errors.RaiseException, match="rejected checkpoint change"):
+                if operation == "write":
+                    await saver.aput(saved, empty_checkpoint(), {}, {})
+                else:
+                    await saver.adelete_thread(thread)
+            after = await saver.aget_tuple(config)
+            assert after == before
+        async with saver._cursor() as cursor:
+            await cursor.execute(f"DROP TRIGGER reject_change ON {table}")
+        await saver.adelete_thread(thread)
+        assert await saver.aget_tuple(config) is None
+
+
+@pytest.mark.parametrize("durability", ["sync", "async"])
+@pytest.mark.parametrize("operation", ["invoke", "stream"])
+@pytest.mark.parametrize("failure", ["checkpoint", "pending_write"])
+async def test_database_write_failure_reaches_api_and_keeps_previous_messages(
+    backend, monkeypatch, durability, operation, failure
+):
+    class FailureState(MessagesState):
+        checkpoint_fault: bool
+
+    async def reply(state):
+        message = state["messages"][-1].content
+        return {"messages": [AIMessage("reply to " + message)], "checkpoint_fault": message == "fail"}
+
+    monkeypatch.setattr(settings, "CHECKPOINT_DURABILITY", durability)
+    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
+    monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("checkpoint-test-credential"))
+    monkeypatch.setattr(settings, "AUTH_USERS", {})
+    async with backend.get_checkpoint_saver() as saver, backend.get_lock_pool() as pool:
+        await saver.setup()
+        builder = StateGraph(FailureState)
+        builder.add_node("reply", reply)
+        builder.set_entry_point("reply")
+        builder.add_edge("reply", END)
+        executor = make_executor(builder.compile(checkpointer=saver), PostgresConversationCoordinator(pool, timeout=2))
+        app = create_app()
+        # The fixture owns real pools on this event loop instead of running another lifespan.
+        app.state.agent_executor = executor
+        transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://checkpoint.test",
+            headers={"Authorization": "Bearer checkpoint-test-credential"},
+        ) as client:
+            identity = {"thread_id": uuid4().hex, "user_id": "checkpoint-owner"}
+            seeded = await client.post("/test/invoke", json={**identity, "input": {"message": "saved"}})
+            assert seeded.status_code == 200, seeded.text
+            assert seeded.json()["content"] == "reply to saved"
+            table = "checkpoints" if failure == "checkpoint" else "checkpoint_writes"
+            condition = (
+                "NEW.checkpoint->'channel_values'->>'checkpoint_fault' = 'true'"
+                if failure == "checkpoint"
+                else "NEW.channel = 'checkpoint_fault'"
+            )
+            async with saver._cursor() as cursor:
+                await cursor.execute(
+                    "CREATE FUNCTION reject_agent_write() RETURNS trigger LANGUAGE plpgsql AS $$ "
+                    "BEGIN RAISE EXCEPTION 'rejected agent write'; END $$"
+                )
+                await cursor.execute(
+                    f"CREATE TRIGGER reject_agent_write BEFORE INSERT ON {table} FOR EACH ROW "
+                    f"WHEN ({condition}) EXECUTE FUNCTION reject_agent_write()"
+                )
+            response = await client.post(f"/test/{operation}", json={**identity, "input": {"message": "fail"}})
+            if operation == "invoke":
+                assert response.status_code == 500, response.text
+            else:
+                assert response.status_code == 200, response.text
+                frames = [line.removeprefix("data: ") for line in response.text.splitlines() if line]
+                assert frames[-1] == "[DONE]"
+                events = [json.loads(frame) for frame in frames[:-1]]
+                assert events[-1]["type"] == "error", events
+            history = await client.get("/test/history", params=identity)
+            assert history.status_code == 200, history.text
+            contents = [message["content"] for message in history.json()["messages"]]
+            assert contents[:2] == ["saved", "reply to saved"]
+            async with saver._cursor() as cursor:
+                await cursor.execute(f"DROP TRIGGER reject_agent_write ON {table}")
+            recovered = await client.post("/test/invoke", json={**identity, "input": {"message": "recovered"}})
+            assert recovered.status_code == 200, recovered.text
+            assert recovered.json()["content"] == "reply to recovered"
+            history = await client.get("/test/history", params=identity)
+            assert history.status_code == 200, history.text
+            contents = [message["content"] for message in history.json()["messages"]]
+            assert contents[:2] == ["saved", "reply to saved"]
+            assert contents[-2:] == ["recovered", "reply to recovered"]
 
 
 async def test_normal_langgraph_subgraph_reuses_the_parent_lock(backend):

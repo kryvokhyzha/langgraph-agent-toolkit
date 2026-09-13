@@ -171,8 +171,9 @@ Use one global settings singleton:
 - Notable defaults: `ENV_MODE=production`, `HOST/PORT=0.0.0.0/8080`,
   `MEMORY_BACKEND` unset (→ no persistence), `OBSERVABILITY_BACKEND` unset (→
   `EMPTY` at runtime), `DEFAULT_AGENT=create-agent`, `CHECK_INTERRUPTS=True`,
-  `CORS_ENABLED=False`, `AUTH_MODE=token`. Production requires authentication. A
-  trusted client deployment uses `AUTH_MODE=trusted` with one `AUTH_SECRET`.
+  `CORS_ENABLED=False`, `AUTH_MODE=trusted`. Production requires authentication.
+  One `AUTH_SECRET` preserves shared-token access with optional `user_id`. Set
+  `AUTH_MODE=token` to require token-bound user identities.
 - `MCP_SERVERS` configures optional MCP tools. `MCP_AGENT_SERVERS` assigns
   servers to agents. An empty assignment selects the default agent. MCP imports
   stay lazy, and tool discovery runs during service startup. See `docs/mcp.rst`.

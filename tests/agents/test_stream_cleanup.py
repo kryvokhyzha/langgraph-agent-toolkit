@@ -29,7 +29,9 @@ def executor_for(graph):
 
 
 @pytest.mark.parametrize("stop", ["close", "cancel"])
-async def test_stream_keeps_conversation_locked_until_graph_and_checkpoint_cleanup(stop):
+async def test_stream_keeps_conversation_locked_until_graph_and_checkpoint_cleanup(stop, monkeypatch):
+    # Async durability allows a checkpoint write to overlap node cleanup.
+    monkeypatch.setattr(settings, "CHECKPOINT_DURABILITY", "async")
     first_received = asyncio.Event()
     close_requested = asyncio.Event()
     cleanup_started = asyncio.Event()

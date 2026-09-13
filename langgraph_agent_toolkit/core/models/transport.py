@@ -74,13 +74,14 @@ class LLMTransportConfig(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     async_transport: Literal["httpx", "aiohttp"] = "httpx"
-    max_connections: int = Field(default=100, gt=0)
-    max_keepalive_connections: int = Field(default=20, ge=0)
-    keepalive_expiry: float = Field(default=30, gt=0, allow_inf_nan=False)
-    connect_timeout: float = Field(default=10, gt=0, allow_inf_nan=False)
-    read_timeout: float = Field(default=120, gt=0, allow_inf_nan=False)
-    write_timeout: float = Field(default=30, gt=0, allow_inf_nan=False)
-    pool_timeout: float = Field(default=10, gt=0, allow_inf_nan=False)
+    # Match OpenAI SDK 3.13.0 defaults without importing this optional dependency.
+    max_connections: int = Field(default=1000, gt=0)
+    max_keepalive_connections: int = Field(default=100, ge=0)
+    keepalive_expiry: float = Field(default=5, gt=0, allow_inf_nan=False)
+    connect_timeout: float = Field(default=5, gt=0, allow_inf_nan=False)
+    read_timeout: float = Field(default=600, gt=0, allow_inf_nan=False)
+    write_timeout: float = Field(default=600, gt=0, allow_inf_nan=False)
+    pool_timeout: float = Field(default=600, gt=0, allow_inf_nan=False)
     max_retries: int = Field(default=2, ge=0)
     shutdown_timeout: float = Field(default=10, gt=0, allow_inf_nan=False)
     max_pools: int = Field(default=32, gt=0)

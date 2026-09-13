@@ -17,11 +17,13 @@ from langchain_core.messages import (
     BaseMessage,
     HumanMessage,
     RemoveMessage,
+    SystemMessage,
     ToolMessage,
     convert_to_messages,
 )
 from langchain_core.runnables import RunnableConfig
 from langgraph._internal._constants import PREVIOUS
+from langgraph.channels import LastValue
 from langgraph.constants import END, START
 from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import add_messages
@@ -83,6 +85,8 @@ async def add_graph_history(graph: Pregel, config: RunnableConfig, messages: lis
     if _uses_functional_history(graph):
         values = dict(await _graph_history_values(graph, config))
         values["messages"] = add_messages(values.get("messages", []), messages)
+    elif isinstance(graph.channels.get("messages"), LastValue):
+        values = {"messages": add_messages(await get_graph_history(graph, config), messages)}
     else:
         values = {"messages": messages}
     await graph.aupdate_state(config=config, values=values)
@@ -550,6 +554,7 @@ class AgentExecutor:
                     config=config,
                     stream_mode=["values"],
                     output_keys=agent.graph.output_channels,
+                    durability=settings.CHECKPOINT_DURABILITY if agent.graph.checkpointer else None,
                 )
             ) as events:
                 async for response_type, response in events:
@@ -641,7 +646,12 @@ class AgentExecutor:
 
             # Close graph tasks and checkpoint writes before releasing the conversation.
             async with aclosing(
-                agent.graph.astream(input=input_data, config=config, stream_mode=stream_mode)
+                agent.graph.astream(
+                    input=input_data,
+                    config=config,
+                    stream_mode=stream_mode,
+                    durability=settings.CHECKPOINT_DURABILITY if agent.graph.checkpointer else None,
+                )
             ) as events:
                 async for stream_event in events:
                     if not isinstance(stream_event, tuple):
@@ -713,26 +723,22 @@ class AgentExecutor:
                         processed_messages.append(create_ai_message(current_message))
 
                     for msg in processed_messages:
-                        if isinstance(msg, RemoveMessage):
+                        if isinstance(msg, (RemoveMessage, HumanMessage, SystemMessage)):
                             continue
-                        try:
-                            chat_message = langchain_to_chat_message(msg)
-                            chat_message.run_id = str(run_id)
-                            if chat_message.type == "human":
-                                continue
-                            if chat_message.type == "ai" and chat_message.content:
-                                _content = chat_message.content
-                                final_output = (
-                                    _content
-                                    if isinstance(_content, str)
-                                    else convert_message_content_to_string(_content)
-                                    if isinstance(_content, list)
-                                    else str(_content)
-                                )
-                            yield chat_message
-                        except Exception as e:
-                            logger.error(f"Error parsing message: {e}")
+                        chat_message = langchain_to_chat_message(msg)
+                        chat_message.run_id = str(run_id)
+                        if chat_message.type == "human":
                             continue
+                        if chat_message.type == "ai" and chat_message.content:
+                            _content = chat_message.content
+                            final_output = (
+                                _content
+                                if isinstance(_content, str)
+                                else convert_message_content_to_string(_content)
+                                if isinstance(_content, list)
+                                else str(_content)
+                            )
+                        yield chat_message
 
             if pending_interrupts:
                 chat_message = interrupts_to_chat_message(pending_interrupts)

@@ -5,7 +5,7 @@ import functools
 import hashlib
 import inspect
 import sys
-from contextlib import asynccontextmanager, suppress
+from contextlib import aclosing, asynccontextmanager, suppress
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -81,8 +81,9 @@ class ConversationCoordinator:
         deadline = asyncio.get_running_loop().time() + self.timeout
         try:
             try:
-                await asyncio.wait_for(entry.lock.acquire(), timeout=self.timeout)
-                acquired = True
+                async with asyncio.timeout_at(deadline):
+                    await entry.lock.acquire()
+                    acquired = True
             except TimeoutError as exc:
                 raise ConversationBusyError("The conversation queue wait expired. Retry later.") from exc
             lease = _ConversationLease()
@@ -114,27 +115,105 @@ class SQLiteConversationCoordinator(ConversationCoordinator):
 
     @asynccontextmanager
     async def _external_lock(self, key: str, deadline: float):
-        from filelock import FileLock, Timeout
+        from filelock import AsyncFileLock
 
         # Fixed stripes bound the number of files. Collisions only add waiting.
         stripe = int.from_bytes(hashlib.sha256(key.encode()).digest()[:2], "big") % 256
-        lock = FileLock(str(self.directory / f"{stripe}.lock"), thread_local=False)
-        acquired = False
+        # Nonblocking OS acquisition must finish before cancellation can release it.
+        lock = AsyncFileLock(str(self.directory / f"{stripe}.lock"), thread_local=False, run_in_executor=False)
         try:
-            try:
-                async with asyncio.timeout_at(deadline):
-                    while not acquired:
-                        try:
-                            lock.acquire(timeout=0)
-                            acquired = True
-                        except Timeout:
-                            await asyncio.sleep(0.05)
-            except TimeoutError as exc:
-                raise ConversationBusyError("The conversation queue wait expired. Retry later.") from exc
+            async with asyncio.timeout_at(deadline):
+                acquired = await lock.acquire()
+        except TimeoutError as exc:
+            raise ConversationBusyError("The conversation queue wait expired. Retry later.") from exc
+        async with acquired:
             yield
-        finally:
-            if acquired:
-                lock.release()
+
+
+@dataclass
+class _PostgresLease:
+    """Acquire, monitor, and release one PostgreSQL conversation lock."""
+
+    session: PostgresLockSession
+    lock_id: int
+    owner: asyncio.Task
+    acquired: bool = False
+    acquisition_pending: bool = False
+    heartbeat: asyncio.Task | None = None
+    stop_heartbeat: asyncio.Event = field(default_factory=asyncio.Event)
+    lost: Exception | None = None
+
+    async def acquire(self, deadline: float) -> None:
+        try:
+            async with asyncio.timeout_at(deadline):
+                while not self.acquired:
+                    self.acquisition_pending = True
+                    cursor = await self.session.connection.execute(
+                        "SELECT pg_try_advisory_lock(%s) AS acquired", (self.lock_id,)
+                    )
+                    self.acquired = (await cursor.fetchone())["acquired"]
+                    self.acquisition_pending = False
+                    if not self.acquired:
+                        await asyncio.sleep(0.05)
+        except TimeoutError as exc:
+            raise ConversationBusyError("The conversation queue wait expired. Retry later.") from exc
+
+    async def monitor(self) -> None:
+        try:
+            while True:
+                try:
+                    await asyncio.wait_for(self.stop_heartbeat.wait(), settings.THREAD_LOCK_HEARTBEAT)
+                    return
+                except TimeoutError:
+                    pass
+                # Checkpoint I/O has its own query and request time limits.
+                async with self.session.lock:
+                    if self.stop_heartbeat.is_set():
+                        return
+                    async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
+                        await self.session.connection.execute("SELECT 1")
+        except Exception as exc:
+            self.lost = exc
+            if not self.stop_heartbeat.is_set():
+                self.owner.cancel()
+
+    async def finish_monitor(self) -> None:
+        if self.heartbeat is None:
+            return
+        # Do not cancel a healthy query during normal run cleanup.
+        self.stop_heartbeat.set()
+        try:
+            async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
+                await self.heartbeat
+        except TimeoutError as exc:
+            self.lost = exc
+            await self.session.connection.close()
+        except asyncio.CancelledError:
+            # The owner was cancelled again during cleanup.
+            await self.session.connection.close()
+            raise
+
+    async def release(self, active_error: BaseException | None) -> None:
+        await self.finish_monitor()
+        if self.acquired:
+            try:
+                async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
+                    async with self.session.lock:
+                        await self.session.connection.execute("SELECT pg_advisory_unlock(%s)", (self.lock_id,))
+            except BaseException as exc:
+                # Closing the session releases locks even after cancellation.
+                with suppress(Exception):
+                    await self.session.connection.close()
+                if active_error is None:
+                    if isinstance(exc, asyncio.CancelledError):
+                        raise
+                    raise ConversationLockLostError("The database conversation lock was lost.") from exc
+        elif self.acquisition_pending:
+            # The server can acquire the lock before cancellation reaches the client.
+            # Do not return this session to the pool with an unknown lock state.
+            await self.session.connection.close()
+        if self.lost is not None and active_error is None:
+            raise ConversationLockLostError("The database conversation lock was lost.") from self.lost
 
 
 class PostgresConversationCoordinator(ConversationCoordinator):
@@ -151,57 +230,18 @@ class PostgresConversationCoordinator(ConversationCoordinator):
         if remaining <= 0:
             raise ConversationBusyError("The conversation queue wait expired. Retry later.")
         async with self.pool.connection(timeout=remaining) as conn:
-            acquired = False
-            acquisition_pending = False
-            heartbeat = None
-            stop_heartbeat = asyncio.Event()
-            lost = None
-            owner = asyncio.current_task()
             session = PostgresLockSession(conn, scope=getattr(self.pool, "_lat_checkpoint_scope", None))
+            lease = _PostgresLease(session, lock_id, asyncio.current_task())
             token = None
-
-            async def check_session():
-                nonlocal lost
-                try:
-                    while True:
-                        try:
-                            await asyncio.wait_for(stop_heartbeat.wait(), settings.THREAD_LOCK_HEARTBEAT)
-                            return
-                        except TimeoutError:
-                            pass
-                        # Checkpoint I/O has its own query and request time limits.
-                        async with session.lock:
-                            if stop_heartbeat.is_set():
-                                return
-                            async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
-                                await conn.execute("SELECT 1")
-                except asyncio.CancelledError:
-                    raise
-                except Exception as exc:
-                    lost = exc
-                    if not stop_heartbeat.is_set():
-                        owner.cancel()
-
             try:
-                try:
-                    async with asyncio.timeout_at(deadline):
-                        while not acquired:
-                            acquisition_pending = True
-                            cursor = await conn.execute("SELECT pg_try_advisory_lock(%s) AS acquired", (lock_id,))
-                            row = await cursor.fetchone()
-                            acquired = row["acquired"]
-                            acquisition_pending = False
-                            if not acquired:
-                                await asyncio.sleep(0.05)
-                except TimeoutError as exc:
-                    raise ConversationBusyError("The conversation queue wait expired. Retry later.") from exc
+                await lease.acquire(deadline)
                 token = postgres_lock_session.set(session)
-                heartbeat = asyncio.create_task(check_session())
+                lease.heartbeat = asyncio.create_task(lease.monitor())
                 try:
                     yield
                 except asyncio.CancelledError:
-                    if lost is not None:
-                        raise ConversationLockLostError("The database conversation lock was lost.") from lost
+                    if lease.lost is not None:
+                        raise ConversationLockLostError("The database conversation lock was lost.") from lease.lost
                     raise
             finally:
                 active_error = sys.exception()
@@ -209,38 +249,7 @@ class PostgresConversationCoordinator(ConversationCoordinator):
                 if token is not None:
                     with suppress(ValueError):
                         postgres_lock_session.reset(token)
-                if heartbeat is not None:
-                    # Do not cancel a healthy query during normal run cleanup.
-                    stop_heartbeat.set()
-                    try:
-                        async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
-                            await heartbeat
-                    except TimeoutError as exc:
-                        lost = exc
-                        await conn.close()
-                    except asyncio.CancelledError:
-                        # The owner was cancelled again during cleanup.
-                        await conn.close()
-                        raise
-                if acquired:
-                    try:
-                        async with asyncio.timeout(settings.THREAD_LOCK_HEARTBEAT_TIMEOUT):
-                            async with session.lock:
-                                await conn.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
-                    except BaseException as exc:
-                        # Closing the session releases locks even after cancellation.
-                        with suppress(Exception):
-                            await conn.close()
-                        if active_error is None:
-                            if isinstance(exc, asyncio.CancelledError):
-                                raise
-                            raise ConversationLockLostError("The database conversation lock was lost.") from exc
-                elif acquisition_pending:
-                    # The server can acquire the lock before cancellation reaches the client.
-                    # Do not return this session to the pool with an unknown lock state.
-                    await conn.close()
-                if lost is not None and active_error is None:
-                    raise ConversationLockLostError("The database conversation lock was lost.") from lost
+                await lease.release(active_error)
 
 
 def serialize_execution(function):
@@ -260,12 +269,9 @@ def serialize_execution(function):
             bound = prepare(self, args, kwargs)
             async with self.concurrency.lock(bound.arguments["thread_id"]):
                 async with execution_timeout(settings.REQUEST_TIMEOUT):
-                    generator = function(*bound.args, **bound.kwargs)
-                    try:
+                    async with aclosing(function(*bound.args, **bound.kwargs)) as generator:
                         async for item in generator:
                             yield item
-                    finally:
-                        await generator.aclose()
 
         return stream
 

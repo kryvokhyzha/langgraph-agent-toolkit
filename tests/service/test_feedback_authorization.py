@@ -29,8 +29,9 @@ BOB = {"Authorization": "Bearer feedback-bob-token"}
 
 
 @pytest.fixture
-def feedback_service(monkeypatch, tmp_path):
+def feedback_service(monkeypatch, tmp_path, mock_env):
     recorded = []
+    defaults = Settings(_env_file=None)
 
     class Recorder(EmptyObservability):
         def record_feedback(self, run_id, key, score, **kwargs):
@@ -38,7 +39,7 @@ def feedback_service(monkeypatch, tmp_path):
 
     for name, value in {
         "ENV_MODE": EnvironmentMode.PRODUCTION,
-        "AUTH_MODE": "token",
+        "AUTH_MODE": defaults.AUTH_MODE,
         "AUTH_SECRET": None,
         "AUTH_USERS": {"alice": SecretStr("feedback-alice-token"), "bob": SecretStr("feedback-bob-token")},
         "FEEDBACK_SIGNING_SECRET": SecretStr(SIGNING_SECRET),
@@ -181,16 +182,20 @@ def test_missing_signing_secret_only_disables_token_feedback(feedback_service, m
     assert recorded == []
 
 
-def test_trusted_client_keeps_legacy_feedback_but_user_tokens_require_proof(feedback_service, monkeypatch):
+@pytest.mark.parametrize("user_id", [None, "client-user"])
+def test_default_shared_token_keeps_legacy_feedback_but_user_tokens_require_proof(
+    feedback_service, monkeypatch, user_id
+):
     make_app, recorded = feedback_service
-    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
     monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("feedback-shared-token"))
     monkeypatch.setattr(settings, "FEEDBACK_SIGNING_SECRET", None)
-    body = {"run_id": str(uuid4()), "key": "helpfulness", "score": 1.0, "user_id": "client-user"}
+    body = {"run_id": str(uuid4()), "key": "helpfulness", "score": 1.0}
+    if user_id is not None:
+        body["user_id"] = user_id
     with TestClient(make_app()) as http:
         saved = http.post("/feedback", headers={"Authorization": "Bearer feedback-shared-token"}, json=body)
         assert saved.status_code == 201, saved.text
-        assert recorded[-1]["user_id"] == "client-user"
+        assert recorded[-1]["user_id"] == (user_id or settings.AUTH_SERVICE_USER_ID)
         rejected = http.post("/feedback", headers=ALICE, json={**body, "user_id": "alice"})
         assert rejected.status_code == 503
     assert len(recorded) == 1

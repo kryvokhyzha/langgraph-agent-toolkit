@@ -106,6 +106,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     app.state.sqlite_connection = saver.conn
                     if settings.SQLITE_DB_PATH != ":memory:":
                         concurrency = SQLiteConversationCoordinator(settings.SQLITE_DB_PATH)
+                    else:
+                        logger.warning(
+                            "SQLite checkpoints use :memory: and are not durable. "
+                            "Workers do not share this database. Worker shutdown deletes its checkpoints."
+                        )
 
             executor = AgentExecutor(*settings.AGENT_PATHS)
             executor.concurrency = concurrency
@@ -117,6 +122,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 agent = executor.get_agent(info.key)
                 if agent.graph.checkpointer is None:
                     agent.graph.checkpointer = saver if saver is not None else MemorySaver()
+                if isinstance(agent.graph.checkpointer, MemorySaver):
+                    logger.warning(
+                        f"Agent {info.key!r} uses MemorySaver. Checkpoints are not durable. "
+                        "Workers do not share these checkpoints. Worker shutdown deletes them."
+                    )
                 if agent.observability is None:
                     agent.observability = observability
                 app.state.initialized_agents.append(info.key)

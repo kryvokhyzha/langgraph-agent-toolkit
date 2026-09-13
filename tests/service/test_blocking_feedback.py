@@ -101,7 +101,7 @@ async def test_shutdown_does_not_wait_forever_for_a_stuck_feedback_thread():
 
 async def test_feedback_api_rejects_work_while_a_timed_out_call_still_runs(monkeypatch):
     monkeypatch.setattr(settings, "REQUEST_MAX_CONCURRENT", 1)
-    monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.05)
+    monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 1)
     monkeypatch.setattr(settings, "AUTH_USERS", {})
     monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("feedback-test-token"))
     monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
@@ -126,6 +126,13 @@ async def test_feedback_api_rejects_work_while_a_timed_out_call_still_runs(monke
             base_url="http://test",
             headers={"Authorization": "Bearer feedback-test-token"},
         ) as client:
+            # Build lazy route handlers before testing a timeout during feedback.
+            release.set()
+            assert (await client.post("/local/feedback", json=payload)).status_code == 201
+            release.clear()
+            entered.clear()
+            finished.clear()
+            monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.05)
             timed_out = await client.post("/local/feedback", json=payload)
             assert timed_out.status_code == 504
             assert entered.is_set()

@@ -40,9 +40,11 @@ Use an agent's ``key`` in request paths. The examples below use the built-in
 Authentication and memory identity
 ----------------------------------
 
-For one deployment per client application, configure the service with
-``AUTH_MODE=trusted`` and one ``AUTH_SECRET``. The trusted application supplies
-the ``user_id`` for each user. Keep the shared token in that application.
+For one deployment per client application, keep the default
+``AUTH_MODE=trusted`` and one ``AUTH_SECRET``. ``user_id`` is optional.
+The trusted application can supply it for a user's memory identity. If it
+omits the field, the service uses ``AUTH_SERVICE_USER_ID`` (default: ``service``).
+Keep the shared token in that application.
 Anyone who has this token can select user identities in that deployment.
 
 The examples below assume trusted mode and use ``user_id="user-1"``.
