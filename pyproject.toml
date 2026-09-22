@@ -142,7 +142,7 @@ all-backends = [
 
 # Different LLM providers
 aws = [
-    "langchain-aws >= 1.0.0, < 1.5.2",
+    "langchain-aws>=1.0.0,<1.7.7",
 ]
 
 anthropic = [
@@ -150,7 +150,7 @@ anthropic = [
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai >= 3.0.0, < 3.2.4",
+    "langchain-google-vertexai>=3.0.0,<3.2.5",
 ]
 
 google-genai = [
