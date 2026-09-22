@@ -36,6 +36,61 @@ Synchronous model calls still use HTTPX. Caller-supplied model clients keep
 their own transport. Python installations outside this image retain HTTPX as
 the default. See :doc:`reliability` for timeout differences and limits.
 
+Production Image Builds
+-----------------------
+
+Both images use separate builder and runtime stages based on
+``python:3.13-slim``. The builder installs frozen production dependencies in
+``/opt/venv``. The runtime copies that environment and the package source.
+It does not copy ``uv``, its download cache, or development dependency groups.
+BuildKit cache mounts reuse downloads between builds without adding them to
+the runtime image. The builder compiles dependency bytecode. This bytecode
+stays in the image to reduce import work during startup. Local source caches
+do not enter the image.
+
+The API retains Gunicorn, both OpenAI transports, MCP, and observability extras.
+Add ``--build-arg INSTALL_DEEPAGENTS=true`` to include Deep Agents. The UI uses
+only the ``client`` dependency group. Build it with:
+
+.. code-block:: bash
+
+   docker build -f docker/app/Dockerfile -t toolkit-app .
+
+Both containers run as ``appuser``. ``COPY --chown`` assigns source ownership
+without copying the source again in a later ownership-change layer.
+The build context permits only ``pyproject.toml``, ``uv.lock``, and the package
+source. It excludes nested environment files, caches, and local databases.
+Add required inputs explicitly when you extend a Dockerfile. Supply secrets
+at runtime or through BuildKit secret mounts. Do not copy them into an image.
+
+Both runtime images install ``curl`` for health probes. The API probe requests
+``/health/ready``. The port comes from nonempty ``LANGGRAPH_PORT``, then
+nonempty ``PORT``. It defaults to 8080. Compose uses this image probe.
+The UI probe requests ``/_stcore/health`` on port 8501. Both probes bypass
+HTTP proxies and have a five-second timeout. If you change the Streamlit port,
+change its probe too. Docker marks failed probes as unhealthy; this status
+alone does not restart the container. Configure recovery in the supervisor.
+
+Measure before you remove a dependency. Keep required native libraries,
+certificate roots, and package data. Compare the same platform, lockfile,
+build arguments, and size metric. Pin the Python and ``uv`` image digests for
+the comparison. Run the first build before changes and the second after them:
+
+.. code-block:: bash
+
+   docker build --platform linux/amd64 -f docker/api/Dockerfile -t toolkit-api:before .
+   # Apply the intended Docker changes before the next build.
+   docker build --platform linux/amd64 -f docker/api/Dockerfile -t toolkit-api:after .
+   docker image inspect toolkit-api:before toolkit-api:after \
+     --format '{{.Id}} {{.Os}}/{{.Architecture}} {{.Size}}'
+   docker history --no-trunc toolkit-api:before
+   docker history --no-trunc toolkit-api:after
+
+``.Size`` reports uncompressed local image bytes. Registry transfer size and
+build cache size are different measures. A smaller image does not establish
+a faster startup or a fixed reduction ratio. Run the final-image checks in
+:doc:`testing` before deployment. CI records image sizes and layer history.
+
 Startup and Worker Supervision
 ------------------------------
 
@@ -153,6 +208,10 @@ operations for one conversation in each worker. ``THREAD_QUEUE_TIMEOUT`` limits
 lock waiting and defaults to 60 seconds. Queue admission or wait failures return
 an error so the caller can retry. These are per-worker admission limits, not a
 single durable queue shared by all replicas.
+
+Serialization does not remove duplicate submissions or guarantee arrival order
+across workers. A busy conversation can occupy all request slots in a worker.
+See :ref:`conversation-bursts` for response codes, examples, and client tuning.
 
 PostgreSQL uses session advisory locks to coordinate workers. A dedicated pool
 holds these sessions. While a conversation lock is held, checkpoint SQL uses

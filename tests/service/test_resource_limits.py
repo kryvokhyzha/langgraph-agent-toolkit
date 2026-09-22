@@ -272,14 +272,18 @@ async def test_busy_conversation_returns_409_and_recovers(delayed_service):
 @pytest.mark.asyncio
 async def test_invoke_timeout_returns_504_and_releases_execution(delayed_service, monkeypatch):
     service = delayed_service
-    monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.1)
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(service.app),
         base_url="http://test",
         headers={"Authorization": "Bearer resource-test-token"},
     ) as client:
+        # Initialize the route and graph before testing cancellation of a running node.
+        warmup = await client.post("/local/invoke", json={"input": {"message": "fast"}, "thread_id": "warmup"})
+        assert warmup.status_code == 200, warmup.text
+        monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.1)
         response = await client.post("/local/invoke", json={"input": {"message": "wait"}, "thread_id": "one"})
         assert response.status_code == 504, response.text
+        assert service.started.is_set(), "The request must reach the node before its deadline expires."
         assert service.stopped.is_set()
         assert not service.executor.concurrency._entries
         monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 2)

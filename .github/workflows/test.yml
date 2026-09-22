@@ -315,6 +315,13 @@ jobs:
           cache-from: type=gha,scope=api
           cache-to: type=gha,scope=api,mode=max,ignore-error=true,timeout=2m
 
+      - name: Verify service runtime contents
+        run: |
+          docker run --rm --network none \
+            --mount "type=bind,source=$PWD/tests/integration/docker_image_smoke.py,target=/tmp/docker_image_smoke.py,readonly" \
+            agent-service-toolkit.service:${{ github.sha }} \
+            python /tmp/docker_image_smoke.py api
+
       - name: Verify both model transports in the service image
         run: |
           docker run --rm --network none \
@@ -333,6 +340,33 @@ jobs:
           cache-from: type=gha,scope=app
           cache-to: type=gha,scope=app,mode=max,ignore-error=true,timeout=2m
 
+      - name: Verify app runtime contents and client-only imports
+        run: |
+          docker run --rm --network none \
+            --mount "type=bind,source=$PWD/tests/integration/docker_image_smoke.py,target=/tmp/docker_image_smoke.py,readonly" \
+            --mount "type=bind,source=$PWD/scripts/ci/verify_ui_imports.py,target=/tmp/verify_ui_imports.py,readonly" \
+            agent-service-toolkit.app:${{ github.sha }} \
+            python /tmp/docker_image_smoke.py app
+
+      - name: Record image sizes and layers
+        run: |
+          {
+            echo "### Docker image sizes"
+            echo
+            echo "These are uncompressed local image sizes, not registry transfer sizes."
+            echo
+            echo '| Image | Platform | Size (bytes) |'
+            echo '| --- | --- | ---: |'
+            for image in agent-service-toolkit.service:${{ github.sha }} agent-service-toolkit.app:${{ github.sha }}; do
+              docker image inspect --format '| {{index .RepoTags 0}} | {{.Os}}/{{.Architecture}} | {{.Size}} |' "$image"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+          for image in agent-service-toolkit.service:${{ github.sha }} agent-service-toolkit.app:${{ github.sha }}; do
+            echo "::group::Layers for $image"
+            docker history --no-trunc "$image"
+            echo "::endgroup::"
+          done
+
       - name: Start service container
         run:
           docker run -d --name service-container --network host -e
@@ -342,33 +376,29 @@ jobs:
 
       - name: Confirm service starts correctly
         run: |
-          timeout 30 bash -c '
-            while ! curl -fsS http://127.0.0.1:8080/health/ready; do
-              echo "Waiting for service to be ready..."
+          timeout 90 bash <<'BASH'
+            while [ "$(docker inspect --format "{{.State.Health.Status}}" service-container)" != "healthy" ]; do
+              echo "Waiting for the service health check..."
               docker logs service-container
               sleep 2
             done
-          '
+          BASH
 
       - name: Run app container
         run:
           docker run -d --name app-container --network host -e
-          AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token --mount
-          "type=bind,source=$PWD/scripts/ci/verify_ui_imports.py,target=/tmp/verify_ui_imports.py,readonly"
+          AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token
           agent-service-toolkit.app:${{ github.sha }}
 
       - name: Confirm app starts correctly
         run: |
-          timeout 30 bash -c '
-            while ! curl -fsS http://localhost:8501/_stcore/health; do
-              echo "Waiting for app to be ready..."
+          timeout 90 bash <<'BASH'
+            while [ "$(docker inspect --format "{{.State.Health.Status}}" app-container)" != "healthy" ]; do
+              echo "Waiting for the app health check..."
               docker logs app-container
               sleep 2
             done
-          '
-
-      - name: Verify imports in the client-only image
-        run: docker exec app-container python /tmp/verify_ui_imports.py
+          BASH
 
       - name: Set up Python
         uses: actions/setup-python@v7

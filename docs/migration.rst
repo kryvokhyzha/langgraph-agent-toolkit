@@ -1,7 +1,12 @@
-Migrate authentication and checkpoint storage
-=============================================
+Migrate to the current release
+==============================
 
-This release binds each stored conversation to a user and an agent. The public
+This guide covers upgrades from 0.9.2 to |release|. The target version comes
+from ``pyproject.toml`` when the documentation builds. Review the current
+defaults below when upgrading from an earlier 0.10.x release. Checkpoint
+records that already use the correct ``lat:v1:`` keys do not need to move again.
+
+The service binds each stored conversation to a user and an agent. The public
 ``thread_id`` can stay the same. The database uses a new ``lat:v1:`` storage key.
 Existing raw thread IDs need an explicit migration before the service can read
 them through the new API.
@@ -306,7 +311,7 @@ Plan a maintenance window that permits this scan.
 Connection and Admission Limits
 -------------------------------
 
-Version 0.10.0 accepts eight active HTTP requests per worker by default. Excess
+The service accepts eight active HTTP requests per worker by default. Excess
 requests receive 503 with ``error_code=service_busy`` and ``Retry-After: 1``
 before an agent run starts. Tune ``REQUEST_MAX_CONCURRENT`` with the worker,
 database, and provider limits. The optional waiting queue defaults to zero.

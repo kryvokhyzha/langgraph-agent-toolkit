@@ -229,6 +229,90 @@ with 503 when all thread slots are occupied. Shutdown waits up to
 ``OBSERVABILITY_SHUTDOWN_TIMEOUT`` for feedback, then the same limit for telemetry
 flush. Configure the process shutdown budget for both waits and resource cleanup.
 
+.. _conversation-bursts:
+
+Repeated Requests for One Conversation
+--------------------------------------
+
+The HTTP API identifies a conversation by its effective ``user_id``, ``agent_id``,
+and public ``thread_id``. Invoke, stream, and history operations use the same
+conversation lock. One operation holds that lock at a time. Another accepted
+operation waits before it accesses or changes the conversation state.
+This prevents concurrent turns from overwriting each other's checkpoint state
+when they use the same coordinated backend. See :doc:`deployment` for backend
+requirements and custom saver limits.
+
+With shared-token authentication, an omitted ``user_id`` resolves to
+``AUTH_SERVICE_USER_ID``. Two callers that omit it and reuse the same agent and
+``thread_id`` access the same conversation. A different user or agent selects a
+different conversation. Different threads can still update the same long-term
+user memory; the conversation lock does not coordinate those store writes.
+
+.. list-table:: Concurrent request outcomes
+   :header-rows: 1
+   :widths: 35 65
+
+   * - Condition
+     - Result
+   * - Another operation holds the conversation lock
+     - The request waits within the conversation and total HTTP deadlines.
+       It occupies one active HTTP slot while it waits.
+   * - Conversation queue is full or its 60-second wait expires
+     - Invoke and history requests return HTTP 409 with ``Retry-After: 1``.
+       The waiting operation has not started graph execution or a history change.
+   * - All eight worker request slots are occupied
+     - With the default admission queue of zero, further requests receive
+       HTTP 503 with ``error_code=service_busy`` and ``Retry-After: 1``.
+       This can also reject requests for other conversations.
+   * - Database pool acquisition fails or the lock session is lost
+     - Before response headers, the request returns HTTP 503. This is different
+       from ``service_busy``. A lock can be lost after graph execution starts.
+   * - Total HTTP request deadline expires
+     - Before response headers, the request returns HTTP 504 after cleanup.
+       Some graph steps or tool actions can already have completed.
+   * - Streaming response headers were already sent
+     - Conversation queue failures become ``type=error`` events in the HTTP 200
+       stream. SSE then sends ``[DONE]``. A request deadline or disconnect can
+       instead close the stream. Do not use HTTP 200 or ``[DONE]`` alone as proof
+       of success.
+   * - The same message is submitted again and reaches execution
+     - It starts another run. The API does not deduplicate requests, merge rapid
+       updates, replace a pending turn, or cancel an older run for a newer one.
+
+For example, consider 100 simultaneous requests for one conversation on an idle
+single worker. If no request finishes during admission, at most eight enter:
+one holds the conversation lock and seven wait. The other 92 receive the
+admission 503 response. Later waiters can reach their deadlines before they run.
+The default ``THREAD_QUEUE_MAX_WAITERS=32`` does not add 32 slots above the
+worker's eight-request limit.
+
+PostgreSQL coordinates the conversation across workers and replicas that share
+the checkpoint database and schema. SQLite requires the same database file and
+local filesystem. In-memory coordination protects only one process. There is no
+global first-in, first-out ordering guarantee across workers. These queues also
+do not survive worker loss or automatically resume accepted HTTP requests.
+PostgreSQL requests waiting for the shared lock occupy lock-pool connections.
+Admission and conversation limits are not a per-user rate limiter.
+
+For interactive chat, send one request per conversation at a time from the
+application. Disable repeated submission while that request runs. If rapid edits
+should produce only one request, combine unsent edits in the application before
+calling the API. Reducing ``THREAD_QUEUE_MAX_WAITERS`` to 0 or 1 can limit local
+contention. This value applies per conversation in each worker. A value of zero
+can still allow one request in each other worker to wait for the shared database
+lock; it is not a global immediate-rejection policy.
+
+For retries after an uncertain result, use an application operation ID and a
+durable record of its status and result. The toolkit has no built-in
+``Idempotency-Key`` contract. A returned ``run_id`` identifies a run; it does not
+deduplicate the next request. Check saved state before retrying a failed run.
+Tools that change external systems also need idempotency at those systems.
+Ordinary repeated message text creates another turn when no interrupt is pending.
+A paused graph uses the next accepted input as an answer to its pending
+interrupt. Repeated approval messages are not deduplicated either. Custom message
+reducers can replace messages with the same message ID, but this does not prevent
+another model call or tool action.
+
 Managed OpenAI and Azure Connections
 ------------------------------------
 

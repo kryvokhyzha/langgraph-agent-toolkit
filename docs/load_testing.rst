@@ -11,6 +11,14 @@ These tests measure local API behavior. They do not measure provider quotas,
 internet latency, a production proxy, or live Langfuse ingestion. Run a separate
 deployment test with those components before you set production capacity.
 
+Include repeated requests for one conversation in that deployment test. Mix
+them with independent conversations and check whether lock waiters consume all
+worker request slots. Send identical messages as well as different messages.
+Record admission 503 responses, conversation 409 responses, stream error events,
+and deadline failures separately. The API does not deduplicate accepted requests
+or guarantee first-in, first-out ordering across workers. See
+:ref:`conversation-bursts` for these limits and client behavior.
+
 Run the tests
 -------------
 

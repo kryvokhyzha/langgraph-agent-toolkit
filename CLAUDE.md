@@ -339,9 +339,11 @@ asynchronous OpenAI and Azure calls. Python installations default to HTTPX. Use
 Langfuse stack. The Langfuse stack contains postgres, redis, clickhouse, minio,
 langfuse-web :3000, and langfuse-worker. Postgres creates three DBs (`agents`,
 `litellm`, `langfuse`) and a `checkpoints` schema through
-`scripts/postgres-init/`. Both application images use single-stage
-`python:3.13-slim` builds with `uv`. Use `make rebuild_api` / `make rebuild_app`
-to rebuild one service.
+`scripts/postgres-init/`. Both application images use multi-stage
+`python:3.13-slim` builds. The builder uses `uv`; the runtime contains its
+virtual environment and application source. Both runtime images install `curl`
+for health probes. Use `make rebuild_api` / `make rebuild_app` to rebuild one
+service.
 
 ## Pre-commit hooks (what runs on commit)
 

@@ -11,7 +11,7 @@ Start here
 * Follow :doc:`quickstart` to run a local API without a model key.
 * Follow :doc:`onboarding` to integrate the toolkit into an application.
 * Use :doc:`integrations` to choose an agent pattern and tool integration.
-* Read :doc:`migration` before upgrading an existing deployment to 0.10.x.
+* Read :doc:`migration` before upgrading an existing deployment to |release|.
 * Use :doc:`deployment` and :doc:`reliability` to configure a deployed service.
 
 The toolkit supports Python 3.11–3.14. Optional extras select providers,

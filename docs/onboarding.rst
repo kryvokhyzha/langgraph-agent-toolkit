@@ -151,9 +151,9 @@ recovery. Tune worker, request, model, and database limits together. See
 7. Upgrade existing data and release
 ------------------------------------
 
-When upgrading from raw checkpoint IDs to 0.10.x, create the ownership manifest
-described in :doc:`migration`. Verify a database backup and the migration dry
-run before applying changes. Stop all checkpoint writers during migration.
+When upgrading from raw checkpoint IDs to scoped checkpoint IDs, create the
+ownership manifest described in :doc:`migration`. Verify a database backup and
+the migration dry run before applying changes. Stop all checkpoint writers during migration.
 Do not run old and new workers against the same checkpoint tables.
 
 Test the migrated conversations through their public IDs and original user

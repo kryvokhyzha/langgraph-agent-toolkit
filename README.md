@@ -13,8 +13,8 @@ persistent conversation history, managed model connections, and optional tools
 and observability. Use your own client or the included Streamlit interface.
 
 **Python 3.11–3.14.** The API image uses Python 3.13. Existing deployments
-should read the [0.10.x migration guide](docs/migration.rst) and
-[changelog](CHANGELOG.md) before upgrading.
+should read the [migration guide for the current release](docs/migration.rst)
+and [changelog](CHANGELOG.md) before upgrading.
 
 [Quickstart](#quickstart) · [Integrations](#choose-an-integration) ·
 [Onboarding](docs/onboarding.rst) ·
@@ -156,6 +156,9 @@ The API can run alone under Uvicorn or Gunicorn. Docker Compose adds the
 optional frontend, model proxy, and observability services. Configure the full
 stack through the [environment guide](docs/environment_setup.rst).
 
+- Both Docker images use separate build and runtime stages, a slim Python base,
+  and locked production dependencies. See the
+  [image build and measurement guide](docs/deployment.rst#production-image-builds).
 - The API Docker image installs and selects **aiohttp** for managed async OpenAI
   and Azure calls. Python installations default to HTTPX. Set
   `LLM_HTTP_ASYNC_TRANSPORT=httpx` to override the image default.
