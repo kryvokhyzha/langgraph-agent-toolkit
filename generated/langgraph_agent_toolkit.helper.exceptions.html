@@ -1,0 +1,755 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.helper.exceptions module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.helper.exceptions.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.helper.logging module" href="langgraph_agent_toolkit.helper.logging.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.helper.constants module" href="langgraph_agent_toolkit.helper.constants.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.helper.exceptions module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.helper.exceptions.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.helper.exceptions">
+<span id="langgraph-agent-toolkit-helper-exceptions-module"></span><h1>langgraph_agent_toolkit.helper.exceptions module<a class="headerlink" href="#module-langgraph_agent_toolkit.helper.exceptions" title="Link to this heading"></a></h1>
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AgentToolkitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentToolkitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L1-L16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Base class for LangGraph Agent Toolkit errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentToolkitError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L4-L16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AgentError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L19-L22"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for agent errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentConfigurationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AgentConfigurationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentConfigurationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L25-L28"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentConfigurationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentError" title="langgraph_agent_toolkit.helper.exceptions.AgentError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentError</span></code></a></p>
+<p>Raised when an agent configuration has an error.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentExecutionError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AgentExecutionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentExecutionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L31-L34"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentExecutionError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentError" title="langgraph_agent_toolkit.helper.exceptions.AgentError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentError</span></code></a></p>
+<p>Raised when an agent cannot run.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AgentTimeoutError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AgentTimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AgentTimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L37-L40"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AgentTimeoutError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentError" title="langgraph_agent_toolkit.helper.exceptions.AgentError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentError</span></code></a></p>
+<p>Raised when an agent operation times out.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MessageError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">MessageError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MessageError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L43-L46"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MessageError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for message errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnsupportedMessageTypeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supported_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#UnsupportedMessageTypeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L49-L64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.MessageError" title="langgraph_agent_toolkit.helper.exceptions.MessageError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageError</span></code></a></p>
+<p>Raised for an unsupported message type.</p>
+<p>Initialize the error with message type information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message_type</strong> (<em>str</em>) – Unsupported message type.</p></li>
+<li><p><strong>supported_types</strong> (<em>list</em>) – Supported message types.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supported_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#UnsupportedMessageTypeError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L52-L64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.UnsupportedMessageTypeError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with message type information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message_type</strong> (<em>str</em>) – Unsupported message type.</p></li>
+<li><p><strong>supported_types</strong> (<em>list</em>) – Supported message types.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MessageConversionError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">MessageConversionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MessageConversionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L67-L70"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MessageConversionError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.MessageError" title="langgraph_agent_toolkit.helper.exceptions.MessageError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageError</span></code></a></p>
+<p>Raised when message conversion fails.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ValidationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L73-L76"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ValidationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for validation errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.InputValidationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">InputValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#InputValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L79-L82"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.InputValidationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ValidationError" title="langgraph_agent_toolkit.helper.exceptions.ValidationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationError</span></code></a></p>
+<p>Raised when input validation fails.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ConfigurationValidationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ConfigurationValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ConfigurationValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L85-L88"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ConfigurationValidationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ValidationError" title="langgraph_agent_toolkit.helper.exceptions.ValidationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationError</span></code></a></p>
+<p>Raised when configuration validation fails.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ModelError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ModelError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ModelError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L91-L94"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ModelError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for model errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ModelNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ModelNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L97-L112"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ModelError" title="langgraph_agent_toolkit.helper.exceptions.ModelError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelError</span></code></a></p>
+<p>Raised when a requested model is not found.</p>
+<p>Initialize the error with model information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) – Name of the missing model.</p></li>
+<li><p><strong>provider</strong> (<em>str</em>) – Optional model provider.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ModelNotFoundError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L100-L112"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ModelNotFoundError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with model information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) – Name of the missing model.</p></li>
+<li><p><strong>provider</strong> (<em>str</em>) – Optional model provider.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ModelConfigurationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ModelConfigurationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ModelConfigurationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L115-L118"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ModelConfigurationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ModelError" title="langgraph_agent_toolkit.helper.exceptions.ModelError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelError</span></code></a></p>
+<p>Raised when a model configuration has an error.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ToolError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ToolError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ToolError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L121-L124"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ToolError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for tool errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ToolNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_tools</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ToolNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L127-L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ToolError" title="langgraph_agent_toolkit.helper.exceptions.ToolError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ToolError</span></code></a></p>
+<p>Raised when a requested tool is not found.</p>
+<p>Initialize the error with tool information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tool_name</strong> (<em>str</em>) – Name of the missing tool.</p></li>
+<li><p><strong>available_tools</strong> (<em>list</em>) – Available tools.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_tools</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ToolNotFoundError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L130-L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ToolNotFoundError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with tool information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tool_name</strong> (<em>str</em>) – Name of the missing tool.</p></li>
+<li><p><strong>available_tools</strong> (<em>list</em>) – Available tools.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ToolExecutionError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ToolExecutionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ToolExecutionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L145-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ToolExecutionError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ToolError" title="langgraph_agent_toolkit.helper.exceptions.ToolError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ToolError</span></code></a></p>
+<p>Raised when tool execution fails.</p>
+<p>Initialize the error with tool execution information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tool_name</strong> (<em>str</em>) – Name of the failed tool.</p></li>
+<li><p><strong>original_error</strong> (<em>Exception</em>) – Exception that caused the failure.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ToolExecutionError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ToolExecutionError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L148-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ToolExecutionError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with tool execution information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tool_name</strong> (<em>str</em>) – Name of the failed tool.</p></li>
+<li><p><strong>original_error</strong> (<em>Exception</em>) – Exception that caused the failure.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MemoryError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">MemoryError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MemoryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L164-L167"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MemoryError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for memory errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">MemoryNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thread'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MemoryNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L170-L184"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.MemoryError" title="langgraph_agent_toolkit.helper.exceptions.MemoryError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MemoryError</span></code></a></p>
+<p>Raised when the requested memory or thread is missing.</p>
+<p>Initialize the error with memory identifier information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<em>str</em>) – Missing identifier.</p></li>
+<li><p><strong>identifier_type</strong> (<em>str</em>) – Identifier type, such as <cite>thread</cite> or <cite>user</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thread'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MemoryNotFoundError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L173-L184"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MemoryNotFoundError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with memory identifier information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<em>str</em>) – Missing identifier.</p></li>
+<li><p><strong>identifier_type</strong> (<em>str</em>) – Identifier type, such as <cite>thread</cite> or <cite>user</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.MemoryOperationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">MemoryOperationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#MemoryOperationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L187-L190"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.MemoryOperationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.MemoryError" title="langgraph_agent_toolkit.helper.exceptions.MemoryError"><code class="xref py py-class docutils literal notranslate"><span class="pre">MemoryError</span></code></a></p>
+<p>Raised when memory operations fail.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ObservabilityError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ObservabilityError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ObservabilityError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L193-L196"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ObservabilityError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for observability errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.FeedbackError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">FeedbackError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#FeedbackError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L199-L217"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.FeedbackError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.ObservabilityError" title="langgraph_agent_toolkit.helper.exceptions.ObservabilityError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservabilityError</span></code></a></p>
+<p>Raised when feedback operations fail.</p>
+<p>Initialize the error with feedback operation information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_id</strong> (<em>str</em>) – Run ID for the feedback.</p></li>
+<li><p><strong>operation</strong> (<em>str</em>) – Failed feedback operation.</p></li>
+<li><p><strong>reason</strong> (<em>str</em>) – Optional failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.FeedbackError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#FeedbackError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L202-L217"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.FeedbackError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with feedback operation information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>run_id</strong> (<em>str</em>) – Run ID for the feedback.</p></li>
+<li><p><strong>operation</strong> (<em>str</em>) – Failed feedback operation.</p></li>
+<li><p><strong>reason</strong> (<em>str</em>) – Optional failure reason.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AuthenticationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L220-L223"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AuthenticationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Raised when authentication fails.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.AuthorizationError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">AuthorizationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#AuthorizationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L226-L229"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.AuthorizationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Raised when authorization fails.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.RateLimitError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">RateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#RateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L232-L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.RateLimitError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Raised when rate limits are exceeded.</p>
+<p>Initialize the error with rate-limit information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource</strong> (<em>str</em>) – Resource that reached the rate limit.</p></li>
+<li><p><strong>limit</strong> (<em>int</em>) – Exceeded rate limit.</p></li>
+<li><p><strong>reset_time</strong> (<em>float</em>) – Optional limit reset time.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.RateLimitError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#RateLimitError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L235-L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.RateLimitError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with rate-limit information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource</strong> (<em>str</em>) – Resource that reached the rate limit.</p></li>
+<li><p><strong>limit</strong> (<em>int</em>) – Exceeded rate limit.</p></li>
+<li><p><strong>reset_time</strong> (<em>float</em>) – Optional limit reset time.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.NetworkError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">NetworkError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#NetworkError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L253-L256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.NetworkError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.AgentToolkitError" title="langgraph_agent_toolkit.helper.exceptions.AgentToolkitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentToolkitError</span></code></a></p>
+<p>Base class for network errors.</p>
+<p>Initialize the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Error message for a user.</p></li>
+<li><p><strong>error_code</strong> (<em>str</em>) – Optional error code for a program.</p></li>
+<li><p><strong>details</strong> (<em>dict</em>) – Optional error context.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.helper.exceptions.</span></span><span class="sig-name descname"><span class="pre">ServiceUnavailableError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ServiceUnavailableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L259-L274"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#langgraph_agent_toolkit.helper.exceptions.NetworkError" title="langgraph_agent_toolkit.helper.exceptions.NetworkError"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkError</span></code></a></p>
+<p>Raised when an external service is unavailable.</p>
+<p>Initialize the error with service information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> (<em>str</em>) – Name of the unavailable service.</p></li>
+<li><p><strong>details</strong> (<em>str</em>) – Optional unavailability details.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/helper/exceptions.html#ServiceUnavailableError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/helper/exceptions.py#L262-L274"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.helper.exceptions.ServiceUnavailableError.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the error with service information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> (<em>str</em>) – Name of the unavailable service.</p></li>
+<li><p><strong>details</strong> (<em>str</em>) – Optional unavailability details.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.helper.constants.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.helper.constants module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.helper.logging.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.helper.logging module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

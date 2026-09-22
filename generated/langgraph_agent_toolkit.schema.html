@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.schema package &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.schema.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.schema.models module" href="langgraph_agent_toolkit.schema.models.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.helper.utils module" href="langgraph_agent_toolkit.helper.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.schema package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.schema.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.schema">
+<span id="langgraph-agent-toolkit-schema-package"></span><h1>langgraph_agent_toolkit.schema package<a class="headerlink" href="#module-langgraph_agent_toolkit.schema" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html">langgraph_agent_toolkit.schema.models module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider"><code class="docutils literal notranslate"><span class="pre">ModelProvider</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.OPENAI"><code class="docutils literal notranslate"><span class="pre">ModelProvider.OPENAI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.AZURE_OPENAI"><code class="docutils literal notranslate"><span class="pre">ModelProvider.AZURE_OPENAI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.ANTHROPIC"><code class="docutils literal notranslate"><span class="pre">ModelProvider.ANTHROPIC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.GOOGLE_VERTEXAI"><code class="docutils literal notranslate"><span class="pre">ModelProvider.GOOGLE_VERTEXAI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.GOOGLE_GENAI"><code class="docutils literal notranslate"><span class="pre">ModelProvider.GOOGLE_GENAI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.BEDROCK"><code class="docutils literal notranslate"><span class="pre">ModelProvider.BEDROCK</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.DEEPSEEK"><code class="docutils literal notranslate"><span class="pre">ModelProvider.DEEPSEEK</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.OLLAMA"><code class="docutils literal notranslate"><span class="pre">ModelProvider.OLLAMA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.models.html#langgraph_agent_toolkit.schema.models.ModelProvider.FAKE"><code class="docutils literal notranslate"><span class="pre">ModelProvider.FAKE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html">langgraph_agent_toolkit.schema.schema module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AgentInfo"><code class="docutils literal notranslate"><span class="pre">AgentInfo</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AgentInfo.key"><code class="docutils literal notranslate"><span class="pre">AgentInfo.key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AgentInfo.description"><code class="docutils literal notranslate"><span class="pre">AgentInfo.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AgentInfo.model_config"><code class="docutils literal notranslate"><span class="pre">AgentInfo.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ServiceMetadata"><code class="docutils literal notranslate"><span class="pre">ServiceMetadata</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ServiceMetadata.agents"><code class="docutils literal notranslate"><span class="pre">ServiceMetadata.agents</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ServiceMetadata.default_agent"><code class="docutils literal notranslate"><span class="pre">ServiceMetadata.default_agent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ServiceMetadata.model_config"><code class="docutils literal notranslate"><span class="pre">ServiceMetadata.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserComplexInput"><code class="docutils literal notranslate"><span class="pre">UserComplexInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserComplexInput.message"><code class="docutils literal notranslate"><span class="pre">UserComplexInput.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserComplexInput.model_config"><code class="docutils literal notranslate"><span class="pre">UserComplexInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput"><code class="docutils literal notranslate"><span class="pre">UserInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.input"><code class="docutils literal notranslate"><span class="pre">UserInput.input</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.model_name"><code class="docutils literal notranslate"><span class="pre">UserInput.model_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.model_provider"><code class="docutils literal notranslate"><span class="pre">UserInput.model_provider</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.model_config_key"><code class="docutils literal notranslate"><span class="pre">UserInput.model_config_key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.thread_id"><code class="docutils literal notranslate"><span class="pre">UserInput.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.user_id"><code class="docutils literal notranslate"><span class="pre">UserInput.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.agent_config"><code class="docutils literal notranslate"><span class="pre">UserInput.agent_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.recursion_limit"><code class="docutils literal notranslate"><span class="pre">UserInput.recursion_limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UserInput.model_config"><code class="docutils literal notranslate"><span class="pre">UserInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamInput"><code class="docutils literal notranslate"><span class="pre">StreamInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamInput.stream_tokens"><code class="docutils literal notranslate"><span class="pre">StreamInput.stream_tokens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamInput.model_config"><code class="docutils literal notranslate"><span class="pre">StreamInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ToolCall"><code class="docutils literal notranslate"><span class="pre">ToolCall</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ToolCall.name"><code class="docutils literal notranslate"><span class="pre">ToolCall.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ToolCall.args"><code class="docutils literal notranslate"><span class="pre">ToolCall.args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ToolCall.id"><code class="docutils literal notranslate"><span class="pre">ToolCall.id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ToolCall.type"><code class="docutils literal notranslate"><span class="pre">ToolCall.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata"><code class="docutils literal notranslate"><span class="pre">UsageMetadata</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata.input_tokens"><code class="docutils literal notranslate"><span class="pre">UsageMetadata.input_tokens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata.output_tokens"><code class="docutils literal notranslate"><span class="pre">UsageMetadata.output_tokens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata.total_tokens"><code class="docutils literal notranslate"><span class="pre">UsageMetadata.total_tokens</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata.input_token_details"><code class="docutils literal notranslate"><span class="pre">UsageMetadata.input_token_details</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.UsageMetadata.output_token_details"><code class="docutils literal notranslate"><span class="pre">UsageMetadata.output_token_details</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage"><code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.type"><code class="docutils literal notranslate"><span class="pre">ChatMessage.type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.content"><code class="docutils literal notranslate"><span class="pre">ChatMessage.content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.tool_calls"><code class="docutils literal notranslate"><span class="pre">ChatMessage.tool_calls</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.tool_call_id"><code class="docutils literal notranslate"><span class="pre">ChatMessage.tool_call_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.run_id"><code class="docutils literal notranslate"><span class="pre">ChatMessage.run_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.feedback_token"><code class="docutils literal notranslate"><span class="pre">ChatMessage.feedback_token</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.thread_id"><code class="docutils literal notranslate"><span class="pre">ChatMessage.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.response_metadata"><code class="docutils literal notranslate"><span class="pre">ChatMessage.response_metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.usage_metadata"><code class="docutils literal notranslate"><span class="pre">ChatMessage.usage_metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.custom_data"><code class="docutils literal notranslate"><span class="pre">ChatMessage.custom_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_repr"><code class="docutils literal notranslate"><span class="pre">ChatMessage.pretty_repr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.pretty_print"><code class="docutils literal notranslate"><span class="pre">ChatMessage.pretty_print()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatMessage.model_config"><code class="docutils literal notranslate"><span class="pre">ChatMessage.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamChunk"><code class="docutils literal notranslate"><span class="pre">StreamChunk</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamChunk.type"><code class="docutils literal notranslate"><span class="pre">StreamChunk.type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamChunk.content"><code class="docutils literal notranslate"><span class="pre">StreamChunk.content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StreamChunk.model_config"><code class="docutils literal notranslate"><span class="pre">StreamChunk.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ErrorResponse"><code class="docutils literal notranslate"><span class="pre">ErrorResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ErrorResponse.detail"><code class="docutils literal notranslate"><span class="pre">ErrorResponse.detail</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ErrorResponse.error_code"><code class="docutils literal notranslate"><span class="pre">ErrorResponse.error_code</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ErrorResponse.model_config"><code class="docutils literal notranslate"><span class="pre">ErrorResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback"><code class="docutils literal notranslate"><span class="pre">Feedback</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.run_id"><code class="docutils literal notranslate"><span class="pre">Feedback.run_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.feedback_token"><code class="docutils literal notranslate"><span class="pre">Feedback.feedback_token</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.key"><code class="docutils literal notranslate"><span class="pre">Feedback.key</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.score"><code class="docutils literal notranslate"><span class="pre">Feedback.score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.user_id"><code class="docutils literal notranslate"><span class="pre">Feedback.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.kwargs"><code class="docutils literal notranslate"><span class="pre">Feedback.kwargs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.Feedback.model_config"><code class="docutils literal notranslate"><span class="pre">Feedback.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.FeedbackResponse"><code class="docutils literal notranslate"><span class="pre">FeedbackResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.FeedbackResponse.status"><code class="docutils literal notranslate"><span class="pre">FeedbackResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.FeedbackResponse.run_id"><code class="docutils literal notranslate"><span class="pre">FeedbackResponse.run_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.FeedbackResponse.message"><code class="docutils literal notranslate"><span class="pre">FeedbackResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.FeedbackResponse.model_config"><code class="docutils literal notranslate"><span class="pre">FeedbackResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput"><code class="docutils literal notranslate"><span class="pre">MessageInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.type"><code class="docutils literal notranslate"><span class="pre">MessageInput.type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.content"><code class="docutils literal notranslate"><span class="pre">MessageInput.content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.custom_data"><code class="docutils literal notranslate"><span class="pre">MessageInput.custom_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.tool_call_id"><code class="docutils literal notranslate"><span class="pre">MessageInput.tool_call_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.tool_calls"><code class="docutils literal notranslate"><span class="pre">MessageInput.tool_calls</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.usage_metadata"><code class="docutils literal notranslate"><span class="pre">MessageInput.usage_metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.response_metadata"><code class="docutils literal notranslate"><span class="pre">MessageInput.response_metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.validate_tool_message"><code class="docutils literal notranslate"><span class="pre">MessageInput.validate_tool_message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.MessageInput.model_config"><code class="docutils literal notranslate"><span class="pre">MessageInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesInput"><code class="docutils literal notranslate"><span class="pre">AddMessagesInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesInput.thread_id"><code class="docutils literal notranslate"><span class="pre">AddMessagesInput.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesInput.user_id"><code class="docutils literal notranslate"><span class="pre">AddMessagesInput.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesInput.messages"><code class="docutils literal notranslate"><span class="pre">AddMessagesInput.messages</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesInput.model_config"><code class="docutils literal notranslate"><span class="pre">AddMessagesInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.status"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.thread_id"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.user_id"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.message"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.AddMessagesResponse.model_config"><code class="docutils literal notranslate"><span class="pre">AddMessagesResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryInput"><code class="docutils literal notranslate"><span class="pre">ClearHistoryInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.thread_id"><code class="docutils literal notranslate"><span class="pre">ClearHistoryInput.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.user_id"><code class="docutils literal notranslate"><span class="pre">ClearHistoryInput.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryInput.model_config"><code class="docutils literal notranslate"><span class="pre">ClearHistoryInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.status"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.thread_id"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.user_id"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.message"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ClearHistoryResponse.model_config"><code class="docutils literal notranslate"><span class="pre">ClearHistoryResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.thread_id"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.user_id"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.offset"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput.offset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.limit"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput.limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistoryInput.model_config"><code class="docutils literal notranslate"><span class="pre">ChatHistoryInput.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistory"><code class="docutils literal notranslate"><span class="pre">ChatHistory</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistory.messages"><code class="docutils literal notranslate"><span class="pre">ChatHistory.messages</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistory.next_offset"><code class="docutils literal notranslate"><span class="pre">ChatHistory.next_offset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistory.total"><code class="docutils literal notranslate"><span class="pre">ChatHistory.total</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ChatHistory.model_config"><code class="docutils literal notranslate"><span class="pre">ChatHistory.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.HealthCheck"><code class="docutils literal notranslate"><span class="pre">HealthCheck</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.HealthCheck.content"><code class="docutils literal notranslate"><span class="pre">HealthCheck.content</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.HealthCheck.version"><code class="docutils literal notranslate"><span class="pre">HealthCheck.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.HealthCheck.model_config"><code class="docutils literal notranslate"><span class="pre">HealthCheck.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.LivenessResponse"><code class="docutils literal notranslate"><span class="pre">LivenessResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.LivenessResponse.status"><code class="docutils literal notranslate"><span class="pre">LivenessResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.LivenessResponse.version"><code class="docutils literal notranslate"><span class="pre">LivenessResponse.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.LivenessResponse.model_config"><code class="docutils literal notranslate"><span class="pre">LivenessResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse.status"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse.version"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse.initialized_agents"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse.initialized_agents</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse.message"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.ReadinessResponse.model_config"><code class="docutils literal notranslate"><span class="pre">ReadinessResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StartupResponse"><code class="docutils literal notranslate"><span class="pre">StartupResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StartupResponse.status"><code class="docutils literal notranslate"><span class="pre">StartupResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StartupResponse.version"><code class="docutils literal notranslate"><span class="pre">StartupResponse.version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StartupResponse.message"><code class="docutils literal notranslate"><span class="pre">StartupResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.StartupResponse.model_config"><code class="docutils literal notranslate"><span class="pre">StartupResponse.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.status"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.message"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_size"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.pool_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.model_config"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.pool_available"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.pool_available</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.requests_waiting"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.requests_waiting</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.schema.html#langgraph_agent_toolkit.schema.schema.DatabaseHealthResponse.connections_num"><code class="docutils literal notranslate"><span class="pre">DatabaseHealthResponse.connections_num</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html">langgraph_agent_toolkit.schema.task_data module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData"><code class="docutils literal notranslate"><span class="pre">TaskData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.name"><code class="docutils literal notranslate"><span class="pre">TaskData.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.run_id"><code class="docutils literal notranslate"><span class="pre">TaskData.run_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.state"><code class="docutils literal notranslate"><span class="pre">TaskData.state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.result"><code class="docutils literal notranslate"><span class="pre">TaskData.result</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.data"><code class="docutils literal notranslate"><span class="pre">TaskData.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.completed"><code class="docutils literal notranslate"><span class="pre">TaskData.completed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.completed_with_error"><code class="docutils literal notranslate"><span class="pre">TaskData.completed_with_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskData.model_config"><code class="docutils literal notranslate"><span class="pre">TaskData.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskDataStatus"><code class="docutils literal notranslate"><span class="pre">TaskDataStatus</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskDataStatus.__init__"><code class="docutils literal notranslate"><span class="pre">TaskDataStatus.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskDataStatus.current_task_data"><code class="docutils literal notranslate"><span class="pre">TaskDataStatus.current_task_data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.schema.task_data.html#langgraph_agent_toolkit.schema.task_data.TaskDataStatus.add_and_draw_task_data"><code class="docutils literal notranslate"><span class="pre">TaskDataStatus.add_and_draw_task_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.helper.utils.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.helper.utils module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.schema.models.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.schema.models module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

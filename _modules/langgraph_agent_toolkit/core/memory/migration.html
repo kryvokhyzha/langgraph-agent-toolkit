@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.memory.migration &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/memory/migration.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.memory.migration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.memory.migration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Plan and apply checkpoint maintenance while service workers are stopped.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sqlite3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">TypeAdapter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.service.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">storage_thread_id</span>
+
+
+<div class="viewcode-block" id="MigrationEntry">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.MigrationEntry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MigrationEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map one legacy thread to an explicit owner and agent.&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">old_thread_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">thread_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">public_thread_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_thread_id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_id</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">256</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Set thread_id to a public ID with at most 256 characters&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">destination</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">storage_thread_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_thread_id</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_manifest</span><span class="p">(</span><span class="n">entries</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MigrationEntry</span><span class="p">]:</span>
+    <span class="n">mappings</span> <span class="o">=</span> <span class="n">TypeAdapter</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">MigrationEntry</span><span class="p">])</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">mappings</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The migration manifest must not be empty&quot;</span><span class="p">)</span>
+    <span class="n">sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">]</span>
+    <span class="n">destinations</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">destination</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sources</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate old_thread_id in the migration manifest&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">destinations</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">destinations</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate destination in the migration manifest&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">destinations</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Source and destination thread IDs overlap&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mappings</span>
+
+
+<div class="viewcode-block" id="load_manifest">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.load_manifest">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_manifest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MigrationEntry</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read explicit mappings from a JSON array.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_validate_manifest</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_timestamp</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A timestamp must be an ISO 8601 string with a timezone&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;+00:00&quot;</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid ISO 8601 timestamp&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">utcoffset</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A timestamp must include a timezone&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_identifier</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&quot;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Store</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;public&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">apply</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apply must be a Boolean value&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply</span> <span class="o">=</span> <span class="n">apply</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span> <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The SQLite checkpoint file does not exist&quot;</span><span class="p">)</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span> <span class="k">else</span> <span class="s2">&quot;ro&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">as_uri</span><span class="p">()</span><span class="si">}</span><span class="s2">?mode=</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">isolation_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">psycopg</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">psycopg</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">),</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;BEGIN IMMEDIATE&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span> <span class="k">else</span> <span class="s2">&quot;BEGIN&quot;</span><span class="p">)</span>
+                <span class="n">existing</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;&quot;</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="n">required</span><span class="p">,</span> <span class="n">optional</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;writes&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET LOCAL lock_timeout = &#39;30s&#39;&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY&quot;</span><span class="p">)</span>
+                <span class="n">existing</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;SELECT table_name FROM information_schema.tables &quot;</span>
+                        <span class="s2">&quot;WHERE table_schema = </span><span class="si">%s</span><span class="s2"> AND table_type = &#39;BASE TABLE&#39;&quot;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,),</span>
+                    <span class="p">)</span>
+                <span class="p">}</span>
+                <span class="n">required</span><span class="p">,</span> <span class="n">optional</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">,</span> <span class="s2">&quot;checkpoint_blobs&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;checkpoint_writes&quot;</span><span class="p">]</span>
+            <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">required</span><span class="p">)</span> <span class="o">-</span> <span class="n">existing</span>
+            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing checkpoint tables: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span> <span class="o">=</span> <span class="n">required</span> <span class="o">+</span> <span class="p">[</span><span class="n">table</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">optional</span> <span class="k">if</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;postgres&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">:</span>
+                <span class="n">tables</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LOCK TABLE </span><span class="si">{</span><span class="n">tables</span><span class="si">}</span><span class="s2"> IN SHARE ROW EXCLUSIVE MODE&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception_type</span><span class="p">,</span> <span class="n">exception</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exception_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">_identifier</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_identifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thread_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Count rows in bounded batches without reading checkpoint content.&quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thread_ids</span><span class="p">),</span> <span class="mi">500</span><span class="p">):</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="n">thread_ids</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">500</span><span class="p">]</span>
+                <span class="n">parameters</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SELECT thread_id, COUNT(*) FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;WHERE thread_id IN (</span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">) GROUP BY thread_id&quot;</span>
+                <span class="p">)</span>
+                <span class="n">counts</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">counts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">latest_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]:</span>
+        <span class="n">latest</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;postgres&quot;</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;SELECT thread_id, MAX((checkpoint-&gt;&gt;&#39;ts&#39;)::timestamptz), &quot;</span>
+                <span class="s2">&quot;COUNT(*) FILTER (WHERE NOT COALESCE((checkpoint-&gt;&gt;&#39;ts&#39;) ~ &#39;(Z|[+-][0-9]</span><span class="si">{2}</span><span class="s2">:[0-9]</span><span class="si">{2}</span><span class="s2">)$&#39;, FALSE)) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s1">&#39;checkpoints&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> WHERE thread_id ~ &#39;^lat:v1:[0-9a-f]</span><span class="se">{{</span><span class="s2">64</span><span class="se">}}</span><span class="s2">$&#39; GROUP BY thread_id&quot;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">missing</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;lat:v1:[0-9a-f]</span><span class="si">{64}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">missing</span> <span class="ow">or</span> <span class="n">timestamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A checkpoint timestamp is missing; retention stopped&quot;</span><span class="p">)</span>
+                <span class="n">latest</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">latest</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT thread_id, type, checkpoint FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s1">&#39;checkpoints&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> WHERE thread_id LIKE &#39;lat:v1:%&#39;&quot;</span>
+        <span class="k">for</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;lat:v1:[0-9a-f]</span><span class="si">{64}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+                <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">encoding</span> <span class="o">==</span> <span class="s2">&quot;msgpack&quot;</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">ormsgpack</span>
+
+                <span class="c1"># Ignore extension objects. Retention only reads the plain timestamp.</span>
+                <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">ormsgpack</span><span class="o">.</span><span class="n">unpackb</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">ext_hook</span><span class="o">=</span><span class="k">lambda</span> <span class="n">code</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="n">ormsgpack</span><span class="o">.</span><span class="n">OPT_NON_STR_KEYS</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported checkpoint encoding; retention stopped&quot;</span><span class="p">)</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">_timestamp</span><span class="p">(</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">latest</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">),</span> <span class="n">timestamp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">latest</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_migrate</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">_Store</span><span class="p">,</span> <span class="n">mappings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MigrationEntry</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">thread_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">destination</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">]</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">counts</span><span class="p">(</span><span class="n">thread_ids</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="p">[</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Source thread </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span><span class="si">!r}</span><span class="s2"> has no checkpoints&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">tables</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Destination for </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span><span class="si">!r}</span><span class="s2"> already exists&quot;</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">)</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">tables</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">apply</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;UPDATE </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> SET thread_id = </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">parameter</span><span class="si">}</span><span class="s2"> WHERE thread_id = </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">parameter</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">old_thread_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="s2">&quot;migration&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;applied&quot;</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span>
+        <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="p">,</span>
+        <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="o">**</span><span class="n">entry</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span> <span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">public_thread_id</span><span class="p">,</span> <span class="s2">&quot;storage_thread_id&quot;</span><span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">destination</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">mappings</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="migrate_sqlite">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_sqlite">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">migrate_sqlite</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan or atomically apply a SQLite thread migration.&quot;&quot;&quot;</span>
+    <span class="n">mappings</span> <span class="o">=</span> <span class="n">_validate_manifest</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_Store</span><span class="p">(</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_migrate</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="migrate_postgres">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.migrate_postgres">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">migrate_postgres</span><span class="p">(</span><span class="n">conninfo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;public&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan or atomically apply a PostgreSQL thread migration.&quot;&quot;&quot;</span>
+    <span class="n">mappings</span> <span class="o">=</span> <span class="n">_validate_manifest</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_Store</span><span class="p">(</span><span class="s2">&quot;postgres&quot;</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_migrate</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_retain</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">_Store</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">latest</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">latest_timestamps</span><span class="p">()</span>
+    <span class="n">threads</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">thread_id</span> <span class="k">for</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">timestamp</span> <span class="ow">in</span> <span class="n">latest</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">timestamp</span> <span class="o">&lt;</span> <span class="n">before</span><span class="p">)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">counts</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">{</span><span class="n">table</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">table</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">tables</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">apply</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">thread_id</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DELETE FROM </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> WHERE thread_id = </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">parameter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">thread_id</span><span class="p">,)</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="s2">&quot;retention&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;applied&quot;</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span>
+        <span class="s2">&quot;before&quot;</span><span class="p">:</span> <span class="n">before</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="p">,</span>
+        <span class="s2">&quot;threads&quot;</span><span class="p">:</span> <span class="n">threads</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="retain_sqlite">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_sqlite">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">retain_sqlite</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan or delete complete inactive SQLite threads before a timestamp.&quot;&quot;&quot;</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">_timestamp</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_Store</span><span class="p">(</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_retain</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="retain_postgres">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.retain_postgres">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">retain_postgres</span><span class="p">(</span><span class="n">conninfo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;public&quot;</span><span class="p">,</span> <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan or delete complete inactive PostgreSQL threads before a timestamp.&quot;&quot;&quot;</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">_timestamp</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_Store</span><span class="p">(</span><span class="s2">&quot;postgres&quot;</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_retain</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.migration.html#langgraph_agent_toolkit.core.memory.migration.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">manifest</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">before</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sqlite_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">postgres_env</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">,</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;public&quot;</span><span class="p">,</span>
+    <span class="n">apply</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preview maintenance. Set --apply=true to commit after review.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">apply</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">apply</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;--apply must be true or false&quot;</span><span class="p">)</span>
+        <span class="n">apply</span> <span class="o">=</span> <span class="n">apply</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
+    <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">(</span><span class="n">before</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Set exactly one of --manifest or --before&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;sqlite&quot;</span><span class="p">,</span> <span class="s2">&quot;postgres&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;backend must be sqlite or postgres&quot;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">load_manifest</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span> <span class="k">if</span> <span class="n">manifest</span> <span class="k">else</span> <span class="n">before</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sqlite&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sqlite_path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SQLite maintenance requires --sqlite-path&quot;</span><span class="p">)</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="n">migrate_sqlite</span> <span class="k">if</span> <span class="n">manifest</span> <span class="k">else</span> <span class="n">retain_sqlite</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">sqlite_path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conninfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">postgres_env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">conninfo</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The named PostgreSQL connection environment variable is empty&quot;</span><span class="p">)</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="n">migrate_postgres</span> <span class="k">if</span> <span class="n">manifest</span> <span class="k">else</span> <span class="n">retain_postgres</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="n">conninfo</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">apply</span><span class="o">=</span><span class="n">apply</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">fire</span>
+
+    <span class="n">fire</span><span class="o">.</span><span class="n">Fire</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

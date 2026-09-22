@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.observability.langfuse &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/observability/langfuse.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.observability.langfuse</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.observability.langfuse</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span><span class="p">,</span> <span class="n">nullcontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">langfuse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_langfuse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCallbackHandler</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseObservabilityPlatform</span><span class="p">,</span>
+    <span class="n">PromptReturnType</span><span class="p">,</span>
+    <span class="n">PromptTemplateType</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="n">_SDK_MAJOR</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;langfuse&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">_SDK_MAJOR</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported Langfuse SDK major version: </span><span class="si">{</span><span class="n">_SDK_MAJOR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">_IS_NEW_LANGFUSE</span> <span class="o">=</span> <span class="n">_SDK_MAJOR</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+<span class="n">Langfuse</span> <span class="o">=</span> <span class="n">_langfuse</span><span class="o">.</span><span class="n">Langfuse</span>
+<span class="n">get_client</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_langfuse</span><span class="p">,</span> <span class="s2">&quot;get_client&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">propagate_attributes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_langfuse</span><span class="p">,</span> <span class="s2">&quot;propagate_attributes&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_legacy_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retain message data and add the role used by the Langfuse chat view.&quot;&quot;&quot;</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;human&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;ai&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="s2">&quot;function&quot;</span><span class="p">}</span>
+    <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="n">roles</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">payload</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_legacy_usage</span><span class="p">(</span><span class="n">response</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep token categories without counting cached or reasoning tokens twice.&quot;&quot;&quot;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">generations</span> <span class="ow">and</span> <span class="n">response</span><span class="o">.</span><span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">generations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s2">&quot;usage_metadata&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">llm_output</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token_usage&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">raw</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">usage</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">aliases</span> <span class="ow">in</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;input_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;output_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">),</span>
+    <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">raw</span><span class="p">:</span>
+                <span class="n">usage</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span>
+                <span class="k">break</span>
+    <span class="k">for</span> <span class="n">side</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">_token_details&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">usage</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+            <span class="k">if</span> <span class="n">side</span> <span class="ow">in</span> <span class="n">usage</span><span class="p">:</span>
+                <span class="n">usage</span><span class="p">[</span><span class="n">side</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">usage</span><span class="p">[</span><span class="n">side</span><span class="p">]</span> <span class="o">-</span> <span class="n">count</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">usage</span> <span class="ow">or</span> <span class="kc">None</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_LegacyCallbackHandler</span><span class="p">(</span><span class="n">BaseCallbackHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect LangChain 1 callbacks to the Langfuse SDK v2 client.</span>
+
+<span class="sd">    The SDK v2 callback imports modules that LangChain 1 removed.</span>
+<span class="sd">    Each handler belongs to one run and uses one fixed trace.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stateful_client</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace</span> <span class="o">=</span> <span class="n">stateful_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generation_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_tokens</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="nb">input</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">generation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">serialized</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;generation&quot;</span> <span class="k">if</span> <span class="n">generation</span> <span class="k">else</span> <span class="s2">&quot;chain&quot;</span><span class="p">)</span>
+            <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="nb">input</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">)}</span>
+            <span class="k">if</span> <span class="n">generation</span><span class="p">:</span>
+                <span class="n">invocation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;invocation_params&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+                <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">invocation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_name&quot;</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="n">invocation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ls_model_name&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">generation</span><span class="p">(</span><span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_generation_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">span</span><span class="p">(</span><span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generation_ids</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_first_tokens</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">observation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">observation</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_chain_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_chain_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_chain_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="n">status_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_chat_model_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">messages</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_legacy_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">messages</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_llm_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">prompts</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">prompts</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">,</span> <span class="n">generation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_llm_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_legacy_message</span><span class="p">(</span><span class="n">generation</span><span class="o">.</span><span class="n">message</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">generation</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">generation</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">generations</span>
+            <span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="n">batch</span>
+        <span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">outputs</span>
+        <span class="n">usage</span> <span class="o">=</span> <span class="n">_legacy_usage</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span> <span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">,</span> <span class="n">usage_details</span><span class="o">=</span><span class="n">usage</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_llm_new_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">run_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generation_ids</span> <span class="ow">or</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_tokens</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="n">run_id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">completion_start_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_first_tokens</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_llm_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_chain_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_tool_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">input_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;inputs&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">input_str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_tool_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_tool_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_chain_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_retriever_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">serialized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_retriever_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="p">[</span><span class="n">document</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_retriever_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_chain_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">_IS_NEW_LANGFUSE</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langfuse.langchain</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackHandler</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">CallbackHandler</span> <span class="o">=</span> <span class="n">_LegacyCallbackHandler</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_configuration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use validated settings and retain direct environment configuration.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">credential</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">host</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_HOST</span>
+    <span class="k">if</span> <span class="s2">&quot;LANGFUSE_HOST&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">model_fields_set</span><span class="p">:</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANGFUSE_HOST&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">host</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;public_key&quot;</span><span class="p">:</span> <span class="n">credential</span><span class="p">(</span><span class="s2">&quot;LANGFUSE_PUBLIC_KEY&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="n">credential</span><span class="p">(</span><span class="s2">&quot;LANGFUSE_SECRET_KEY&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LANGFUSE_BASE_URL&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">host</span><span class="p">,</span>
+        <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_TRACING_ENVIRONMENT</span><span class="p">,</span>
+        <span class="s2">&quot;flush_at&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_FLUSH_AT</span><span class="p">,</span>
+        <span class="s2">&quot;flush_interval&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_FLUSH_INTERVAL</span><span class="p">,</span>
+        <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_TIMEOUT</span><span class="p">,</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_DEBUG</span><span class="p">,</span>
+        <span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_SAMPLE_RATE</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_langfuse_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the selected project with explicit settings.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Langfuse</span><span class="p">(</span><span class="o">**</span><span class="n">_configuration</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_supported_kwargs</span><span class="p">(</span><span class="n">function</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep named parameters that the installed SDK accepts.&quot;&quot;&quot;</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">function</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_trace_io</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">io</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set root observation I/O and retain legacy trace I/O.&quot;&quot;&quot;</span>
+    <span class="n">io</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">io</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">io</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">):</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">io</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="s2">&quot;update_trace&quot;</span><span class="p">):</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">update_trace</span><span class="p">(</span><span class="o">**</span><span class="n">io</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="s2">&quot;set_trace_io&quot;</span><span class="p">):</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">set_trace_io</span><span class="p">(</span><span class="o">**</span><span class="n">io</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LangfuseObservability">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LangfuseObservability</span><span class="p">(</span><span class="n">BaseObservabilityPlatform</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Langfuse observability platform.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LangfuseObservability.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize LangfuseObservability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            remote_first: Prioritize remote prompts when `True`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">remote_first</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;LANGFUSE_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;LANGFUSE_PUBLIC_KEY&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.validate_environment">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.validate_environment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the current URL variable and its legacy alias.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">_configuration</span><span class="p">()</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;LANGFUSE_PUBLIC_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;public_key&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;LANGFUSE_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;secret_key&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required environment variables: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reuse one client for prompts, feedback, and traces.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span> <span class="o">=</span> <span class="n">_configuration</span><span class="p">()[</span><span class="s2">&quot;public_key&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">_get_langfuse_client</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span>
+
+<div class="viewcode-block" id="LangfuseObservability.get_callback_handler">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.get_callback_handler">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_callback_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallbackHandler</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the LangChain Langfuse callback handler.</span>
+
+<span class="sd">        Create a separate handler for each run.</span>
+<span class="sd">        SDK v2 handlers keep mutable trace state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_IS_NEW_LANGFUSE</span><span class="p">:</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">uuid4</span><span class="p">()),</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">),</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;stateful_client&quot;</span><span class="p">:</span> <span class="n">trace</span><span class="p">,</span> <span class="s2">&quot;update_stateful_client&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;public_key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_key</span>
+        <span class="k">return</span> <span class="n">CallbackHandler</span><span class="p">(</span><span class="o">**</span><span class="n">_supported_kwargs</span><span class="p">(</span><span class="n">CallbackHandler</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.before_shutdown">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.before_shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Flush an initialized client without creating a new client.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_IS_NEW_LANGFUSE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.record_feedback">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.record_feedback">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attach feedback to the same trace ID as the run.&quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_score</span> <span class="k">if</span> <span class="n">_IS_NEW_LANGFUSE</span> <span class="k">else</span> <span class="n">client</span><span class="o">.</span><span class="n">score</span>
+        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">_supported_kwargs</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key_to_remove</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;trace_id&quot;</span><span class="p">):</span>
+            <span class="n">filtered_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key_to_remove</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">trace_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">_IS_NEW_LANGFUSE</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="n">method</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">score</span><span class="p">,</span> <span class="n">trace_id</span><span class="o">=</span><span class="n">trace_id</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_prompt_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt_template</span><span class="p">:</span> <span class="n">PromptTemplateType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute a hash of the prompt content to detect changes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">content_to_hash</span> <span class="o">=</span> <span class="n">prompt_template</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">content_to_hash</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content_to_hash</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">content_to_hash</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LangfuseObservability.push_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.push_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">push_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="p">:</span> <span class="n">PromptTemplateType</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">force_create_new_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Push a prompt to Langfuse.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the prompt</span>
+<span class="sd">            prompt_template: The prompt template (string or list of message dicts)</span>
+<span class="sd">            metadata: Optional metadata including &#39;labels&#39;</span>
+<span class="sd">            force_create_new_version: If True, always create a new version</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;production&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">metadata</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;production&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Use an existing remote prompt when `remote_first` is enabled.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_first</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">existing</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_prompt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">existing</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Remote-first: Using existing prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">404</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Remote-first: Prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found, creating new&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Generate a hash to detect prompt content changes.</span>
+        <span class="n">prompt_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_prompt_hash</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">)</span>
+
+        <span class="c1"># Get the existing prompt and compare its content.</span>
+        <span class="n">existing_prompt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">content_changed</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">existing_prompt</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_prompt</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Compare hashes in `commit_message` or `tags`.</span>
+            <span class="n">existing_hash</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">existing_prompt</span><span class="p">,</span> <span class="s2">&quot;commit_message&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">existing_prompt</span><span class="o">.</span><span class="n">commit_message</span><span class="p">:</span>
+                <span class="n">existing_hash</span> <span class="o">=</span> <span class="n">existing_prompt</span><span class="o">.</span><span class="n">commit_message</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">existing_prompt</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">existing_prompt</span><span class="o">.</span><span class="n">tags</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">existing_prompt</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">existing_hash</span> <span class="o">=</span> <span class="n">existing_prompt</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">existing_hash</span> <span class="ow">and</span> <span class="n">existing_hash</span> <span class="o">==</span> <span class="n">prompt_hash</span><span class="p">:</span>
+                <span class="n">content_changed</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; content unchanged (hash: </span><span class="si">{</span><span class="n">existing_hash</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; content changed (old: </span><span class="si">{</span><span class="n">existing_hash</span><span class="si">}</span><span class="s2">, new: </span><span class="si">{</span><span class="n">prompt_hash</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">404</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found, will create new&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Decide whether to create a version.</span>
+        <span class="n">should_create</span> <span class="o">=</span> <span class="n">force_create_new_version</span> <span class="ow">or</span> <span class="n">existing_prompt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">content_changed</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">should_create</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reusing existing prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; (unchanged, force_create=False)&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create the prompt.</span>
+        <span class="n">prompt_type</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prompt_template</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;chat&quot;</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">create_prompt</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="o">=</span><span class="n">prompt_template</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">prompt_type</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="n">prompt_hash</span><span class="p">],</span>
+            <span class="n">commit_message</span><span class="o">=</span><span class="n">prompt_hash</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created prompt &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; in Langfuse&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.pull_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.pull_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pull_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_with_prompt_object</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cache_ttl_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="s2">&quot;mustache&quot;</span><span class="p">,</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PromptReturnType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PromptReturnType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pull a prompt from Langfuse.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Name of the prompt</span>
+<span class="sd">            return_with_prompt_object: If True, return tuple of (prompt, langfuse_prompt)</span>
+<span class="sd">            cache_ttl_seconds: Cache TTL for the prompt</span>
+<span class="sd">            template_format: Format for the template</span>
+<span class="sd">            label: Optional label to fetch specific version</span>
+<span class="sd">            version: Optional version number to fetch</span>
+<span class="sd">            **kwargs: Additional kwargs (prompt_label, prompt_version as aliases)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ChatPromptTemplate or tuple of (ChatPromptTemplate, langfuse_prompt)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+
+        <span class="c1"># Build arguments for `get_prompt`.</span>
+        <span class="n">get_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;cache_ttl_seconds&quot;</span><span class="p">:</span> <span class="n">cache_ttl_seconds</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_label&quot;</span><span class="p">):</span>
+            <span class="n">get_kwargs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_label&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_version&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">get_kwargs</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span> <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_version&quot;</span><span class="p">)</span>
+            <span class="n">get_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">langfuse_prompt</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_prompt</span><span class="p">(</span><span class="o">**</span><span class="n">get_kwargs</span><span class="p">)</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_prompt_object</span><span class="p">(</span><span class="n">langfuse_prompt</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">langfuse_prompt</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_with_prompt_object</span> <span class="k">else</span> <span class="n">prompt</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.apull_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.apull_prompt">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">apull_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_with_prompt_object</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cache_ttl_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="s2">&quot;mustache&quot;</span><span class="p">,</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">PromptReturnType</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PromptReturnType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Asynchronously run `pull_prompt` in a thread pool.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">return_with_prompt_object</span><span class="o">=</span><span class="n">return_with_prompt_object</span><span class="p">,</span>
+            <span class="n">cache_ttl_seconds</span><span class="o">=</span><span class="n">cache_ttl_seconds</span><span class="p">,</span>
+            <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.delete_prompt">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.delete_prompt">[docs]</a>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete all prompt versions when the installed SDK supports deletion.&quot;&quot;&quot;</span>
+        <span class="n">delete</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">prompts</span><span class="p">,</span> <span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delete</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This Langfuse SDK does not support prompt deletion&quot;</span><span class="p">)</span>
+        <span class="n">delete</span><span class="p">(</span><span class="n">prompt_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.trace_context">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.trace_context">[docs]</a>
+    <span class="nd">@contextmanager</span>
+    <span class="nd">@BaseObservabilityPlatform</span><span class="o">.</span><span class="n">requires_env_vars</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Open the root trace and propagate user and session attributes.&quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+        <span class="n">agent_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_name&quot;</span><span class="p">,</span> <span class="s2">&quot;agent-execution&quot;</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;session_id&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_IS_NEW_LANGFUSE</span><span class="p">:</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">agent_name</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">trace</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">trace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">])</span>
+            <span class="k">return</span>
+
+        <span class="n">trace_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">start_observation</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="s2">&quot;start_as_current_observation&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">client</span><span class="o">.</span><span class="n">start_as_current_span</span>
+        <span class="n">attrs_cm</span> <span class="o">=</span> <span class="n">propagate_attributes</span><span class="p">(</span><span class="o">**</span><span class="n">attributes</span><span class="p">)</span> <span class="k">if</span> <span class="n">attributes</span> <span class="ow">and</span> <span class="n">propagate_attributes</span> <span class="k">else</span> <span class="n">nullcontext</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">attrs_cm</span><span class="p">,</span> <span class="n">start_observation</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">agent_name</span><span class="p">,</span> <span class="n">trace_context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;trace_id&quot;</span><span class="p">:</span> <span class="n">trace_id</span><span class="p">})</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_SDK_MAJOR</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="s2">&quot;update_trace&quot;</span><span class="p">):</span>
+                <span class="n">span</span><span class="o">.</span><span class="n">update_trace</span><span class="p">(</span><span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+            <span class="n">_set_trace_io</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">span</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">_set_trace_io</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LangfuseObservability.update_trace">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.observability.langfuse.html#langgraph_agent_toolkit.core.observability.langfuse.LangfuseObservability.update_trace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record final output on the root trace before it closes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">_IS_NEW_LANGFUSE</span><span class="p">:</span>
+            <span class="n">_set_trace_io</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">attributes</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

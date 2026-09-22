@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Environment Setup &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/environment_setup.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage Guide" href="usage.html" />
+    <link rel="prev" title="Installation Options" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Environment Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-sources">Configuration sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-and-identity">Authentication and identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-providers">Model providers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#named-model-configurations">Named model configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#persistence">Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observability">Observability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-compose-services">Optional Compose services</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Environment Setup</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/environment_setup.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="environment-setup">
+<h1>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading"></a></h1>
+<p>Start with <a class="reference internal" href="quickstart.html"><span class="doc">Run your first agent</span></a> for a working API that uses a fake model and
+SQLite. That example needs no provider credentials. This guide explains the
+configuration for an application deployment.</p>
+<section id="configuration-sources">
+<h2>Configuration sources<a class="headerlink" href="#configuration-sources" title="Link to this heading"></a></h2>
+<p>For a source checkout, copy the template only if <code class="docutils literal notranslate"><span class="pre">.env</span></code> does not already
+exist:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+</pre></div>
+</div>
+<p>The template selects PostgreSQL and contains example model configurations.
+Replace those values before starting the service. Configure only the features
+that you use. A local fake-model service does not need PostgreSQL, LiteLLM,
+Redis, or Langfuse.</p>
+<p>The application reads environment variables and the nearest <code class="docutils literal notranslate"><span class="pre">.env</span></code> file.
+Regular environment variables take precedence over values in that file.
+After loading these settings, <code class="docutils literal notranslate"><span class="pre">settings.setup()</span></code> validates and applies
+<code class="docutils literal notranslate"><span class="pre">LANGGRAPH_&lt;NAME&gt;</span></code> environment overrides. These overrides take precedence
+over the regular variables and the file. For example,
+<code class="docutils literal notranslate"><span class="pre">LANGGRAPH_REQUEST_TIMEOUT</span></code> overrides <code class="docutils literal notranslate"><span class="pre">REQUEST_TIMEOUT</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PYTHON_DOTENV_DISABLED=1</span></code> disables explicit <code class="docutils literal notranslate"><span class="pre">load_dotenv()</span></code> calls. It does
+not stop Pydantic from reading the file selected by <code class="docutils literal notranslate"><span class="pre">Settings</span></code>. In embedded
+code, <code class="docutils literal notranslate"><span class="pre">Settings(_env_file=None)</span></code> disables file loading for that instance.
+Repository tests and documentation builds also replace <code class="docutils literal notranslate"><span class="pre">find_dotenv()</span></code> to
+prevent file discovery. The flag alone does not isolate a service from a local
+<code class="docutils literal notranslate"><span class="pre">.env</span></code> file.</p>
+<p>Keep credentials in a secret manager or an untracked environment file. Do not
+put real credentials in examples, source files, or test results. <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>
+excludes the root <code class="docutils literal notranslate"><span class="pre">.env</span></code> and the service environment files listed below.</p>
+</section>
+<section id="authentication-and-identity">
+<h2>Authentication and identity<a class="headerlink" href="#authentication-and-identity" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">AUTH_MODE</span></code> is an API server setting. It is not a request field or a client
+constructor argument. The code defaults to <code class="docutils literal notranslate"><span class="pre">trusted</span></code> when the setting is
+absent. This preserves 0.9.2 shared bearer-token authentication. The example
+<code class="docutils literal notranslate"><span class="pre">.env</span></code> uses the same mode. Installing the package does not copy that file.</p>
+<p>For one trusted client application, configure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">AUTH_MODE</span><span class="o">=</span>trusted
+<span class="nv">AUTH_SECRET</span><span class="o">=</span>replace-with-a-private-shared-secret
+<span class="nv">AUTH_SERVICE_USER_ID</span><span class="o">=</span>service
+</pre></div>
+</div>
+<p>The client sends <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span> <span class="pre">&lt;AUTH_SECRET&gt;</span></code>. <code class="docutils literal notranslate"><span class="pre">user_id</span></code> is
+optional. The trusted application can supply a user’s ID. A missing
+<code class="docutils literal notranslate"><span class="pre">user_id</span></code> uses <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code> (default: <code class="docutils literal notranslate"><span class="pre">service</span></code>). Keep the
+shared secret in that application. No new request header or per-user token
+is required for an existing shared-token deployment.</p>
+<p>An explicit <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=token</span></code> overrides the default. Remove it or set
+<code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> on every API worker to use the compatible behavior.
+Apply the same settings to every worker before service import.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=token</span></code> and <code class="docutils literal notranslate"><span class="pre">AUTH_USERS</span></code> when users connect to the API
+directly. In token mode, the shared secret identifies
+<code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code> only. A different supplied <code class="docutils literal notranslate"><span class="pre">user_id</span></code> receives 403.
+An <code class="docutils literal notranslate"><span class="pre">AUTH_USERS</span></code> token remains bound to its configured user in either mode.
+See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a> for both request formats and the separate history,
+validation, and checkpoint storage changes.</p>
+<p>To accept feedback from token users, set <code class="docutils literal notranslate"><span class="pre">FEEDBACK_SIGNING_SECRET</span></code> to a
+separate server-only random value with at least 32 characters. Use the same
+value across workers and replicas. It must differ from every bearer token.
+Trusted backend feedback does not require this setting. See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a>
+for response proof and client changes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">user_id</span></code> identifies a user for long-term memory. <code class="docutils literal notranslate"><span class="pre">thread_id</span></code> identifies
+one conversation for short-term history. Setting <code class="docutils literal notranslate"><span class="pre">user_id</span></code> does not create a
+long-term store. The application must configure and use that store.</p>
+</section>
+<section id="model-providers">
+<h2>Model providers<a class="headerlink" href="#model-providers" title="Link to this heading"></a></h2>
+<p>Install the provider extra before selecting a real model. See
+<a class="reference internal" href="installation.html"><span class="doc">Installation Options</span></a> for the available extras. The default OpenAI-backed
+blueprints use these settings:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">USE_FAKE_MODEL</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">OPENAI_MODEL_NAME</span><span class="o">=</span>your-model-name
+<span class="nv">OPENAI_API_BASE_URL</span><span class="o">=</span>https://api.openai.com/v1
+</pre></div>
+</div>
+<p>Supply <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code> through the deployment environment. Choose a model
+available to that account. A model request can incur provider charges.
+<code class="docutils literal notranslate"><span class="pre">OPENAI_API_VERSION</span></code> is not required for the public OpenAI endpoint.</p>
+<p>For LiteLLM, set the model name to a configured proxy alias. Set the base URL to
+<code class="docutils literal notranslate"><span class="pre">http://litellm:4000/v1</span></code> from another Compose service, or
+<code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:4000/v1</span></code> from the host. Supply the proxy key as
+<code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>. Container service names do not resolve on the host.</p>
+<p>The API Docker image includes <code class="docutils literal notranslate"><span class="pre">openai-aiohttp</span></code> and sets
+<code class="docutils literal notranslate"><span class="pre">LLM_HTTP_ASYNC_TRANSPORT=aiohttp</span></code>. Python installations default to <code class="docutils literal notranslate"><span class="pre">httpx</span></code>.
+Leave this setting unset in <code class="docutils literal notranslate"><span class="pre">.env</span></code> to keep the image or Python default. Set it
+to <code class="docutils literal notranslate"><span class="pre">httpx</span></code> to override the image default. A Python installation needs the
+<code class="docutils literal notranslate"><span class="pre">openai-aiohttp</span></code> extra before selecting <code class="docutils literal notranslate"><span class="pre">aiohttp</span></code>. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a>
+for pool limits and timeouts.</p>
+</section>
+<section id="named-model-configurations">
+<h2>Named model configurations<a class="headerlink" href="#named-model-configurations" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code> maps application names to flat provider configurations:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_CONFIGS</span><span class="o">=</span><span class="s1">&#39;{&quot;assistant&quot;:{&quot;provider&quot;:&quot;openai&quot;,&quot;name&quot;:&quot;your-model-name&quot;}}&#39;</span>
+</pre></div>
+</div>
+<p>For a larger configuration, store JSON in a private file and set
+<code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS_PATH</span></code>. For example, <code class="docutils literal notranslate"><span class="pre">data/models.json</span></code> can contain:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;assistant&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your-model-name&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;azure_assistant&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;azure_openai&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your-model-name&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;azure_endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://your-resource.openai.azure.com/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;azure_deployment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your-deployment-name&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;api_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your-supported-api-version&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_CONFIGS_PATH</span><span class="o">=</span>data/models.json
+</pre></div>
+</div>
+<p>The factory accepts <code class="docutils literal notranslate"><span class="pre">name</span></code> or <code class="docutils literal notranslate"><span class="pre">model_name</span></code>. It passes other fields to the
+provider’s model constructor. Use <code class="docutils literal notranslate"><span class="pre">azure_endpoint</span></code> and <code class="docutils literal notranslate"><span class="pre">azure_deployment</span></code>
+for Azure. The factory does not expand a nested <code class="docutils literal notranslate"><span class="pre">params</span></code> object. Supply
+<code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code> or <code class="docutils literal notranslate"><span class="pre">AZURE_OPENAI_API_KEY</span></code> through the environment for these
+examples.</p>
+<p>Set one configuration source. An explicit <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code> value, including
+<code class="docutils literal notranslate"><span class="pre">{}</span></code>, takes precedence over <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS_BASE64</span></code> and <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS_PATH</span></code>.
+Base64 takes precedence over the file path. Remove the inline template entry
+before using the file path. Base64 encodes content; it does not encrypt it.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">chatbot-agent</span></code> reads the request’s <code class="docutils literal notranslate"><span class="pre">model_config_key</span></code> and creates the
+selected model from this mapping. Custom agents must read that setting or use
+<code class="docutils literal notranslate"><span class="pre">CompletionModelFactory.get_model_from_config</span></code> themselves. The Deep Agent
+blueprint instead selects <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS.deep_agent</span></code> at startup. See
+<a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> and <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a> before changing model selection.</p>
+</section>
+<section id="persistence">
+<h2>Persistence<a class="headerlink" href="#persistence" title="Link to this heading"></a></h2>
+<p>For local durable conversation history, use SQLite:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">MEMORY_BACKEND</span><span class="o">=</span>sqlite
+<span class="nv">SQLITE_DB_PATH</span><span class="o">=</span>checkpoints.db
+</pre></div>
+</div>
+<p>The service must have write access to the database directory. A container needs
+a persistent volume if history must survive container replacement. SQLite
+checkpointing does not provide a long-term store.</p>
+<p>For PostgreSQL, supply the password separately and configure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">MEMORY_BACKEND</span><span class="o">=</span>postgres
+<span class="nv">POSTGRES_HOST</span><span class="o">=</span><span class="m">127</span>.0.0.1
+<span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+<span class="nv">POSTGRES_USER</span><span class="o">=</span>your-database-user
+<span class="nv">POSTGRES_DB</span><span class="o">=</span>agents
+<span class="nv">POSTGRES_SCHEMA</span><span class="o">=</span>public
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">POSTGRES_HOST=postgres</span></code> for the repository’s Compose network. Set
+<code class="docutils literal notranslate"><span class="pre">POSTGRES_PASSWORD</span></code> to the password for the selected user. Size checkpoint
+and conversation-lock pools for the total worker count. See <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a>
+for database setup, pool sizing, and worker recovery.</p>
+</section>
+<section id="observability">
+<h2>Observability<a class="headerlink" href="#observability" title="Link to this heading"></a></h2>
+<p>Observability is optional. For Langfuse, install one SDK selector and set
+<code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_BACKEND=langfuse</span></code>. Supply <code class="docutils literal notranslate"><span class="pre">LANGFUSE_PUBLIC_KEY</span></code>,
+<code class="docutils literal notranslate"><span class="pre">LANGFUSE_SECRET_KEY</span></code>, and the project’s <code class="docutils literal notranslate"><span class="pre">LANGFUSE_HOST</span></code>.
+<code class="docutils literal notranslate"><span class="pre">LANGFUSE_BASE_URL</span></code> is an accepted URL alias and takes precedence over
+<code class="docutils literal notranslate"><span class="pre">LANGFUSE_HOST</span></code>. Use <code class="docutils literal notranslate"><span class="pre">http://langfuse-web:3000</span></code> inside Compose or
+<code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:3000</span></code> from the host.</p>
+<p>For LangSmith, install <code class="docutils literal notranslate"><span class="pre">langsmith</span></code> and set
+<code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_BACKEND=langsmith</span></code>. Supply <code class="docutils literal notranslate"><span class="pre">LANGSMITH_API_KEY</span></code>,
+<code class="docutils literal notranslate"><span class="pre">LANGSMITH_PROJECT</span></code>, <code class="docutils literal notranslate"><span class="pre">LANGSMITH_ENDPOINT=https://api.smith.langchain.com</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">LANGSMITH_TRACING=true</span></code>. Keep the unused tracing backend disabled.
+See <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> for the difference between SDK and server
+versions.</p>
+</section>
+<section id="optional-compose-services">
+<h2>Optional Compose services<a class="headerlink" href="#optional-compose-services" title="Link to this heading"></a></h2>
+<p>The full Compose stack includes external databases, LiteLLM, and Langfuse.
+Prepare its configuration files before starting it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>configs/litellm/config.example.yaml<span class="w"> </span>configs/litellm/config.yaml
+cp<span class="w"> </span>configs/litellm/.litellm.env.example<span class="w"> </span>configs/litellm/.litellm.env
+cp<span class="w"> </span>configs/redis/.redis.env.example<span class="w"> </span>configs/redis/.redis.env
+cp<span class="w"> </span>configs/postgres/.postgres.env.example<span class="w"> </span>configs/postgres/.postgres.env
+cp<span class="w"> </span>configs/minio/.minio.env.example<span class="w"> </span>configs/minio/.minio.env
+cp<span class="w"> </span>configs/clickhouse/.clickhouse.env.example<span class="w"> </span>configs/clickhouse/.clickhouse.env
+cp<span class="w"> </span>configs/langfuse/.langfuse.env.example<span class="w"> </span>configs/langfuse/.langfuse.env
+</pre></div>
+</div>
+<p>Use these copy commands only for files that do not yet exist. Replace example
+passwords, host names, model aliases, and API versions for the selected
+services. Keep shared credentials consistent across their environment files.
+The LiteLLM example reads provider credentials through <code class="docutils literal notranslate"><span class="pre">os.environ/...</span></code>
+references. Supply the referenced variables to the LiteLLM container.</p>
+<p>The checked-in Compose file selects Langfuse server v3. A package extra does
+not change that server image. See <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> for startup commands and
+<a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> before changing the server version.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

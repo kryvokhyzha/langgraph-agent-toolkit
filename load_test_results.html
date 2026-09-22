@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local pressure-test results: 2026-09-12 &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/load_test_results.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Real LLM verification" href="live_llm_testing.html" />
+    <link rel="prev" title="API load tests" href="load_testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Local pressure-test results: 2026-09-12</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#environment-and-scope">Environment and scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#findings-and-changes">Findings and changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-matrix-and-timeout-failures">Complete matrix and timeout failures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#final-soak-verification">Final soak verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-and-cleanup-evidence">Database and cleanup evidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reproduction-and-limits">Reproduction and limits</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Local pressure-test results: 2026-09-12</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/load_test_results.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="local-pressure-test-results-2026-09-12">
+<h1>Local pressure-test results: 2026-09-12<a class="headerlink" href="#local-pressure-test-results-2026-09-12" title="Link to this heading"></a></h1>
+<p>The final two-minute soak passed: all 9,600 arrivals were sent, 4,618 returned
+complete correct replies, and 4,982 received explicit overload rejections. There
+were no transport or stream errors and no retained locks. The broader 57-phase
+matrix had three failed scenarios, investigated below; its failures were retained.</p>
+<p>The tests exercised real toolkit HTTP routes, OpenAI SDK clients, SQLite and
+PostgreSQL persistence, and worker supervision. They exposed a provider error
+translation bug and slow worker replacement, plus load-generator and
+test-configuration limits. These were addressed and verified with focused reruns.</p>
+<section id="environment-and-scope">
+<h2>Environment and scope<a class="headerlink" href="#environment-and-scope" title="Link to this heading"></a></h2>
+<p>The local machine ran macOS 26.4 on ARM with eight logical CPUs and Python
+3.12.0. PostgreSQL 16.15 ran in a disposable container limited to two CPUs and
+512 MiB. Background host load was high: observed load averages were roughly
+100–147. The API, load driver, simulator, and database shared this machine.
+These numbers describe recovery under local pressure, not production capacity.
+They do not establish a performance ranking between HTTPX and aiohttp.</p>
+<p>The dependency set included OpenAI 3.13.0, langchain-openai 1.6.2,
+langchain-core 1.6.3, LangGraph 1.2.11, HTTPX 0.28.1, httpx2 2.12.0,
+aiohttp 3.14.3, Uvicorn 0.49.0, psycopg 3.2.13, and psycopg-pool 3.3.1.
+The simulated model used 50 ms to first token and four subsequent 10 ms gaps,
+or a 100 ms nonstream response. No paid model or external telemetry was used.</p>
+<p>Five configurations covered SQLite with one HTTPX worker, PostgreSQL with one
+HTTPX worker, one aiohttp worker, two HTTPX workers, and one HTTPX worker with
+eight admission waiters. Every worker allowed eight active agent requests.
+Tests covered invoke, SSE, JSON Lines, upstream streaming and nonstreaming,
+constant arrivals, concurrent conversation updates, client disconnects,
+slow readers, provider faults, database locks and lost connections, worker
+death, and a two-minute soak.</p>
+</section>
+<section id="findings-and-changes">
+<h2>Findings and changes<a class="headerlink" href="#findings-and-changes" title="Link to this heading"></a></h2>
+<p>Provider disconnects after response headers escaped the usual SDK error
+translation and returned HTTP 500. The OpenAI and Azure model wrappers now
+normalize interrupted transport streams. Provider rate limits return 429,
+connection failures return 503, and timeouts return 504 when an HTTP response
+has not started. Failures after stream headers remain stream errors; HTTP 200
+alone never counts as success. Received tokens are not retried.</p>
+<p>Uvicorn did replace killed workers. A heartbeat wait could delay detection,
+and fresh worker startup added more time. With the former 30-second allowance,
+one observed replacement took about 40 seconds. The toolkit allowance is now
+10 seconds and remains configurable. This is not a guaranteed recovery bound.
+The complete matrix observed replacement after 9.29 seconds. Requests served
+by the killed worker can fail; they are not replayed automatically.</p>
+<p>The initial load driver used one shared HTTPX connection pool. Its own pre-send
+wait reached 5.5 seconds at p95, while send-to-response p95 was 345 ms. The
+bounded driver now loans one persistent client per active slot. A comparison
+sent all 1,280 scheduled requests at 128 arrivals/second without client timeouts
+or dropped arrivals. Pre-send p95 fell to 27 ms. This corrected the measurement
+method rather than increasing server capacity.</p>
+<p>In the tested OpenAI SDK, HTTPX streamed responses stopped at <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code> before
+HTTP EOF and closed the TCP connection. The aiohttp path reused connections.
+Managed client reuse and TCP reuse are different measurements. The harness
+records observed provider connections for both streaming modes; it does not
+patch SDK internals. Recheck this behavior after dependency upgrades.</p>
+</section>
+<section id="complete-matrix-and-timeout-failures">
+<h2>Complete matrix and timeout failures<a class="headerlink" href="#complete-matrix-and-timeout-failures" title="Link to this heading"></a></h2>
+<p>The 57-phase matrix completed 53,679 attempted requests, plus four separate
+slow-reader connections. It recorded 15,577 complete correct replies, 114
+intentional first-token disconnects, and 256 arrivals the driver could not send
+within its bounds. There were no request-ID, metadata, or framing mismatches.
+There were 37,866 overload HTTP 503 responses. This was deliberate overload;
+rejections are excluded from successful goodput and latency percentiles.</p>
+<p>All 57 phases drained to zero active requests, waiters, stalled cleanups, and
+active provider calls. Three phases failed the stricter correctness verdict:</p>
+<ul class="simple">
+<li><p>SQLite’s 40-turn concurrent conversation test completed 39 turns and rejected
+one with HTTP 409 when its four-second queue deadline expired. Stored history
+contained every successful turn. The original verdict mislabeled this as
+lost history; the checker now distinguishes rejected work from missing data.</p></li>
+<li><p>One PostgreSQL JSON Lines phase had two stream failures during pool pressure.</p></li>
+<li><p>The two-worker soak had two stream failures, four transport failures, and one
+HTTP 504. A replacement worker was still cold at the start of that phase;
+one observed event-loop delay reached 5.8 seconds.</p></li>
+</ul>
+<p>These runs used a five-second request deadline, two-second PostgreSQL pool and
+connect waits, and 500 ms health and conversation-heartbeat deadlines. Those
+were aggressive test overrides. A subsequent run increased most deadlines and
+passed all six selected JSON Lines and concurrent-history phases, but its soak
+still had two stream errors. The logs identified the remaining 500 ms
+conversation-heartbeat deadline. This was shorter than observed event-loop
+delays above one second. The final normal profile uses the package’s five-second
+heartbeat timeout. It also requires a complete correct agent reply from every
+worker, including replacements, before steady-state measurements.</p>
+<p>The next normal-profile run removed those stream errors and observed a new
+worker after 5.24 seconds, but still failed its soak: 116 requests raised a
+client read error before response headers. All 3,295 successful replies were
+complete and correct. The trace recorded 372 TCP connections: 256 initial client
+slots plus 116 reconnects. Both the driver and server used a five-second idle
+expiry, leaving no margin for delayed connection reuse. This evidence was kept
+as another failed run while the connection timing was investigated. A bounded
+TCP reproduction confirmed this race with both Uvicorn HTTP parsers: immediate
+connection reuse returned the expected 503, but delaying a reused request after
+pool selection until the server idle timeout expired raised a read error before
+headers. The normal-profile soak logs contained no corresponding application
+errors. The probe used a 120 ms server idle expiry, a five-second client expiry,
+and a 200 ms pause after connection selection. This confirms a possible cause,
+not the cause of every individual soak failure. The harness now expires idle
+client connections after one second, below Uvicorn’s five-second allowance,
+and retains bounded exception-cause and transport-stage diagnostics. It does
+not retry agent requests.</p>
+</section>
+<section id="final-soak-verification">
+<h2>Final soak verification<a class="headerlink" href="#final-soak-verification" title="Link to this heading"></a></h2>
+<p>The subsequent two-minute PostgreSQL soak passed with two warm workers, the
+normal timeout profile, and the one-second client idle expiry. All 9,600
+scheduled arrivals were sent. There were no client transport errors, stream
+errors, identity mismatches, malformed responses, or dropped arrivals.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 60.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Measurement</p></th>
+<th class="head"><p>Observed result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Offered rate / duration</p></td>
+<td><p>80 requests/second for 120 seconds</p></td>
+</tr>
+<tr class="row-odd"><td><p>Complete correct replies</p></td>
+<td><p>4,618</p></td>
+</tr>
+<tr class="row-even"><td><p>Explicit overload rejections</p></td>
+<td><p>4,982 HTTP 503 responses</p></td>
+</tr>
+<tr class="row-odd"><td><p>Successful goodput</p></td>
+<td><p>38.44 replies/second</p></td>
+</tr>
+<tr class="row-even"><td><p>Successful response p95 / p99</p></td>
+<td><p>893 ms / 1,518 ms</p></td>
+</tr>
+<tr class="row-odd"><td><p>First stream data p95</p></td>
+<td><p>553 ms</p></td>
+</tr>
+<tr class="row-even"><td><p>Driver scheduler lag p95</p></td>
+<td><p>136 ms</p></td>
+</tr>
+<tr class="row-odd"><td><p>Client transport or stream errors</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>PostgreSQL deadlock counter increase</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+<p>Both workers returned to 12 asyncio tasks, one managed transport pool, zero
+active requests, zero waiters, and zero stalled cleanups. Each retained one sync
+and one async model client. All 256 load clients closed. Open file descriptors
+grew from 34 and 30 to 38 per worker while pooled database sessions grew from
+8 to 20 in total. No advisory locks or idle transactions remained. Sampled peak
+resident memory was about 165 MiB per worker; post-drain resident memory was
+below each worker’s baseline. These short observations show bounded cleanup in
+this run, not proof that no long-term leak is possible.</p>
+<p>This final run selected only the soak phase. Worker replacement was verified in
+the preceding run, where the new process appeared after 5.24 seconds and then
+completed a correct agent request. The earlier full matrix still has its three
+recorded failures. The focused JSON Lines and history reruns, heartbeat diagnosis,
+and idle-expiry comparison explain the follow-up verification; no entire matrix
+was silently reclassified as passing.</p>
+</section>
+<section id="database-and-cleanup-evidence">
+<h2>Database and cleanup evidence<a class="headerlink" href="#database-and-cleanup-evidence" title="Link to this heading"></a></h2>
+<p>A two-second checkpoint table lock and termination of ten tagged toolkit
+connections both recovered. No PostgreSQL deadlock counter increased. After
+phases drained, no conversation advisory locks or idle transactions remained.
+Pooled idle sessions remained available for reuse. The largest observed session
+counts at phase boundaries were 12 for one HTTPX worker, 11 for one aiohttp
+worker, 20 for two HTTPX workers, and 11 for the queue configuration. These are
+boundary observations, not continuous peak connection counts.</p>
+<p>The original five history checks retained all 199 successful turns and their
+matching replies. Follow-up checks completed all 40 turns each on SQLite,
+one PostgreSQL worker, and two PostgreSQL workers. The slow-reader checks
+observed the server release capacity while the client sockets were still held
+open. Client disconnects also drained without retained work.</p>
+</section>
+<section id="reproduction-and-limits">
+<h2>Reproduction and limits<a class="headerlink" href="#reproduction-and-limits" title="Link to this heading"></a></h2>
+<p>See <a class="reference internal" href="load_testing.html"><span class="doc">API load tests</span></a> for commands, profiles, report fields, and fault controls.
+Use a fresh output directory for each run. Keep failed reports beside reruns;
+a later pass does not turn an earlier failed run into a pass. The normal and
+aggressive profiles are explicit harness settings, not full production presets.</p>
+<p>A two-minute soak can expose immediate resource growth. It cannot exclude slow
+leaks. These tests do not measure real model quality, external quotas, remote
+network failure, proxy behavior, live Langfuse ingestion, MCP tools, or complex
+multi-agent graphs under load. Repeat on an isolated deployment with its actual
+request mix before choosing throughput targets or increasing admission limits.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="load_testing.html" class="btn btn-neutral float-left" title="API load tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="live_llm_testing.html" class="btn btn-neutral float-right" title="Real LLM verification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service.admission &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/service/admission.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service.admission</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.service.admission</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Bound HTTP work and stop abandoned requests before releasing capacity.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span><span class="p">,</span> <span class="n">nullcontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASGIApp</span><span class="p">,</span> <span class="n">Message</span><span class="p">,</span> <span class="n">Receive</span><span class="p">,</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">Send</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.execution</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_deadline_scope</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Lease</span><span class="p">:</span>
+    <span class="n">active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="n">_request_lease</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">_Lease</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;request_admission_lease&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ServiceBusyError">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.ServiceBusyError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServiceBusyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The worker has no request capacity available.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ResponseSendTimeout">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.ResponseSendTimeout">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResponseSendTimeout</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The client did not accept response data before the deadline.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RequestAdmission">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestAdmission</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Limit active requests and queued waiters in one worker.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RequestAdmission.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_waiters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">queue_timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="n">capacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_waiters</span> <span class="o">=</span> <span class="n">max_waiters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue_timeout</span> <span class="o">=</span> <span class="n">queue_timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">waiting</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="RequestAdmission.acquire">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission.acquire">[docs]</a>
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">queued</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span><span class="o">.</span><span class="n">locked</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">queued</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">waiting</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_waiters</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceBusyError</span>
+        <span class="k">if</span> <span class="n">queued</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">waiting</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_timeout</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceBusyError</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">queued</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">waiting</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_drain</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finish cleanup without sending a second cancellation to the task.&quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">shield</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">break</span>
+
+
+<div class="viewcode-block" id="RequestAdmissionMiddleware">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmissionMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestAdmissionMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Admit requests before buffering bodies and hold capacity through cleanup.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Probes must remain available when all execution slots are in use.</span>
+    <span class="n">_probe_paths</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span> <span class="s2">&quot;/health/live&quot;</span><span class="p">,</span> <span class="s2">&quot;/health/ready&quot;</span><span class="p">,</span> <span class="s2">&quot;/health/startup&quot;</span><span class="p">,</span> <span class="s2">&quot;/health/db&quot;</span><span class="p">})</span>
+
+<div class="viewcode-block" id="RequestAdmissionMiddleware.__init__">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmissionMiddleware.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span> <span class="n">ASGIApp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">admission</span> <span class="o">=</span> <span class="n">RequestAdmission</span><span class="p">(</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_MAX_CONCURRENT</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_QUEUE_MAX_WAITERS</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_QUEUE_TIMEOUT</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">:</span> <span class="n">Receive</span><span class="p">,</span> <span class="n">send</span><span class="p">:</span> <span class="n">Send</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;root_path&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">root</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="p">:]</span>
+        <span class="k">if</span> <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probe_paths</span><span class="p">:</span>
+            <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="s2">&quot;probe_without_body&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">_request_lease</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">current</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">current</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">,</span> <span class="mi">409</span><span class="p">,</span> <span class="s2">&quot;Nested service requests are not supported&quot;</span><span class="p">,</span> <span class="s2">&quot;nested_request&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">request_admission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">admission</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">admission</span><span class="o">.</span><span class="n">acquire</span><span class="p">():</span>
+                <span class="n">lease</span> <span class="o">=</span> <span class="n">_Lease</span><span class="p">()</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">_request_lease</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lease</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serve</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">lease</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">_request_lease</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ServiceBusyError</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="s2">&quot;Worker request capacity is full&quot;</span><span class="p">,</span> <span class="s2">&quot;service_busy&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_error</span><span class="p">(</span><span class="n">scope</span><span class="p">:</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">:</span> <span class="n">Receive</span><span class="p">,</span> <span class="n">send</span><span class="p">:</span> <span class="n">Send</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">RESPONSE_SEND_TIMEOUT</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="n">detail</span><span class="p">,</span> <span class="s2">&quot;error_code&quot;</span><span class="p">:</span> <span class="n">code</span><span class="p">},</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">}</span> <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">503</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_serve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">:</span> <span class="n">Receive</span><span class="p">,</span> <span class="n">send</span><span class="p">:</span> <span class="n">Send</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">disconnected</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="n">body_complete</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">response_started</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">response_complete</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">monitor</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">cancel_once</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelling</span><span class="p">():</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">watch_disconnect</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="k">await</span> <span class="n">receive</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http.disconnect&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">response_complete</span><span class="p">:</span>
+                            <span class="n">disconnected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                            <span class="n">cancel_once</span><span class="p">()</span>
+                        <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="n">disconnected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+                <span class="n">cancel_once</span><span class="p">()</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">guarded_receive</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Message</span><span class="p">:</span>
+            <span class="k">nonlocal</span> <span class="n">body_complete</span><span class="p">,</span> <span class="n">monitor</span>
+            <span class="k">if</span> <span class="n">body_complete</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">disconnected</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;http.disconnect&quot;</span><span class="p">}</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="k">await</span> <span class="n">receive</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http.disconnect&quot;</span><span class="p">:</span>
+                <span class="n">disconnected</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http.request&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;more_body&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">body_complete</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># Only this task reads the ASGI channel after the final body chunk.</span>
+                <span class="n">monitor</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">watch_disconnect</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;http-disconnect&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">message</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">guarded_send</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">Message</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">nonlocal</span> <span class="n">response_started</span><span class="p">,</span> <span class="n">response_complete</span>
+            <span class="k">if</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http.response.start&quot;</span><span class="p">:</span>
+                <span class="n">response_started</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">RESPONSE_SEND_TIMEOUT</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="n">send</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">message</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http.response.body&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;more_body&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">response_complete</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1"># Do not invoke FastAPI&#39;s request timeout handler after headers.</span>
+                <span class="k">raise</span> <span class="n">ResponseSendTimeout</span><span class="p">(</span><span class="s2">&quot;Response send time limit expired&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">manager</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">scope</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;llm_transport_manager&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">request_deadline_scope</span><span class="p">(),</span> <span class="n">manager</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span> <span class="k">if</span> <span class="n">manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nullcontext</span><span class="p">():</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">guarded_receive</span><span class="p">,</span> <span class="n">guarded_send</span><span class="p">)</span>
+
+        <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">run</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;http-request&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">({</span><span class="n">task</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_TIMEOUT</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                <span class="n">cancel_once</span><span class="p">()</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span><span class="o">.</span><span class="n">cancelling</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Request time limit expired&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">task</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="n">cancel_once</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">disconnected</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span> <span class="ow">or</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span><span class="o">.</span><span class="n">cancelling</span><span class="p">():</span>
+                <span class="k">raise</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TimeoutError</span><span class="p">,</span> <span class="n">ResponseSendTimeout</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">response_started</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Request or response send deadline expired after response headers&quot;</span><span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">,</span> <span class="mi">504</span><span class="p">,</span> <span class="s2">&quot;Request time limit expired&quot;</span><span class="p">,</span> <span class="s2">&quot;request_timeout&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">monitor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                <span class="k">await</span> <span class="n">_drain</span><span class="p">(</span><span class="n">monitor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">monitor</span><span class="o">.</span><span class="n">cancelled</span><span class="p">():</span>
+                    <span class="n">monitor</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Scope</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">deadline</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_CLEANUP_TIMEOUT</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">scope</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">state</span>
+        <span class="n">stalled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">stalled</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">shield</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span>
+                            <span class="p">{</span><span class="n">task</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                            <span class="n">stalled</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">state</span><span class="o">.</span><span class="n">stalled_request_cleanups</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;stalled_request_cleanups&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Request cleanup is stalled; health probes require worker recovery&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stalled</span><span class="p">:</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">stalled_request_cleanups</span> <span class="o">-=</span> <span class="mi">1</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

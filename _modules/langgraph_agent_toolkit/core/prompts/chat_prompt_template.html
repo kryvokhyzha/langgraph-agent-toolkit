@@ -1,0 +1,774 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.prompts.chat_prompt_template &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.prompts.chat_prompt_template</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.prompts.chat_prompt_template</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">Future</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">jinja2.sandbox</span><span class="w"> </span><span class="kn">import</span> <span class="n">SandboxedEnvironment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIMessage</span><span class="p">,</span> <span class="n">HumanMessage</span><span class="p">,</span> <span class="n">SystemMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.prompt_values</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptValue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.prompts.chat</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AIMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">BaseChatPromptTemplate</span><span class="p">,</span>
+    <span class="n">BaseMessage</span><span class="p">,</span>
+    <span class="n">BaseMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">ChatPromptTemplate</span><span class="p">,</span>
+    <span class="n">HumanMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">MessageLikeRepresentation</span><span class="p">,</span>
+    <span class="n">MessagesPlaceholder</span><span class="p">,</span>
+    <span class="n">SystemMessagePromptTemplate</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.prompts.string</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_template_variables</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">PrivateAttr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseObservabilityPlatform</span><span class="p">,</span> <span class="n">PromptReturnType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObservabilityFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageRole</span><span class="p">,</span> <span class="n">ObservabilityBackend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="c1"># Keep dictionary attribute access and block access to Python internals.</span>
+<span class="n">_JINJA2_ENV</span> <span class="o">=</span> <span class="n">SandboxedEnvironment</span><span class="p">(</span><span class="n">autoescape</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Map message roles to prompt template classes.</span>
+<span class="n">_MESSAGE_TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">MessageRole</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">:</span> <span class="n">SystemMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">MessageRole</span><span class="o">.</span><span class="n">HUMAN</span><span class="p">:</span> <span class="n">HumanMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">MessageRole</span><span class="o">.</span><span class="n">USER</span><span class="p">:</span> <span class="n">HumanMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">MessageRole</span><span class="o">.</span><span class="n">AI</span><span class="p">:</span> <span class="n">AIMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">MessageRole</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">:</span> <span class="n">AIMessagePromptTemplate</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Map `BaseMessage.type` strings to prompt template classes.</span>
+<span class="n">_STRING_TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="n">SystemMessagePromptTemplate</span><span class="p">,</span>
+    <span class="s2">&quot;human&quot;</span><span class="p">:</span> <span class="n">HumanMessagePromptTemplate</span><span class="p">,</span>
+    <span class="s2">&quot;ai&quot;</span><span class="p">:</span> <span class="n">AIMessagePromptTemplate</span><span class="p">,</span>
+    <span class="s2">&quot;assistant&quot;</span><span class="p">:</span> <span class="n">AIMessagePromptTemplate</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_template_format</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a template string between formats.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">content</span>
+
+    <span class="k">if</span> <span class="n">target_format</span> <span class="o">==</span> <span class="s2">&quot;jinja2&quot;</span> <span class="ow">and</span> <span class="s2">&quot;{&quot;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">and</span> <span class="s2">&quot;{{&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+        <span class="c1"># Convert f-string format to Jinja2 format.</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;{(\w+)}&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;{{ \1 }}&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">target_format</span> <span class="o">==</span> <span class="s2">&quot;f-string&quot;</span> <span class="ow">and</span> <span class="s2">&quot;{{&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+        <span class="c1"># Convert Jinja2 format to f-string format.</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;{{\s*(\w+)\s*}}&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;{\1}&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObservabilityChatPromptTemplate</span><span class="p">(</span><span class="n">ChatPromptTemplate</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chat prompt template that loads prompts from observability platforms.&quot;&quot;&quot;</span>
+
+    <span class="n">prompt_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the prompt to load&quot;</span><span class="p">)</span>
+    <span class="n">prompt_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Version of the prompt&quot;</span><span class="p">)</span>
+    <span class="n">prompt_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Label of the prompt&quot;</span><span class="p">)</span>
+    <span class="n">load_at_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to load prompt at runtime&quot;</span><span class="p">)</span>
+    <span class="n">observability_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservabilityBackend</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Observability backend to use&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cache_ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cache TTL for prompts&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">template_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Format of the template&quot;</span><span class="p">)</span>
+
+    <span class="n">_observability_platform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseObservabilityPlatform</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_loaded_prompt</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_last_load_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_jinja2_template_cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_load_state_lock</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">)</span>
+    <span class="n">_load_future</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">_declared_input_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="s2">&quot;allow&quot;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">messages</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">MessageLikeRepresentation</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_at_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">observability_platform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseObservabilityPlatform</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observability_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ObservabilityBackend</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="s2">&quot;mustache&quot;</span><span class="p">,</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+        <span class="n">input_variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">partial_variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize ObservabilityChatPromptTemplate.&quot;&quot;&quot;</span>
+        <span class="c1"># Process the observability platform and backend.</span>
+        <span class="n">_observability_platform</span> <span class="o">=</span> <span class="n">observability_platform</span>
+        <span class="n">_observability_backend</span> <span class="o">=</span> <span class="n">observability_backend</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">observability_platform</span> <span class="ow">and</span> <span class="n">observability_backend</span><span class="p">:</span>
+            <span class="n">_observability_backend</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">ObservabilityBackend</span><span class="p">(</span><span class="n">observability_backend</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">observability_backend</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">observability_backend</span>
+            <span class="p">)</span>
+            <span class="n">_observability_platform</span> <span class="o">=</span> <span class="n">ObservabilityFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">_observability_backend</span><span class="p">)</span>
+
+        <span class="c1"># Load messages when required.</span>
+        <span class="n">_messages</span> <span class="o">=</span> <span class="n">messages</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">loaded_prompt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">load_at_runtime</span> <span class="ow">and</span> <span class="n">prompt_name</span> <span class="ow">and</span> <span class="n">_observability_platform</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">loaded_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_prompt_from_platform</span><span class="p">(</span>
+                    <span class="n">_observability_platform</span><span class="p">,</span>
+                    <span class="n">prompt_name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+                    <span class="n">prompt_version</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">,</span>
+                    <span class="n">prompt_label</span><span class="o">=</span><span class="n">prompt_label</span><span class="p">,</span>
+                    <span class="n">cache_ttl_seconds</span><span class="o">=</span><span class="n">cache_ttl_seconds</span><span class="p">,</span>
+                    <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Process the returned prompt by type.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">_messages</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">):</span>
+                        <span class="n">_messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_messages_from_prompt</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="o">.</span><span class="n">messages</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="n">BaseChatPromptTemplate</span><span class="p">):</span>
+                        <span class="n">_messages</span> <span class="o">=</span> <span class="n">loaded_prompt</span><span class="o">.</span><span class="n">messages</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">processed_messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_list_prompt</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">processed_messages</span><span class="p">:</span>
+                            <span class="n">_messages</span> <span class="o">=</span> <span class="n">processed_messages</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">_messages</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="n">loaded_prompt</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">_messages</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The prompt backend returned no messages&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load prompt </span><span class="si">{</span><span class="n">prompt_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">_messages</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load prompt and no fallback available: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="c1"># Save input and partial variables.</span>
+        <span class="n">_input_variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_variables</span><span class="p">)</span> <span class="k">if</span> <span class="n">input_variables</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">_partial_variables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">partial_variables</span><span class="p">)</span> <span class="k">if</span> <span class="n">partial_variables</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="c1"># Let the parent derive required variables and process partial values.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">_messages</span><span class="p">,</span>
+            <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">,</span>
+            <span class="n">partial_variables</span><span class="o">=</span><span class="n">_partial_variables</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set attributes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span> <span class="o">=</span> <span class="n">prompt_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_version</span> <span class="o">=</span> <span class="n">prompt_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_label</span> <span class="o">=</span> <span class="n">prompt_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_at_runtime</span> <span class="o">=</span> <span class="n">load_at_runtime</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observability_backend</span> <span class="o">=</span> <span class="n">_observability_backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_ttl_seconds</span> <span class="o">=</span> <span class="n">cache_ttl_seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span> <span class="o">=</span> <span class="n">template_format</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_declared_input_variables</span> <span class="o">=</span> <span class="n">_input_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_variables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_variables</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">_input_variables</span><span class="p">))</span>
+            <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_variables</span><span class="p">)</span>
+            <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optional_variables</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set private attributes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span> <span class="o">=</span> <span class="n">_observability_platform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_prompt</span> <span class="o">=</span> <span class="n">loaded_prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_load_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observability_platform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseObservabilityPlatform</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the observability platform.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span>
+
+    <span class="nd">@observability_platform</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observability_platform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="n">BaseObservabilityPlatform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the observability platform.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span> <span class="o">=</span> <span class="n">platform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_prompt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_load_time</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_prompt_from_platform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">platform</span><span class="p">:</span> <span class="n">BaseObservabilityPlatform</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">prompt_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span> <span class="s2">&quot;mustache&quot;</span><span class="p">,</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PromptReturnType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load prompt from observability platform.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+            <span class="n">accepts_kwargs</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">parameter</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">if</span> <span class="s2">&quot;cache_ttl_seconds&quot;</span> <span class="ow">in</span> <span class="n">sig</span> <span class="ow">or</span> <span class="n">accepts_kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cache_ttl_seconds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_ttl_seconds</span>
+            <span class="k">if</span> <span class="s2">&quot;template_format&quot;</span> <span class="ow">in</span> <span class="n">sig</span> <span class="ow">or</span> <span class="n">accepts_kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;template_format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template_format</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">prompt_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_version</span>
+        <span class="k">if</span> <span class="n">prompt_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt_label</span>
+
+        <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">(</span><span class="n">prompt_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_prompt_from_observability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PromptReturnType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load prompt from observability platform.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No observability platform set&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No prompt name provided&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_prompt_from_platform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span><span class="p">,</span>
+            <span class="n">prompt_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span><span class="p">,</span>
+            <span class="n">prompt_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_version</span><span class="p">,</span>
+            <span class="n">prompt_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_label</span><span class="p">,</span>
+            <span class="n">cache_ttl_seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_ttl_seconds</span><span class="p">,</span>
+            <span class="n">template_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_accept_loaded_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loaded_prompt</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a refreshed prompt before replacing the active messages.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="s2">&quot;messages&quot;</span><span class="p">):</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_messages_from_prompt</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="o">.</span><span class="n">messages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_list_prompt</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="n">loaded_prompt</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The prompt backend returned an unsupported prompt&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The prompt backend returned no messages&quot;</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">ChatPromptTemplate</span><span class="p">(</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+            <span class="n">template_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">,</span>
+            <span class="n">partial_variables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_variables</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">messages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial_variables</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">partial_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optional_variables</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">optional_variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_variables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">input_variables</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_declared_input_variables</span><span class="p">))</span>
+            <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">partial_variables</span><span class="p">)</span>
+            <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">optional_variables</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_jinja2_template_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_prompt</span> <span class="o">=</span> <span class="n">loaded_prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_load_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_messages_from_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">template_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">MessageLikeRepresentation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process messages from a loaded prompt.&quot;&quot;&quot;</span>
+        <span class="n">processed_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">MessagesPlaceholder</span><span class="p">):</span>
+                <span class="c1"># Keep `MessagesPlaceholder` objects.</span>
+                <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">BaseMessage</span><span class="p">)</span> <span class="ow">and</span> <span class="n">msg</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="n">_STRING_TYPE_MAP</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">_convert_template_format</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                <span class="n">template_class</span> <span class="o">=</span> <span class="n">_STRING_TYPE_MAP</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+                <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">role</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="k">if</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">_convert_template_format</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                    <span class="n">template_class</span> <span class="o">=</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;role&quot;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">and</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="n">role</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">_convert_template_format</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                    <span class="n">template_class</span> <span class="o">=</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">processed_messages</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_list_prompt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prompt_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">template_format</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">MessageLikeRepresentation</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a list prompt from an observability platform.&quot;&quot;&quot;</span>
+        <span class="n">processed_messages</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Process a list of `(role, content)` tuples.</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">prompt_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">role</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">prompt_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">_convert_template_format</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                    <span class="n">template_class</span> <span class="o">=</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">processed_messages</span>
+
+        <span class="c1"># Process a list of dictionaries with `role` and `content`.</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;role&quot;</span> <span class="ow">in</span> <span class="n">item</span> <span class="ow">and</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">prompt_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">prompt_list</span><span class="p">:</span>
+                <span class="n">role</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">_convert_template_format</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="p">)</span>
+                    <span class="n">template_class</span> <span class="o">=</span> <span class="n">_MESSAGE_TYPE_MAP</span><span class="p">[</span><span class="n">role</span><span class="p">]</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="n">template_format</span><span class="p">))</span>
+                <span class="c1"># Process a `MessagesPlaceholder`.</span>
+                <span class="k">elif</span> <span class="n">role</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="n">MessageRole</span><span class="o">.</span><span class="n">PLACEHOLDER</span><span class="p">,</span> <span class="n">MessageRole</span><span class="o">.</span><span class="n">MESSAGES_PLACEHOLDER</span><span class="p">):</span>
+                    <span class="c1"># Use `content` as the `MessagesPlaceholder` variable name.</span>
+                    <span class="n">processed_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MessagesPlaceholder</span><span class="p">(</span><span class="n">variable_name</span><span class="o">=</span><span class="n">content</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">processed_messages</span>
+
+        <span class="k">return</span> <span class="n">processed_messages</span> <span class="ow">or</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_reload_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether cache TTL requires a prompt reload.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_at_runtime</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_prompt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_load_time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_ttl_seconds</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_begin_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Future</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Share one prompt load across synchronous and asynchronous callers.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_state_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_future</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_future</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_reload_prompt</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_future</span> <span class="o">=</span> <span class="n">Future</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_future</span><span class="p">,</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finish_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_state_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">future</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_future</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">error</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load prompt: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+            <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to load prompt and no fallback available: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_messages_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load messages from the observability platform when required.&quot;&quot;&quot;</span>
+        <span class="n">future</span><span class="p">,</span> <span class="n">owner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begin_load</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">future</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">owner</span><span class="p">:</span>
+            <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_accept_loaded_prompt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_prompt_from_observability</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">failure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finish_load</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">failure</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">failure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">failure</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finish_load</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_aensure_messages_loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load messages without blocking the event loop.&quot;&quot;&quot;</span>
+        <span class="n">future</span><span class="p">,</span> <span class="n">owner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begin_load</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">future</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">owner</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">shield</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">wrap_future</span><span class="p">(</span><span class="n">future</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loaded_prompt</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span><span class="o">.</span><span class="n">apull_prompt</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span><span class="p">,</span>
+                <span class="n">cache_ttl_seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_ttl_seconds</span><span class="p">,</span>
+                <span class="n">template_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_version</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_label</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_accept_loaded_prompt</span><span class="p">(</span><span class="n">loaded_prompt</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">failure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finish_load</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">failure</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">failure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">failure</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finish_load</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_compiled_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a compiled Jinja2 template from cache or create one.</span>
+
+<span class="sd">        The cache avoids parsing templates for each render.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jinja2_template_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">template_content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">_JINJA2_ENV</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template_content</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_jinja2_template_cache</span><span class="p">[</span><span class="n">template_content</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span>
+        <span class="k">return</span> <span class="n">template</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_render_jinja2_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Render a cached template inside the Jinja2 sandbox.&quot;&quot;&quot;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_compiled_template</span><span class="p">(</span><span class="n">template_content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">variables</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_messages_with_jinja2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format Jinja2 text and keep standard message behavior.&quot;&quot;&quot;</span>
+        <span class="n">formatted_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">message_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">SystemMessagePromptTemplate</span><span class="p">:</span> <span class="n">SystemMessage</span><span class="p">,</span>
+            <span class="n">HumanMessagePromptTemplate</span><span class="p">:</span> <span class="n">HumanMessage</span><span class="p">,</span>
+            <span class="n">AIMessagePromptTemplate</span><span class="p">:</span> <span class="n">AIMessage</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">BaseMessage</span><span class="p">):</span>
+                <span class="n">formatted_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">prompt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">message_type</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">message_types</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">key</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">message_type</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;template_format&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">:</span>
+                <span class="n">variables</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">_merge_partial_and_user_variables</span><span class="p">(</span><span class="o">**</span><span class="n">input_values</span><span class="p">)</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_jinja2_template</span><span class="p">(</span><span class="n">prompt</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+                <span class="n">formatted_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message_type</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="o">**</span><span class="n">msg</span><span class="o">.</span><span class="n">additional_kwargs</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">formatted_messages</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="o">**</span><span class="n">input_values</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">formatted_messages</span>
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.format_messages">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.format_messages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format messages with standard partial and placeholder handling.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span> <span class="o">!=</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">input_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_partial_and_user_variables</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_messages_with_jinja2</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.aformat_messages">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.aformat_messages">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">aformat_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span> <span class="o">!=</span> <span class="s2">&quot;jinja2&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">aformat_messages</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.invoke">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.invoke">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PromptValue</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Invoke the prompt with standard input validation and callbacks.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_messages_loaded</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.ainvoke">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.ainvoke">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ainvoke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PromptValue</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Asynchronously invoke the prompt with standard callbacks.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aensure_messages_loaded</span><span class="p">()</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.partial">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.partial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">partial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ObservabilityChatPromptTemplate&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Keep the remote backend when binding partial variables.&quot;&quot;&quot;</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">template</span><span class="o">.</span><span class="n">_observability_platform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observability_platform</span>
+        <span class="n">template</span><span class="o">.</span><span class="n">_loaded_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_prompt</span>
+        <span class="n">template</span><span class="o">.</span><span class="n">_last_load_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_load_time</span>
+        <span class="k">return</span> <span class="n">template</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.from_observability_platform">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_platform">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_observability_platform</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">observability_platform</span><span class="p">:</span> <span class="n">BaseObservabilityPlatform</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">prompt_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_at_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ObservabilityChatPromptTemplate&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a chat prompt template from an observability platform.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">prompt_name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+            <span class="n">prompt_version</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">,</span>
+            <span class="n">prompt_label</span><span class="o">=</span><span class="n">prompt_label</span><span class="p">,</span>
+            <span class="n">load_at_runtime</span><span class="o">=</span><span class="n">load_at_runtime</span><span class="p">,</span>
+            <span class="n">observability_platform</span><span class="o">=</span><span class="n">observability_platform</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObservabilityChatPromptTemplate.from_observability_backend">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_backend">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_observability_backend</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">observability_backend</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ObservabilityBackend</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">prompt_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">load_at_runtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ObservabilityChatPromptTemplate&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a chat prompt template from an observability backend.&quot;&quot;&quot;</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ObservabilityBackend</span><span class="p">(</span><span class="n">observability_backend</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">observability_backend</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">observability_backend</span>
+        <span class="p">)</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="n">ObservabilityFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">prompt_name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">,</span>
+            <span class="n">prompt_version</span><span class="o">=</span><span class="n">prompt_version</span><span class="p">,</span>
+            <span class="n">prompt_label</span><span class="o">=</span><span class="n">prompt_label</span><span class="p">,</span>
+            <span class="n">load_at_runtime</span><span class="o">=</span><span class="n">load_at_runtime</span><span class="p">,</span>
+            <span class="n">observability_platform</span><span class="o">=</span><span class="n">platform</span><span class="p">,</span>
+            <span class="n">observability_backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatPromptTemplate</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine two prompt templates.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ChatPromptTemplate</span><span class="p">):</span>
+            <span class="c1"># Copy messages from both templates.</span>
+            <span class="n">combined_messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">)</span>
+
+            <span class="c1"># Process messages from the other template.</span>
+            <span class="n">other_messages</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+                <span class="c1"># Process `MessagesPlaceholder`.</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">MessagesPlaceholder</span><span class="p">):</span>
+                    <span class="n">other_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">BaseMessagePromptTemplate</span><span class="p">):</span>
+                    <span class="n">other_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">BaseMessage</span><span class="p">):</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">content</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">template_vars</span> <span class="o">=</span> <span class="n">get_template_variables</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">template_vars</span><span class="p">:</span>
+                            <span class="n">template_class</span> <span class="o">=</span> <span class="n">_STRING_TYPE_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">template_class</span><span class="p">:</span>
+                                <span class="n">other_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                    <span class="n">template_class</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">template_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">template_format</span><span class="p">)</span>
+                                <span class="p">)</span>
+                                <span class="k">continue</span>
+
+                    <span class="n">other_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">other_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">combined_messages</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">other_messages</span><span class="p">)</span>
+
+            <span class="c1"># Collect input variables.</span>
+            <span class="n">all_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_variables</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="n">other_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">input_variables</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="n">all_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other_vars</span><span class="p">)</span>
+
+            <span class="c1"># Get variables from `MessagesPlaceholder`.</span>
+            <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">combined_messages</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">MessagesPlaceholder</span><span class="p">):</span>
+                    <span class="n">all_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;input_variables&quot;</span><span class="p">):</span>
+                    <span class="n">all_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">input_variables</span><span class="p">)</span>
+
+            <span class="c1"># Create the partial variable dictionary.</span>
+            <span class="n">combined_partial_vars</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_variables</span> <span class="ow">or</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;partial_variables&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">partial_variables</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">partial_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">combined_partial_vars</span><span class="p">:</span>
+                        <span class="n">combined_partial_vars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+            <span class="c1"># Create the combined template.</span>
+            <span class="k">return</span> <span class="n">ChatPromptTemplate</span><span class="p">(</span>
+                <span class="n">messages</span><span class="o">=</span><span class="n">combined_messages</span><span class="p">,</span>
+                <span class="n">input_variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">all_vars</span><span class="p">),</span>
+                <span class="n">partial_variables</span><span class="o">=</span><span class="n">combined_partial_vars</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="n">BaseMessagePromptTemplate</span><span class="p">,</span> <span class="n">BaseMessage</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_messages</span><span class="p">([</span><span class="n">other</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_messages</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported operand type for +: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ObservabilityChatPromptTemplate&quot;</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

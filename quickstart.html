@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run your first agent &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/quickstart.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Application Onboarding" href="onboarding.html" />
+    <link rel="prev" title="LangGraph Agent Toolkit" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run your first agent</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prepare-a-fresh-checkout">Prepare a fresh checkout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#start-and-call-the-api">Start and call the API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stream-and-read-history">Stream and read history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-the-python-client">Use the Python client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-the-optional-ui">Add the optional UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#select-a-real-model-or-another-agent">Select a real model or another agent</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Run your first agent</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/quickstart.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="run-your-first-agent">
+<h1>Run your first agent<a class="headerlink" href="#run-your-first-agent" title="Link to this heading"></a></h1>
+<p>This guide starts one local API with a deterministic fake model and a SQLite
+checkpointer. It needs no model key or external service. It checks API behavior
+and conversation persistence. Model quality requires separate evaluation.</p>
+<section id="prepare-a-fresh-checkout">
+<h2>Prepare a fresh checkout<a class="headerlink" href="#prepare-a-fresh-checkout" title="Link to this heading"></a></h2>
+<p>Install <code class="docutils literal notranslate"><span class="pre">uv</span></code> and use Python 3.11, 3.12, 3.13, or 3.14. Run these commands in a
+shell without existing toolkit or tracing overrides:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
+<span class="nb">cd</span><span class="w"> </span>langgraph-agent-toolkit
+uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--no-dev<span class="w"> </span>--extra<span class="w"> </span>uvicorn-backend
+</pre></div>
+</div>
+<p>Create <code class="docutils literal notranslate"><span class="pre">.env</span></code> in the fresh checkout with these values:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">USE_FAKE_MODEL</span><span class="o">=</span><span class="s">true</span>
+<span class="na">AUTH_MODE</span><span class="o">=</span><span class="s">trusted</span>
+<span class="na">AUTH_SECRET</span><span class="o">=</span><span class="s">local-demo-token</span>
+<span class="na">AGENT_PATHS</span><span class="o">=</span><span class="s">[&quot;langgraph_agent_toolkit.agents.blueprints.chatbot.agent:chatbot_agent&quot;]</span>
+<span class="na">DEFAULT_AGENT</span><span class="o">=</span><span class="s">chatbot-agent</span>
+<span class="na">MEMORY_BACKEND</span><span class="o">=</span><span class="s">sqlite</span>
+<span class="na">SQLITE_DB_PATH</span><span class="o">=</span><span class="s">quickstart.sqlite</span>
+<span class="na">OBSERVABILITY_BACKEND</span><span class="o">=</span><span class="s">empty</span>
+<span class="na">MCP_SERVERS</span><span class="o">=</span><span class="s">{}</span>
+<span class="na">MODEL_CONFIGS</span><span class="o">=</span><span class="s">{}</span>
+<span class="na">LANGSMITH_TRACING</span><span class="o">=</span><span class="s">false</span>
+<span class="na">LANGCHAIN_TRACING_V2</span><span class="o">=</span><span class="s">false</span>
+</pre></div>
+</div>
+<p>Do not replace an existing deployment’s <code class="docutils literal notranslate"><span class="pre">.env</span></code> with this demo configuration.
+The repository’s <code class="docutils literal notranslate"><span class="pre">.env.example</span></code> is a configuration reference for external
+services and models. Its placeholders need configuration before use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> lets the trusted API caller supply <code class="docutils literal notranslate"><span class="pre">user_id</span></code>. Use the
+demo token only on localhost. For a deployed application, authenticate end users
+in your backend and supply their stable IDs. See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a> for the token
+mode and ownership rules.</p>
+</section>
+<section id="start-and-call-the-api">
+<h2>Start and call the API<a class="headerlink" href="#start-and-call-the-api" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>langgraph_agent_toolkit.run_api<span class="w"> </span>--host<span class="w"> </span><span class="m">127</span>.0.0.1<span class="w"> </span>--port<span class="w"> </span><span class="m">8080</span>
+</pre></div>
+</div>
+<p>In another terminal, export the demo token and check readiness. Retry after
+startup if the first check cannot connect:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUTH_SECRET</span><span class="o">=</span>local-demo-token
+
+curl<span class="w"> </span>--fail<span class="w"> </span>http://127.0.0.1:8080/health/ready
+</pre></div>
+</div>
+<p>Send the first turn:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>http://127.0.0.1:8080/chatbot-agent/invoke<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;:{&quot;message&quot;:&quot;Hello&quot;},&quot;user_id&quot;:&quot;demo-user&quot;,&quot;thread_id&quot;:&quot;demo-thread&quot;}&#39;</span>
+</pre></div>
+</div>
+<p>The JSON response contains <code class="docutils literal notranslate"><span class="pre">type=ai</span></code>, <code class="docutils literal notranslate"><span class="pre">thread_id=demo-thread</span></code>, a <code class="docutils literal notranslate"><span class="pre">run_id</span></code>,
+and the content <code class="docutils literal notranslate"><span class="pre">This</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">test</span> <span class="pre">response</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">fake</span> <span class="pre">model.</span></code>
+The service’s interactive API reference is at <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:8080/docs</span></code>.</p>
+</section>
+<section id="stream-and-read-history">
+<h2>Stream and read history<a class="headerlink" href="#stream-and-read-history" title="Link to this heading"></a></h2>
+<p>Send a second turn to the same conversation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>-N<span class="w"> </span>http://127.0.0.1:8080/chatbot-agent/stream<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;:{&quot;message&quot;:&quot;Another turn&quot;},&quot;user_id&quot;:&quot;demo-user&quot;,&quot;thread_id&quot;:&quot;demo-thread&quot;,&quot;stream_tokens&quot;:true}&#39;</span>
+</pre></div>
+</div>
+<p>SSE events use <code class="docutils literal notranslate"><span class="pre">data:</span></code> lines and end with <code class="docutils literal notranslate"><span class="pre">data:</span> <span class="pre">[DONE]</span></code>. The response can
+contain token, message, or error events. Check the events for errors even when
+the HTTP status is 200. Use <code class="docutils literal notranslate"><span class="pre">/chatbot-agent/stream/jsonl</span></code> for JSON Lines.
+That protocol has no <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code> marker.</p>
+<p>Read the saved conversation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>--get<span class="w"> </span>http://127.0.0.1:8080/chatbot-agent/history<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;user_id=demo-user&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;thread_id=demo-thread&#39;</span>
+</pre></div>
+</div>
+<p>After both turns, history contains two human messages and two AI replies.
+Stop the API with Ctrl+C and restart it with the same command. Repeat the
+history request. The file <code class="docutils literal notranslate"><span class="pre">quickstart.sqlite</span></code> retains the conversation.</p>
+</section>
+<section id="use-the-python-client">
+<h2>Use the Python client<a class="headerlink" href="#use-the-python-client" title="Link to this heading"></a></h2>
+<p>Run this example from the checkout while the API is running:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span>
+
+<span class="k">with</span> <span class="n">AgentClient</span><span class="p">(</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">,</span>
+    <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;chatbot-agent&quot;</span><span class="p">,</span>
+    <span class="n">auth_secret</span><span class="o">=</span><span class="s2">&quot;local-demo-token&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">reply</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello from Python&quot;</span><span class="p">},</span>
+        <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;demo-user&quot;</span><span class="p">,</span>
+        <span class="n">thread_id</span><span class="o">=</span><span class="s2">&quot;python-demo&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">get_history</span><span class="p">(</span><span class="s2">&quot;python-demo&quot;</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;demo-user&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The context manager closes the client’s owned connections. See <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a>
+for async clients, streaming, history import, and feedback.</p>
+</section>
+<section id="add-the-optional-ui">
+<h2>Add the optional UI<a class="headerlink" href="#add-the-optional-ui" title="Link to this heading"></a></h2>
+<p>Stop the API before changing its environment’s dependencies. Install the UI
+extra and restart the API with the earlier command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--no-dev<span class="w"> </span>--extra<span class="w"> </span>uvicorn-backend<span class="w"> </span>--extra<span class="w"> </span>ui
+</pre></div>
+</div>
+<p>In another terminal, use the same checkout and start Streamlit:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">AGENT_URL</span><span class="o">=</span>http://127.0.0.1:8080<span class="w"> </span><span class="nv">AUTH_SECRET</span><span class="o">=</span>local-demo-token<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>streamlit<span class="w"> </span>run<span class="w"> </span>langgraph_agent_toolkit/run_app.py
+</pre></div>
+</div>
+<p>Open <code class="docutils literal notranslate"><span class="pre">http://localhost:8501</span></code>. The UI calls the running API. A UI session can
+use its own user and thread IDs. It does not automatically open the curl
+example’s conversation.</p>
+</section>
+<section id="select-a-real-model-or-another-agent">
+<h2>Select a real model or another agent<a class="headerlink" href="#select-a-real-model-or-another-agent" title="Link to this heading"></a></h2>
+<p>Install the chosen provider extra, set its model and credentials, and set
+<code class="docutils literal notranslate"><span class="pre">USE_FAKE_MODEL=false</span></code>. Keep real credentials in your deployment’s environment
+or secret manager. The quickstart does not select or call a real provider.
+See <a class="reference internal" href="installation.html"><span class="doc">Installation Options</span></a> and <a class="reference internal" href="environment_setup.html"><span class="doc">Environment Setup</span></a> for provider configuration.</p>
+<p>Use <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> to choose a tool agent, fixed graph, or Deep Agent.
+Register the selected agent through <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code> and <code class="docutils literal notranslate"><span class="pre">DEFAULT_AGENT</span></code>.
+See <a class="reference internal" href="usage.html"><span class="doc">Usage Guide</span></a> for a custom agent and <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a> for remote tools.</p>
+<p>Before deployment, configure authentication, persistent storage, worker
+supervision, and request limits through <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> and <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a>.
+The API Docker image selects aiohttp by default. Python installations select
+HTTPX unless you configure another transport.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="LangGraph Agent Toolkit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="onboarding.html" class="btn btn-neutral float-right" title="Application Onboarding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

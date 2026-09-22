@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation Options &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/installation.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Environment Setup" href="environment_setup.html" />
+    <link rel="prev" title="Application Onboarding" href="onboarding.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#provider-and-backend-extras">Provider and Backend Extras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#agent-integrations">Agent Integrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ui-and-development-server">UI and Development Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-frontend-from-source">Minimal Frontend from Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-and-deployment">Development and Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation Options</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/installation.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-options">
+<h1>Installation Options<a class="headerlink" href="#installation-options" title="Link to this heading"></a></h1>
+<p>Use Python 3.11, 3.12, 3.13, or 3.14. See <a class="reference internal" href="quickstart.html"><span class="doc">Run your first agent</span></a> for the first working
+API example. It uses a fake model and needs no provider credentials.</p>
+<p>Python 3.14 requires Pydantic 2.13.0 or later. This version also supports the
+legacy models used by Langfuse SDK v2 and v3. The package metadata applies this
+minimum only on Python 3.14. The <code class="docutils literal notranslate"><span class="pre">studio</span></code> extra also requires
+<code class="docutils literal notranslate"><span class="pre">jsonschema-rs&gt;=0.44.1</span></code> on Python 3.14. Older locked versions cannot build on
+this interpreter. Update the application lockfile when changing Python versions.
+Docker images and the LangGraph deployment configuration still use Python 3.13.</p>
+<p>For a published package installation, create an environment outside the source
+checkout:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>--python<span class="w"> </span><span class="m">3</span>.13
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>langgraph-agent-toolkit
+</pre></div>
+</div>
+<p>The base installation contains the service, graph runtime, search tools, and
+PostgreSQL and SQLite checkpoint adapters. These dependencies remain in the
+base package to preserve existing service installations. It does not install a
+model provider, Streamlit, or the LangGraph development server.</p>
+<section id="provider-and-backend-extras">
+<h2>Provider and Backend Extras<a class="headerlink" href="#provider-and-backend-extras" title="Link to this heading"></a></h2>
+<p>Install the extras for the provider and deployment backend that you use.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># OpenAI, Uvicorn, and Langfuse SDK v4</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v4]&quot;</span>
+
+<span class="c1"># Anthropic, AWS Lambda, and LangSmith</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[anthropic,aws-backend,langsmith]&quot;</span>
+</pre></div>
+</div>
+<p>The provider extras are <code class="docutils literal notranslate"><span class="pre">openai</span></code>, <code class="docutils literal notranslate"><span class="pre">anthropic</span></code>, <code class="docutils literal notranslate"><span class="pre">aws</span></code>,
+<code class="docutils literal notranslate"><span class="pre">google-vertexai</span></code>, and <code class="docutils literal notranslate"><span class="pre">google-genai</span></code>. <code class="docutils literal notranslate"><span class="pre">all-llms</span></code> installs all of them.
+The fake model works without a provider extra or an API key.</p>
+<p><code class="docutils literal notranslate"><span class="pre">openai-aiohttp</span></code> adds the OpenAI SDK’s optional asynchronous transport.
+The API Docker image includes this extra and selects aiohttp by default.
+<code class="docutils literal notranslate"><span class="pre">all-llms</span></code> and <code class="docutils literal notranslate"><span class="pre">all</span></code> also include it. Python installations keep HTTPX as
+their default so the base <code class="docutils literal notranslate"><span class="pre">openai</span></code> extra does not require aiohttp.
+See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> to select a transport and configure connection limits.</p>
+<p>The backend extras are <code class="docutils literal notranslate"><span class="pre">uvicorn-backend</span></code>, <code class="docutils literal notranslate"><span class="pre">gunicorn-backend</span></code>,
+<code class="docutils literal notranslate"><span class="pre">aws-backend</span></code>, and <code class="docutils literal notranslate"><span class="pre">azure-backend</span></code>. <code class="docutils literal notranslate"><span class="pre">all-backends</span></code> installs all of them.
+Uvicorn is already a base dependency. Its named extra remains available for
+existing installation commands.
+Use <code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code>, or <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> to select a Langfuse
+Python SDK generation. Choose only one selector. These extras do not select or
+install a Langfuse server. See <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> for the supported
+SDK and server combinations.</p>
+<p>The generic <code class="docutils literal notranslate"><span class="pre">langfuse</span></code> extra permits SDK versions from 2.60.10 to below 5.
+It can combine with any one version selector. <code class="docutils literal notranslate"><span class="pre">langsmith</span></code> selects LangSmith,
+and <code class="docutils literal notranslate"><span class="pre">all-observability</span></code> includes both generic <code class="docutils literal notranslate"><span class="pre">langfuse</span></code> and <code class="docutils literal notranslate"><span class="pre">langsmith</span></code>.
+Extra names use hyphens; underscore spellings such as <code class="docutils literal notranslate"><span class="pre">langfuse_v2</span></code> normalize
+to the same name.</p>
+</section>
+<section id="agent-integrations">
+<h2>Agent Integrations<a class="headerlink" href="#agent-integrations" title="Link to this heading"></a></h2>
+<p>Install only the integrations that your agents use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[mcp]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[deepagents,openai]&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">mcp</span></code> adds remote tool discovery and calls. <code class="docutils literal notranslate"><span class="pre">deepagents</span></code> adds the optional
+Deep Agent blueprint. A real model still needs its provider extra and
+configuration. See <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a>, <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a>, and <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> for
+their use cases and limits.</p>
+</section>
+<section id="ui-and-development-server">
+<h2>UI and Development Server<a class="headerlink" href="#ui-and-development-server" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install the Streamlit frontend.</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[ui]&quot;</span>
+
+<span class="c1"># Install the LangGraph development server and CLI.</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[studio]&quot;</span>
+
+<span class="c1"># Install all optional features with the default SDK selection.</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[all]&quot;</span>
+
+<span class="c1"># Install the same features with Langfuse SDK v2.</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[all,langfuse-v2]&quot;</span>
+</pre></div>
+</div>
+<p>Extras add dependencies. They cannot remove the graph and service dependencies
+from the base wheel. There is no <code class="docutils literal notranslate"><span class="pre">client</span></code> package extra that produces a
+smaller wheel installation. Langfuse SDK selectors are published extras in the
+wheel. Local dependency groups are available only from a source checkout.</p>
+</section>
+<section id="minimal-frontend-from-source">
+<h2>Minimal Frontend from Source<a class="headerlink" href="#minimal-frontend-from-source" title="Link to this heading"></a></h2>
+<p>A source checkout has a separate dependency group for the SDK and Streamlit
+frontend. This group does not install the package or its service dependencies.
+Run these commands from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--only-group<span class="w"> </span>client
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>streamlit<span class="w"> </span>run<span class="w"> </span>langgraph_agent_toolkit/run_app.py
+</pre></div>
+</div>
+<p>Keep <code class="docutils literal notranslate"><span class="pre">--no-sync</span></code> on the run command. A normal project sync also installs the
+base service dependencies.</p>
+</section>
+<section id="development-and-deployment">
+<h2>Development and Deployment<a class="headerlink" href="#development-and-deployment" title="Link to this heading"></a></h2>
+<p>Install the locked development environment with all optional features:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest
+</pre></div>
+</div>
+<p>Replace earlier <code class="docutils literal notranslate"><span class="pre">--all-extras</span></code> commands with <code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">all</span></code>. Selecting every
+extra now includes three incompatible Langfuse SDK selectors. The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra
+keeps the complete feature set and uses SDK v4 in the default lockfile selection.
+It does not force the <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> selector.</p>
+<p>Add one selector to use another SDK generation, when all dependencies permit it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--extra<span class="w"> </span>langfuse-v2
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code> or <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> in the same position. Keep the selected
+SDK generation in the deployment’s install command and lockfile.</p>
+<p>The lockfile fixes the complete source environment. The wheel metadata limits
+the graph and model framework APIs to the versions supported by this release.
+Python 3.13 is required for the configured pre-commit hook environments.
+See <a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a> for source changes and <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for opt-in process,
+container, database, and live-provider tests.</p>
+<p>The API Docker image includes OpenAI, both HTTP transports, MCP, Gunicorn, and
+observability dependencies. Deep Agents requires the <code class="docutils literal notranslate"><span class="pre">INSTALL_DEEPAGENTS=true</span></code>
+build argument. Other model providers require a custom image with their extras.</p>
+<p>See <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> for worker recovery, database sizing, and concurrent
+conversation limits.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="onboarding.html" class="btn btn-neutral float-left" title="Application Onboarding" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="environment_setup.html" class="btn btn-neutral float-right" title="Environment Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service.utils &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/service/utils.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.service.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">aclosing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncGenerator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPAuthorizationCredentials</span><span class="p">,</span> <span class="n">HTTPBearer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core._api</span><span class="w"> </span><span class="kn">import</span> <span class="n">LangChainBetaWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelAuthenticationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent_executor</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.memory.concurrency</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConversationBusyError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">InterceptHandler</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvironmentMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatMessage</span><span class="p">,</span> <span class="n">StreamChunk</span><span class="p">,</span> <span class="n">StreamInput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.service.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">authenticate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.service.feedback</span><span class="w"> </span><span class="kn">import</span> <span class="n">sign_feedback_message</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_safe_stream_error</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return client text for a stream failure.</span>
+
+<span class="sd">    Provider authentication failures always use fixed text.</span>
+<span class="sd">    For other failures, non-production clients receive the error detail.</span>
+<span class="sd">    Production clients receive a general message for other failures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">ModelAuthenticationError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;The model provider credentials were rejected&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">ConversationBusyError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">ENV_MODE</span> <span class="o">!=</span> <span class="n">EnvironmentMode</span><span class="o">.</span><span class="n">PRODUCTION</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Internal server error: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;Internal server error&quot;</span>
+
+
+<div class="viewcode-block" id="verify_bearer">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.verify_bearer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_bearer</span><span class="p">(</span>
+    <span class="n">http_auth</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
+        <span class="n">HTTPAuthorizationCredentials</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">Depends</span><span class="p">(</span><span class="n">HTTPBearer</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Provide a configured bearer token.&quot;</span><span class="p">,</span> <span class="n">auto_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)),</span>
+    <span class="p">],</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">principal</span> <span class="o">=</span> <span class="n">authenticate</span><span class="p">(</span><span class="n">http_auth</span><span class="o">.</span><span class="n">credentials</span> <span class="k">if</span> <span class="n">http_auth</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_agent_executor">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_agent_executor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_agent_executor</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentExecutor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the `AgentExecutor` initialized during lifespan.&quot;&quot;&quot;</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;agent_executor&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_503_SERVICE_UNAVAILABLE</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Agent executor not initialized. Service might be starting up.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">agent_executor</span></div>
+
+
+
+<div class="viewcode-block" id="get_agent">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_agent">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_agent</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an agent by ID from the initialized `AgentExecutor`.&quot;&quot;&quot;</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">get_agent_executor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">executor</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Agent &#39;</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_all_agent_info">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_all_agent_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_all_agent_info</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all agent information from the initialized `AgentExecutor`.&quot;&quot;&quot;</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">get_agent_executor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">executor</span><span class="o">.</span><span class="n">get_all_agent_info</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="jsonl_message_generator">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.jsonl_message_generator">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">jsonl_message_generator</span><span class="p">(</span>
+    <span class="n">stream_input</span><span class="p">:</span> <span class="n">StreamInput</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">public_thread_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">StreamChunk</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield typed events and close execution when the consumer disconnects.&quot;&quot;&quot;</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">get_agent_executor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+            <span class="nb">input</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">model_provider</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">model_provider</span><span class="p">,</span>
+            <span class="n">model_config_key</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">model_config_key</span><span class="p">,</span>
+            <span class="n">stream_tokens</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">stream_tokens</span><span class="p">,</span>
+            <span class="n">agent_config</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">agent_config</span><span class="p">,</span>
+            <span class="n">recursion_limit</span><span class="o">=</span><span class="n">stream_input</span><span class="o">.</span><span class="n">recursion_limit</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">aclosing</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">StreamChunk</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ChatMessage</span><span class="p">):</span>
+                    <span class="n">message</span><span class="o">.</span><span class="n">thread_id</span> <span class="o">=</span> <span class="n">public_thread_id</span>
+                    <span class="k">yield</span> <span class="n">StreamChunk</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">sign_feedback_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">ModelAuthenticationError</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The model provider credentials were rejected&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Agent stream failed&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">StreamChunk</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">_safe_stream_error</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="message_generator">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.message_generator">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">message_generator</span><span class="p">(</span>
+    <span class="n">stream_input</span><span class="p">:</span> <span class="n">StreamInput</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">public_thread_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Encode typed events as SSE frames.&quot;&quot;&quot;</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aclosing</span><span class="p">(</span><span class="n">jsonl_message_generator</span><span class="p">(</span><span class="n">stream_input</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">public_thread_id</span><span class="p">))</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;data: </span><span class="si">{</span><span class="n">chunk</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">yield</span> <span class="s2">&quot;data: [DONE]</span><span class="se">\n\n</span><span class="s2">&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sse_response_example</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Server Sent Event Response&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;text/event-stream&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;example&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s2">&quot;data: {&#39;type&#39;: &#39;token&#39;, &#39;content&#39;: &#39;Hello&#39;}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;data: {&#39;type&#39;: &#39;token&#39;, &#39;content&#39;: &#39; World&#39;}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;data: [DONE]</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="setup_logging">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.setup_logging">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure application logging to use loguru.&quot;&quot;&quot;</span>
+    <span class="c1"># Configure logging once and redirect standard-library logging to loguru.</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">InterceptHandler</span><span class="p">()],</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Configure the root logger with this handler.</span>
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">InterceptHandler</span><span class="p">()]</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
+
+    <span class="c1"># Configure uvicorn and related loggers.</span>
+    <span class="k">for</span> <span class="n">logger_name</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;uvicorn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uvicorn.access&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uvicorn.error&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uvicorn.asgi&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;watchfiles&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;watchfiles.main&quot;</span><span class="p">,</span>
+    <span class="p">]:</span>
+        <span class="n">uvicorn_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
+        <span class="n">uvicorn_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">InterceptHandler</span><span class="p">()]</span>
+        <span class="n">uvicorn_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="n">uvicorn_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Reduce selected logger output in production.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">is_dev</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;uvicorn.access&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;asyncio&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;fastapi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+    <span class="c1"># Suppress LangChain beta warnings.</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">LangChainBetaWarning</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

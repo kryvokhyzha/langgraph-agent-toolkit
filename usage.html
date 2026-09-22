@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage Guide &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/usage.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Choose an agent integration" href="integrations.html" />
+    <link rel="prev" title="Environment Setup" href="environment_setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#connect-to-a-running-service">Connect to a running service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-and-memory-identity">Authentication and memory identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-the-http-api">Call the HTTP API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-the-synchronous-client">Use the synchronous client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stream-responses">Stream responses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-and-change-history">Read and change history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interpret-metadata-and-failures">Interpret metadata and failures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resume-a-conversation-in-the-ui">Resume a conversation in the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#register-a-custom-agent">Register a custom agent</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage Guide</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/usage.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage-guide">
+<h1>Usage Guide<a class="headerlink" href="#usage-guide" title="Link to this heading"></a></h1>
+<p>Start the service with <a class="reference internal" href="quickstart.html"><span class="doc">Run your first agent</span></a>. Use <a class="reference internal" href="installation.html"><span class="doc">Installation Options</span></a> to select
+optional dependencies. Use <a class="reference internal" href="environment_setup.html"><span class="doc">Environment Setup</span></a> for model and database
+configuration. This guide covers the toolkit HTTP API and <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code>.</p>
+<section id="connect-to-a-running-service">
+<h2>Connect to a running service<a class="headerlink" href="#connect-to-a-running-service" title="Link to this heading"></a></h2>
+<p>The API listens on port 8080 by default. Use <code class="docutils literal notranslate"><span class="pre">http://localhost:8080</span></code> from
+the same computer. Use the service’s HTTPS address from another computer.
+The interactive API reference is at <code class="docutils literal notranslate"><span class="pre">/docs</span></code>.</p>
+<p>Set these variables in the shell that runs the examples. Replace the secret
+with the service’s configured bearer token:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_API_URL</span><span class="o">=</span>http://localhost:8080
+<span class="nb">export</span><span class="w"> </span><span class="nv">AUTH_SECRET</span><span class="o">=</span>replace-with-your-deployment-secret
+</pre></div>
+</div>
+<p>Check readiness, then read the available agent names:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_API_URL</span><span class="s2">/health/ready&quot;</span>
+curl<span class="w"> </span>--fail-with-body<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_API_URL</span><span class="s2">/info&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">/health/ready</span></code> is public. <code class="docutils literal notranslate"><span class="pre">/info</span></code> requires authentication. It returns
+<code class="docutils literal notranslate"><span class="pre">agents</span></code> and <code class="docutils literal notranslate"><span class="pre">default_agent</span></code>. It does not list model configurations.
+Use an agent’s <code class="docutils literal notranslate"><span class="pre">key</span></code> in request paths. The examples below use the built-in
+<code class="docutils literal notranslate"><span class="pre">create-agent</span></code>. Replace this value if your service loads another agent:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_ID</span><span class="o">=</span>create-agent
+</pre></div>
+</div>
+</section>
+<section id="authentication-and-memory-identity">
+<h2>Authentication and memory identity<a class="headerlink" href="#authentication-and-memory-identity" title="Link to this heading"></a></h2>
+<p>For one deployment per client application, keep the default
+<code class="docutils literal notranslate"><span class="pre">AUTH_MODE=trusted</span></code> and one <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code>. <code class="docutils literal notranslate"><span class="pre">user_id</span></code> is optional.
+The trusted application can supply it for a user’s memory identity. If it
+omits the field, the service uses <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code> (default: <code class="docutils literal notranslate"><span class="pre">service</span></code>).
+Keep the shared token in that application.
+Anyone who has this token can select user identities in that deployment.</p>
+<p>The examples below assume trusted mode and use <code class="docutils literal notranslate"><span class="pre">user_id=&quot;user-1&quot;</span></code>.
+In <code class="docutils literal notranslate"><span class="pre">AUTH_MODE=token</span></code>, the server derives the identity from the bearer token.
+Omit <code class="docutils literal notranslate"><span class="pre">user_id</span></code> or supply the same identity. A shared token in token mode
+identifies <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code>, which defaults to <code class="docutils literal notranslate"><span class="pre">service</span></code>. It does
+not authorize other user IDs. See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a> for both authentication
+modes and existing-data migration.</p>
+<p>Use the two memory identifiers for different purposes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">thread_id</span></code> selects one conversation and its short-term checkpoint state.
+Omit it on an invocation to create a new public thread ID. Save the returned
+<code class="docutils literal notranslate"><span class="pre">thread_id</span></code> and send it on later requests for that conversation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_id</span></code> is the stable user identity for long-term memory across threads.
+The agent must have a store and logic to read and write that memory.
+Supplying this value alone does not create long-term memory.</p></li>
+</ul>
+<p>The API scopes checkpoints by user, agent, and public thread ID. Use all three
+consistently for invocation, streaming, and history requests. Reusing a public
+thread ID for a different user or agent selects different checkpoint state.
+In trusted mode, an omitted <code class="docutils literal notranslate"><span class="pre">user_id</span></code> selects <code class="docutils literal notranslate"><span class="pre">AUTH_SERVICE_USER_ID</span></code>.</p>
+<p>Configure SQLite or PostgreSQL for durable checkpoints. If an agent has no
+checkpointer and <code class="docutils literal notranslate"><span class="pre">MEMORY_BACKEND</span></code> is unset, the service uses process-local
+memory. It is lost when the worker restarts. Use <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> and
+<a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> before adding workers.
+See <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a> for the distinction between checkpoints and stores.</p>
+</section>
+<section id="call-the-http-api">
+<h2>Call the HTTP API<a class="headerlink" href="#call-the-http-api" title="Link to this heading"></a></h2>
+<p>Send the agent input inside the <code class="docutils literal notranslate"><span class="pre">input</span></code> object. Identity and model selection
+fields belong at the top level:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_API_URL</span><span class="s2">/</span><span class="nv">$AGENT_ID</span><span class="s2">/invoke&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;:{&quot;message&quot;:&quot;Hello&quot;},&quot;thread_id&quot;:&quot;conversation-1&quot;,&quot;user_id&quot;:&quot;user-1&quot;}&#39;</span>
+</pre></div>
+</div>
+<p>The response is a <code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code>. It includes <code class="docutils literal notranslate"><span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">content</span></code>,
+<code class="docutils literal notranslate"><span class="pre">thread_id</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_id</span></code>. The <code class="docutils literal notranslate"><span class="pre">run_id</span></code> identifies this agent run and can
+be used for feedback. It is not a conversation identifier.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">/invoke</span></code>, <code class="docutils literal notranslate"><span class="pre">/stream</span></code>, or <code class="docutils literal notranslate"><span class="pre">/stream/jsonl</span></code> without an agent prefix to
+select the service’s default agent. The corresponding history and feedback
+routes also have default-agent aliases.</p>
+<p>To select a configured model, add <code class="docutils literal notranslate"><span class="pre">model_config_key</span></code> to the request. The key
+must refer to your <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code> configuration. <code class="docutils literal notranslate"><span class="pre">model_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">model_provider</span></code> are also request fields. The selected agent must support
+runtime model selection. A custom graph can use a fixed model. Do not put
+identity or checkpoint fields in <code class="docutils literal notranslate"><span class="pre">agent_config</span></code>; the API rejects them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">input.message</span></code> can also contain LangChain content blocks. For example, use
+this helper with an open client and a real image URL:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">describe_image</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">image_url</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Describe this image.&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">image_url</span><span class="p">},</span>
+        <span class="p">]},</span>
+        <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>The selected agent and model must support the content type. URL accessibility,
+file size, and model input limits remain provider requirements. Base64 media
+blocks also require <code class="docutils literal notranslate"><span class="pre">mime_type</span></code>. <code class="docutils literal notranslate"><span class="pre">MULTIMODAL_MAX_ATTACHMENTS</span></code> can limit the
+number of attachments in one request.</p>
+</section>
+<section id="use-the-synchronous-client">
+<h2>Use the synchronous client<a class="headerlink" href="#use-the-synchronous-client" title="Link to this heading"></a></h2>
+<p>Import <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code> from the installed package. Supply the full service URL,
+including its port. The constructor reads <code class="docutils literal notranslate"><span class="pre">/info</span></code> by default and selects the
+service’s default agent when <code class="docutils literal notranslate"><span class="pre">agent</span></code> is omitted.</p>
+<p>Use a context manager to close the client’s HTTP connections:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span><span class="p">,</span> <span class="n">AgentClientError</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">AgentClient</span><span class="p">(</span>
+        <span class="n">base_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AGENT_API_URL&quot;</span><span class="p">],</span>
+        <span class="n">agent</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AGENT_ID&quot;</span><span class="p">],</span>
+        <span class="n">auth_secret</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AUTH_SECRET&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;My preferred language is English.&quot;</span><span class="p">},</span> <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Conversation:&quot;</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">thread_id</span><span class="p">)</span>
+
+        <span class="n">second</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Which language did I request?&quot;</span><span class="p">},</span>
+            <span class="n">thread_id</span><span class="o">=</span><span class="n">first</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">second</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Run:&quot;</span><span class="p">,</span> <span class="n">second</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">,</span> <span class="n">second</span><span class="o">.</span><span class="n">usage_metadata</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">AgentClientError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The request failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">AgentClient</span></code> reads <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> from the process environment when
+<code class="docutils literal notranslate"><span class="pre">auth_secret</span></code> is omitted. It does not load your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file. Set environment
+variables before starting the client or load that file in your application.
+Keep a shared client open for the lifetime of your application. Do not create
+a new client for each request.</p>
+</section>
+<section id="stream-responses">
+<h2>Stream responses<a class="headerlink" href="#stream-responses" title="Link to this heading"></a></h2>
+<p>The SSE endpoint emits frames with these payloads:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">type=&quot;token&quot;</span></code>: incremental text.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type=&quot;message&quot;</span></code>: a complete <code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code>. Tool and custom messages can
+occur before the final assistant message.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type=&quot;error&quot;</span></code>: a failed run. The content is an error description.</p></li>
+</ul>
+<p>A normal SSE stream ends with <code class="docutils literal notranslate"><span class="pre">data:</span> <span class="pre">[DONE]</span></code>. JSON Lines uses the same typed
+payloads, one JSON object per line, without a <code class="docutils literal notranslate"><span class="pre">data:</span></code> prefix or completion
+marker. HTTP 200 alone does not establish that a stream succeeded.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">curl</span> <span class="pre">-N</span></code> to print frames as they arrive:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>-N<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_API_URL</span><span class="s2">/</span><span class="nv">$AGENT_ID</span><span class="s2">/stream&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;input&quot;:{&quot;message&quot;:&quot;Continue our conversation.&quot;},&quot;thread_id&quot;:&quot;conversation-1&quot;,&quot;user_id&quot;:&quot;user-1&quot;,&quot;stream_tokens&quot;:true}&#39;</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">/stream</span></code> with <code class="docutils literal notranslate"><span class="pre">/stream/jsonl</span></code> for JSON Lines. Set
+<code class="docutils literal notranslate"><span class="pre">stream_tokens=false</span></code> to receive complete messages without token events.
+Consume error events even when the HTTP request succeeds.</p>
+<p>The client returns <code class="docutils literal notranslate"><span class="pre">str</span></code> for tokens and <code class="docutils literal notranslate"><span class="pre">ChatMessage</span></code> for complete
+messages. It raises <code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> for error events, invalid frames, HTTP
+failures, and an SSE stream that ends without its completion marker. JSON Lines
+does not have a completion marker; a clean end alone cannot prove that the
+graph finished. A final response and your application contract must establish
+completion. Token events and complete messages can contain the same text.
+Do not append both to the final answer.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">get_info=False</span></code> and an explicit agent for an asynchronous client. This
+avoids the constructor’s synchronous <code class="docutils literal notranslate"><span class="pre">/info</span></code> request:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">aclosing</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span><span class="p">,</span> <span class="n">AgentClientError</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">AgentClient</span><span class="p">(</span>
+        <span class="n">base_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AGENT_API_URL&quot;</span><span class="p">],</span>
+        <span class="n">agent</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AGENT_ID&quot;</span><span class="p">],</span>
+        <span class="n">auth_secret</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AUTH_SECRET&quot;</span><span class="p">],</span>
+        <span class="n">get_info</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aclosing</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">astream</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Give me a short greeting.&quot;</span><span class="p">},</span>
+                <span class="n">thread_id</span><span class="o">=</span><span class="s2">&quot;conversation-2&quot;</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span>
+            <span class="p">))</span> <span class="k">as</span> <span class="n">events</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Message:&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Conversation:&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">thread_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">AgentClientError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The stream failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">stream()</span></code> for synchronous SSE. Use <code class="docutils literal notranslate"><span class="pre">stream_jsonl()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">astream_jsonl()</span></code> for JSON Lines. Close a stream iterator if you stop reading
+early. Use <code class="docutils literal notranslate"><span class="pre">contextlib.closing</span></code> for synchronous streams and
+<code class="docutils literal notranslate"><span class="pre">contextlib.aclosing</span></code> for asynchronous streams.</p>
+<p>An async client must stay in one event loop until it closes. <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">with</span></code>
+closes its owned sync and async HTTP clients. If you inject <code class="docutils literal notranslate"><span class="pre">http_client</span></code> or
+<code class="docutils literal notranslate"><span class="pre">async_http_client</span></code>, your application must close that injected client.
+The <code class="docutils literal notranslate"><span class="pre">stream_timeout</span></code> read limit measures idle time between reads. See
+<a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for timeout and connection settings.</p>
+</section>
+<section id="read-and-change-history">
+<h2>Read and change history<a class="headerlink" href="#read-and-change-history" title="Link to this heading"></a></h2>
+<p>History operations require <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>. They read or change short-term
+checkpoints only. Supply the same agent and user that own the conversation.</p>
+<p>Read a page through HTTP:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>--get<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_API_URL</span><span class="s2">/</span><span class="nv">$AGENT_ID</span><span class="s2">/history&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="si">${</span><span class="nv">AUTH_SECRET</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;thread_id=conversation-1&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;user_id=user-1&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;limit=100&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-urlencode<span class="w"> </span><span class="s1">&#39;offset=0&#39;</span>
+</pre></div>
+</div>
+<p>The response contains <code class="docutils literal notranslate"><span class="pre">messages</span></code>, <code class="docutils literal notranslate"><span class="pre">total</span></code>, and <code class="docutils literal notranslate"><span class="pre">next_offset</span></code>. Read the
+next page with <code class="docutils literal notranslate"><span class="pre">offset=next_offset</span></code> until that value is null. The default
+page has at most 100 messages. The requested limit must be from 1 to 1000.
+<code class="docutils literal notranslate"><span class="pre">HISTORY_MAX_PAGE_SIZE</span></code> can set a smaller server limit.</p>
+<p>With an open <code class="docutils literal notranslate"><span class="pre">AgentClient</span></code>, use these methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">read_conversation</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_history</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">next_offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">next_offset</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_conversation</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">clear_history</span><span class="p">(</span><span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="s2">&quot;user-1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">clear_history()</span></code> deletes all checkpoint versions for that thread. It does
+not delete the user’s long-term store records. <code class="docutils literal notranslate"><span class="pre">add_messages()</span></code> appends
+<code class="docutils literal notranslate"><span class="pre">MessageInput</span></code> values or dictionaries with <code class="docutils literal notranslate"><span class="pre">type</span></code> and <code class="docutils literal notranslate"><span class="pre">content</span></code>. It does
+not run the agent. Use <code class="docutils literal notranslate"><span class="pre">aget_history()</span></code>, <code class="docutils literal notranslate"><span class="pre">aclear_history()</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">aadd_messages()</span></code> for asynchronous calls. See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a> before changing
+an existing deployment’s checkpoint identifiers.</p>
+</section>
+<section id="interpret-metadata-and-failures">
+<h2>Interpret metadata and failures<a class="headerlink" href="#interpret-metadata-and-failures" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">usage_metadata</span></code> contains provider token counts when available. <code class="docutils literal notranslate"><span class="pre">None</span></code>
+means that counts are unavailable. It does not mean zero tokens. These counts
+belong to the returned model message; they are not a total for every model call
+in a graph with several steps.</p>
+<p>Inspect <code class="docutils literal notranslate"><span class="pre">response_metadata</span></code> when the provider supplies completion details.
+For example, <code class="docutils literal notranslate"><span class="pre">finish_reason=&quot;length&quot;</span></code> indicates a response that reached its
+output limit. OpenAI and Azure refusals preserve their text in
+<code class="docutils literal notranslate"><span class="pre">response_metadata[&quot;refusal&quot;]</span></code>. An empty message with <code class="docutils literal notranslate"><span class="pre">tool_calls</span></code> can be a
+valid intermediate message. Do not treat every empty content field as a
+transport failure.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">create_feedback()</span></code> or <code class="docutils literal notranslate"><span class="pre">acreate_feedback()</span></code> to record a score for a
+returned <code class="docutils literal notranslate"><span class="pre">run_id</span></code>. Supply <code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">score</span></code>, and the same <code class="docutils literal notranslate"><span class="pre">user_id</span></code>. The
+selected agent’s observability backend receives the feedback. Token users must
+also pass <code class="docutils literal notranslate"><span class="pre">feedback_token=reply.feedback_token</span></code> from the corresponding run
+response. Use the same agent as the original request. The server requires a
+separate <code class="docutils literal notranslate"><span class="pre">FEEDBACK_SIGNING_SECRET</span></code> for these users. Trusted backend feedback
+keeps its existing request shape. See <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a> for the upgrade and
+<a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> for Langfuse configuration.</p>
+<p>Before a response starts, the API uses HTTP status codes. Its JSON body contains
+<code class="docutils literal notranslate"><span class="pre">detail</span></code> and can include <code class="docutils literal notranslate"><span class="pre">error_code</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 85.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Status</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>401 / 403</p></td>
+<td><p>The service token is invalid, or the requested user does not match it.</p></td>
+</tr>
+<tr class="row-odd"><td><p>409</p></td>
+<td><p>The conversation is busy or its queue wait expired.</p></td>
+</tr>
+<tr class="row-even"><td><p>413 / 422</p></td>
+<td><p>The request exceeds a configured size limit or fails validation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>429</p></td>
+<td><p>The model provider rate limit was exceeded.</p></td>
+</tr>
+<tr class="row-even"><td><p>503</p></td>
+<td><p>The worker is full, the database or provider is unavailable, or the
+provider rejected its configured credentials. Use <code class="docutils literal notranslate"><span class="pre">error_code</span></code> when
+present to distinguish these cases.</p></td>
+</tr>
+<tr class="row-odd"><td><p>504</p></td>
+<td><p>The request deadline or model timeout expired.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">service_busy</span></code> means the worker admission limit was reached.
+<code class="docutils literal notranslate"><span class="pre">model_authentication_failed</span></code> means the provider rejected the server’s
+configured credentials. Changing the client’s service token does not fix
+that provider error.</p>
+<p>After stream headers are sent, failures use an error event. Handle
+<code class="docutils literal notranslate"><span class="pre">AgentClientError</span></code> and retain partial text separately from completed answers.
+The client does not automatically retry agent requests. A failed request can
+already have run tools or saved checkpoints. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for retry,
+admission, and recovery behavior.</p>
+<p>For HTTP failures, <code class="docutils literal notranslate"><span class="pre">AgentClientError.status_code</span></code> contains the response status.
+<code class="docutils literal notranslate"><span class="pre">error_code</span></code> contains a valid service error code when available.
+<code class="docutils literal notranslate"><span class="pre">retry_after</span></code> preserves the <code class="docutils literal notranslate"><span class="pre">Retry-After</span></code> header as a string. The header can
+contain seconds or an HTTP date. These attributes are <code class="docutils literal notranslate"><span class="pre">None</span></code> when unavailable.
+Errors received after streaming starts do not imply a new HTTP status.
+Use this information to handle overload or configuration failures. Do not
+automatically replay a run that may have performed a tool action.</p>
+</section>
+<section id="resume-a-conversation-in-the-ui">
+<h2>Resume a conversation in the UI<a class="headerlink" href="#resume-a-conversation-in-the-ui" title="Link to this heading"></a></h2>
+<p>The Streamlit URL contains <code class="docutils literal notranslate"><span class="pre">agent</span></code> and <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>. The page selects and
+validates the agent before reading history. New Chat creates a new thread.
+Changing the agent starts a new conversation. Opening another conversation
+URL in an existing session replaces the displayed history.</p>
+<p>Share/resume chat uses the current app URL and keeps its deployment path and
+HTTP scheme. The link does not contain a bearer token or user ID. Opening it
+does not grant access to another user. The API still applies authentication
+and conversation ownership. The UI uses its configured user identity; it does
+not provide a public multiuser login system.</p>
+</section>
+<section id="register-a-custom-agent">
+<h2>Register a custom agent<a class="headerlink" href="#register-a-custom-agent" title="Link to this heading"></a></h2>
+<p>Create an importable Python module that exports an <code class="docutils literal notranslate"><span class="pre">Agent</span></code> or a compiled
+LangGraph graph. This deterministic example calls no model or external service.
+Create an empty <code class="docutils literal notranslate"><span class="pre">my_app/__init__.py</span></code>. Put this code in <code class="docutils literal notranslate"><span class="pre">my_app/agent.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.graph</span><span class="w"> </span><span class="kn">import</span> <span class="n">END</span><span class="p">,</span> <span class="n">START</span><span class="p">,</span> <span class="n">MessagesState</span><span class="p">,</span> <span class="n">StateGraph</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reply</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">MessagesState</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s2">&quot;The custom agent is running.&quot;</span><span class="p">)]}</span>
+
+
+<span class="n">builder</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">MessagesState</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;reply&quot;</span><span class="p">,</span> <span class="n">reply</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">START</span><span class="p">,</span> <span class="s2">&quot;reply&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;reply&quot;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;support-agent&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A deterministic custom agent example.&quot;</span><span class="p">,</span>
+    <span class="n">graph</span><span class="o">=</span><span class="n">builder</span><span class="o">.</span><span class="n">compile</span><span class="p">(),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The service puts request messages in <code class="docutils literal notranslate"><span class="pre">state[&quot;messages&quot;]</span></code>. Each node returns
+new messages under the same key. <code class="docutils literal notranslate"><span class="pre">MessagesState</span></code> adds them to the conversation.
+The service assigns its checkpointer when this graph loads.</p>
+<p>Set the import string and registered agent name in the service environment:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">AGENT_PATHS</span><span class="o">=</span><span class="s">[&quot;my_app.agent:agent&quot;]</span>
+<span class="na">DEFAULT_AGENT</span><span class="o">=</span><span class="s">support-agent</span>
+</pre></div>
+</div>
+<p>Run the service from the directory that contains <code class="docutils literal notranslate"><span class="pre">my_app</span></code> or install
+<code class="docutils literal notranslate"><span class="pre">my_app</span></code> as a package. The source file does not need to be inside the toolkit.
+For a custom image, copy or install <code class="docutils literal notranslate"><span class="pre">my_app</span></code> into the image too. The standard
+API Dockerfile copies only the toolkit package. Restart the service after
+changing <code class="docutils literal notranslate"><span class="pre">AGENT_PATHS</span></code>. This example exposes <code class="docutils literal notranslate"><span class="pre">/support-agent/invoke</span></code>.</p>
+<p>Supply <code class="docutils literal notranslate"><span class="pre">Agent.graph_factory</span></code> when the service must rebuild concrete models
+or tools for each lifespan. Keep application-owned stores and injected clients
+open while their graphs run. Do not change <code class="docutils literal notranslate"><span class="pre">core/settings.py</span></code> to register
+agents.</p>
+<p>For a model that calls tools, see the existing
+<a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/blueprints/create_agent/agent.py">native create_agent blueprint</a>.
+Its <a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/agents/blueprints/create_agent/_shared.py">shared graph builder</a>
+shows model setup, tools, and middleware.</p>
+<p>Choose a graph pattern with <a class="reference internal" href="integrations.html"><span class="doc">Choose an agent integration</span></a>. See <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a> for MCP tools
+and <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a> for Deep Agents. Use <a class="reference internal" href="deployment.html"><span class="doc">Deployment and Recovery</span></a> for Uvicorn,
+Gunicorn, container settings, and worker recovery. Use <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for tests
+that need no external model and <a class="reference internal" href="live_llm_testing.html"><span class="doc">Real LLM verification</span></a> for an explicit live
+provider check.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="environment_setup.html" class="btn btn-neutral float-left" title="Environment Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="integrations.html" class="btn btn-neutral float-right" title="Choose an agent integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

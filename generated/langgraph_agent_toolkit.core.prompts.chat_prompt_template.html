@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.prompts.chat_prompt_template module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.prompts.prompt_manager module" href="langgraph_agent_toolkit.core.prompts.prompt_manager.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.core.prompts package" href="langgraph_agent_toolkit.core.prompts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.prompts.html">langgraph_agent_toolkit.core.prompts package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.prompts.chat_prompt_template module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.prompts.chat_prompt_template.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core.prompts.chat_prompt_template">
+<span id="langgraph-agent-toolkit-core-prompts-chat-prompt-template-module"></span><h1>langgraph_agent_toolkit.core.prompts.chat_prompt_template module<a class="headerlink" href="#module-langgraph_agent_toolkit.core.prompts.chat_prompt_template" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.prompts.chat_prompt_template.</span></span><span class="sig-name descname"><span class="pre">ObservabilityChatPromptTemplate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_at_runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f-string'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L68-L598"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ChatPromptTemplate</span></code></p>
+<p>Chat prompt template that loads prompts from observability platforms.</p>
+<p>Initialize ObservabilityChatPromptTemplate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>Sequence</em><em>[</em><em>BaseMessagePromptTemplate</em><em> | </em><em>BaseMessage</em><em> | </em><em>BaseChatPromptTemplate</em><em> | </em><em>tuple</em><em>[</em><em>str</em><em> | </em><em>type</em><em>, </em><em>str</em><em> | </em><em>Sequence</em><em>[</em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>object</em><em>]</em><em>] </em><em>| </em><em>str</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>prompt_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_version</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_label</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>load_at_runtime</strong> (<em>bool</em>)</p></li>
+<li><p><strong>observability_platform</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform" title="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform"><em>BaseObservabilityPlatform</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>observability_backend</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ObservabilityBackend" title="langgraph_agent_toolkit.core.observability.types.ObservabilityBackend"><em>ObservabilityBackend</em></a><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>cache_ttl_seconds</strong> (<em>int</em>)</p></li>
+<li><p><strong>template_format</strong> (<em>Literal</em><em>[</em><em>'f-string'</em><em>, </em><em>'mustache'</em><em>, </em><em>'jinja2'</em><em>]</em>)</p></li>
+<li><p><strong>input_variables</strong> (<em>List</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>partial_variables</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>optional_variables</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>input_types</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>output_parser</strong> (<em>BaseOutputParser</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>tags</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>validate_template</strong> (<em>bool</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True,</span> <span class="pre">'extra':</span> <span class="pre">'allow',</span> <span class="pre">'protected_namespaces':</span> <span class="pre">()}</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_at_runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f-string'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partial_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L95-L188"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize ObservabilityChatPromptTemplate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<em>Sequence</em><em>[</em><em>BaseMessagePromptTemplate</em><em> | </em><em>BaseMessage</em><em> | </em><em>BaseChatPromptTemplate</em><em> | </em><em>tuple</em><em>[</em><em>str</em><em> | </em><em>type</em><em>, </em><em>str</em><em> | </em><em>Sequence</em><em>[</em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>object</em><em>]</em><em>] </em><em>| </em><em>str</em><em> | </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>prompt_name</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_version</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_label</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>load_at_runtime</strong> (<em>bool</em>)</p></li>
+<li><p><strong>observability_platform</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform" title="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform"><em>BaseObservabilityPlatform</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>observability_backend</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ObservabilityBackend" title="langgraph_agent_toolkit.core.observability.types.ObservabilityBackend"><em>ObservabilityBackend</em></a><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>cache_ttl_seconds</strong> (<em>int</em>)</p></li>
+<li><p><strong>template_format</strong> (<em>Literal</em><em>[</em><em>'f-string'</em><em>, </em><em>'mustache'</em><em>, </em><em>'jinja2'</em><em>]</em>)</p></li>
+<li><p><strong>input_variables</strong> (<em>List</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>partial_variables</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_name">
+<span class="sig-name descname"><span class="pre">prompt_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_version">
+<span class="sig-name descname"><span class="pre">prompt_version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_label">
+<span class="sig-name descname"><span class="pre">prompt_label</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.prompt_label" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.load_at_runtime">
+<span class="sig-name descname"><span class="pre">load_at_runtime</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.load_at_runtime" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.observability_backend">
+<span class="sig-name descname"><span class="pre">observability_backend</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ObservabilityBackend" title="langgraph_agent_toolkit.core.observability.types.ObservabilityBackend"><span class="pre">ObservabilityBackend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.observability_backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.cache_ttl_seconds">
+<span class="sig-name descname"><span class="pre">cache_ttl_seconds</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.cache_ttl_seconds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.template_format">
+<span class="sig-name descname"><span class="pre">template_format</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.template_format" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.observability_platform">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">observability_platform</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform" title="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform"><span class="pre">BaseObservabilityPlatform</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.observability_platform" title="Link to this definition"></a></dt>
+<dd><p>Get the observability platform.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>This function is meant to behave like a BaseModel method to initialize private attributes.</p>
+<p>It takes context as an argument since that’s what pydantic-core passes when calling it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<em>BaseModel</em>) – The BaseModel instance.</p></li>
+<li><p><strong>context</strong> (<em>Any</em>) – The context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.format_messages">
+<span class="sig-name descname"><span class="pre">format_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.format_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L450-L455"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.format_messages" title="Link to this definition"></a></dt>
+<dd><p>Format messages with standard partial and placeholder handling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>BaseMessage</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.aformat_messages">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">aformat_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.aformat_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L457-L460"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.aformat_messages" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>List</em>[<em>BaseMessage</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.invoke">
+<span class="sig-name descname"><span class="pre">invoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.invoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L462-L465"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.invoke" title="Link to this definition"></a></dt>
+<dd><p>Invoke the prompt with standard input validation and callbacks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>Any</em>)</p></li>
+<li><p><strong>config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>PromptValue</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.ainvoke">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ainvoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.ainvoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L467-L470"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.ainvoke" title="Link to this definition"></a></dt>
+<dd><p>Asynchronously invoke the prompt with standard callbacks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>Any</em>)</p></li>
+<li><p><strong>config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>PromptValue</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.partial">
+<span class="sig-name descname"><span class="pre">partial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.partial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L472-L478"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.partial" title="Link to this definition"></a></dt>
+<dd><p>Keep the remote backend when binding partial variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate" title="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate"><em>ObservabilityChatPromptTemplate</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_platform">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_observability_platform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_platform</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_at_runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.from_observability_platform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L480-L499"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_platform" title="Link to this definition"></a></dt>
+<dd><p>Create a chat prompt template from an observability platform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>observability_platform</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.base.html#langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform" title="langgraph_agent_toolkit.core.observability.base.BaseObservabilityPlatform"><em>BaseObservabilityPlatform</em></a>)</p></li>
+<li><p><strong>prompt_version</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_label</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>load_at_runtime</strong> (<em>bool</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate" title="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate"><em>ObservabilityChatPromptTemplate</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_backend">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_observability_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observability_backend</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_at_runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/prompts/chat_prompt_template.html#ObservabilityChatPromptTemplate.from_observability_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/prompts/chat_prompt_template.py#L501-L528"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate.from_observability_backend" title="Link to this definition"></a></dt>
+<dd><p>Create a chat prompt template from an observability backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>observability_backend</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.observability.types.html#langgraph_agent_toolkit.core.observability.types.ObservabilityBackend" title="langgraph_agent_toolkit.core.observability.types.ObservabilityBackend"><em>ObservabilityBackend</em></a><em> | </em><em>str</em>)</p></li>
+<li><p><strong>prompt_version</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>prompt_label</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>load_at_runtime</strong> (<em>bool</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate" title="langgraph_agent_toolkit.core.prompts.chat_prompt_template.ObservabilityChatPromptTemplate"><em>ObservabilityChatPromptTemplate</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.core.prompts.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.core.prompts package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.prompts.prompt_manager.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.prompts.prompt_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

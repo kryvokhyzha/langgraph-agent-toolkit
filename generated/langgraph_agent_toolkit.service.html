@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.service package &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.service.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=261ea15a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.service.admission module" href="langgraph_agent_toolkit.service.admission.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.schema.task_data module" href="langgraph_agent_toolkit.schema.task_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.service package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.service.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.service">
+<span id="langgraph-agent-toolkit-service-package"></span><h1>langgraph_agent_toolkit.service package<a class="headerlink" href="#module-langgraph_agent_toolkit.service" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html">langgraph_agent_toolkit.service.admission module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.ServiceBusyError"><code class="docutils literal notranslate"><span class="pre">ServiceBusyError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.ResponseSendTimeout"><code class="docutils literal notranslate"><span class="pre">ResponseSendTimeout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission"><code class="docutils literal notranslate"><span class="pre">RequestAdmission</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission.__init__"><code class="docutils literal notranslate"><span class="pre">RequestAdmission.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmission.acquire"><code class="docutils literal notranslate"><span class="pre">RequestAdmission.acquire()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmissionMiddleware"><code class="docutils literal notranslate"><span class="pre">RequestAdmissionMiddleware</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.admission.html#langgraph_agent_toolkit.service.admission.RequestAdmissionMiddleware.__init__"><code class="docutils literal notranslate"><span class="pre">RequestAdmissionMiddleware.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html">langgraph_agent_toolkit.service.auth module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.Principal"><code class="docutils literal notranslate"><span class="pre">Principal</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.Principal.user_id"><code class="docutils literal notranslate"><span class="pre">Principal.user_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.Principal.trusted"><code class="docutils literal notranslate"><span class="pre">Principal.trusted</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.Principal.__init__"><code class="docutils literal notranslate"><span class="pre">Principal.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.validate_auth_configuration"><code class="docutils literal notranslate"><span class="pre">validate_auth_configuration()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.authenticate"><code class="docutils literal notranslate"><span class="pre">authenticate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.storage_thread_id"><code class="docutils literal notranslate"><span class="pre">storage_thread_id()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.authenticated_user_id"><code class="docutils literal notranslate"><span class="pre">authenticated_user_id()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.conversation_identity"><code class="docutils literal notranslate"><span class="pre">conversation_identity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.auth.html#langgraph_agent_toolkit.service.auth.execution_input"><code class="docutils literal notranslate"><span class="pre">execution_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.blocking.html">langgraph_agent_toolkit.service.blocking module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.blocking.html#langgraph_agent_toolkit.service.blocking.BoundedBlockingExecutor"><code class="docutils literal notranslate"><span class="pre">BoundedBlockingExecutor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.blocking.html#langgraph_agent_toolkit.service.blocking.BoundedBlockingExecutor.__init__"><code class="docutils literal notranslate"><span class="pre">BoundedBlockingExecutor.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.blocking.html#langgraph_agent_toolkit.service.blocking.BoundedBlockingExecutor.run"><code class="docutils literal notranslate"><span class="pre">BoundedBlockingExecutor.run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.blocking.html#langgraph_agent_toolkit.service.blocking.BoundedBlockingExecutor.aclose"><code class="docutils literal notranslate"><span class="pre">BoundedBlockingExecutor.aclose()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.exception_handlers.html">langgraph_agent_toolkit.service.exception_handlers module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.exception_handlers.html#langgraph_agent_toolkit.service.exception_handlers.register_exception_handlers"><code class="docutils literal notranslate"><span class="pre">register_exception_handlers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html">langgraph_agent_toolkit.service.factory module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner"><code class="docutils literal notranslate"><span class="pre">ServiceRunner</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.__init__"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.run_uvicorn"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run_uvicorn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.run_gunicorn"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run_gunicorn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.run_aws_lambda"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run_aws_lambda()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.run_azure_functions"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run_azure_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.aclose"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.aclose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.factory.html#langgraph_agent_toolkit.service.factory.ServiceRunner.run"><code class="docutils literal notranslate"><span class="pre">ServiceRunner.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.feedback.html">langgraph_agent_toolkit.service.feedback module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.feedback.html#langgraph_agent_toolkit.service.feedback.sign_feedback_message"><code class="docutils literal notranslate"><span class="pre">sign_feedback_message()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.feedback.html#langgraph_agent_toolkit.service.feedback.authorize_feedback"><code class="docutils literal notranslate"><span class="pre">authorize_feedback()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.handler.html">langgraph_agent_toolkit.service.handler module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.handler.html#langgraph_agent_toolkit.service.handler.shutdown_observability"><code class="docutils literal notranslate"><span class="pre">shutdown_observability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.handler.html#langgraph_agent_toolkit.service.handler.lifespan"><code class="docutils literal notranslate"><span class="pre">lifespan()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.handler.html#langgraph_agent_toolkit.service.handler.custom_generate_unique_id"><code class="docutils literal notranslate"><span class="pre">custom_generate_unique_id()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.handler.html#langgraph_agent_toolkit.service.handler.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.middleware.html">langgraph_agent_toolkit.service.middleware module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.middleware.html#langgraph_agent_toolkit.service.middleware.RequestSizeLimitMiddleware"><code class="docutils literal notranslate"><span class="pre">RequestSizeLimitMiddleware</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.middleware.html#langgraph_agent_toolkit.service.middleware.RequestSizeLimitMiddleware.__init__"><code class="docutils literal notranslate"><span class="pre">RequestSizeLimitMiddleware.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.middleware.html#langgraph_agent_toolkit.service.middleware.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.middleware.html#langgraph_agent_toolkit.service.middleware.LoggingMiddleware.__init__"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.responses.html">langgraph_agent_toolkit.service.responses module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.responses.html#langgraph_agent_toolkit.service.responses.ClosingStreamingResponse"><code class="docutils literal notranslate"><span class="pre">ClosingStreamingResponse</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.responses.html#langgraph_agent_toolkit.service.responses.ClosingStreamingResponse.stream_response"><code class="docutils literal notranslate"><span class="pre">ClosingStreamingResponse.stream_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html">langgraph_agent_toolkit.service.routes module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.invoke"><code class="docutils literal notranslate"><span class="pre">invoke()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.stream"><code class="docutils literal notranslate"><span class="pre">stream()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.stream_jsonl"><code class="docutils literal notranslate"><span class="pre">stream_jsonl()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.feedback"><code class="docutils literal notranslate"><span class="pre">feedback()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.history"><code class="docutils literal notranslate"><span class="pre">history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.clear_history"><code class="docutils literal notranslate"><span class="pre">clear_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.add_messages"><code class="docutils literal notranslate"><span class="pre">add_messages()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.redirect_to_docs"><code class="docutils literal notranslate"><span class="pre">redirect_to_docs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.health_check"><code class="docutils literal notranslate"><span class="pre">health_check()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.liveness_probe"><code class="docutils literal notranslate"><span class="pre">liveness_probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.readiness_probe"><code class="docutils literal notranslate"><span class="pre">readiness_probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.startup_probe"><code class="docutils literal notranslate"><span class="pre">startup_probe()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.routes.html#langgraph_agent_toolkit.service.routes.db_health_check"><code class="docutils literal notranslate"><span class="pre">db_health_check()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html">langgraph_agent_toolkit.service.types module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html#langgraph_agent_toolkit.service.types.RunnerType"><code class="docutils literal notranslate"><span class="pre">RunnerType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html#langgraph_agent_toolkit.service.types.RunnerType.UVICORN"><code class="docutils literal notranslate"><span class="pre">RunnerType.UVICORN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html#langgraph_agent_toolkit.service.types.RunnerType.GUNICORN"><code class="docutils literal notranslate"><span class="pre">RunnerType.GUNICORN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html#langgraph_agent_toolkit.service.types.RunnerType.AWS_LAMBDA"><code class="docutils literal notranslate"><span class="pre">RunnerType.AWS_LAMBDA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.service.types.html#langgraph_agent_toolkit.service.types.RunnerType.AZURE_FUNCTIONS"><code class="docutils literal notranslate"><span class="pre">RunnerType.AZURE_FUNCTIONS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html">langgraph_agent_toolkit.service.utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.verify_bearer"><code class="docutils literal notranslate"><span class="pre">verify_bearer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_agent_executor"><code class="docutils literal notranslate"><span class="pre">get_agent_executor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_agent"><code class="docutils literal notranslate"><span class="pre">get_agent()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.get_all_agent_info"><code class="docutils literal notranslate"><span class="pre">get_all_agent_info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.jsonl_message_generator"><code class="docutils literal notranslate"><span class="pre">jsonl_message_generator()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.message_generator"><code class="docutils literal notranslate"><span class="pre">message_generator()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="langgraph_agent_toolkit.service.utils.html#langgraph_agent_toolkit.service.utils.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.schema.task_data.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.schema.task_data module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.service.admission.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.service.admission module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

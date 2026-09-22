@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dependency update review &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/dependency_updates.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=261ea15a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Related projects and source review" href="related_projects.html" />
+    <link rel="prev" title="Migrate to the current release" href="migration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dependency update review</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#changes-that-affect-this-package">Changes that affect this package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#langgraph">LangGraph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#langchain">LangChain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mcp-and-studio-compatibility">MCP and Studio compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deep-agents">Deep Agents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#langfuse">Langfuse</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-and-verify">Install and verify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-3-14-and-ci-follow-up">Python 3.14 and CI follow-up</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Dependency update review</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/dependency_updates.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dependency-update-review">
+<h1>Dependency update review<a class="headerlink" href="#dependency-update-review" title="Link to this heading"></a></h1>
+<p>Review date: 2026-09-12.</p>
+<p>This review uses stable releases from PyPI and the official release notes.
+It excludes pre-release and withdrawn versions.
+The tables record updates in implementation order. Later sections record
+additional updates required by optional integrations.</p>
+<table class="docutils align-default" id="id8">
+<caption><span class="caption-text">Reviewed dependency updates</span><a class="headerlink" href="#id8" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 52.9%" />
+<col style="width: 23.5%" />
+<col style="width: 23.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Before</p></th>
+<th class="head"><p>After</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph</span></code></p></td>
+<td><p>1.2.4</p></td>
+<td><p>1.2.11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-checkpoint</span></code></p></td>
+<td><p>4.1.1</p></td>
+<td><p>4.2.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-checkpoint-postgres</span></code></p></td>
+<td><p>3.1.0</p></td>
+<td><p>3.1.2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-checkpoint-sqlite</span></code></p></td>
+<td><p>3.1.0</p></td>
+<td><p>3.1.1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-sdk</span></code></p></td>
+<td><p>0.4.2</p></td>
+<td><p>0.4.4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langchain</span></code></p></td>
+<td><p>1.3.4</p></td>
+<td><p>1.4.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langchain-core</span></code></p></td>
+<td><p>1.4.2</p></td>
+<td><p>1.6.3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langchain-openai</span></code></p></td>
+<td><p>1.2.2</p></td>
+<td><p>1.6.2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">openai</span></code></p></td>
+<td><p>2.41.1</p></td>
+<td><p>3.13.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langfuse</span></code></p></td>
+<td><p>4.7.1</p></td>
+<td><p>4.15.2</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">langchain-community==0.4.2</span></code> and <code class="docutils literal notranslate"><span class="pre">langgraph-prebuilt==1.1.0</span></code> remain unchanged.
+They are the latest stable versions at the review date.
+This update does not upgrade all provider integrations or all transitive packages.
+The OpenAI SDK update is required by the selected OpenAI integration.</p>
+<p>The test suite still reports upstream deprecations for <code class="docutils literal notranslate"><span class="pre">langchain-community</span></code>
+and the supervisor package’s use of <code class="docutils literal notranslate"><span class="pre">create_react_agent</span></code>. The current package
+ranges retain these supported APIs. A future LangGraph major upgrade requires
+another compatibility review. Langfuse SDK v4 also warns about legacy trace I/O;
+the adapter retains it for server v3 consumers and excludes SDK v5.</p>
+<p>The release metadata is available from
+<a class="reference external" href="https://pypi.org/project/langgraph/1.2.11/">LangGraph on PyPI</a>,
+<a class="reference external" href="https://pypi.org/project/langchain/1.4.0/">LangChain on PyPI</a>,
+<a class="reference external" href="https://pypi.org/project/langchain-core/1.6.3/">LangChain Core on PyPI</a>, and
+<a class="reference external" href="https://pypi.org/project/langfuse/4.15.2/">Langfuse on PyPI</a>.</p>
+<section id="changes-that-affect-this-package">
+<h2>Changes that affect this package<a class="headerlink" href="#changes-that-affect-this-package" title="Link to this heading"></a></h2>
+<section id="langgraph">
+<h3>LangGraph<a class="headerlink" href="#langgraph" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Version 1.2.6 fixes checkpoint namespace inheritance in nested subgraphs.
+It also cancels active subgraphs when a v3 stream stops.
+See the <a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.6">1.2.6 release notes</a>.</p></li>
+<li><p>Versions 1.2.5 through 1.2.9 fix several <code class="docutils literal notranslate"><span class="pre">DeltaChannel</span></code> state-update cases.
+These include new threads, overwrite snapshots, and state counters.
+Version 1.2.11 adds <code class="docutils literal notranslate"><span class="pre">trace_policy</span></code> to <code class="docutils literal notranslate"><span class="pre">add_node</span></code>.
+See the <a class="reference external" href="https://github.com/langchain-ai/langgraph/releases">LangGraph release notes</a>.</p></li>
+<li><p>The PostgreSQL and SQLite patches match checkpoint namespaces at segment
+boundaries. The PostgreSQL patch also fixes delta-history seed lookup.
+Checkpoint 4.2.0 adds optional <code class="docutils literal notranslate"><span class="pre">omit_expired</span></code> reads.
+See the <a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointsqlite%3D%3D3.1.1">SQLite 3.1.1 release</a>
+and the <a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointpostgres%3D%3D3.1.2">PostgreSQL 3.1.2 release</a>.</p></li>
+</ul>
+<p>The toolkit keeps its current streaming API.
+The dependency update does not enable v3 streaming or <code class="docutils literal notranslate"><span class="pre">omit_expired</span></code>.
+The PostgreSQL 3.1.0 and 3.1.2 schema migration lists are identical.
+Keep a database backup before each deployment.
+Use the checkpoint migration guide for conversation ownership changes.</p>
+</section>
+<section id="langchain">
+<h3>LangChain<a class="headerlink" href="#langchain" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Version 1.3.14 limits tool retries to retryable errors.
+See the <a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.3.14">1.3.14 release notes</a>.</p></li>
+<li><p>Version 1.3.15 fixes approval gates that could fail open.
+It clears stale structured responses between saved turns.
+It preserves history when summarization fails.
+It also fixes orphaned tool calls and middleware control flow.
+These fixes affect the built-in <code class="docutils literal notranslate"><span class="pre">create_agent</span></code> agents.
+See the <a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.3.15">1.3.15 release notes</a>.</p></li>
+<li><p>Version 1.4.0 adds <code class="docutils literal notranslate"><span class="pre">langchain.mcp</span></code> and <code class="docutils literal notranslate"><span class="pre">MCPAdapter</span></code>.
+It reduces middleware trace input work and fixes model tool routing.
+The toolkit’s optional <code class="docutils literal notranslate"><span class="pre">mcp</span></code> extra enables this integration.
+Operators select servers through <code class="docutils literal notranslate"><span class="pre">MCP_SERVERS</span></code>.
+See the <a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.4.0">1.4.0 release notes</a>.</p></li>
+<li><p>Core 1.6.0 adds standard model errors and fixes strict tool schemas.
+Core 1.6.3 permits gateway responses to set model and provider trace metadata.
+See the <a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.0">Core 1.6.0 release</a>
+and the <a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.3">Core 1.6.3 release</a>.</p></li>
+</ul>
+</section>
+<section id="mcp-and-studio-compatibility">
+<h3>MCP and Studio compatibility<a class="headerlink" href="#mcp-and-studio-compatibility" title="Link to this heading"></a></h3>
+<p>The MCP integration uses <code class="docutils literal notranslate"><span class="pre">langchain[mcp]&gt;=1.4.0,&lt;1.5</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fastmcp&gt;=4.0.3,&lt;4.1</span></code>.
+The lockfile selects FastMCP 4.0.3 and MCP SDK 2.2.0.
+The base package keeps these dependencies optional.
+The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra and backend Docker image include them.
+See <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a> for configuration and compatibility limits.</p>
+<p>MCP SDK 2 requires <code class="docutils literal notranslate"><span class="pre">sse-starlette&gt;=3</span></code>.
+The previously locked Studio API required <code class="docutils literal notranslate"><span class="pre">sse-starlette&lt;2.2</span></code>.
+These ranges cannot coexist.
+The lockfile now uses the following compatible versions:</p>
+<table class="docutils align-default" id="id9">
+<caption><span class="caption-text">Dependency changes required by MCP with Studio</span><a class="headerlink" href="#id9" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 52.9%" />
+<col style="width: 23.5%" />
+<col style="width: 23.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Before</p></th>
+<th class="head"><p>After</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langsmith</span></code></p></td>
+<td><p>0.4.60</p></td>
+<td><p>0.6.9</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-api</span></code></p></td>
+<td><p>0.6.35</p></td>
+<td><p>0.10.3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langgraph-runtime-inmem</span></code></p></td>
+<td><p>0.22.1</p></td>
+<td><p>0.30.3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sse-starlette</span></code></p></td>
+<td><p>2.1.3</p></td>
+<td><p>3.3.4</p></td>
+</tr>
+</tbody>
+</table>
+<p>The LangSmith extra now permits <code class="docutils literal notranslate"><span class="pre">&gt;=0.4.60,&lt;0.7</span></code>.
+The new Studio API requires LangSmith 0.6.3 or later.
+The LangGraph CLI stays at 0.4.29.
+The toolkit’s graph runtime stays at LangGraph 1.2.11.
+The resolver also aligns the Studio gRPC packages at 1.80.0.</p>
+<p>These choices use the official metadata for
+<a class="reference external" href="https://pypi.org/project/fastmcp/4.0.3/">FastMCP 4.0.3</a>,
+<a class="reference external" href="https://pypi.org/project/mcp/2.2.0/">MCP 2.2.0</a>, and
+<a class="reference external" href="https://pypi.org/project/langgraph-api/0.10.3/">Studio API 0.10.3</a>.
+The resolver checks the <code class="docutils literal notranslate"><span class="pre">all</span></code> feature set with Langfuse SDK 2.60.10 on Python
+3.11 through 3.13.
+SDK v2 keeps its required <code class="docutils literal notranslate"><span class="pre">packaging&lt;25</span></code> constraint.
+The CI matrix runs MCP tests with each supported Langfuse SDK generation.</p>
+<p>The OpenAI integration now uses OpenAI SDK 3.13.0 in the lockfile.
+The regression tests exercise HTTPX client injection with a local mock transport.
+They cover synchronous and asynchronous requests, streaming, and gateway roles.
+They do not call a live provider.</p>
+</section>
+<section id="deep-agents">
+<h3>Deep Agents<a class="headerlink" href="#deep-agents" title="Link to this heading"></a></h3>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">deepagents</span></code> extra uses <code class="docutils literal notranslate"><span class="pre">deepagents&gt;=0.7.13,&lt;0.8</span></code>.
+The lockfile selects 0.7.13, released on 2026-09-02. This release fits the
+existing LangChain 1.4.0, Core 1.6.3, and LangGraph 1.2.11 versions.
+Its required provider and telemetry dependencies need these additional updates:</p>
+<table class="docutils align-default" id="id10">
+<caption><span class="caption-text">Dependency changes required by Deep Agents</span><a class="headerlink" href="#id10" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 52.9%" />
+<col style="width: 23.5%" />
+<col style="width: 23.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Before</p></th>
+<th class="head"><p>After</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langchain-anthropic</span></code></p></td>
+<td><p>1.4.4</p></td>
+<td><p>1.7.2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">anthropic</span></code></p></td>
+<td><p>0.109.1</p></td>
+<td><p>1.5.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langchain-google-genai</span></code></p></td>
+<td><p>4.2.4</p></td>
+<td><p>4.4.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">google-genai</span></code></p></td>
+<td><p>2.8.0</p></td>
+<td><p>2.23.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">langsmith</span></code></p></td>
+<td><p>0.6.9</p></td>
+<td><p>0.12.4</p></td>
+</tr>
+</tbody>
+</table>
+<p>The corresponding optional ranges now allow these tested releases. Deep Agents
+requires these provider packages even when an application selects another model.
+The base package does not require Deep Agents. The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra includes it.
+The backend Docker build enables it only with <code class="docutils literal notranslate"><span class="pre">INSTALL_DEEPAGENTS=true</span></code>.</p>
+<p>Version 0.5.3 was the last release that fit all previous optional ranges.
+The integration uses the current release to include later fixes for subagent
+private state, composite backend routing, and filesystem tool dispatch.
+Version 0.7 also requires an explicit StoreBackend namespace and removes the
+default planning middleware. The toolkit adds planning explicitly and uses
+StateBackend for thread-scoped virtual files. See <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a> for the
+memory and execution limits.</p>
+<p>Sources: <a class="reference external" href="https://pypi.org/project/deepagents/0.7.13/">Deep Agents 0.7.13 metadata</a>,
+<a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.0">Deep Agents 0.7 release notes</a>,
+<a class="reference external" href="https://pypi.org/project/langchain-anthropic/1.7.2/">Anthropic integration 1.7.2</a>,
+<a class="reference external" href="https://pypi.org/project/langchain-google-genai/4.4.0/">Google integration 4.4.0</a>,
+and <a class="reference external" href="https://pypi.org/project/langsmith/0.12.4/">LangSmith 0.12.4</a>.</p>
+</section>
+<section id="langfuse">
+<h3>Langfuse<a class="headerlink" href="#langfuse" title="Link to this heading"></a></h3>
+<p>The Python SDK version and the Langfuse server version are separate.
+The <code class="docutils literal notranslate"><span class="pre">langfuse</span></code> extra permits SDK versions from 2.60.10 to below 5.
+Published extras now select one SDK generation: <code class="docutils literal notranslate"><span class="pre">langfuse-v2</span></code> requires
+<code class="docutils literal notranslate"><span class="pre">&gt;=2.60.10,&lt;3</span></code>, <code class="docutils literal notranslate"><span class="pre">langfuse-v3</span></code> requires <code class="docutils literal notranslate"><span class="pre">&gt;=3.15.0,&lt;4</span></code>, and <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code>
+requires <code class="docutils literal notranslate"><span class="pre">&gt;=4.15.2,&lt;5</span></code>. Use only one selector. The generic <code class="docutils literal notranslate"><span class="pre">langfuse</span></code> extra
+can combine with any one selector. <code class="docutils literal notranslate"><span class="pre">all-observability</span></code> keeps its existing
+generic Langfuse and LangSmith dependencies.
+The default lockfile selects SDK 4.15.2.
+The compatibility matrix tests SDK 2.60.10, 3.15.0, and 4.15.2.
+See <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a> to select the SDK for each server.</p>
+<p>Recent SDK fixes include these changes:</p>
+<ul class="simple">
+<li><p>Version 4.14.0 fixes nested Anthropic cache usage and adds prompt linking
+through <code class="docutils literal notranslate"><span class="pre">propagate_attributes</span></code>.
+See the <a class="reference external" href="https://github.com/langfuse/langfuse-python/releases/tag/v4.14.0">4.14.0 release notes</a>.</p></li>
+<li><p>Version 4.14.2 fixes tool-definition normalization, zero sampling rates,
+and generator cancellation. It preserves the legacy score-create alias.
+See the <a class="reference external" href="https://github.com/langfuse/langfuse-python/releases/tag/v4.14.2">4.14.2 release notes</a>.</p></li>
+<li><p>Version 4.15.1 avoids span formatting when debug logging is disabled.
+Version 4.15.2 updates generated API types.
+See the <a class="reference external" href="https://github.com/langfuse/langfuse-python/releases/tag/v4.15.1">4.15.1 release notes</a>
+and the <a class="reference external" href="https://github.com/langfuse/langfuse-python/releases/tag/v4.15.2">4.15.2 release notes</a>.</p></li>
+</ul>
+<p>Server v4 changes the ingestion and read data models.
+Python SDK v4 works with server v3.
+SDK 4.7.0 or later sends data directly to the new v4 tables.
+Older SDK combinations can require a migration mode or delayed propagation.
+SDK v2 is rejected by server v4 in <code class="docutils literal notranslate"><span class="pre">events_only</span></code> mode.
+See the <a class="reference external" href="https://langfuse.com/self-hosting/upgrade/upgrade-guides/upgrade-v3-to-v4">official server v3-to-v4 upgrade guide</a>.</p>
+</section>
+</section>
+<section id="install-and-verify">
+<h2>Install and verify<a class="headerlink" href="#install-and-verify" title="Link to this heading"></a></h2>
+<p>Use the lockfile to reproduce the tested dependency set:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">--all-extras</span></code> in earlier source installation commands with
+<code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">all</span></code>. The old flag selects the three incompatible SDK selectors.
+The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra keeps all features without forcing a selector. It can combine
+with one selector, such as <code class="docutils literal notranslate"><span class="pre">--extra</span> <span class="pre">all</span> <span class="pre">--extra</span> <span class="pre">langfuse-v2</span></code>, when the complete
+dependency set is compatible.</p>
+<p>For an application that uses Langfuse server v2, select SDK v2 and commit the
+application’s lockfile:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;langgraph-agent-toolkit[langfuse-v2]&#39;</span>
+</pre></div>
+</div>
+<p>For an application that must retain Python SDK v3:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;langgraph-agent-toolkit[langfuse-v3]&#39;</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">langfuse-v4</span></code> for SDK v4. Add an exact SDK pin only when a specific patch
+version is required. For example, add <code class="docutils literal notranslate"><span class="pre">langfuse==2.60.10</span></code> beside the v2 selector
+to reproduce that test baseline. These selectors are published package extras,
+not local dependency groups.</p>
+<p>SDK v2 requires <code class="docutils literal notranslate"><span class="pre">packaging&lt;25</span></code>.
+SDK v3 requires <code class="docutils literal notranslate"><span class="pre">packaging&lt;26</span></code>.
+Resolve all application dependencies together.
+Do not copy a v4 lockfile and replace only the installed Langfuse package.</p>
+<p>The CI matrix installs each version selector with an exact SDK baseline.
+It checks the resulting environment and runs the observability contracts.
+The regular suite checks the default lockfile on Python 3.11, 3.12, 3.13, and 3.14.
+Worker tests run with package coverage. Database tests have a separate job.
+Live Langfuse server acceptance tests need a staging server for each deployed
+server version and migration mode.</p>
+</section>
+<section id="python-3-14-and-ci-follow-up">
+<h2>Python 3.14 and CI follow-up<a class="headerlink" href="#python-3-14-and-ci-follow-up" title="Link to this heading"></a></h2>
+<p>Review date: 2026-09-13. The package now permits Python 3.11 through 3.14.
+Docker images and the LangGraph deployment configuration retain Python 3.13.
+The Ruff target remains <code class="docutils literal notranslate"><span class="pre">py311</span></code> to preserve the minimum supported syntax.</p>
+<p>Two dependency changes are needed for Python 3.14:</p>
+<ul class="simple">
+<li><p>Require <code class="docutils literal notranslate"><span class="pre">pydantic&gt;=2.13.0</span></code> on Python 3.14. Pydantic 2.12 installs, but
+Langfuse’s legacy models fail during import. The
+<a class="reference external" href="https://pydantic.dev/articles/pydantic-v2-13-release">Pydantic 2.13 release</a>
+restores Python 3.14 support in <code class="docutils literal notranslate"><span class="pre">pydantic.v1</span></code>. Python 3.11 through 3.13 keep
+their existing Pydantic minimum.</p></li>
+<li><p>Update locked <code class="docutils literal notranslate"><span class="pre">jsonschema-rs</span></code> from 0.29.1 to 0.44.1. Require at least 0.44.1
+in the <code class="docutils literal notranslate"><span class="pre">studio</span></code> extra on Python 3.14. The old native extension cannot build
+on this interpreter. The new release supplies compatible stable-ABI wheels
+and stays within <code class="docutils literal notranslate"><span class="pre">langgraph-api==0.10.3</span></code> requirements. See the
+<a class="reference external" href="https://pypi.org/pypi/jsonschema-rs/0.44.1/json">wheel metadata</a>
+and <a class="reference external" href="https://pypi.org/pypi/langgraph-api/0.10.3/json">API requirements</a>.</p></li>
+</ul>
+<p>The other locked package versions remain unchanged. See <a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> for
+the Python 3.14 and Langfuse SDK results.</p>
+<p>CI now tests wheels, package behavior, process journeys, and each Langfuse SDK
+on all four Python versions. PostgreSQL checks cover Python 3.13 and 3.14.
+Lint and lockfile validation run once. Jobs have time limits, superseded pull
+request runs stop, and Docker builds use separate caches for each image.
+CI and the <code class="docutils literal notranslate"><span class="pre">uv-lock</span></code> pre-commit hook use uv 0.12.1.
+Releases wait for the test workflow. The publish job checks the release tag,
+builds distributions, and validates their metadata before it uploads to PyPI.
+The metadata check uses isolated Twine v7. Twine v6 rejects the current
+backend’s metadata version 2.5. See the
+<a class="reference external" href="https://github.com/pypa/twine/blob/main/docs/changelog.rst">Twine changelog</a>.
+If branch protection names the old <code class="docutils literal notranslate"><span class="pre">test-e2e</span></code> checks, replace them with the
+corresponding <code class="docutils literal notranslate"><span class="pre">test-python</span></code> checks. Process tests now run in those jobs.</p>
+<p>Dependabot uses its native <code class="docutils literal notranslate"><span class="pre">uv</span></code> updater to keep <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and
+<code class="docutils literal notranslate"><span class="pre">uv.lock</span></code> consistent. It groups related minor and patch updates. Major and
+security updates remain separate. It also checks GitHub Actions, Docker base
+images, and pre-commit hooks. See the
+<a class="reference external" href="https://docs.astral.sh/uv/guides/integration/dependabot/">uv integration guide</a>.
+Enable Dependabot security updates in the repository settings. The configuration
+file alone does not enable that GitHub setting.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="migration.html" class="btn btn-neutral float-left" title="Migrate to the current release" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="related_projects.html" class="btn btn-neutral float-right" title="Related projects and source review" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>
