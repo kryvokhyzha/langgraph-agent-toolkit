@@ -61,8 +61,9 @@ database faults, worker replacement during traffic, and bounded soak tests.
      - A real service process, HTTP client, SQLite database, restart, and resume.
      - ``tests/e2e`` and ``tests/service/test_worker_recovery.py``
    * - Container checks
-     - Built images, model transports, readiness, chat history, and HTML.
-     - ``tests/integration/test_docker_e2e.py`` and
+     - Runtime contents, model transports, readiness, chat history, and HTML.
+     - ``tests/integration/docker_image_smoke.py``,
+       ``tests/integration/test_docker_e2e.py``, and
        ``tests/integration/docker_transport_smoke.py``
    * - External service integration
      - PostgreSQL locking and recovery; Langfuse ingestion and stored results.
@@ -130,6 +131,29 @@ CI builds both images before this check. Tests call readiness, invoke, stream,
 history, and clear-history endpoints. They check the frontend health endpoint
 and HTML response. They do not control a browser or test Streamlit interaction.
 An unavailable requested container causes failure.
+
+CI also checks final runtime contents with ``docker_image_smoke.py``.
+The check uses no test packages or external network. It verifies the non-root
+user, copied virtual environment, and TLS certificate roots. It rejects build
+tools, development packages, and source environment files. The API check
+imports the selected features, loads the bundled PostgreSQL client, and writes
+and reopens a temporary SQLite database. The UI check reuses the client-only
+import check. After building both images, run:
+
+.. code-block:: bash
+
+   docker run --rm --network none \
+     --mount "type=bind,source=$PWD/tests/integration/docker_image_smoke.py,target=/tmp/docker_image_smoke.py,readonly" \
+     toolkit-api python /tmp/docker_image_smoke.py api
+   docker run --rm --network none \
+     --mount "type=bind,source=$PWD/tests/integration/docker_image_smoke.py,target=/tmp/docker_image_smoke.py,readonly" \
+     --mount "type=bind,source=$PWD/scripts/ci/verify_ui_imports.py,target=/tmp/verify_ui_imports.py,readonly" \
+     toolkit-app python /tmp/docker_image_smoke.py app
+
+CI waits for each image's actual Docker health probe before the HTTP tests.
+It records the platform and uncompressed image size in the job summary.
+Layer history appears in the job log. These checks do not connect to a live
+PostgreSQL server or verify the optional Deep Agents image variant.
 
 The API image also has a separate transport check. It runs with the image's
 runtime dependencies and no test packages. Build the image, then run:
