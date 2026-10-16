@@ -124,7 +124,7 @@ aws-backend = [
 ]
 
 azure-backend = [
-    "azure-functions >= 1.23, < 1.25",
+    "azure-functions>=1.23,<1.26",
 ]
 
 gunicorn-backend = [
