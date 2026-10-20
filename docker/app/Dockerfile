@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 # Builder: install the minimum Streamlit client dependencies in an isolated virtual environment.
 # ---------------------------------------------------------------------------
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # ---------------------------------------------------------------------------
 # Runtime: include only the virtual environment and application source.
 # ---------------------------------------------------------------------------
-FROM python:3.13-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
