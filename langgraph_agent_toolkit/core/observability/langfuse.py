@@ -4,6 +4,7 @@ import inspect
 import json
 import os
 from contextlib import contextmanager, nullcontext
+from dataclasses import fields, is_dataclass
 from datetime import datetime, timezone
 from importlib.metadata import version
 from threading import Lock
@@ -12,6 +13,10 @@ from uuid import uuid4
 
 import langfuse as _langfuse
 from langchain_core.callbacks import BaseCallbackHandler
+from pydantic import BaseModel, SecretBytes, SecretStr
+from pydantic.v1 import BaseModel as LegacyBaseModel
+from pydantic.v1 import SecretBytes as LegacySecretBytes
+from pydantic.v1 import SecretStr as LegacySecretStr
 
 from langgraph_agent_toolkit.core.observability.base import (
     BaseObservabilityPlatform,
@@ -23,7 +28,7 @@ from langgraph_agent_toolkit.helper.logging import logger
 
 
 _SDK_MAJOR = int(version("langfuse").split(".")[0])
-if _SDK_MAJOR not in (2, 3, 4):
+if _SDK_MAJOR not in (2, 3, 4, 5):
     raise ImportError(f"Unsupported Langfuse SDK major version: {_SDK_MAJOR}")
 
 _IS_NEW_LANGFUSE = _SDK_MAJOR >= 3
@@ -209,6 +214,36 @@ else:
     CallbackHandler = _LegacyCallbackHandler
 
 
+def _mask_secret_values(*, data: Any) -> Any:
+    """Mask typed secrets before the SDK serializes observation data."""
+    active: set[int] = set()
+
+    def mask(value: Any) -> Any:
+        if isinstance(value, (SecretStr, SecretBytes, LegacySecretStr, LegacySecretBytes)):
+            return "<secret>"
+        dataclass_value = is_dataclass(value) and not isinstance(value, type)
+        if not isinstance(value, (BaseModel, LegacyBaseModel, dict, list, tuple)) and not dataclass_value:
+            return value
+        identity = id(value)
+        if identity in active:
+            return "<circular>"
+        active.add(identity)
+        try:
+            if isinstance(value, BaseModel):
+                return mask(value.model_dump())
+            if isinstance(value, LegacyBaseModel):
+                return mask(value.dict())
+            if dataclass_value:
+                return {field.name: mask(getattr(value, field.name)) for field in fields(value)}
+            if isinstance(value, dict):
+                return {mask(key): mask(item) for key, item in value.items()}
+            return [mask(item) for item in value]
+        finally:
+            active.remove(identity)
+
+    return mask(data)
+
+
 def _configuration() -> Dict[str, Any]:
     """Use validated settings and retain direct environment configuration."""
 
@@ -222,13 +257,14 @@ def _configuration() -> Dict[str, Any]:
     return {
         "public_key": credential("LANGFUSE_PUBLIC_KEY"),
         "secret_key": credential("LANGFUSE_SECRET_KEY"),
-        "host": os.environ.get("LANGFUSE_BASE_URL") or host,
+        "base_url" if _IS_NEW_LANGFUSE else "host": (os.environ.get("LANGFUSE_BASE_URL") or host).rstrip("/"),
         "environment": settings.LANGFUSE_TRACING_ENVIRONMENT,
         "flush_at": settings.LANGFUSE_FLUSH_AT,
         "flush_interval": settings.LANGFUSE_FLUSH_INTERVAL,
         "timeout": settings.LANGFUSE_TIMEOUT,
         "debug": settings.LANGFUSE_DEBUG,
         "sample_rate": settings.LANGFUSE_SAMPLE_RATE,
+        "mask": _mask_secret_values,
     }
 
 

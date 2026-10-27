@@ -76,6 +76,20 @@ def build_live_graph(builder):
     return graph, answer
 
 
+def validate_server_version(server_version):
+    """Reject SDK and server combinations before creating a client."""
+    if server_version.major not in (2, 3, 4):
+        pytest.fail("LAT_TEST_LANGFUSE_SERVER_VERSION must select server v2, v3, or v4")
+    if server_version.major == 2 and adapter._SDK_MAJOR != 2:
+        pytest.fail("Langfuse server v2 requires SDK v2")
+    if server_version.major == 3 and server_version < Version("3.63.0") and adapter._SDK_MAJOR != 2:
+        pytest.fail("Langfuse server versions before 3.63.0 require SDK v2")
+    if server_version.major == 4 and adapter._SDK_MAJOR == 2:
+        pytest.fail("Langfuse server v4 events_only mode does not accept SDK v2 traces")
+    if adapter._SDK_MAJOR >= 5 and server_version < Version("4.59.0"):
+        pytest.fail("Langfuse SDK v5 requires server 4.59.0 or later")
+
+
 @pytest.fixture(scope="module")
 def live_langfuse(request):
     """Keep one SDK client open for all runs in the same test project."""
@@ -88,14 +102,7 @@ def live_langfuse(request):
     config = {name: os.environ[f"LAT_TEST_LANGFUSE_{name}"] for name in names}
     server_version = Version(config["SERVER_VERSION"])
     server_major = server_version.major
-    if server_major not in (2, 3, 4):
-        pytest.fail("LAT_TEST_LANGFUSE_SERVER_VERSION must select server v2, v3, or v4")
-    if server_major == 2 and adapter._SDK_MAJOR != 2:
-        pytest.fail("Langfuse server v2 requires SDK v2")
-    if server_major == 3 and server_version < Version("3.63.0") and adapter._SDK_MAJOR != 2:
-        pytest.fail("Langfuse server versions before 3.63.0 require SDK v2")
-    if server_major == 4 and adapter._SDK_MAJOR == 2:
-        pytest.fail("Langfuse server v4 events_only mode does not accept SDK v2 traces")
+    validate_server_version(server_version)
     timeout = float(os.environ.get("LAT_TEST_LANGFUSE_TIMEOUT", "90"))
     if not 0 < timeout <= 1800:
         pytest.fail("LAT_TEST_LANGFUSE_TIMEOUT must be greater than 0 and at most 1800 seconds")
@@ -109,8 +116,9 @@ def live_langfuse(request):
     monkeypatch.setattr(
         adapter,
         "settings",
-        adapter.settings.model_copy(
-            update={
+        adapter.settings.__class__.model_validate(
+            {
+                **adapter.settings.model_dump(),
                 "LANGFUSE_PUBLIC_KEY": SecretStr(config["PUBLIC_KEY"]),
                 "LANGFUSE_SECRET_KEY": SecretStr(config["SECRET_KEY"]),
                 "LANGFUSE_HOST": config["BASE_URL"],
@@ -128,9 +136,7 @@ def live_langfuse(request):
         actual_version = Version(health.json()["version"])
         assert actual_version == server_version, "The server version differs from LAT_TEST_LANGFUSE_SERVER_VERSION"
         kwargs = {
-            "public_key": config["PUBLIC_KEY"],
-            "secret_key": config["SECRET_KEY"],
-            "host": config["BASE_URL"],
+            **adapter._configuration(),
             "flush_at": 1,
             "flush_interval": 0.01,
             "timeout": 10,

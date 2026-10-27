@@ -131,6 +131,7 @@ def test_stateless_agent_remains_valid_with_a_configured_service_backend(configu
         )
         assert response.status_code == 201, response.text
         assert contents(history(client, thread_id="stateless")) == []
+        assert history(client, thread_id="stateless").json()["pending_interrupts"] == []
         assert invoke(client, "stateless run", thread_id="stateless").status_code == 200
         assert contents(history(client, thread_id="stateless")) == []
 

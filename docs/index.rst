@@ -42,6 +42,7 @@ The generated reference below describes the Python package.
    mcp
    deepagents
    langfuse_compatibility
+   langfuse_server_upgrade
 
 .. toctree::
    :maxdepth: 2
@@ -51,6 +52,7 @@ The generated reference below describes the Python package.
    reliability
    migration
    dependency_updates
+   dependency_releases_2026_10
    related_projects
 
 .. toctree::

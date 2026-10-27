@@ -12,6 +12,7 @@ from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatMessage
 from langgraph_agent_toolkit.ui.components.draw_message import draw_messages
+from langgraph_agent_toolkit.ui.components.elicitation import has_mcp_interrupts, render_elicitation
 from langgraph_agent_toolkit.ui.components.side_panel import side_panel_component
 from langgraph_agent_toolkit.ui.utils import constants
 from langgraph_agent_toolkit.ui.utils.message import (
@@ -97,6 +98,7 @@ async def _main_page() -> None:
         st.session_state.pop("failed_submission")
         failed_submission = None
     if st.session_state.get("conversation") != conversation:
+        pending_interrupts = []
         if not requested_thread:
             # Add a welcome message for a new thread.
             messages = [create_welcome_message(agent_client.agent)]
@@ -109,6 +111,10 @@ async def _main_page() -> None:
                         agent_client.get_history, thread_id=thread_id, user_id=user_id, offset=offset
                     )
                     messages.extend(history.messages)
+                    pending_interrupts = [
+                        item.model_dump() if hasattr(item, "model_dump") else item
+                        for item in getattr(history, "pending_interrupts", [])
+                    ]
                     if history.next_offset is None:
                         break
                     offset = history.next_offset
@@ -116,6 +122,8 @@ async def _main_page() -> None:
                 st.error("Could not load this conversation. Check the URL and try again.")
                 st.stop()
         st.session_state.messages = messages
+        st.session_state.pending_interrupts = pending_interrupts
+        st.session_state.elicitation_revision = st.session_state.get("elicitation_revision", 0) + 1
         st.session_state.conversation = conversation
         st.session_state.last_feedback = (None, None)
 
@@ -127,15 +135,29 @@ async def _main_page() -> None:
         for m in messages:
             yield m
 
-    await draw_messages(amessage_iter())
+    # Keep the form position stable when a submission adds history messages.
+    with st.container():
+        await draw_messages(amessage_iter())
 
-    if failed_submission is not None:
-        st.warning("The previous request did not complete. Check the saved history before sending it again.")
-        with st.expander("Previous input"):
-            render_human_message(failed_submission["content"])
+        if failed_submission is not None:
+            st.warning("The previous request did not complete. Check the saved history before sending it again.")
+            with st.expander("Previous input"):
+                render_human_message(failed_submission["content"])
+
+    pending = st.session_state.get("pending_interrupts", [])
+    needs_answers = has_mcp_interrupts(pending)
+    input_data = None
+    question_container = st.empty()
+    if needs_answers:
+        with question_container.container():
+            input_data = render_elicitation(pending, conversation, st.session_state.elicitation_revision)
+    message = "Submitted answers to the agent's questions." if input_data is not None else None
 
     # Generate a message when the user submits text or attachments.
-    if user_input := st.chat_input(accept_file="multiple", file_type=constants.MULTIMODAL_FILE_TYPES):
+    user_input = st.chat_input(
+        accept_file="multiple", file_type=constants.MULTIMODAL_FILE_TYPES, disabled=needs_answers
+    )
+    if user_input and not needs_answers:
         # `accept_file` adds `.text` and `.files` to the submission.
         text = getattr(user_input, "text", "") or ""
         files = list(getattr(user_input, "files", None) or [])
@@ -148,6 +170,9 @@ async def _main_page() -> None:
                 st.error(f"Too many attachments ({n_media}); the limit is {max_attachments}.")
                 st.stop()
 
+        input_data = dict(message=message)
+
+    if input_data is not None:
         confirmed_count = len(messages)
         messages.append(ChatMessage(type="human", content=message))
         with st.chat_message("user"):
@@ -157,20 +182,27 @@ async def _main_page() -> None:
                 # `astream` and `astream_jsonl` yield the same `ChatMessage | str` values.
                 astream_fn = agent_client.astream_jsonl if stream_protocol == "JSON Lines" else agent_client.astream
                 stream = astream_fn(
-                    input=dict(message=message),
+                    input=input_data,
                     thread_id=st.session_state.thread_id,
                     user_id=user_id,
                 )
                 await draw_messages(stream, is_new=True)
             else:
                 response = await agent_client.ainvoke(
-                    input=dict(message=message),
+                    input=input_data,
                     thread_id=st.session_state.thread_id,
                     user_id=user_id,
                 )
                 messages.append(response)
                 st.chat_message("assistant").write(response.content)
+            # Only this submission can replace the pending questions. Old history
+            # messages can still contain interrupts from earlier rounds.
+            st.session_state.pending_interrupts = [
+                item for response in messages[confirmed_count:] for item in response.custom_data.get("interrupts", [])
+            ]
+            st.session_state.elicitation_revision += 1
             st.session_state.pop("failed_submission", None)
+            question_container.empty()
             st.rerun()  # Clear stale containers
         except AgentClientError as e:
             # Reload checkpoints on the next page run. The remote outcome can be uncertain.

@@ -54,6 +54,9 @@ def sdk(monkeypatch):
         if request.method == "GET":
             return httpx.Response(200, json=prompt)
         body = json.loads(request.content) if request.content else {}
+        if request.url.path.endswith("/scores"):
+            assert isinstance(body, list)
+            return httpx.Response(202, json={"message": "Accepted"})
         if request.url.path.endswith("/ingestion"):
             return httpx.Response(
                 207,
@@ -74,6 +77,7 @@ def sdk(monkeypatch):
         httpx_client=transport,
         flush_at=1,
         flush_interval=0.01,
+        mask=adapter._configuration()["mask"],
     )
     exporter = None
     if adapter._IS_NEW_LANGFUSE:
@@ -117,7 +121,17 @@ def test_prompt_and_feedback_use_real_sdk_contracts(sdk):
     assert json.loads(created.content)["prompt"] == "Hello {{name}}"
     run_id = str(uuid4())
     obs.record_feedback(run_id, "accuracy", 0.9, comment="Correct", user_id="owner")
-    score = next(item["body"] for item in events(sdk) if item["type"] == "score-create")
+    sdk.client.flush()
+    if adapter._SDK_MAJOR >= 5:
+        score = next(
+            score
+            for request in sdk.requests
+            if request.url.path.endswith("/scores")
+            for score in json.loads(request.content)
+        )
+        assert not any(request.url.path.endswith("/ingestion") for request in sdk.requests)
+    else:
+        score = next(item["body"] for item in events(sdk) if item["type"] == "score-create")
     expected = run_id.replace("-", "") if adapter._IS_NEW_LANGFUSE else run_id
     assert score["traceId"] == expected
     assert score["comment"] == "Correct"

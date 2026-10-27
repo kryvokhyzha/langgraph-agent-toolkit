@@ -21,14 +21,20 @@ WORKDIR /app
 # Include both OpenAI transports. The runtime selects aiohttp by default.
 COPY pyproject.toml uv.lock ./
 ARG INSTALL_DEEPAGENTS=false
+ARG LANGFUSE_SDK_MAJOR=5
 RUN --mount=type=cache,target=/root/.cache/uv \
     case "$INSTALL_DEEPAGENTS" in \
       true) set -- --extra deepagents ;; \
       false) set -- ;; \
       *) echo "INSTALL_DEEPAGENTS must be true or false" >&2; exit 1 ;; \
     esac && \
+    case "$LANGFUSE_SDK_MAJOR" in \
+      2|3|4|5) ;; \
+      *) echo "LANGFUSE_SDK_MAJOR must be 2, 3, 4, or 5" >&2; exit 1 ;; \
+    esac && \
     uv sync --frozen --no-install-project --no-dev \
-    --extra gunicorn-backend --extra all-observability --extra openai-aiohttp --extra mcp "$@"
+    --extra gunicorn-backend --extra all-observability --extra openai-aiohttp --extra mcp \
+    --extra "langfuse-v${LANGFUSE_SDK_MAJOR}" "$@"
 
 # ---------------------------------------------------------------------------
 # Runtime: include only the virtual environment and application source.

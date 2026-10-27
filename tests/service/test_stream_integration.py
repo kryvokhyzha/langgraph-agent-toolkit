@@ -55,7 +55,7 @@ def test_custom_and_tool_messages_cross_http_boundary(app, monkeypatch, protocol
     assert [message.model_copy(update={"run_id": None, "thread_id": None}) for message in messages] == [
         ChatMessage(type="custom", content="", custom_data={"key1": "value1", "key2": 123}),
         ChatMessage(type="ai", content="", tool_calls=[{**call, "type": "tool_call"}]),
-        ChatMessage(type="tool", content="42", tool_call_id="test_call_id"),
+        ChatMessage(type="tool", content="42", tool_call_id="test_call_id", tool_status="success"),
         ChatMessage(type="ai", content="The answer is 42"),
         ChatMessage(type="custom", content="", custom_data={"time": "end"}),
     ]

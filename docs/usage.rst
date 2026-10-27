@@ -438,3 +438,38 @@ and :doc:`deepagents` for Deep Agents. Use :doc:`deployment` for Uvicorn,
 Gunicorn, container settings, and worker recovery. Use :doc:`testing` for tests
 that need no external model and :doc:`live_llm_testing` for an explicit live
 provider check.
+
+Resume a typed interrupt
+------------------------
+
+A custom graph can call ``interrupt(question, response_schema=Decision)``.
+``Decision`` is a Pydantic model defined by the application.
+The response includes each question in ``custom_data.interrupts``.
+Each typed question has an ``id``, ``value``, and ``response_schema``.
+The history endpoint returns the same records in ``pending_interrupts``.
+Use history to recover after a lost response or worker restart.
+Reading history does not execute the graph.
+
+Render the JSON Schema in the application. Send one answer for each pending
+ID. The order of parallel questions can change. Match them by ``id``.
+For example, a quantity question can use this request:
+
+.. code-block:: bash
+
+   curl --fail-with-body "$AGENT_API_URL/$AGENT_ID/invoke" \
+     -H "Authorization: Bearer ${AUTH_SECRET}" \
+     -H 'Content-Type: application/json' \
+     -d '{"thread_id":"conversation-1","user_id":"user-1", "input":{"resume":{"<interrupt-id>":{"quantity":3}}}}'
+
+Replace ``<interrupt-id>`` with the saved question's ID.
+Use the same conversation and user identity as the interrupted run.
+LangGraph validates the answer when execution resumes.
+An invalid typed answer returns HTTP 400 in invoke mode. The question stays
+pending. Correct the answer and submit it again.
+A missing or unknown interrupt ID returns HTTP 422 before execution.
+For streaming requests, read error events as described above.
+
+This structured envelope is optional. Existing raw interrupt replies and
+human approval replies keep their format. MCP forms use their own response
+schema and ``responses`` envelope. See :doc:`mcp`.
+The Streamlit client does not generate generic typed forms automatically.

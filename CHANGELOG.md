@@ -6,6 +6,71 @@ This file uses the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 format. The project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.2]
+
+### Added
+
+- Return `pending_interrupts` with history pages. Recover saved questions after
+  a lost response or worker restart without executing remote tools.
+- Show MCP forms and URL requests in Streamlit. Support structured answers,
+  decline, cancel, parallel questions, and recovery after a failed request.
+- Preserve tool status and JSON-safe MCP structured content in streaming
+  messages and saved history.
+- Add optional Deep Agents backend, store, and binary offloading configuration.
+  Keep offloading disabled by default. Require blob storage outside graph state.
+- Accept DOCX, PPTX, XLSX, CSV, JSON, and Markdown uploads in Streamlit.
+  Preserve document filenames in standard content blocks.
+- Add native Deep Agents filesystem permissions, skills, memory files, and
+  remote async subagent configuration. Keep these features optional.
+- Preserve typed interrupt response schemas in live responses and history.
+  Accept answers by interrupt ID through `input.resume`.
+- Add per-server `max_sse_event_size` for MCP HTTP connections. Keep the SDK's 1
+  MiB limit unless an operator sets a larger positive limit.
+
+### Changed
+
+- Update the default Langfuse Python SDK to 5.0.4. Add `langfuse-v5` and keep
+  SDK v2, v3, and v4 selectors. Require server 4.59.0 or later for SDK v5.
+- Update the explicit SDK v4 baseline to 4.18.0. Keep SDK v2 and v3 at 2.60.10
+  and 3.15.0.
+- Select Langfuse Server 4.71.0 for new Compose deployments. Require an explicit
+  `LANGFUSE_SERVER_VERSION` before starting the web and worker services.
+- Update Deep Agents to 0.7.32, LangChain to 1.4.7, Core to 1.7.0, and LangGraph
+  to 1.2.18. Include native document support, filesystem permission fixes, and
+  checkpoint resume fixes.
+- Update the provider integrations, PostgreSQL saver, SQLite saver, MCP, and
+  Studio dependency sets. Require LangSmith `>=0.14.14,<0.15`.
+
+### Fixed
+
+- Normalize Langfuse base URLs before SDK construction. Prevent duplicate
+  slashes from redirecting telemetry exports without storing traces.
+- Keep public conversation IDs in telemetry sessions. Retain owner and agent
+  scoping for checkpoint storage and conversation locks.
+- Persist Redis queues in an AOF volume. Reject writes under the configured
+  memory limit instead of removing queued keys. Read Redis credentials from the
+  service environment for both startup and health checks.
+- Start the Langfuse worker after web migrations. Use probes supported by the
+  new server images without a `hostname` executable.
+- Mask typed Pydantic secret values before Langfuse SDK serialization. Prevent
+  SDK v2 and v3 from recording their plaintext values.
+- Load MCP schemas before a tool call so the SDK can send `x-mcp-header`
+  arguments. Use server cache policies to reduce repeated catalog requests.
+- Reuse isolated MCP HTTP pools through the worker lifespan. Close them after
+  shutdown or failed startup. Keep standalone calls safe without a manager.
+
+### Documentation
+
+- Add pending-question recovery, Streamlit forms, tool metadata, and direct
+  Python connection management to the MCP and migration guides.
+- Add OpenAI Responses configuration and durable binary storage examples.
+  Explain scoped blobs, checkpoint limits, missing media, and cleanup.
+- Review each intervening dependency release. Explain typed interrupt answers,
+  filesystem permissions, async subagent deployment, and database upgrade
+  limits.
+- Add SDK v5 and server v4 migration steps, reproducible disposable service
+  tests, and a manual CI matrix for SDK v2 through v5.
+
 ## [0.10.1]
 
 ### Changed

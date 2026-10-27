@@ -197,6 +197,92 @@ An explicit ``async`` override keeps overlapping saves and graph steps. Remove
 that override or set it to ``sync`` to use the new default. Both modes report
 write errors. See :doc:`reliability` for recovery limits and tuning guidance.
 
+Review MCP clients
+------------------
+
+History responses now include ``pending_interrupts``.
+Each entry has the same ``id`` and ``value`` fields as
+``custom_data.interrupts`` in a live response.
+Every history page includes all pending interrupts.
+Use this field to recover questions after a lost response or a worker restart.
+Reading history does not execute the remote tool.
+Keep a persistent checkpointer for restart recovery.
+
+Tool messages now include ``tool_status`` and ``tool_artifact``.
+The artifact contains only JSON-safe MCP ``structured_content`` objects.
+These fields are optional and use ``null`` when unavailable.
+Update clients that reject unknown response fields.
+The existing invoke, SSE, JSON Lines, and structured-resume request formats
+remain the same.
+
+The service now owns MCP HTTP pools for the worker's lifetime.
+Direct Python users can pass ``MCPTransportManager`` to ``load_mcp_tools``.
+Keep the manager open until all tool calls finish.
+Calls without a manager keep closing their HTTP resources after each operation.
+See :doc:`mcp` for recovery examples, forms, and connection behavior.
+
+Review Deep Agents document inputs
+----------------------------------
+
+The ``deepagents`` extra now requires ``deepagents>=0.7.32,<0.8``.
+The ``langsmith`` extra requires ``>=0.14.14,<0.15``.
+Resolve the complete application dependency set and review its lockfile.
+Core now requires ``>=1.7.0,<1.8``. The OpenAI integration requires
+``>=1.7.3,<1.8``. The PostgreSQL saver requires ``>=3.2.0,<3.3``.
+Remove conflicting application pins before resolving the lockfile.
+See :doc:`dependency_updates` for all selected versions.
+
+SQLite saver 3.1.2 adds ``writes.task_path`` during ``setup()``.
+Back up the database and stop old workers before this schema update.
+Do not run old and new SQLite saver versions against the same file.
+The PostgreSQL saver 3.2.0 keeps the 3.1.2 schema migration list.
+The service does not call its new pruning API automatically.
+Do not use ``keep_latest`` for Deep Agents ``DeltaChannel`` state.
+
+The toolkit UI accepts DOCX, PPTX, XLSX, CSV, JSON, and Markdown uploads.
+It preserves filenames in ``extras.filename`` for standard file blocks.
+The REST message format stays the same.
+An accepted upload extension does not prove that the selected model supports
+that content. For OpenAI native document inputs, explicitly enable
+``use_responses_api`` in the blueprint's model configuration.
+Verify the actual model and gateway route before deployment.
+Global model defaults do not change.
+
+Binary offloading stays disabled by default.
+Custom graphs can set ``build_graph(backend=..., store=..., offload_binary_content=True)``.
+The blob route must use storage outside graph state.
+Use durable storage shared by all replicas and scope it to the conversation.
+The default service manages its checkpointer only.
+It does not initialize or attach a blob store automatically.
+
+Earlier input checkpoints can still hold the original upload.
+Missing blobs become a text notice, and the model call continues.
+Checkpoint clearing and retention do not delete external blobs.
+Keep those blobs while retained checkpoints can reference them.
+See :doc:`deepagents` for the PostgreSQL store example and recovery limits.
+
+Review typed interrupts and filesystem permissions
+--------------------------------------------------
+
+Custom graphs can use ``interrupt(..., response_schema=Model)``.
+Responses and ``pending_interrupts`` preserve its ``response_schema``.
+Send typed answers in ``input.resume`` with one value for each pending
+interrupt ID. Existing raw interrupt replies and MCP forms keep their formats.
+LangGraph validates typed answers when the graph resumes. Correct invalid
+answers and submit them again.
+
+Deep Agents now checks requested and symlink-resolved paths for file
+permissions and approvals. The blueprint accepts ``permissions``, ``skills``,
+and ``memory``. Their defaults remain ``None``.
+Review rules for both paths before enabling a host filesystem backend.
+Configured skill and memory paths are trusted instruction sources.
+File-tool permissions do not restrict their direct backend reads.
+
+``AsyncSubAgent`` requires a separate Agent Protocol deployment.
+The toolkit's REST API does not provide that protocol.
+Use ``isolated`` or ``fork``. The old ``handoff`` alias was removed upstream.
+See :doc:`deepagents` and :doc:`dependency_releases_2026_10`.
+
 Check existing persistence
 --------------------------
 
@@ -391,3 +477,50 @@ configuration failure. The caller's API authentication is separate. Streams
 that have sent headers emit a fixed error message. Correct the provider
 credential before retrying. Toolkit responses and logs omit provider error
 text and tracebacks for these authentication failures in all environment modes.
+
+Select the Langfuse SDK before upgrading
+----------------------------------------
+
+The generic ``langfuse`` extra now allows SDK v5. The default source lockfile
+selects 5.0.4. ``all-observability`` and ``all`` inherit this selection.
+SDK v5 needs Langfuse Cloud or self-hosted server 4.59.0 or later.
+An existing server v3 deployment must use ``langfuse-v4`` or ``langfuse-v3``
+before resolving its application dependencies.
+
+.. code-block:: bash
+
+   # Keep a current server v3 deployment.
+   uv add 'langgraph-agent-toolkit[all-observability,langfuse-v4]'
+
+   # Use a server v4 deployment at version 4.59.0 or later.
+   uv add 'langgraph-agent-toolkit[all-observability,langfuse-v5]'
+
+Remove the old selector when changing generations.
+The ``langfuse-v2`` and ``langfuse-v3`` selectors remain available.
+Only one generation selector can be selected at a time.
+The toolkit's feedback and prompt request formats remain unchanged.
+Applications that call removed SDK APIs directly must follow the upstream
+`SDK v5 migration guide
+<https://langfuse.com/docs/observability/sdk/upgrade-path/python-v4-to-v5>`_.
+
+The Compose stack requires an explicit ``LANGFUSE_SERVER_VERSION``.
+The new environment example selects 4.71.0 for a fresh deployment.
+Keep 3.225.15 for existing server v3 data until its upgrade steps are complete.
+A container image update does not complete the database migration checks.
+See :doc:`langfuse_server_upgrade` for backups, background migrations,
+ClickHouse requirements, and ingestion compatibility.
+
+Check Langfuse trace URLs and session identity
+----------------------------------------------
+
+The adapter now removes a final slash from the selected Langfuse base URL.
+It passes that normalized URL through the current SDK parameter.
+This also applies to ``LANGFUSE_BASE_URL`` and proxy path prefixes.
+Earlier validated settings could produce an export path with ``//api``.
+A redirect response could be reported as an export success without ingestion.
+Verify stored records after upgrading this path.
+
+The service uses the public ``thread_id`` as the Langfuse session identity.
+Checkpoint keys and conversation locks remain scoped to the owner and agent.
+Earlier scoped session IDs can remain in historical telemetry.
+This change does not move or rewrite those records.

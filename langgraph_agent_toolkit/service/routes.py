@@ -8,7 +8,7 @@ from langchain_core.messages import ChatMessage as LangchainChatMessage
 from langchain_core.runnables import RunnableConfig
 
 from langgraph_agent_toolkit import __version__
-from langgraph_agent_toolkit.agents.agent_executor import add_graph_history, get_graph_history
+from langgraph_agent_toolkit.agents.agent_executor import add_graph_history, get_graph_conversation
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
@@ -118,6 +118,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
         model_config_key=user_input.model_config_key,
         agent_config=user_input.agent_config,
         recursion_limit=user_input.recursion_limit,
+        trace_session_id=public_id,
     )
     response.thread_id = public_id
     return sign_feedback_message(request, agent_id, response)
@@ -285,13 +286,13 @@ async def history(
     agent_id: str | None = None,
     request: Request = None,
 ) -> ChatHistory:
-    """Get short-term chat history for one thread."""
+    """Get saved messages and all pending interrupts for one thread."""
     agent_id = agent_id or get_default_agent()
     _, owner, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
     executor = get_agent_executor(request)
     agent = get_agent(request, agent_id)
     async with executor.concurrency.lock(key):
-        messages = await get_graph_history(
+        messages, pending_interrupts = await get_graph_conversation(
             agent.graph, RunnableConfig(configurable={"thread_id": key, "user_id": owner})
         )
         limit = min(input.limit, settings.HISTORY_MAX_PAGE_SIZE)
@@ -301,6 +302,7 @@ async def history(
             messages=[langchain_to_chat_message(m) for m in page],
             total=len(messages),
             next_offset=next_offset if next_offset < len(messages) else None,
+            pending_interrupts=pending_interrupts,
         )
 
 

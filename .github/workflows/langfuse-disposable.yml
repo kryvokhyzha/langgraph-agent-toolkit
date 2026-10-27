@@ -1,0 +1,87 @@
+name: Langfuse disposable E2E
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: langfuse-disposable-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test-server:
+    name: Server ${{ matrix.server }} with SDK ${{ matrix.sdk }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - server: "4.71.0"
+            sdk: "5.0.4"
+            extra: langfuse-v5
+          - server: "4.71.0"
+            sdk: "4.18.0"
+            extra: langfuse-v4
+          - server: "3.225.15"
+            sdk: "4.18.0"
+            extra: langfuse-v4
+          - server: "3.225.15"
+            sdk: "3.15.0"
+            extra: langfuse-v3
+          - server: "3.225.15"
+            sdk: "2.60.10"
+            extra: langfuse-v2
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Install the locked SDK and service dependencies
+        run: >-
+          uv sync --frozen --no-install-project --no-default-groups --extra all
+          --extra '${{ matrix.extra }}' --group tests
+      - name: Generate a disposable project
+        env:
+          EXPECTED_LANGFUSE_VERSION: ${{ matrix.sdk }}
+        run: |
+          uv run --no-sync python - <<'PY'
+          import os
+          from importlib.metadata import version
+          assert version("langfuse") == os.environ["EXPECTED_LANGFUSE_VERSION"]
+          PY
+          uv run --no-sync python scripts/ci/langfuse_stack.py prepare \
+            --directory=data/langfuse-ci --server_version='${{ matrix.server }}'
+      - name: Start the isolated server and wait for health checks
+        run: >-
+          uv run --no-sync python scripts/ci/langfuse_stack.py start
+          --directory=data/langfuse-ci
+      - name: Verify stored SDK and API process records
+        run: |
+          set -a
+          source data/langfuse-ci/server.env
+          set +a
+          uv run --no-sync pytest tests/integration/test_langfuse_live.py \
+            tests/e2e/test_langfuse_api.py --run-e2e --run-langfuse \
+            --junitxml=data/langfuse-ci/results.xml -q
+      - name: Collect logs and remove only this test stack
+        if: always()
+        run: >-
+          uv run --no-sync python scripts/ci/langfuse_stack.py stop
+          --directory=data/langfuse-ci
+      - name: Save the test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: langfuse-${{ matrix.server }}-sdk-${{ matrix.sdk }}
+          path: data/langfuse-ci/results.xml
+          if-no-files-found: warn
+          retention-days: 14

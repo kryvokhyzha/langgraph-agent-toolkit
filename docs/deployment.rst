@@ -287,3 +287,27 @@ The Azure Functions runner uses the Azure SDK ASGI adapter. It starts the
 application lifespan before serving requests. Call ``await runner.aclose()``
 before stopping that runner's event loop so the application can release its
 checkpoint and observability resources.
+
+Select the Langfuse SDK in an API image
+---------------------------------------
+
+The API image defaults to ``LANGFUSE_SDK_MAJOR=5``.
+This SDK requires Langfuse Server 4.59.0 or later.
+Use the build argument to keep SDK v4 with an existing server v3:
+
+.. code-block:: bash
+
+   docker build -f docker/api/Dockerfile \
+     --build-arg LANGFUSE_SDK_MAJOR=4 \
+     -t toolkit-api-sdk4 .
+
+Values ``2``, ``3``, ``4``, and ``5`` select the matching package extra.
+The lockfile selects the exact SDK version.
+The image keeps both OpenAI transports and its curl readiness probe.
+
+For Compose, set ``LANGFUSE_SDK_MAJOR`` in the root ``.env`` before building.
+Set ``LANGFUSE_SERVER_VERSION`` separately to select the web and worker images.
+For an existing server v3 deployment, use SDK major 3 or 4 and server 3.225.15.
+For a fresh deployment, the example selects SDK major 5 and server 4.71.0.
+Changing an SDK build argument requires rebuilding the API image.
+See :doc:`langfuse_server_upgrade` before changing an existing server major.

@@ -12,7 +12,7 @@ from langgraph.checkpoint.memory import MemorySaver
 
 from langgraph_agent_toolkit import __version__
 from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.core.mcp import configure_mcp_agents
+from langgraph_agent_toolkit.core.mcp import MCPTransportManager, configure_mcp_agents
 from langgraph_agent_toolkit.core.memory.concurrency import (
     ConversationCoordinator,
     PostgresConversationCoordinator,
@@ -81,12 +81,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.state.lock_pool = None
     app.state.sqlite_connection = None
     app.state.llm_transport_manager = None
+    app.state.mcp_transport_manager = None
     try:
         validate_auth_configuration()
         async with AsyncExitStack() as resources:
             manager = await resources.enter_async_context(LLMTransportManager.from_settings(settings))
             resources.enter_context(manager.bind())
             app.state.llm_transport_manager = manager
+            mcp_manager = await resources.enter_async_context(MCPTransportManager())
+            app.state.mcp_transport_manager = mcp_manager
             observability = ObservabilityFactory.create(settings.OBSERVABILITY_BACKEND or ObservabilityBackend.EMPTY)
             resources.push_async_callback(shutdown_observability, observability)
             app.state.blocking_executor = BoundedBlockingExecutor(settings.REQUEST_MAX_CONCURRENT)
@@ -114,7 +117,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
             executor = AgentExecutor(*settings.AGENT_PATHS)
             executor.concurrency = concurrency
-            await configure_mcp_agents(executor, settings, rebuild_all=True)
+            await configure_mcp_agents(executor, settings, rebuild_all=True, manager=mcp_manager)
             agents = executor.get_all_agent_info()
             if not agents:
                 raise RuntimeError("No agents were initialized")
@@ -142,6 +145,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         app.state.lock_pool = None
         app.state.sqlite_connection = None
         app.state.llm_transport_manager = None
+        app.state.mcp_transport_manager = None
         if hasattr(app.state, "agent_executor"):
             del app.state.agent_executor
 

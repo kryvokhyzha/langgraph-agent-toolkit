@@ -94,6 +94,7 @@ async def jsonl_message_generator(
             stream_tokens=stream_input.stream_tokens,
             agent_config=stream_input.agent_config,
             recursion_limit=stream_input.recursion_limit,
+            trace_session_id=public_thread_id,
         )
         async with aclosing(stream):
             async for message in stream:

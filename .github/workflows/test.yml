@@ -214,7 +214,9 @@ jobs:
           - extra: langfuse-v3
             version: "3.15.0"
           - extra: langfuse-v4
-            version: "4.15.2"
+            version: "4.18.0"
+          - extra: langfuse-v5
+            version: "5.0.4"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -278,13 +280,15 @@ jobs:
         with:
           version: "0.12.1"
       - name: Install test dependencies
-        run:
+        run: >-
           uv sync --frozen --no-install-project --no-default-groups --group
-          tests
-      - name: Verify locking, restart, cancellation, and checkpoint migration
+          tests --extra deepagents
+      - name: Verify locking, restart, cancellation, checkpoints, and media
         run: >-
           uv run --no-sync pytest tests/integration/test_postgres_reliability.py
           tests/integration/test_postgres_migration.py
+          tests/integration/test_deepagents_postgres.py
+          tests/integration/test_postgres_checkpoint_prune.py
           tests/core/test_concurrency.py tests/core/test_deadlocks.py
           --run-postgres -q
         env:

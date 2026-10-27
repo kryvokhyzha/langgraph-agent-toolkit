@@ -78,7 +78,7 @@ services:
 
   clickhouse:
     <<: *service-defaults
-    image: clickhouse/clickhouse-server
+    image: clickhouse/clickhouse-server:26.4
     user: "101:101"
     env_file:
       - ./configs/clickhouse/.clickhouse.env
@@ -109,13 +109,20 @@ services:
     container_name: redis
     env_file:
       - ./configs/redis/.redis.env
-    command: >
-      --requirepass ${REDIS_AUTH:-myredissecret}
+    command:
+      - sh
+      - -c
+      - >
+        exec docker-entrypoint.sh redis-server --requirepass "$${REDIS_AUTH:?Set
+        REDIS_AUTH in configs/redis/.redis.env}" --appendonly yes --appendfsync
+        everysec --maxmemory 256mb --maxmemory-policy noeviction
     ports:
       - "6379:6379"
+    volumes:
+      - langfuse_redis_data:/data
     healthcheck:
       <<: *healthcheck-defaults
-      test: ["CMD", "redis-cli", "-a", "${REDIS_AUTH:-myredissecret}", "ping"]
+      test: ["CMD-SHELL", 'REDISCLI_AUTH="$$REDIS_AUTH" redis-cli -e ping']
       interval: 3s
       timeout: 10s
       retries: 10
@@ -156,8 +163,13 @@ services:
   # Langfuse services
   langfuse-worker:
     <<: *service-defaults
-    image: langfuse/langfuse-worker:3
-    depends_on: *langfuse-depends-on
+    image:
+      docker.langfuse.com/langfuse/langfuse-worker:${LANGFUSE_SERVER_VERSION:?Select
+      a reviewed Langfuse server version in .env}
+    depends_on:
+      <<: *langfuse-depends-on
+      langfuse-web:
+        condition: service_healthy
     env_file:
       - ./configs/minio/.minio.env
       - ./configs/clickhouse/.clickhouse.env
@@ -165,15 +177,28 @@ services:
       - ./configs/redis/.redis.env
     ports:
       - "3030:3030"
+    healthcheck:
+      <<: *healthcheck-defaults
+      # The image provides wget. Both server processes bind to HOSTNAME.
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null
+          http://$$HOSTNAME:3030/api/health?failIfEventPropagationStuck=true ||
+          exit 1",
+        ]
+      start_period: 120s
     deploy:
       resources:
         limits:
           cpus: "1"
-          memory: 1G
+          memory: 1536M
 
   langfuse-web:
     <<: *service-defaults
-    image: langfuse/langfuse:3
+    image:
+      docker.langfuse.com/langfuse/langfuse:${LANGFUSE_SERVER_VERSION:?Select a
+      reviewed Langfuse server version in .env}
     depends_on: *langfuse-depends-on
     env_file:
       - ./configs/minio/.minio.env
@@ -187,20 +212,19 @@ services:
     healthcheck:
       <<: *healthcheck-defaults
       # Start the backend after Langfuse is ready for configured tracing and prompts.
-      # The Langfuse Next.js server binds to $$HOSTNAME, not `localhost`.
-      # Check the container hostname ($$(hostname)) at `/api/public/health`.
+      # The image has no hostname executable. Use the HOSTNAME environment value.
       test:
         [
           "CMD-SHELL",
-          "wget --no-verbose --tries=1 -O /dev/null
-          http://$$(hostname):3000/api/public/health || exit 1",
+          "wget -q -O /dev/null http://$$HOSTNAME:3000/api/public/health || exit
+          1",
         ]
       start_period: 120s # Allow time for the first database migration.
     deploy:
       resources:
         limits:
           cpus: "1"
-          memory: 1G
+          memory: 2G
 
   # Application services
   lat-agent-backend:
@@ -208,6 +232,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+      args:
+        LANGFUSE_SDK_MAJOR: ${LANGFUSE_SDK_MAJOR:-5}
     container_name: lat-agent-backend
     platform: linux/amd64
     ports:
@@ -225,7 +251,7 @@ services:
       postgres:
         condition: service_healthy
       langfuse-worker:
-        condition: service_started
+        condition: service_healthy
       langfuse-web:
         condition: service_healthy
       litellm:
@@ -263,4 +289,6 @@ volumes:
   langfuse_clickhouse_logs:
     driver: local
   langfuse_minio_data:
+    driver: local
+  langfuse_redis_data:
     driver: local

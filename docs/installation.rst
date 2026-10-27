@@ -51,12 +51,14 @@ The backend extras are ``uvicorn-backend``, ``gunicorn-backend``,
 ``aws-backend``, and ``azure-backend``. ``all-backends`` installs all of them.
 Uvicorn is already a base dependency. Its named extra remains available for
 existing installation commands.
-Use ``langfuse-v2``, ``langfuse-v3``, or ``langfuse-v4`` to select a Langfuse
+Use ``langfuse-v2``, ``langfuse-v3``, ``langfuse-v4``, or ``langfuse-v5`` to select a Langfuse
 Python SDK generation. Choose only one selector. These extras do not select or
 install a Langfuse server. See :doc:`langfuse_compatibility` for the supported
 SDK and server combinations.
 
-The generic ``langfuse`` extra permits SDK versions from 2.60.10 to below 5.
+The generic ``langfuse`` extra permits SDK versions from 2.60.10 to below 6.
+The default lockfile selects SDK v5, which requires server 4.59.0 or later.
+Use an explicit SDK v3 or v4 selector for server v3.
 It can combine with any one version selector. ``langsmith`` selects LangSmith,
 and ``all-observability`` includes both generic ``langfuse`` and ``langsmith``.
 Extra names use hyphens; underscore spellings such as ``langfuse_v2`` normalize
@@ -125,9 +127,10 @@ Install the locked development environment with all optional features:
    uv run --no-sync pytest
 
 Replace earlier ``--all-extras`` commands with ``--extra all``. Selecting every
-extra now includes three incompatible Langfuse SDK selectors. The ``all`` extra
-keeps the complete feature set and uses SDK v4 in the default lockfile selection.
-It does not force the ``langfuse-v4`` selector.
+extra now includes four incompatible Langfuse SDK selectors. The ``all`` extra
+keeps the complete feature set and uses SDK v5 in the default lockfile selection.
+It does not force a generation selector. SDK v5 requires server 4.59.0 or later.
+Use ``langfuse-v4`` for a server v3 deployment.
 
 Add one selector to use another SDK generation, when all dependencies permit it:
 
@@ -135,7 +138,7 @@ Add one selector to use another SDK generation, when all dependencies permit it:
 
    uv sync --frozen --no-install-project --extra all --extra langfuse-v2
 
-Use ``langfuse-v3`` or ``langfuse-v4`` in the same position. Keep the selected
+Use ``langfuse-v3``, ``langfuse-v4``, or ``langfuse-v5`` in the same position. Keep the selected
 SDK generation in the deployment's install command and lockfile.
 
 The lockfile fixes the complete source environment. The wheel metadata limits

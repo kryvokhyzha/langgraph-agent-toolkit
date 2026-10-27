@@ -111,18 +111,19 @@ the Python client, the UI, and real-model configuration.
 For an existing Python project, select provider and backend extras:
 
 ```sh
-uv add 'langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v4]'
+uv add 'langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v5]'
 ```
 
 Follow the [application onboarding guide](docs/onboarding.rst) to register
 agents, set identity and memory contracts, connect a client, and verify the
 deployment. It also gives the upgrade sequence for existing applications.
 
-`langfuse-v2`, `langfuse-v3`, and `langfuse-v4` select a Python SDK version
-range. Choose one. SDK and server versions are separate. Use the compatibility
-guide for supported combinations. `mcp`, `deepagents`, `ui`, and
-`openai-aiohttp` are separate extras. See [installation](docs/installation.rst)
-for all options.
+`langfuse-v2`, `langfuse-v3`, `langfuse-v4`, and `langfuse-v5` select a Python
+SDK version range. Choose one. SDK and server versions are separate. SDK v5
+requires server 4.59.0 or later. Keep `langfuse-v4` or `langfuse-v3` for server
+v3. Use the compatibility guide for supported combinations. `mcp`, `deepagents`,
+`ui`, and `openai-aiohttp` are separate extras. See
+[installation](docs/installation.rst) for all options.
 
 ## Memory and authentication
 

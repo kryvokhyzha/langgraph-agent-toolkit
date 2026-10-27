@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import httpx
 import pytest
 import test_langfuse_live as live
+from packaging.version import Version
 
 
 def test_v4_reader_decodes_json_and_coalesces_identical_rows_across_pages():
@@ -50,3 +51,15 @@ def test_duplicate_ids_cannot_hide_conflicting_results_or_parent_links(field):
     conflicting = {**original, field: "different"}
     with pytest.raises(AssertionError, match="conflicting rows"):
         live.deduplicate_observations([original, conflicting])
+
+
+@pytest.mark.parametrize("server", ["3.194.0", "4.58.9"])
+def test_sdk_v5_rejects_servers_without_the_modern_score_api(monkeypatch, server):
+    monkeypatch.setattr(live.adapter, "_SDK_MAJOR", 5)
+    with pytest.raises(pytest.fail.Exception, match="SDK v5 requires server 4.59.0"):
+        live.validate_server_version(Version(server))
+
+
+def test_sdk_v5_accepts_the_minimum_supported_server(monkeypatch):
+    monkeypatch.setattr(live.adapter, "_SDK_MAJOR", 5)
+    live.validate_server_version(Version("4.59.0"))

@@ -40,6 +40,12 @@ from langgraph_agent_toolkit.service.handler import create_app
         {"url": "https://example.invalid/mcp", "headers_env": {"invalid name": "ONE"}},
         {"url": "https://example.invalid/mcp", "timeout": 0},
         {"url": "https://example.invalid/mcp", "timeout": float("inf")},
+        {"url": "https://example.invalid/mcp", "max_sse_event_size": 0},
+        {"url": "https://example.invalid/mcp", "max_sse_event_size": -1},
+        {"url": "https://example.invalid/mcp", "max_sse_event_size": True},
+        {"url": "https://example.invalid/mcp", "max_sse_event_size": 1024.5},
+        {"url": "https://example.invalid/mcp", "max_sse_event_size": "1024"},
+        {"transport": "stdio", "command": "python", "max_sse_event_size": 1024},
         {"url": "https://example.invalid/mcp", "tool_allowlist": ["echo", "echo"]},
         {"url": "https://example.invalid/mcp", "typo": True},
     ],
@@ -56,11 +62,13 @@ def test_settings_and_worker_environment_preserve_mcp_types(monkeypatch):
             "headers": {"Authorization": "example-value"},
             "tool_allowlist": ["search"],
             "timeout": "12.5",
+            "max_sse_event_size": 2097152,
         }
     }
     monkeypatch.setenv("MCP_SERVERS", json.dumps(config))
     candidate = Settings(_env_file=None)
     assert candidate.MCP_SERVERS["docs"].timeout == 12.5
+    assert candidate.MCP_SERVERS["docs"].max_sse_event_size == 2097152
     assert isinstance(candidate.MCP_SERVERS["docs"].headers["Authorization"], SecretStr)
     assert "example-value" not in repr(candidate.MCP_SERVERS)
     monkeypatch.delenv("MCP_SERVERS")
@@ -106,14 +114,49 @@ async def test_unconfigured_mcp_does_not_import_optional_dependency(monkeypatch)
     original_import = builtins.__import__
 
     def no_mcp_import(name, *args, **kwargs):
-        if name.startswith(("fastmcp", "langchain.mcp")):
+        if name.startswith(("fastmcp", "langchain.mcp", "httpx2")):
             raise ImportError("Optional dependency is absent")
         return original_import(name, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "__import__", no_mcp_import)
-    assert await load_mcp_tools({}) == {}
+    async with mcp.MCPTransportManager() as manager:
+        assert await load_mcp_tools({}, manager=manager) == {}
     with pytest.raises(RuntimeError, match=r"Install langgraph-agent-toolkit\[mcp\]"):
         await load_mcp_tools({"docs": MCPServerConfig(url="https://example.invalid/mcp")})
+
+
+async def test_cancelled_manager_shutdown_can_finish_without_repeating_pool_close(monkeypatch):
+    httpx = pytest.importorskip("httpx2")
+    entered = asyncio.Event()
+    finish = asyncio.Event()
+    calls = []
+    original_close = httpx.AsyncClient.aclose
+
+    async def blocked_close(client):
+        calls.append(client)
+        entered.set()
+        await finish.wait()
+        await original_close(client)
+
+    monkeypatch.setattr(httpx.AsyncClient, "aclose", blocked_close)
+    manager = await mcp.MCPTransportManager().__aenter__()
+    manager.client_factory()
+    closing = asyncio.create_task(manager.aclose())
+    try:
+        await asyncio.wait_for(entered.wait(), timeout=5)
+        closing.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await closing
+        assert len(calls) == 1
+        assert not calls[0].is_closed
+        finish.set()
+        await asyncio.wait_for(manager.aclose(), timeout=5)
+        await manager.aclose()
+        assert len(calls) == 1
+        assert calls[0].is_closed
+    finally:
+        finish.set()
+        await manager.aclose()
 
 
 @pytest.fixture
@@ -134,7 +177,11 @@ def mcp_server(monkeypatch):
         return "other"
 
     # Use the real protocol and adapter. Replace only the configured transport.
-    monkeypatch.setattr(mcp, "_create_client", lambda name, config: fastmcp.Client(server, name=name, mode=config.mode))
+    monkeypatch.setattr(
+        mcp,
+        "_create_client",
+        lambda name, config, **kwargs: fastmcp.Client(server, name=name, mode=config.mode, cache=True),
+    )
     return server, calls
 
 
@@ -283,7 +330,9 @@ def test_service_attaches_mcp_tools_before_checkpointer_and_readiness(monkeypatc
             ]
         ),
     )
-    monkeypatch.setattr(mcp, "_create_client", lambda name, config: fastmcp.Client(server, name=name))
+    monkeypatch.setattr(
+        mcp, "_create_client", lambda name, config, **kwargs: fastmcp.Client(server, name=name, cache=True)
+    )
     monkeypatch.setattr(settings, "AGENT_PATHS", [f"{blueprint.__name__}:react_agent"])
     monkeypatch.setattr(settings, "MCP_SERVERS", {"docs": MCPServerConfig(url="https://example.invalid/mcp")})
     monkeypatch.setattr(settings, "MCP_AGENT_SERVERS", {"create-agent": ["docs"]})
