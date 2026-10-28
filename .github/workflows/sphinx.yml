@@ -39,7 +39,7 @@ jobs:
           python-version: "3.11"
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install locked documentation and runtime dependencies
         run:
           uv sync --frozen --no-install-project --no-default-groups --extra all

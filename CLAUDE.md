@@ -353,7 +353,7 @@ Langfuse stack. The Langfuse stack contains postgres, redis, clickhouse, minio,
 langfuse-web :3000, and langfuse-worker. Postgres creates three DBs (`agents`,
 `litellm`, `langfuse`) and a `checkpoints` schema through
 `scripts/postgres-init/`. Both application images use multi-stage
-`python:3.13-slim` builds. The builder uses `uv`; the runtime contains its
+`python:3.13.18-slim` builds. The builder uses `uv`; the runtime contains its
 virtual environment and application source. Both runtime images install `curl`
 for health probes. Use `make rebuild_api` / `make rebuild_app` to rebuild one
 service.

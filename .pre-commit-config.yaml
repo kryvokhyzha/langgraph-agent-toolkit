@@ -48,6 +48,6 @@ repos:
         args: [--print-width=80, --prose-wrap=always]
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.1
+    rev: 0.13.6
     hooks:
       - id: uv-lock

@@ -117,6 +117,80 @@ async def test_workers_can_initialize_the_same_checkpoint_schema(backend):
         assert await second.aget_tuple(config) is None
 
 
+async def test_thread_listing_uses_metadata_and_survives_pool_replacement(backend, monkeypatch):
+    """Page through owner-scoped conversations without loading checkpoint blobs."""
+    monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
+    monkeypatch.setattr(settings, "AUTH_SECRET", SecretStr("thread-test-credential"))
+    monkeypatch.setattr(settings, "AUTH_USERS", {})
+
+    async def reply(state):
+        return {"messages": [AIMessage("reply")]}
+
+    async with backend.get_checkpoint_saver() as saver, backend.get_lock_pool() as pool:
+        await saver.setup()
+        coordinator = PostgresConversationCoordinator(pool, timeout=2)
+        executor = make_executor(message_graph(saver, reply), coordinator)
+        executor.agents["other"] = Agent("other", "Other test agent", message_graph(saver, reply), EmptyObservability())
+        app = create_app()
+        app.state.agent_executor = executor
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://thread.test",
+            headers={"Authorization": "Bearer thread-test-credential"},
+        ) as client:
+            for agent, owner, thread in (
+                ("test", "owner", "first"),
+                ("test", "owner", "second"),
+                ("test", "other", "private"),
+                ("other", "owner", "other-agent"),
+            ):
+                response = await client.post(
+                    f"/{agent}/invoke", json={"user_id": owner, "thread_id": thread, "input": {"message": "saved"}}
+                )
+                assert response.status_code == 200, response.text
+            imported = await client.post(
+                "/test/history/add_messages",
+                json={
+                    "user_id": "owner",
+                    "thread_id": "imported",
+                    "messages": [{"type": "human", "content": "x" * 10000}],
+                },
+            )
+            assert imported.status_code == 201, imported.text
+
+            def reject_checkpoint_payload(*args, **kwargs):
+                pytest.fail("Thread listing must not deserialize checkpoint messages.")
+
+            with monkeypatch.context() as guard:
+                guard.setattr(saver.serde, "loads_typed", reject_checkpoint_payload)
+                response = await client.get("/test/threads", params={"user_id": "owner", "limit": 2})
+                assert response.status_code == 200, response.text
+                first = response.json()
+                assert [item["thread_id"] for item in first["threads"]] == ["imported", "second"]
+                assert first["next_cursor"]
+
+    async with backend.get_checkpoint_saver() as saver:
+        await saver.setup()
+        # Reads need no conversation lock and use the new pool.
+        app.state.agent_executor = make_executor(message_graph(saver, reply), ConversationCoordinator())
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://thread.test",
+            headers={"Authorization": "Bearer thread-test-credential"},
+        ) as client:
+            response = await client.get(
+                "/test/threads", params={"user_id": "owner", "limit": 2, "cursor": first["next_cursor"]}
+            )
+            assert response.status_code == 200, response.text
+            assert response.json() == {"threads": [{"thread_id": "first", "agent_id": "test"}], "next_cursor": None}
+            cleared = await client.request(
+                "DELETE", "/test/history/clear", json={"thread_id": "first", "user_id": "owner"}
+            )
+            assert cleared.status_code == 200, cleared.text
+            remaining = await client.get("/test/threads", params={"user_id": "owner"})
+            assert [item["thread_id"] for item in remaining.json()["threads"]] == ["imported", "second"]
+
+
 async def test_workers_can_initialize_the_same_store_schema(backend):
     async with backend.get_memory_store() as first, backend.get_memory_store() as second:
         async with asyncio.TaskGroup() as startup:

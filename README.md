@@ -24,7 +24,8 @@ and [changelog](CHANGELOG.md) before upgrading.
 
 ## What the toolkit provides
 
-- FastAPI routes for invocation, SSE, JSON Lines, history, and feedback.
+- FastAPI routes for invocation, SSE, JSON Lines, conversation lists, history,
+  and feedback.
 - Sync and async `AgentClient` interfaces, including multimodal messages.
 - SQLite or PostgreSQL checkpoints with conversation ownership and ordered
   updates across workers.
@@ -46,7 +47,7 @@ This local demo uses a deterministic fake model and SQLite. It needs no model
 key, Docker, or external service. It checks API behavior and persistence. Model
 quality requires separate evaluation.
 
-Install `uv`, then use a fresh checkout:
+Install `uv` 0.13.6 or later, then use a fresh checkout:
 
 ```sh
 git clone https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
@@ -136,6 +137,12 @@ a store. SQLite supplies checkpoints but has no long-term store.
 
 The service separates conversation storage by authenticated user, agent, and
 public thread ID. Keep these values consistent when reading or updating history.
+
+Use `/threads` to list saved conversations for one user and agent. Use
+`/history` to read messages in one conversation. History returns at most 100
+messages by default. Follow `next_offset` for more messages and `next_cursor`
+for more conversations. See the [usage guide](docs/usage.rst) for examples and
+storage limits.
 
 For one deployment per client, keep one `AUTH_SECRET`. The default
 `AUTH_MODE=trusted` preserves 0.9.2 shared bearer-token authentication.

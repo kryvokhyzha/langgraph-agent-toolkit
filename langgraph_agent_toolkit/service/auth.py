@@ -22,6 +22,8 @@ def validate_auth_configuration() -> None:
     tokens = [secret.get_secret_value() for secret in settings.AUTH_USERS.values()]
     if any(not user for user in settings.AUTH_USERS) or any(not token for token in tokens):
         raise ValueError("AUTH_USERS requires nonempty user IDs and tokens")
+    if any("\x00" in user for user in (*settings.AUTH_USERS, settings.AUTH_SERVICE_USER_ID)):
+        raise ValueError("Authentication user IDs must not contain NUL characters")
     if len(tokens) != len(set(tokens)):
         raise ValueError("Each AUTH_USERS token must identify exactly one user")
     shared = settings.AUTH_SECRET.get_secret_value() if settings.AUTH_SECRET else None
@@ -73,6 +75,10 @@ def authenticated_user_id(request: Request, user_id: str | None) -> str:
         if user_id is not None and user_id != principal.user_id:
             raise HTTPException(403, "user_id must match the authenticated user")
         owner = principal.user_id
+    if "\x00" in owner:
+        raise HTTPException(422, "user_id must not contain NUL characters")
+    if len(owner) > 256:
+        raise HTTPException(422, "Conversation identifiers must not exceed 256 characters")
     return owner
 
 
@@ -84,7 +90,9 @@ def conversation_identity(
     public_id = thread_id or (str(uuid4()) if create else None)
     if not public_id:
         raise HTTPException(422, "thread_id is required")
-    if len(public_id) > 256 or len(owner) > 256:
+    if "\x00" in public_id or "\x00" in agent_id:
+        raise HTTPException(422, "Conversation identifiers must not contain NUL characters")
+    if len(public_id) > 256:
         raise HTTPException(422, "Conversation identifiers must not exceed 256 characters")
     return public_id, owner, storage_thread_id(owner, agent_id, public_id)
 
@@ -92,7 +100,15 @@ def conversation_identity(
 def execution_input(request: Request, agent_id: str, value):
     """Create execution input with authenticated storage identifiers."""
     public_id, owner, key = conversation_identity(request, agent_id, value.thread_id, value.user_id, create=True)
-    forbidden = {"thread_id", "user_id", "checkpoint_id", "checkpoint_ns"}
+    forbidden = {
+        "thread_id",
+        "user_id",
+        "checkpoint_id",
+        "checkpoint_ns",
+        "lat_user_id",
+        "lat_agent_id",
+        "lat_thread_id",
+    }
     if forbidden.intersection(value.agent_config) or any(k.startswith("__") for k in value.agent_config):
         raise HTTPException(422, "agent_config cannot override identity or checkpoint fields")
     if value.recursion_limit is not None and not 1 <= value.recursion_limit <= settings.DEFAULT_RECURSION_LIMIT:

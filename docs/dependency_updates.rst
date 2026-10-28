@@ -1,6 +1,34 @@
 Dependency update review
 ========================
 
+CA security follow-up: 2026-10-28
+---------------------------------
+
+The `Python security notice
+<https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576>`_
+requires updated certificate bundles after the eMudhra intermediate-key incident.
+Both the base package and the source-only client group now require
+``certifi>=2026.10.19``. The existing lock already selects 2026.10.23.
+
+CI, Docker builds, and the lock hook now use uv 0.13.6. Source checkouts reject
+older uv versions. This includes the certificate fixes from uv 0.13.4 and 0.13.5
+and the managed Python updates in `uv 0.13.6
+<https://github.com/astral-sh/uv/releases/tag/0.13.6>`_. The new uv lock format
+changes metadata; it does not change the selected package versions.
+
+The Docker base is Python 3.13.18. Both images ensure ``pip>=26.2.2`` and install
+current system CA certificates. The `pip release notes
+<https://pip.pypa.io/en/stable/news/#v26-2-2>`_ confirm that this release updates
+pip's private certifi copy. Updating application dependencies alone does not
+update that copy or the pip wheel bundled with ``ensurepip``. Rebuild both
+images with ``--pull --no-cache`` and recreate the containers.
+
+``[tool.uv.exclude-newer-package]`` sets ``certifi = "0 days"``. Dependabot also
+excludes certifi from its seven-day cooldown. The project has no general uv
+release-age delay. The per-package setting permits certificate updates if a
+general delay is supplied later. It does not upgrade an existing lockfile;
+review and merge the dependency update. Other Dependabot rules stay unchanged.
+
 Current baseline: 2026-10-27
 ----------------------------
 
@@ -505,7 +533,7 @@ CI now tests wheels, package behavior, process journeys, and each Langfuse SDK
 on all four Python versions. PostgreSQL checks cover Python 3.13 and 3.14.
 Lint and lockfile validation run once. Jobs have time limits, superseded pull
 request runs stop, and Docker builds use separate caches for each image.
-CI and the ``uv-lock`` pre-commit hook use uv 0.12.1.
+CI and the ``uv-lock`` pre-commit hook now use uv 0.13.6.
 Releases wait for the test workflow. The publish job checks the release tag,
 builds distributions, and validates their metadata before it uploads to PyPI.
 The metadata check uses isolated Twine v7. Twine v6 rejects the current

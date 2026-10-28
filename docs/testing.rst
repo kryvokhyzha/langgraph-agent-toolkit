@@ -129,6 +129,12 @@ read existing checkpoints, append messages, stream one new answer, reopen the
 database, and clear the conversation. Functional API history reads LangGraph's
 private saved-state channel. Keep these tests when upgrading LangGraph.
 
+Conversation-list tests use real graphs and SQLite checkpoints. They check
+user and agent isolation, cursor pagination, database restart, and deletion.
+They keep conversation lists separate from message-history pages. They also
+check that repeated runs and subgraph checkpoints do not add duplicate threads.
+Pagination tests follow non-null cursors even when a page is empty.
+
 API process journeys
 --------------------
 
@@ -187,7 +193,10 @@ Set ``AGENT_URL`` and ``AUTH_SECRET`` in the app container before it starts.
 CI also checks final runtime contents with ``docker_image_smoke.py``.
 The check uses no test packages or external network. It verifies the non-root
 user, copied virtual environment, and TLS certificate roots. It rejects build
-tools, development packages, and source environment files. The API check
+tools, development packages, and source environment files. It checks the
+application certifi version and the base interpreter's pip and ensurepip
+versions. It rejects the affected emSign root in all four certificate stores.
+The API check
 imports the selected features, loads the bundled PostgreSQL client, and writes
 and reopens a temporary SQLite database. The UI check reuses the client-only
 import check. After building both images, run:

@@ -10,6 +10,9 @@ format. The project uses
 
 ### Added
 
+- Add authenticated `/threads` and `/{agent_id}/threads` endpoints. Return
+  paginated conversation IDs for one user and agent without loading message
+  content. Add `list_threads()` and `alist_threads()` to `AgentClient`.
 - Add optional tool selection for native agents and Deep Agents. Reuse LangChain
   LLM selection and provider tool search. Keep selection disabled by default.
   Add examples and API benchmarks for tool schemas, calls, and task completion.
@@ -35,6 +38,9 @@ format. The project uses
 
 ### Changed
 
+- Require `certifi>=2026.10.19` for service and client installations. Use uv
+  0.13.6 for CI, Docker builds, and the lock hook. Exempt certifi from update
+  cooldowns. Use Python 3.13.18 and pip 26.2.2 or later in both Docker images.
 - Update the default Langfuse Python SDK to 5.0.4. Add `langfuse-v5` and keep
   SDK v2, v3, and v4 selectors. Require server 4.59.0 or later for SDK v5.
 - Update the explicit SDK v4 baseline to 4.18.0. Keep SDK v2 and v3 at 2.60.10
@@ -49,6 +55,11 @@ format. The project uses
 
 ### Fixed
 
+- Protect known credentials in model/database configuration and encoded sources
+  with `SecretStr`. Unwrap them at SDK construction. Hide raw settings inputs in
+  displayed validation errors.
+- Preserve custom progress events when token streaming is disabled. Add real
+  graph tests for interrupted runs and history pagination with subgraphs.
 - Keep tool selection settings independent of agent runtime imports. Restore
   client and Streamlit startup in the minimal app image without LangChain.
 - Close each distinct agent observability backend during shutdown or failed
@@ -71,6 +82,8 @@ format. The project uses
 
 ### Documentation
 
+- Explain conversation-list pagination and the existing 100-message history
+  default. Document storage support and migration limits for conversation lists.
 - Add pending-question recovery, Streamlit forms, tool metadata, and direct
   Python connection management to the MCP and migration guides.
 - Add OpenAI Responses configuration and durable binary storage examples.

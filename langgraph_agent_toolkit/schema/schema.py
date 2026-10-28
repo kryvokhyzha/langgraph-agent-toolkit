@@ -482,6 +482,33 @@ class ChatHistory(BaseModel):
     )
 
 
+class ThreadListInput(BaseModel):
+    """Select one page of conversations for one owner and agent."""
+
+    user_id: str | None = Field(default=None, min_length=1, max_length=256)
+    limit: int = Field(default=100, ge=1, le=100, description="Maximum number of conversations to return.")
+    cursor: str | None = Field(
+        default=None, min_length=1, max_length=2048, description="Use next_cursor from the previous page."
+    )
+
+
+class ThreadSummary(BaseModel):
+    """Identify one saved conversation without loading its messages."""
+
+    thread_id: str
+    agent_id: str
+
+
+class ThreadList(BaseModel):
+    """Return conversations in creation order, with the newest first."""
+
+    threads: list[ThreadSummary]
+    next_cursor: str | None = Field(
+        default=None,
+        description="Continue with this cursor, even when this page is empty. None marks the end.",
+    )
+
+
 class HealthCheck(BaseModel):
     """Response model for a health check."""
 

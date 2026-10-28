@@ -150,6 +150,23 @@ examples.
 
 Set one configuration source. An explicit ``MODEL_CONFIGS`` value, including
 ``{}``, takes precedence over ``MODEL_CONFIGS_BASE64`` and ``MODEL_CONFIGS_PATH``.
+
+Settings store known credentials in ``MODEL_CONFIGS`` and ``DB_CONFIGS`` as
+``SecretStr`` values. This includes API keys, passwords, tokens, HTTP header
+values, connection strings, and endpoint URLs with embedded user credentials.
+Model names, ordinary URLs, and numeric limits remain plain values.
+The base64 source fields also use ``SecretStr``. Base64 does not encrypt a secret.
+
+The toolkit model factories unwrap credentials when they construct SDK clients.
+For a custom SDK or database client, use
+``reveal_config_secrets`` from ``langgraph_agent_toolkit.core.config_secrets``
+only at that client's construction boundary. Do not log its result.
+Settings JSON output masks typed secrets. Python ``model_dump()`` output retains
+the wrappers. Custom configuration keys are not all recognized automatically;
+wrap other confidential strings in ``SecretStr`` in Python code.
+When logging structured validation errors, use
+``error.errors(include_input=False)``. The default structured error data can
+contain input even when the displayed exception hides it.
 Base64 takes precedence over the file path. Remove the inline template entry
 before using the file path. Base64 encodes content; it does not encrypt it.
 

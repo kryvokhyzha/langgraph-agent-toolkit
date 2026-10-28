@@ -21,6 +21,8 @@ from langgraph_agent_toolkit.schema import (
     MessageInput,
     ServiceMetadata,
     StreamInput,
+    ThreadList,
+    ThreadListInput,
     UserComplexInput,
     UserInput,
 )
@@ -695,6 +697,56 @@ class AgentClient:
             return FeedbackResponse.model_validate(response.json())
         except httpx.HTTPError as e:
             raise _http_error(e) from e
+
+    def list_threads(
+        self,
+        user_id: str | None = None,
+        *,
+        limit: int = 100,
+        cursor: str | None = None,
+    ) -> ThreadList:
+        """Get one page of conversations for this agent.
+
+        Follow next_cursor until it is None. A page can be empty before the end.
+        Each item contains identifiers. Use get_history to read its messages.
+        """
+        request = ThreadListInput(user_id=user_id, limit=limit, cursor=cursor)
+        try:
+            response = self._get_http_client().get(
+                f"{self.base_url}/{self.agent}/threads" if self.agent else f"{self.base_url}/threads",
+                params=request.model_dump(exclude_none=True),
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise _http_error(e) from e
+        return ThreadList.model_validate(response.json())
+
+    async def alist_threads(
+        self,
+        user_id: str | None = None,
+        *,
+        limit: int = 100,
+        cursor: str | None = None,
+    ) -> ThreadList:
+        """Get one page of conversations for this agent asynchronously.
+
+        Follow next_cursor until it is None. A page can be empty before the end.
+        Each item contains identifiers. Use aget_history to read its messages.
+        """
+        request = ThreadListInput(user_id=user_id, limit=limit, cursor=cursor)
+        try:
+            response = await self._get_async_http_client().get(
+                f"{self.base_url}/{self.agent}/threads" if self.agent else f"{self.base_url}/threads",
+                params=request.model_dump(exclude_none=True),
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            raise _http_error(e) from e
+        return ThreadList.model_validate(response.json())
 
     def get_history(
         self,

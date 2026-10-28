@@ -40,13 +40,24 @@ Production Image Builds
 -----------------------
 
 Both images use separate builder and runtime stages based on
-``python:3.13-slim``. The builder installs frozen production dependencies in
+``python:3.13.18-slim``. A shared base stage ensures pip is at least 26.2.2.
+It mounts uv 0.13.6 only for that installation. The builder installs frozen production dependencies in
 ``/opt/venv``. The runtime copies that environment and the package source.
 It does not copy ``uv``, its download cache, or development dependency groups.
 BuildKit cache mounts reuse downloads between builds without adding them to
 the runtime image. The builder compiles dependency bytecode. This bytecode
 stays in the image to reduce import work during startup. Local source caches
 do not enter the image.
+
+After a CA security update, refresh the base image and disable the layer cache:
+
+.. code-block:: bash
+
+   docker build --pull --no-cache -f docker/api/Dockerfile -t toolkit-api .
+   docker build --pull --no-cache -f docker/app/Dockerfile -t toolkit-app .
+
+Recreate the running containers from the new images. The runtime checks in
+:doc:`testing` inspect the system, application, pip, and ensurepip trust stores.
 
 The API retains Gunicorn, both OpenAI transports, MCP, and observability extras.
 Add ``--build-arg INSTALL_DEEPAGENTS=true`` to include Deep Agents. The UI uses

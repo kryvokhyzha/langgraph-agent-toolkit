@@ -360,7 +360,7 @@ def test_custom_settings_keep_types_in_parent_and_child_environment(monkeypatch)
     child._apply_langgraph_env_overrides()
     assert child.AUTH_SECRET.get_secret_value() == "test-token"
     assert child.PORT == 9001
-    assert child.MODEL_CONFIGS["fake"]["api_key"] == "nested-test-token"
+    assert child.MODEL_CONFIGS["fake"]["api_key"].get_secret_value() == "nested-test-token"
     assert child.AUTH_USERS["alice"].get_secret_value() == "alice-test-token"
     assert child.AUTH_USERS["bob"].get_secret_value() == "bob-test-token"
     with patch("langgraph_agent_toolkit.service.factory.create_app"):

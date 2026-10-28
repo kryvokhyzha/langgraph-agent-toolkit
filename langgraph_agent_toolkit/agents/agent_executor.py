@@ -481,7 +481,15 @@ class AgentExecutor:
                 configurable["model_provider"] = model_provider
 
         if agent_config:
-            reserved = {"thread_id", "user_id", "checkpoint_id", "checkpoint_ns"}
+            reserved = {
+                "thread_id",
+                "user_id",
+                "checkpoint_id",
+                "checkpoint_ns",
+                "lat_user_id",
+                "lat_agent_id",
+                "lat_thread_id",
+            }
             if reserved.intersection(agent_config) or any(key.startswith("__") for key in agent_config):
                 raise ValueError("agent_config cannot override identity or checkpoint fields")
             configurable.update(agent_config)
@@ -498,6 +506,9 @@ class AgentExecutor:
             callbacks=[callback] if callback else None,
             recursion_limit=recursion_limit,
             metadata={
+                "lat_user_id": user_id,
+                "lat_agent_id": agent_id,
+                "lat_thread_id": session_id,
                 "langfuse_session_id": session_id,
                 "langfuse_user_id": user_id,
                 "langfuse_tags": [agent.name],
@@ -675,7 +686,7 @@ class AgentExecutor:
             input=input_data,
             agent_name=agent.name,
         ) as trace_span:
-            stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
+            stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates", "custom"]
             final_output: str | None = None
             pending_interrupts = []
             seen_interrupts = set()

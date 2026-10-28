@@ -4,6 +4,13 @@ Installation Options
 Use Python 3.11, 3.12, 3.13, or 3.14. See :doc:`quickstart` for the first working
 API example. It uses a fake model and needs no provider credentials.
 
+Use a current security patch release of Python. For the October 2026 CA incident,
+use at least 3.11.18, 3.12.16, 3.13.18, or 3.14.10 for the selected minor version.
+Source checkouts require uv 0.13.6 or later. Update pip to at least 26.2.2 in
+each environment that contains it. Updating the application ``certifi`` package
+does not update pip's private certificate bundle. See :doc:`dependency_updates`
+for sources and rebuild instructions.
+
 Python 3.14 requires Pydantic 2.13.0 or later. This version also supports the
 legacy models used by Langfuse SDK v2 and v3. The package metadata applies this
 minimum only on Python 3.14. The ``studio`` extra also requires

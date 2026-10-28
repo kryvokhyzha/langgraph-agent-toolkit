@@ -11,6 +11,33 @@ The service binds each stored conversation to a user and an agent. The public
 Existing raw thread IDs need an explicit migration before the service can read
 them through the new API.
 
+Refresh installation tools and images
+-------------------------------------
+
+Source checkouts now require uv 0.13.6 or later. Both installation paths require
+``certifi>=2026.10.19``. The current lock already selects 2026.10.23.
+The Docker images use Python 3.13.18 and ensure ``pip>=26.2.2``.
+For the October 2026 CA incident, rebuild with ``--pull --no-cache`` and recreate
+the containers. Existing environments need separate Python, pip, and operating
+system certificate updates. See :doc:`installation` and :doc:`dependency_updates`.
+
+Handle typed configuration secrets
+-----------------------------------
+
+Known credential fields in ``MODEL_CONFIGS`` and ``DB_CONFIGS`` now use
+``SecretStr``. This also applies to values returned by ``get_model_config()``
+and ``get_db_config()``. ``MODEL_CONFIGS_BASE64`` and ``DB_CONFIGS_BASE64`` are
+also secret values. Environment variable syntax and REST requests stay unchanged.
+
+Toolkit model factories accept these values directly. Custom SDK integrations
+can call ``reveal_config_secrets(config)`` from
+``langgraph_agent_toolkit.core.config_secrets`` immediately before constructing
+the client. A single ``SecretStr`` also has ``get_secret_value()``.
+Do not use ``str(secret)`` as a credential; it returns the masked display value.
+Do not use masked settings JSON to transfer credentials between processes.
+The toolkit worker launcher already unwraps secrets for its worker environment.
+See :doc:`environment_setup` for serialization and validation-error limits.
+
 Keep the two memory types separate
 ----------------------------------
 
@@ -172,6 +199,9 @@ The following changes require a client review before deployment:
 * History reads return a page of 100 messages by default. Use ``offset`` and
   ``limit`` to read later pages. The maximum limit is 1000, or the smaller value
   set by ``HISTORY_MAX_PAGE_SIZE``. Continue with ``next_offset`` until it is null.
+  Version 0.9.2 returned all messages. An older client that ignores pagination
+  can display only the first page. The remaining messages stay in storage.
+  ``get_history()`` and ``aget_history()`` each return one page.
 * Clearing history deletes all stored checkpoint versions and pending writes
   for the selected conversation. It does not only empty the latest message list.
   Back up data that must remain available.
@@ -196,6 +226,41 @@ before the next graph step starts. Database calls still use async methods.
 An explicit ``async`` override keeps overlapping saves and graph steps. Remove
 that override or set it to ``sync`` to use the new default. Both modes report
 write errors. See :doc:`reliability` for recovery limits and tuning guidance.
+
+Add conversation discovery
+--------------------------
+
+``GET /threads`` and ``GET /{agent_id}/threads`` list saved conversation IDs.
+They do not replace ``/history``, which reads messages from one conversation.
+This addition keeps the existing history routes and 100-message default.
+No new request header or authentication setting is required.
+
+Use ``list_threads()`` or ``alist_threads()`` in ``AgentClient``. The response
+contains ``threads`` and ``next_cursor``. Each entry contains ``thread_id``
+and ``agent_id``. The default and maximum page size are 100 conversations.
+Continue with ``cursor=next_cursor`` until the cursor is null. An empty page
+can have a next cursor. The response does not contain a total count.
+The order uses conversation creation, newest first. A new message does not
+change that order. See :doc:`usage` for HTTP and Python examples.
+
+The endpoint lists conversations for one authenticated user and agent.
+It supports toolkit-managed SQLite and PostgreSQL checkpointers and in-memory
+savers. In-memory lists are local to one process. ``NoOpSaver`` returns an
+empty list. An unsupported custom saver returns HTTP 501 for listing.
+
+The first startup adds a partial checkpoint index. PostgreSQL builds this index
+concurrently. A large existing database can require a larger
+``POSTGRES_STATEMENT_TIMEOUT`` for this first build. If the PostgreSQL build
+fails, the next startup removes the invalid index and retries the build.
+
+Existing scoped checkpoints need matching ``user_id`` and
+``langfuse_session_id`` metadata to appear in this list. The service verifies
+that the metadata matches the scoped storage key. It does not infer ownership
+from a raw thread ID. Keep known public IDs for conversations that lack this
+metadata. History access to those scoped conversations remains available.
+Keep the initial root checkpoint with ``step=0``. Pruning it can remove the
+conversation from the list even when its latest history remains available.
+Raw 0.9.2 checkpoint IDs still require the migration described below.
 
 Review MCP clients
 ------------------

@@ -165,8 +165,11 @@ committed progress before the connection failed. With ``async`` durability, a
 later step can run and save data before an earlier checkpoint failure reaches
 the caller. A failed run does not roll back all of its writes. The included UI keeps the
 failed input separate, reloads saved history, and does not automatically resend
-the request. Browser session state is not a durable conversation archive. Keep
-public thread IDs and ownership records when users must discover previous chats.
+the request. Browser session state is not a durable conversation archive.
+Use ``/threads`` to discover saved conversations on a supported checkpointer.
+Keep public thread IDs for older conversations that lack discovery metadata.
+Keep application records for titles and other chat metadata. The endpoint lists
+IDs only. See :doc:`usage` for pagination and storage limits.
 
 Request Admission
 -----------------

@@ -31,6 +31,7 @@ classifiers = [
 requires-python = ">=3.11,<3.15"
 
 dependencies = [
+    "certifi >= 2026.10.19",  # Remove trust in the affected emSign root CA.
     "rootutils >= 1.0.7",
     "filelock >= 3.18, < 4",
     "ddgs >= 9.5.0",
@@ -83,6 +84,7 @@ docs = [
 # This group does not install the package or its service dependencies.
 # Run `uv sync --frozen --only-group client` to install this group.
 client = [
+    "certifi >= 2026.10.19",
     "httpx ~= 0.28.1",
     "pydantic >= 2.11.1, < 2.13.5; python_version < '3.14'",
     "pydantic >= 2.13.0, < 2.13.5; python_version >= '3.14'",
@@ -218,6 +220,7 @@ repository = "https://github.com/kryvokhyzha/langgraph-agent-toolkit"
 packages = ["langgraph_agent_toolkit"]
 
 [tool.uv]
+required-version = ">=0.13.6"
 conflicts = [
     [
         {extra = "langfuse-v2"},
@@ -226,6 +229,10 @@ conflicts = [
         {extra = "langfuse-v5"},
     ],
 ]
+
+[tool.uv.exclude-newer-package]
+# Allow certificate trust updates without a release-age delay.
+certifi = "0 days"
 
 [tool.ruff]
 line-length = 120

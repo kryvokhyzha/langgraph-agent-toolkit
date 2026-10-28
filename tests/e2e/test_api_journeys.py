@@ -131,3 +131,33 @@ def test_concurrent_turns_and_pending_interrupt_survive_process_replacement(api_
     assert api_service.database.is_file()
     with sqlite3.connect(f"file:{api_service.database}?mode=ro", uri=True) as database:
         assert database.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+
+
+async def test_thread_pages_survive_restart_and_work_with_both_clients(api_service):
+    """List conversations through both clients without returning their messages."""
+    async with client_for(api_service) as client:
+        for index in range(3):
+            await client.ainvoke({"message": f"message-{index}"}, thread_id=f"thread-{index}", user_id="owner")
+        await client.ainvoke({"message": "private"}, thread_id="other-thread", user_id="other")
+        first = client.list_threads("owner", limit=2)
+        assert [thread.thread_id for thread in first.threads] == ["thread-2", "thread-1"]
+        assert all(thread.agent_id == "journey-agent" for thread in first.threads)
+        assert first.next_cursor
+
+    api_service.restart()
+
+    async with client_for(api_service) as client:
+        # Updating an old thread does not change its creation order.
+        await client.ainvoke({"message": "another turn"}, thread_id="thread-0", user_id="owner")
+        second = await client.alist_threads("owner", limit=2, cursor=first.next_cursor)
+        assert [thread.thread_id for thread in second.threads] == ["thread-0"]
+        assert second.next_cursor is None
+        history = await client.aget_history(second.threads[0].thread_id, user_id="owner")
+        assert [message.content for message in history.messages][::2] == ["message-0", "another turn"]
+        assert (await client.alist_threads()).threads == []
+        with pytest.raises(AgentClientError) as error:
+            await client.alist_threads("other", cursor=first.next_cursor)
+        assert error.value.status_code == 422
+        await client.aclear_history("thread-1", user_id="owner")
+        remaining = client.list_threads("owner")
+        assert [thread.thread_id for thread in remaining.threads] == ["thread-2", "thread-0"]

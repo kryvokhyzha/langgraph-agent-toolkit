@@ -54,7 +54,7 @@ jobs:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install the configured hook runner
         run: uv sync --frozen --only-group lint
       - name: Stage the pull request changes in this disposable checkout
@@ -91,7 +91,7 @@ jobs:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Verify the dependency lockfile
         run: uv lock --check
       - name: Install lint dependencies
@@ -117,7 +117,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Build and install the base wheel in a clean environment
         run: |
           uv build --wheel
@@ -171,7 +171,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install dependencies with uv
         run:
           uv sync --frozen --no-install-project --no-default-groups --extra all
@@ -238,7 +238,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Verify the extra selects its SDK major
         run: |
           uv venv .venv-langfuse
@@ -290,7 +290,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install test dependencies
         run: >-
           uv sync --frozen --no-install-project --no-default-groups --group
@@ -427,7 +427,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install ONLY CLIENT dependencies with uv
         run: |
           uv sync --frozen --only-group client --only-group tests
