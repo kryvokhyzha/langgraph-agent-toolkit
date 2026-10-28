@@ -1,0 +1,86 @@
+name: Phoenix E2E
+
+on:
+  pull_request:
+    paths:
+      - "langgraph_agent_toolkit/core/observability/**"
+      - "langgraph_agent_toolkit/core/_base_settings.py"
+      - "langgraph_agent_toolkit/agents/agent_executor.py"
+      - "langgraph_agent_toolkit/service/**"
+      - "tests/conftest.py"
+      - "tests/e2e/*phoenix*"
+      - "tests/e2e/api_process.py"
+      - "tests/integration/*phoenix*"
+      - "scripts/ci/phoenix_stack.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/phoenix-e2e.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "langgraph_agent_toolkit/core/observability/**"
+      - "tests/e2e/*phoenix*"
+      - "tests/integration/*phoenix*"
+      - "scripts/ci/phoenix_stack.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/phoenix-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phoenix-e2e-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          version: "0.12.1"
+      - name: Install the locked service and Phoenix dependencies
+        run: >-
+          uv sync --frozen --no-install-project --no-default-groups --extra all
+          --group tests
+      - name: Generate and start a disposable Phoenix server
+        run: |
+          uv run --no-sync python scripts/ci/phoenix_stack.py prepare \
+            --directory=data/phoenix-ci --server_version=20.26.1
+          uv run --no-sync python scripts/ci/phoenix_stack.py start \
+            --directory=data/phoenix-ci
+      - name: Verify stored traces, prompts, feedback, and restarts
+        run: |
+          set -a
+          source data/phoenix-ci/server.env
+          set +a
+          uv run --no-sync pytest tests/integration/test_phoenix_live.py \
+            tests/e2e/test_phoenix_api.py --run-e2e --run-phoenix \
+            --no-cov --basetemp=data/phoenix-ci/process-tests \
+            --junitxml=data/phoenix-ci/results.xml -q
+      - name: Collect logs and remove only this test stack
+        if: always()
+        run: >-
+          uv run --no-sync python scripts/ci/phoenix_stack.py stop
+          --directory=data/phoenix-ci
+      - name: Save the test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: phoenix-server-20.26.1
+          path: |
+            data/phoenix-ci/results.xml
+            data/phoenix-ci/process-tests/**/api.log
+            data/phoenix-ci/process-tests/**/phoenix-records.json
+            data/phoenix-ci/services.log
+          if-no-files-found: warn
+          retention-days: 14

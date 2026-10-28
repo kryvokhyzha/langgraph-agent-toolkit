@@ -159,6 +159,22 @@ selected model from this mapping. Custom agents must read that setting or use
 blueprint instead selects ``MODEL_CONFIGS.deep_agent`` at startup. See
 :doc:`integrations` and :doc:`deepagents` before changing model selection.
 
+Tool selection
+--------------
+
+``TOOL_SELECTION`` is a JSON setting for native agents and Deep Agents.
+The default is ``{"mode":"off"}``. Existing tool availability stays unchanged.
+
+.. code-block:: bash
+
+   TOOL_SELECTION='{"mode":"llm","max_tools":8}'
+
+LLM mode uses the main model unless ``model_config_key`` selects a model from
+``MODEL_CONFIGS``. Provider mode uses ``{"mode":"provider"}`` and requires a
+compatible model and API route. Restart workers after a change.
+No REST request fields change. See :doc:`tool_selection` for per-agent settings,
+required tools, failure policies, examples, and benchmark limits.
+
 Persistence
 -----------
 
@@ -206,6 +222,35 @@ and ``LANGSMITH_TRACING=true``. Keep the unused tracing backend disabled.
 See :doc:`langfuse_compatibility` for the difference between SDK and server
 versions.
 
+For Phoenix, install ``phoenix`` and set ``OBSERVABILITY_BACKEND=phoenix``.
+These settings configure the adapter:
+
+.. list-table:: Phoenix settings
+   :header-rows: 1
+   :widths: 30 25 45
+
+   * - Variable
+     - Default
+     - Purpose
+   * - ``PHOENIX_ENDPOINT``
+     - ``http://localhost:6006``
+     - Base HTTP API URL. Do not append ``/v1/traces``.
+   * - ``PHOENIX_PROJECT_NAME``
+     - ``langgraph-agent-toolkit``
+     - Project for exported traces. Feedback uses the response ``run_id``.
+   * - ``PHOENIX_API_KEY``
+     - Unset
+     - API key for a server that requires authentication.
+   * - ``PHOENIX_TIMEOUT``
+     - ``5.0`` seconds
+     - Positive, finite timeout for client and export requests.
+
+The adapter uses HTTP/protobuf OTLP export. Its background export interval is
+one second. ``OTEL_BSP_SCHEDULE_DELAY`` changes this interval in milliseconds.
+Other batch settings use the native OpenTelemetry defaults.
+It does not use ``LANGFUSE_*`` settings. See :doc:`phoenix` for
+deployment, prompt formats, privacy controls, and verification commands.
+
 Optional Compose services
 -------------------------
 
@@ -228,6 +273,6 @@ services. Keep shared credentials consistent across their environment files.
 The LiteLLM example reads provider credentials through ``os.environ/...``
 references. Supply the referenced variables to the LiteLLM container.
 
-The checked-in Compose file selects Langfuse server v3. A package extra does
+The checked-in Compose file selects Langfuse server v4. A package extra does
 not change that server image. See :doc:`deployment` for startup commands and
 :doc:`langfuse_compatibility` before changing the server version.

@@ -40,9 +40,11 @@ The generated reference below describes the Python package.
 
    integrations
    mcp
+   tool_selection
    deepagents
    langfuse_compatibility
    langfuse_server_upgrade
+   phoenix
 
 .. toctree::
    :maxdepth: 2

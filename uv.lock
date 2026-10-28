@@ -276,6 +276,25 @@ wheels = [
 ]
 
 [[package]]
+name = "arize-phoenix-client"
+version = "3.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "openinference-instrumentation" },
+    { name = "openinference-semantic-conventions" },
+    { name = "opentelemetry-exporter-otlp" },
+    { name = "opentelemetry-sdk" },
+    { name = "tqdm" },
+    { name = "typing-extensions", version = "4.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+    { name = "typing-extensions", version = "4.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/43/564a6250a64a8dbd05239fca547fac74f47ef003c3d2284cb86edc05ff61/arize_phoenix_client-3.5.0.tar.gz", hash = "sha256:6f9013457f6f56d56db65f61877369eae7bd23460212030b54da68cb0a4d8047", size = 311114, upload-time = "2026-09-08T22:24:52.577Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/93/e6/ce7d4acb909595d215a81effd1af1ee33e7ce09f1d53b095d8441afeed17/arize_phoenix_client-3.5.0-py3-none-any.whl", hash = "sha256:db7d05b692db0389d8d3306d59579793264f8ec3b2f7e9e5d724e9160ac78f72", size = 263582, upload-time = "2026-09-08T22:24:50.833Z" },
+]
+
+[[package]]
 name = "attrs"
 version = "26.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2616,6 +2635,7 @@ dependencies = [
 
 [package.optional-dependencies]
 all = [
+    { name = "arize-phoenix-client" },
     { name = "azure-functions" },
     { name = "deepagents" },
     { name = "fastmcp" },
@@ -2635,7 +2655,11 @@ all = [
     { name = "langsmith" },
     { name = "mangum" },
     { name = "openai", extra = ["aiohttp"] },
+    { name = "openinference-instrumentation-langchain" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
     { name = "streamlit" },
+    { name = "tenacity" },
     { name = "uvicorn", extra = ["standard"] },
     { name = "watchdog" },
 ]
@@ -2654,11 +2678,16 @@ all-llms = [
     { name = "openai", extra = ["aiohttp"] },
 ]
 all-observability = [
+    { name = "arize-phoenix-client" },
     { name = "langfuse", version = "2.60.10", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
     { name = "langfuse", version = "3.15.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
     { name = "langfuse", version = "4.18.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra != 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
     { name = "langfuse", version = "5.0.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra != 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra != 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra != 'extra-23-langgraph-agent-toolkit-langfuse-v4')" },
     { name = "langsmith" },
+    { name = "openinference-instrumentation-langchain" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
+    { name = "tenacity" },
 ]
 anthropic = [
     { name = "langchain-anthropic" },
@@ -2717,6 +2746,13 @@ openai-aiohttp = [
     { name = "langchain-openai" },
     { name = "openai", extra = ["aiohttp"] },
 ]
+phoenix = [
+    { name = "arize-phoenix-client" },
+    { name = "openinference-instrumentation-langchain" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
+    { name = "tenacity" },
+]
 studio = [
     { name = "jsonschema-rs", marker = "python_full_version >= '3.14' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
     { name = "langgraph-cli", extra = ["inmem"] },
@@ -2770,6 +2806,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
+    { name = "arize-phoenix-client", marker = "extra == 'phoenix'", specifier = ">=3.5.0,<3.6" },
     { name = "azure-functions", marker = "extra == 'azure-backend'", specifier = ">=1.23,<1.25" },
     { name = "ddgs", specifier = ">=9.5.0" },
     { name = "deepagents", marker = "extra == 'deepagents'", specifier = ">=0.7.32,<0.8" },
@@ -2799,7 +2836,7 @@ requires-dist = [
     { name = "langgraph", specifier = ">=1.2.18,<1.3" },
     { name = "langgraph-agent-toolkit", extras = ["aws", "anthropic", "google-vertexai", "google-genai", "openai-aiohttp"], marker = "extra == 'all-llms'" },
     { name = "langgraph-agent-toolkit", extras = ["aws-backend", "azure-backend", "gunicorn-backend", "uvicorn-backend"], marker = "extra == 'all-backends'" },
-    { name = "langgraph-agent-toolkit", extras = ["langfuse", "langsmith"], marker = "extra == 'all-observability'" },
+    { name = "langgraph-agent-toolkit", extras = ["langfuse", "langsmith", "phoenix"], marker = "extra == 'all-observability'" },
     { name = "langgraph-agent-toolkit", extras = ["openai"], marker = "extra == 'openai-aiohttp'" },
     { name = "langgraph-agent-toolkit", extras = ["ui", "studio", "mcp", "deepagents", "all-backends", "all-llms", "all-observability"], marker = "extra == 'all'" },
     { name = "langgraph-checkpoint", specifier = ">=4.3.1,<4.4" },
@@ -2812,6 +2849,9 @@ requires-dist = [
     { name = "loguru", specifier = "~=0.7.3" },
     { name = "mangum", marker = "extra == 'aws-backend'", specifier = "~=0.19.0" },
     { name = "openai", extras = ["aiohttp"], marker = "extra == 'openai-aiohttp'", specifier = ">=3.13.0,<4" },
+    { name = "openinference-instrumentation-langchain", marker = "extra == 'phoenix'", specifier = ">=0.1.80,<0.2" },
+    { name = "opentelemetry-exporter-otlp-proto-http", marker = "extra == 'phoenix'", specifier = ">=1.45.1,<2" },
+    { name = "opentelemetry-sdk", marker = "extra == 'phoenix'", specifier = ">=1.45.1,<2" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = "~=3.2.4" },
     { name = "pydantic", marker = "python_full_version < '3.14'", specifier = ">=2.11.1,<2.13.5" },
     { name = "pydantic", marker = "python_full_version >= '3.14'", specifier = ">=2.13.0,<2.13.5" },
@@ -2819,12 +2859,13 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.1,<1.3" },
     { name = "rootutils", specifier = ">=1.0.7" },
     { name = "streamlit", marker = "extra == 'ui'", specifier = ">=1.45,<1.58.1" },
+    { name = "tenacity", marker = "extra == 'phoenix'", specifier = ">=9.1,<10" },
     { name = "uvicorn", specifier = ">=0.35,<0.50" },
     { name = "uvicorn", marker = "extra == 'uvicorn-backend'", specifier = ">=0.35,<0.50" },
     { name = "uvicorn", extras = ["standard"], marker = "extra == 'gunicorn-backend'", specifier = ">=0.35,<0.50" },
     { name = "watchdog", marker = "extra == 'ui'", specifier = "~=6.0.0" },
 ]
-provides-extras = ["ui", "studio", "all", "mcp", "deepagents", "aws-backend", "azure-backend", "gunicorn-backend", "uvicorn-backend", "all-backends", "aws", "anthropic", "google-vertexai", "google-genai", "openai", "openai-aiohttp", "all-llms", "langfuse", "langfuse-v2", "langfuse-v3", "langfuse-v4", "langfuse-v5", "langsmith", "all-observability"]
+provides-extras = ["ui", "studio", "all", "mcp", "deepagents", "aws-backend", "azure-backend", "gunicorn-backend", "uvicorn-backend", "all-backends", "aws", "anthropic", "google-vertexai", "google-genai", "openai", "openai-aiohttp", "all-llms", "langfuse", "langfuse-v2", "langfuse-v3", "langfuse-v4", "langfuse-v5", "langsmith", "phoenix", "all-observability"]
 
 [package.metadata.requires-dev]
 client = [
@@ -3656,6 +3697,47 @@ wheels = [
 ]
 
 [[package]]
+name = "openinference-instrumentation"
+version = "0.1.72"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openinference-semantic-conventions" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-sdk" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/55/5d/281d31ef653257875209cdaef355157bf4ca5e99599df88c3e02ccdbd4a7/openinference_instrumentation-0.1.72.tar.gz", hash = "sha256:4470a316dcb279aff45c2368e16d76ec43b2f46985ee2a4dab183b448c1bc18b", size = 46527, upload-time = "2026-10-23T20:49:53.504Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/be/d63a820efd759f04d6463380807e1dd04ce898d54cddec23e39ef5abd216/openinference_instrumentation-0.1.72-py3-none-any.whl", hash = "sha256:1eaba9604e6a0de4829094f2b5f6796a3962c36c72752b1ac7c01fca27540a0f", size = 54454, upload-time = "2026-10-23T20:49:51.429Z" },
+]
+
+[[package]]
+name = "openinference-instrumentation-langchain"
+version = "0.1.80"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openinference-instrumentation" },
+    { name = "openinference-semantic-conventions" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/e9/48ba881a9d8996f56d5f44b8f774da74263454e41146ee44360be19f3b78/openinference_instrumentation_langchain-0.1.80.tar.gz", hash = "sha256:eaa187c306299cfcedaee9be6f00970406fcbf42cb3933ddfb601b971949b4e3", size = 79849, upload-time = "2026-10-23T20:49:48.117Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e9/ff/9b2172bc79758498cd5fa131a3934a1d9702d20dd15ab590df5ec2be1f44/openinference_instrumentation_langchain-0.1.80-py3-none-any.whl", hash = "sha256:e8ea746b068699a4d2ebffd4eb7e00174bfb416fdec8d2fff4f66520cbcd73c7", size = 25428, upload-time = "2026-10-23T20:49:46.673Z" },
+]
+
+[[package]]
+name = "openinference-semantic-conventions"
+version = "0.1.42"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/69/c5b78dacc2c8afcdfd47322cc50a10be87b00fe6692b2ce35c5fb9170e6c/openinference_semantic_conventions-0.1.42.tar.gz", hash = "sha256:d64c37a910b6212d097954b13cd50c551a0b935b53627fda8dc51b278d34856d", size = 16125, upload-time = "2026-10-23T20:49:57.775Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/ce/badf538da4eea8aa590f7c3c99d3a7fbe9b29399afa1e84f0cfa5f1ab7a0/openinference_semantic_conventions-0.1.42-py3-none-any.whl", hash = "sha256:1deaf0b0fdfa74d020240ff25d909741fd5f1a27383339d88b5a508f45953454", size = 12974, upload-time = "2026-10-23T20:49:56.532Z" },
+]
+
+[[package]]
 name = "opentelemetry-api"
 version = "1.45.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3686,6 +3768,19 @@ requests = [
 ]
 
 [[package]]
+name = "opentelemetry-exporter-otlp"
+version = "1.45.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-exporter-otlp-proto-grpc" },
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e3/6f/5a561048ea372894f22f58f70e8478e4cd97d9a4e2d6f014559584a29bc5/opentelemetry_exporter_otlp-1.45.1.tar.gz", hash = "sha256:d0ac35592e77663a9fabf2740b4818c57196b1b764e0c8449d0d7bb2c7b2bc67", size = 6094, upload-time = "2026-10-06T17:33:00.966Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/e1/68c28d7da4482ce882a640b2c61405a78284c0a3a17a4db125647189b0b7/opentelemetry_exporter_otlp-1.45.1-py3-none-any.whl", hash = "sha256:ef3910d32b36ccbaf62390189759bd43a8109885e2d50b738ed9c9b255bf5cb5", size = 6730, upload-time = "2026-10-06T17:32:37.236Z" },
+]
+
+[[package]]
 name = "opentelemetry-exporter-otlp-common"
 version = "0.66b1"
 source = { registry = "https://pypi.org/simple" }
@@ -3707,6 +3802,26 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c1/8e/65e85e5137991a3c493b11682151d198638a5bc1dd4b4c5f67e013c57d7c/opentelemetry_exporter_otlp_proto_common-1.45.1.tar.gz", hash = "sha256:2e4adcc3a67bcf57804fc49514f0ef64974ca7590aa3491da389852b4a0628f6", size = 18873, upload-time = "2026-10-06T17:33:04.471Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/84/aa/92f225d353904e7f70b8b3e3c1b02db0cf56f744c2e83c581dc372e78873/opentelemetry_exporter_otlp_proto_common-1.45.1-py3-none-any.whl", hash = "sha256:2f446183ae7047b036226f1d846c41a834b0e8755ad13b51a51dd38952eb466c", size = 15393, upload-time = "2026-10-06T17:32:41.911Z" },
+]
+
+[[package]]
+name = "opentelemetry-exporter-otlp-proto-grpc"
+version = "1.45.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "googleapis-common-protos" },
+    { name = "grpcio" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-exporter-otlp-common" },
+    { name = "opentelemetry-exporter-otlp-proto-common" },
+    { name = "opentelemetry-proto" },
+    { name = "opentelemetry-sdk" },
+    { name = "typing-extensions", version = "4.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+    { name = "typing-extensions", version = "4.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d6/00/a82af0be959dc58495740b169c6669a86e0811f6cd353a01eda34d255db3/opentelemetry_exporter_otlp_proto_grpc-1.45.1.tar.gz", hash = "sha256:3b3dcfbfdcb4e35149fcf309972282054b45228f5c10547d0095d6578510a9a0", size = 25997, upload-time = "2026-10-06T17:33:05.114Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/46/2d1da202f1e17c81aae7efcf702898d524b46709e4d3e2bf1f7f8ca8fbc6/opentelemetry_exporter_otlp_proto_grpc-1.45.1-py3-none-any.whl", hash = "sha256:e42ecb789d2fc5d8145e3dadc3e2991c9f18cd166d7c7514e234702540274b76", size = 19492, upload-time = "2026-10-06T17:32:42.838Z" },
 ]
 
 [[package]]
@@ -3742,6 +3857,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ed/58/e552853748c3a1478d3f0db31bb4e3bef2e45385f64d658148693183410e/opentelemetry_exporter_prometheus-0.66b1.tar.gz", hash = "sha256:1c702a0cc7a1b8c5e1f3f246aeb4273dbd707179af30dbb66182a75e16a06ed8", size = 16987, upload-time = "2026-10-06T17:33:06.358Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4d/8a/5e7262d970586a8d69dd159bebc68fbee7457088883b179599a562881a6f/opentelemetry_exporter_prometheus-0.66b1-py3-none-any.whl", hash = "sha256:a938e6af7295d5bacf82da9ca845cab9a9cb1c5f565abe39f54ef8bf511c05d9", size = 13222, upload-time = "2026-10-06T17:32:44.94Z" },
+]
+
+[[package]]
+name = "opentelemetry-instrumentation"
+version = "0.66b1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "packaging", version = "24.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+    { name = "packaging", version = "25.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+    { name = "packaging", version = "26.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' or extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra != 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra != 'extra-23-langgraph-agent-toolkit-langfuse-v3')" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/03/89e47ff8d52a4f83b343e6eb9ef1698ff45357216e5b6b2b21e0da5c5c7d/opentelemetry_instrumentation-0.66b1.tar.gz", hash = "sha256:e79a510f7d87c72d95e964ddb42193a0d9a75668c027d980eab032ea1322a5ce", size = 43308, upload-time = "2026-10-06T17:36:10.703Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/b2/d1413681ff43e13ac9860df27e1226d3199ab0b97b352ceea41abcc660a5/opentelemetry_instrumentation-0.66b1-py3-none-any.whl", hash = "sha256:4c4aa14dc9a24a02325a9d4c42c4d0208dbb1374c2b1b8fe6c9392d59f3e1008", size = 36904, upload-time = "2026-10-06T17:35:11.663Z" },
 ]
 
 [[package]]
@@ -5696,6 +5828,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/12/64/da524626d3b9cc40c168a13da8335fe1c51be12c0a63685cc6db7308daae/tomli-2.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:2c1c351919aca02858f740c6d33adea0c5deea37f9ecca1cc1ef9e884a619d26", size = 121196, upload-time = "2026-03-25T20:22:01.169Z" },
     { url = "https://files.pythonhosted.org/packages/5a/cd/e80b62269fc78fc36c9af5a6b89c835baa8af28ff5ad28c7028d60860320/tomli-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:eab21f45c7f66c13f2a9e0e1535309cee140182a9cdae1e041d02e47291e8396", size = 100393, upload-time = "2026-03-25T20:22:02.137Z" },
     { url = "https://files.pythonhosted.org/packages/7b/61/cceae43728b7de99d9b847560c262873a1f6c98202171fd5ed62640b494b/tomli-2.4.1-py3-none-any.whl", hash = "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe", size = 14583, upload-time = "2026-03-25T20:22:03.012Z" },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.70.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v2' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v3' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5') or (extra == 'extra-23-langgraph-agent-toolkit-langfuse-v4' and extra == 'extra-23-langgraph-agent-toolkit-langfuse-v5')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl", hash = "sha256:c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73", size = 80199, upload-time = "2026-09-11T07:25:14.599Z" },
 ]
 
 [[package]]

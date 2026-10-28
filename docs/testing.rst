@@ -35,6 +35,9 @@ processes. Test setup disables loading credentials and database paths from
 Test setup also ignores exported ``LANGFUSE_*`` and
 ``LANGGRAPH_LANGFUSE_*`` project settings. Live Langfuse tests use only the
 explicit ``LAT_TEST_LANGFUSE_*`` configuration.
+The same setup removes ``PHOENIX_*``, ``LANGGRAPH_PHOENIX_*``, ``OTEL_*``,
+and ``OPENINFERENCE_*`` settings. Live Phoenix tests use the explicit
+``LAT_TEST_PHOENIX_*`` configuration.
 
 Test layers
 -----------
@@ -79,8 +82,8 @@ These tests do not verify a live provider's model quality or access rules.
        ``tests/integration/test_docker_e2e.py``, and
        ``tests/integration/docker_transport_smoke.py``
    * - External service integration
-     - PostgreSQL locking and recovery; Langfuse ingestion and stored results.
-     - PostgreSQL and Langfuse live tests in ``tests/integration``
+     - PostgreSQL locking and recovery; telemetry ingestion and stored results.
+     - PostgreSQL, Langfuse, and Phoenix live tests in ``tests/integration``
 
 The directories name the component under test. They do not always identify a
 test layer. For example, ``tests/service/test_stream_integration.py`` uses an in-process
@@ -223,6 +226,51 @@ connection pools. CI supplies a PostgreSQL 16 service for this job.
 The binary store test closes both PostgreSQL pools, opens new pools, and
 restores saved media. It also checks owner isolation and blob retention after
 checkpoint deletion.
+
+Tool selection and API benchmarks
+----------------------------------
+
+The normal suite checks the optional tool-selection bridge with native
+LangChain middleware and real graphs. SDK wire tests check deferred tool
+schemas through OpenAI Responses and Anthropic clients with local transports.
+They do not contact either provider.
+MCP protocol tests also call selected remote tools through a local FastMCP
+server. They check connection cleanup and forward failures without retries.
+
+Run the API benchmark with:
+
+.. code-block:: bash
+
+   LAT_TEST_TOOL_SELECTION_REPORT_DIR=data/tool-selection-reports \
+     uv run --no-sync pytest tests/e2e/test_tool_selection_api.py --run-e2e -q
+
+The tests compare native agents and Deep Agents with selection disabled and
+enabled. Catalogs include 8, 32, or 128 unrelated tools. Each report includes
+task completion, model and selector calls, schema bytes, and local latency.
+These tests use scripted models. Their latency is not a provider performance
+estimate. See :doc:`tool_selection` for the metric definitions and limits.
+CI saves the reports with each Python test artifact.
+
+Phoenix SDK and service checks
+-------------------------------
+
+The normal suite includes native OpenInference callback and Phoenix SDK
+contract tests. These tests need the ``phoenix`` extra. The ``all`` extra
+includes it. They use local export transports and do not contact a server.
+
+Live tests require ``--run-phoenix``. API process tests also require
+``--run-e2e``. They use a disposable Phoenix 20.26.1 server with an isolated
+SQLite volume. Tests read native stored traces, prompt versions, tags, and
+feedback. The API journeys cover native agents and Deep Agents, JSON Lines,
+checkpoint recovery, and retained telemetry after a Phoenix restart.
+These tests use the ``phoenix_live`` marker. The Phoenix client's ``phoenix``
+marker starts its separate experiment integration. Do not use it for the
+toolkit's service checks.
+
+Use the ``Phoenix E2E`` workflow for the same disposable check in CI.
+It runs on relevant pull requests and supports manual runs. It does not need
+model keys or production observability credentials. See :doc:`phoenix` for
+local commands and the limits of these tests.
 
 Langfuse SDK compatibility
 --------------------------

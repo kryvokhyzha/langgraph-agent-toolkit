@@ -10,6 +10,12 @@ format. The project uses
 
 ### Added
 
+- Add optional tool selection for native agents and Deep Agents. Reuse LangChain
+  LLM selection and provider tool search. Keep selection disabled by default.
+  Add examples and API benchmarks for tool schemas, calls, and task completion.
+- Add the optional Phoenix observability backend. Support isolated OpenInference
+  traces, remote prompt versions, and feedback annotations. Add a disposable
+  Phoenix server and API end-to-end verification.
 - Return `pending_interrupts` with history pages. Recover saved questions after
   a lost response or worker restart without executing remote tools.
 - Show MCP forms and URL requests in Streamlit. Support structured answers,
@@ -43,6 +49,8 @@ format. The project uses
 
 ### Fixed
 
+- Close each distinct agent observability backend during shutdown or failed
+  startup. Include custom agent backends and close shared instances once.
 - Normalize Langfuse base URLs before SDK construction. Prevent duplicate
   slashes from redirecting telemetry exports without storing traces.
 - Keep public conversation IDs in telemetry sessions. Retain owner and agent

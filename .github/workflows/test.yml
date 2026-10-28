@@ -169,6 +169,8 @@ jobs:
           --group tests
 
       - name: Test the package and API process journeys with coverage
+        env:
+          LAT_TEST_TOOL_SELECTION_REPORT_DIR: data/tool-selection-ci/reports
         run: >-
           uv run --no-sync pytest --run-e2e --cov --cov-report=xml
           --junitxml=test-results.xml
@@ -181,6 +183,7 @@ jobs:
           path: |
             coverage.xml
             test-results.xml
+            data/tool-selection-ci/reports/*.json
           retention-days: 14
           if-no-files-found: warn
 

@@ -45,5 +45,10 @@ class ObservabilityFactory:
 
                 return EmptyObservability(remote_first=remote_first, **kwargs)
 
+            case ObservabilityBackend.PHOENIX:
+                from langgraph_agent_toolkit.core.observability.phoenix import PhoenixObservability
+
+                return PhoenixObservability(remote_first=remote_first, **kwargs)
+
             case _:
                 raise ValueError(f"Unsupported ObservabilityBackend: {platform}")

@@ -3,8 +3,14 @@
 from collections.abc import Sequence
 
 from langchain.agents import AgentState, create_agent
-from langchain.agents.middleware import ClearToolUsesEdit, ContextEditingMiddleware, ToolRetryMiddleware
+from langchain.agents.middleware import (
+    AgentMiddleware,
+    ClearToolUsesEdit,
+    ContextEditingMiddleware,
+    ToolRetryMiddleware,
+)
 from langchain_community.tools import DuckDuckGoSearchResults
+from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langgraph.pregel import Pregel
 from pydantic import BaseModel
@@ -18,6 +24,7 @@ from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.mcp import merge_tools
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory, ModelT
+from langgraph_agent_toolkit.core.tool_selection import ToolSelectionConfig, create_tool_selection_middleware
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -39,6 +46,9 @@ def build_tool_graph(
     extra_tools: Sequence[BaseTool] = (),
     *,
     response_format: type[BaseModel] | None = None,
+    tool_selection: ToolSelectionConfig | None = None,
+    selector_model: BaseChatModel | None = None,
+    extra_middleware: Sequence[AgentMiddleware] = (),
 ) -> Pregel:
     """Build a fresh graph and restrict automatic retries to local tools."""
     local_tools = [add, multiply, DuckDuckGoSearchResults()]
@@ -50,6 +60,8 @@ def build_tool_graph(
             ImmediateGenerationMiddleware(),
             ClearIntermediateToolCallsMiddleware(),
             SanitizeHistoryMiddleware(),
+            *extra_middleware,
+            *create_tool_selection_middleware(tool_selection, selector_model=selector_model),
             ToolRetryMiddleware(max_retries=2, tools=local_tools),
         ],
         system_prompt=(

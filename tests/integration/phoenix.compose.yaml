@@ -1,0 +1,14 @@
+services:
+  phoenix:
+    image: arizephoenix/phoenix:version-${LAT_TEST_PHOENIX_SERVER_VERSION:?}
+    ports:
+      - "127.0.0.1:${LAT_TEST_PHOENIX_PORT:?}:6006"
+    environment:
+      PHOENIX_WORKING_DIR: /data
+      PHOENIX_ENABLE_PROMETHEUS: "false"
+      PHOENIX_TELEMETRY_ENABLED: "false"
+    volumes:
+      - phoenix-data:/data
+
+volumes:
+  phoenix-data:

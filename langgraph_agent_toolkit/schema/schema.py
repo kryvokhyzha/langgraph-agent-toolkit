@@ -319,7 +319,7 @@ class Feedback(BaseModel):
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
     kwargs: dict[str, Any] = Field(
-        description="Additional feedback kwargs, passed to LangSmith.",
+        description="Additional feedback kwargs for the selected observability backend.",
         default={},
         examples=[{"comment": "In-line human feedback"}],
     )

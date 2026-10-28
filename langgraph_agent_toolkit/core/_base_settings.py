@@ -18,6 +18,7 @@ from pydantic_settings import BaseSettings, EnvSettingsSource, SettingsConfigDic
 from langgraph_agent_toolkit.core.mcp import MCPServerConfig, ServerName
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
+from langgraph_agent_toolkit.core.tool_selection import ToolSelectionConfig
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
 
@@ -118,6 +119,8 @@ class Settings(BaseSettings):
     MCP_AGENT_SERVERS: dict[str, list[ServerName]] = Field(default_factory=dict)
     MCP_DISCOVERY_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
 
+    TOOL_SELECTION: ToolSelectionConfig = Field(default_factory=ToolSelectionConfig)
+
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"
     LANGCHAIN_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "https://api.smith.langchain.com"
@@ -133,6 +136,11 @@ class Settings(BaseSettings):
     LANGFUSE_TIMEOUT: int = 5
     LANGFUSE_DEBUG: bool = False
     LANGFUSE_SAMPLE_RATE: float = 1.0
+
+    PHOENIX_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "http://localhost:6006"
+    PHOENIX_PROJECT_NAME: str = Field(default="langgraph-agent-toolkit", min_length=1)
+    PHOENIX_API_KEY: SecretStr | None = None
+    PHOENIX_TIMEOUT: float = Field(default=5.0, gt=0, allow_inf_nan=False)
 
     # Database configuration.
     MEMORY_BACKEND: MemoryBackends | None = None

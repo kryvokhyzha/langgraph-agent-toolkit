@@ -197,8 +197,16 @@ langsmith = [
     "langsmith >= 0.14.14, < 0.15",
 ]
 
+phoenix = [
+    "arize-phoenix-client >= 3.5.0, < 3.6",
+    "openinference-instrumentation-langchain >= 0.1.80, < 0.2",
+    "opentelemetry-sdk >= 1.45.1, < 2",
+    "opentelemetry-exporter-otlp-proto-http >= 1.45.1, < 2",
+    "tenacity >= 9.1, < 10",
+]
+
 all-observability = [
-    "langgraph-agent-toolkit[langfuse,langsmith]",
+    "langgraph-agent-toolkit[langfuse,langsmith,phoenix]",
 ]
 
 [project.urls]
@@ -259,6 +267,7 @@ lines-after-imports = 2
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config"
+testpaths = ["tests"]
 pythonpath = ["langgraph_agent_toolkit", "."]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"

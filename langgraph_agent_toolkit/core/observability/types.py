@@ -5,6 +5,7 @@ from typing import TypedDict
 class ObservabilityBackend(StrEnum):
     LANGFUSE = auto()
     LANGSMITH = auto()
+    PHOENIX = auto()
     EMPTY = auto()
 
 

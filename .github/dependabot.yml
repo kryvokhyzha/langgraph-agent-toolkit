@@ -58,6 +58,8 @@ updates:
         patterns:
           - "langfuse"
           - "langsmith"
+          - "arize-phoenix*"
+          - "openinference*"
           - "opentelemetry*"
         update-types:
           - "minor"

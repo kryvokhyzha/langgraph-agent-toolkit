@@ -134,6 +134,21 @@ The existing invoke, streaming, history, clear, and interrupt-resume endpoints
 also apply to this agent. History contains messages. It is not a file-download
 API. The Python example uses ``graph.aget_state`` to inspect virtual files.
 
+Select tools for large catalogs
+-------------------------------
+
+Tool selection is disabled by default. Set ``TOOL_SELECTION`` or pass
+``build_graph(tool_selection=ToolSelectionConfig(...))`` to enable it for the
+main graph. The integration reuses LangChain's LLM selector or provider tool
+search. It keeps existing planning, delegation, filesystem, and asynchronous
+task tools available. Those tools do not use the selected-tool count limit.
+
+Supplied subagents and the upstream general-purpose subagent keep their own
+middleware. Configure their selection policy separately when needed.
+Selection does not change checkpoints, filesystem permissions, or tool access
+checks. See :doc:`tool_selection` for configuration, the offline example,
+provider limits, and the API benchmark.
+
 What it adds
 ------------
 

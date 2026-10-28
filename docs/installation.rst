@@ -59,8 +59,11 @@ SDK and server combinations.
 The generic ``langfuse`` extra permits SDK versions from 2.60.10 to below 6.
 The default lockfile selects SDK v5, which requires server 4.59.0 or later.
 Use an explicit SDK v3 or v4 selector for server v3.
-It can combine with any one version selector. ``langsmith`` selects LangSmith,
-and ``all-observability`` includes both generic ``langfuse`` and ``langsmith``.
+It can combine with any one version selector. ``langsmith`` selects LangSmith.
+``phoenix`` selects the Phoenix client and OpenInference tracing adapter.
+``all-observability`` includes generic ``langfuse``, ``langsmith``, and
+``phoenix``. The Phoenix extra does not install the Phoenix server. See
+:doc:`phoenix` for its configuration and supported features.
 Extra names use hyphens; underscore spellings such as ``langfuse_v2`` normalize
 to the same name.
 

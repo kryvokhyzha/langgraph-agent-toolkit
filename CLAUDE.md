@@ -11,8 +11,8 @@ library, not a monorepo. It has one installable package
 (`langgraph_agent_toolkit/`) and Docker/CI infrastructure.
 
 Key components include a **LiteLLM** proxy for multi-provider LLMs, PostgreSQL /
-SQLite checkpointers for memory, and **Langfuse / LangSmith** for observability
-and prompt management. Almost all subsystems use a **factory +
+SQLite checkpointers for memory, and **Langfuse / LangSmith / Phoenix** for
+observability and prompt management. Almost all subsystems use a **factory +
 Pydantic-settings** pattern. See
 [Architecture & core patterns](#architecture--core-patterns).
 
@@ -204,9 +204,10 @@ This pattern applies to **models** (`CompletionModelFactory`/
 `EmbeddingModelFactory`; OpenAI uses `ChatOpenAIPatched`; other models use
 LangChain `init_chat_model`; `FAKE` uses `FakeToolModel`). It also applies to
 **memory** (`POSTGRES`/`SQLITE`; SQLite has no store), **observability**
-(`LANGFUSE`/`LANGSMITH`/`EMPTY`; lazy imports keep optional dependencies
-optional), and **prompts** (`PromptManager` + `ObservabilityChatPromptTemplate`;
-files are the source of truth and Jinja2 renders them).
+(`LANGFUSE`/`LANGSMITH`/`PHOENIX`/`EMPTY`; lazy imports keep optional
+dependencies optional), and **prompts** (`PromptManager` +
+`ObservabilityChatPromptTemplate`; files are the source of truth and Jinja2
+renders them).
 
 **Register agents with import strings, not filesystem scans.** `AgentExecutor`
 reads `"module.path:object"` strings from `settings.AGENT_PATHS` and imports
@@ -306,19 +307,20 @@ resume answers. Keep `CHECK_INTERRUPTS=True` for this feature.
   providers are `openai`, `anthropic`, `google-vertexai`, `google-genai`, `aws`,
   and `all-llms`. Service backends are `uvicorn-backend`, `gunicorn-backend`,
   `aws-backend`, and `azure-backend`. Observability extras are `langfuse`,
-  `langfuse-v2`, `langfuse-v3`, `langfuse-v4`, `langfuse-v5`, `langsmith`, and
-  `all-observability`. The selectors require SDK `>=2.60.10,<3`, `>=3.15.0,<4`,
-  `>=4.18.0,<5`, and `>=5.0.4,<6`, respectively. Use only one selector. Generic
-  `langfuse` permits `>=2.60.10,<6` and can combine with any one selector. These
-  extras select the SDK, not the server version. Their canonical names use
-  hyphens; package tools normalize underscore spellings such as `langfuse_v2`.
+  `langfuse-v2`, `langfuse-v3`, `langfuse-v4`, `langfuse-v5`, `langsmith`,
+  `phoenix`, and `all-observability`. The selectors require SDK `>=2.60.10,<3`,
+  `>=3.15.0,<4`, `>=4.18.0,<5`, and `>=5.0.4,<6`, respectively. Use only one
+  selector. Generic `langfuse` permits `>=2.60.10,<6` and can combine with any
+  one selector. These extras select the SDK, not the server version. Their
+  canonical names use hyphens; package tools normalize underscore spellings such
+  as `langfuse_v2`.
 - **All features**: Replace `--all-extras` with `--extra all`. The old flag
   selects all four incompatible SDK selectors. The `all` extra includes every
   feature through the existing umbrella extras and does not force a selector.
   The default lockfile selection uses SDK v5. SDK v5 requires server >=4.59.0;
   use `langfuse-v4` for server v3. Use `--extra all --extra langfuse-v2` for the
   same features with SDK v2 when all requirements are compatible.
-  `all-observability` still includes generic `langfuse` and `langsmith`.
+  `all-observability` includes generic `langfuse`, `langsmith`, and `phoenix`.
 - **Dev / lint / test / docs**: Use the matching `[dependency-groups]` group.
   Groups are local source-checkout tools, not published wheel extras. The
   `client` group is the minimal Streamlit-only set.

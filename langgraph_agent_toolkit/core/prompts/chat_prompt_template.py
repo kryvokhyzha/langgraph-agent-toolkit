@@ -69,7 +69,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
     """Chat prompt template that loads prompts from observability platforms."""
 
     prompt_name: Optional[str] = Field(default=None, description="Name of the prompt to load")
-    prompt_version: Optional[int] = Field(default=None, description="Version of the prompt")
+    prompt_version: int | str | None = Field(default=None, description="Version of the prompt")
     prompt_label: Optional[str] = Field(default=None, description="Label of the prompt")
     load_at_runtime: bool = Field(default=False, description="Whether to load prompt at runtime")
     observability_backend: Optional[ObservabilityBackend] = Field(
@@ -97,7 +97,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         messages: Optional[Sequence[MessageLikeRepresentation]] = None,
         *,
         prompt_name: Optional[str] = None,
-        prompt_version: Optional[int] = None,
+        prompt_version: int | str | None = None,
         prompt_label: Optional[str] = None,
         load_at_runtime: bool = False,
         observability_platform: Optional[BaseObservabilityPlatform] = None,
@@ -203,7 +203,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         self,
         platform: BaseObservabilityPlatform,
         prompt_name: str,
-        prompt_version: Optional[int] = None,
+        prompt_version: int | str | None = None,
         prompt_label: Optional[str] = None,
         cache_ttl_seconds: int = settings.LANGFUSE_PROMPT_CACHE_DEFAULT_TTL_SECONDS,
         template_format: Literal["f-string", "mustache", "jinja2"] = "f-string",
@@ -483,7 +483,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         prompt_name: str,
         observability_platform: BaseObservabilityPlatform,
         *,
-        prompt_version: Optional[int] = None,
+        prompt_version: int | str | None = None,
         prompt_label: Optional[str] = None,
         load_at_runtime: bool = True,
         **kwargs: Any,
@@ -504,7 +504,7 @@ class ObservabilityChatPromptTemplate(ChatPromptTemplate):
         prompt_name: str,
         observability_backend: Union[ObservabilityBackend, str],
         *,
-        prompt_version: Optional[int] = None,
+        prompt_version: int | str | None = None,
         prompt_label: Optional[str] = None,
         load_at_runtime: bool = True,
         **kwargs: Any,

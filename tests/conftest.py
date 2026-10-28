@@ -10,6 +10,7 @@ def pytest_addoption(parser):
     parser.addoption("--run-e2e", action="store_true", default=False, help="run local service process journeys")
     parser.addoption("--run-postgres", action="store_true", default=False, help="require PostgreSQL integration tests")
     parser.addoption("--run-langfuse", action="store_true", default=False, help="run against a Langfuse test project")
+    parser.addoption("--run-phoenix", action="store_true", default=False, help="run against a Phoenix test server")
     parser.addoption("--run-llm", action="store_true", default=False, help="make bounded real OpenAI model requests")
 
 
@@ -18,9 +19,11 @@ def pytest_configure(config):
     patches = pytest.MonkeyPatch()
     patches.setattr(dotenv, "find_dotenv", lambda *args, **kwargs: "")
     patches.setattr(dotenv, "load_dotenv", lambda *args, **kwargs: False)
-    # Live tests use LAT_TEST_LANGFUSE_* and must not select a normal project.
+    # Live tests use LAT_TEST_* and must not select a normal telemetry project.
     for key in tuple(os.environ):
-        if key.startswith(("LANGFUSE_", "LANGGRAPH_LANGFUSE_")):
+        if key.startswith(
+            ("LANGFUSE_", "LANGGRAPH_LANGFUSE_", "PHOENIX_", "LANGGRAPH_PHOENIX_", "OTEL_", "OPENINFERENCE_")
+        ):
             patches.delenv(key)
     config.add_cleanup(patches.undo)
     for marker, description in {
@@ -29,6 +32,7 @@ def pytest_configure(config):
         "docker": "require running service and UI containers",
         "postgres": "require a disposable PostgreSQL database",
         "langfuse": "require an explicitly configured Langfuse test project",
+        "phoenix_live": "require an explicitly configured Phoenix test server",
         "llm": "make bounded paid requests to an explicitly configured OpenAI model",
     }.items():
         config.addinivalue_line("markers", f"{marker}: {description}")
@@ -50,9 +54,10 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.integration)
         if "e2e" in parts or item.path.name == "test_worker_recovery.py":
             item.add_marker(pytest.mark.e2e)
-        for marker in ("docker", "e2e", "langfuse", "llm"):
-            if item.get_closest_marker(marker) is not None and not config.getoption(f"--run-{marker}"):
-                item.add_marker(pytest.mark.skip(reason=f"Use --run-{marker} to run this test."))
+        for marker in ("docker", "e2e", "langfuse", "phoenix_live", "llm"):
+            option = "--run-phoenix" if marker == "phoenix_live" else f"--run-{marker}"
+            if item.get_closest_marker(marker) is not None and not config.getoption(option):
+                item.add_marker(pytest.mark.skip(reason=f"Use {option} to run this test."))
 
 
 @pytest.fixture

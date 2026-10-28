@@ -423,7 +423,7 @@ async def test_service_failed_graph_startup_closes_mcp_pool(tcp_mcp_server, monk
     from langgraph_agent_toolkit.core.settings import settings
     from langgraph_agent_toolkit.service import handler
 
-    agent = SimpleNamespace(graph_factory=Mock(side_effect=ValueError("Test graph build failed")))
+    agent = SimpleNamespace(graph_factory=Mock(side_effect=ValueError("Test graph build failed")), observability=None)
     executor = Mock()
     executor.get_all_agent_info.return_value = [SimpleNamespace(key="custom")]
     executor.get_agent.return_value = agent

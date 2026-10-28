@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from langchain.agents.middleware import InterruptOnConfig, TodoListMiddleware
+from langchain.agents.middleware import AgentMiddleware, InterruptOnConfig, TodoListMiddleware
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langgraph.graph.state import CompiledStateGraph
@@ -24,6 +24,7 @@ from langgraph_agent_toolkit.agents.components.tools import add, multiply
 from langgraph_agent_toolkit.core.mcp import merge_tools
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.core.tool_selection import ToolSelectionConfig, create_tool_selection_middleware
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -84,6 +85,9 @@ def build_graph(
     permissions: list[FilesystemPermission] | None = None,
     skills: list[str] | None = None,
     memory: list[str] | None = None,
+    tool_selection: ToolSelectionConfig | None = None,
+    selector_model: BaseChatModel | None = None,
+    extra_middleware: Sequence[AgentMiddleware] = (),
 ) -> CompiledStateGraph:
     """Create a graph for the service or an embedded application.
 
@@ -130,6 +134,10 @@ def build_graph(
                 backend=backend,
                 tools=list(_FILE_TOOLS),
                 offload_binary_content=offload_binary_content,
+            ),
+            *extra_middleware,
+            *create_tool_selection_middleware(
+                tool_selection, selector_model=selector_model, protected_tools=tuple(_RESERVED_TOOLS)
             ),
         ],
         subagents=subagents,
