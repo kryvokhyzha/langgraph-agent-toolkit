@@ -18,7 +18,7 @@ from pydantic_settings import BaseSettings, EnvSettingsSource, SettingsConfigDic
 from langgraph_agent_toolkit.core.mcp import MCPServerConfig, ServerName
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
-from langgraph_agent_toolkit.core.tool_selection import ToolSelectionConfig
+from langgraph_agent_toolkit.core.tool_selection_config import ToolSelectionConfig
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
 

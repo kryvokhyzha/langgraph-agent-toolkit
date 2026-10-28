@@ -77,9 +77,10 @@ These tests do not verify a live provider's model quality or access rules.
      - A real service process, HTTP client, SQLite database, restart, and resume.
      - ``tests/e2e`` and ``tests/service/test_worker_recovery.py``
    * - Container checks
-     - Runtime contents, model transports, readiness, chat history, and HTML.
+     - Runtime contents, model transports, readiness, UI chat, saved history, and HTML.
      - ``tests/integration/docker_image_smoke.py``,
-       ``tests/integration/test_docker_e2e.py``, and
+       ``tests/integration/test_docker_e2e.py``,
+       ``tests/integration/docker_ui_smoke.py``, and
        ``tests/integration/docker_transport_smoke.py``
    * - External service integration
      - PostgreSQL locking and recovery; telemetry ingestion and stored results.
@@ -164,8 +165,24 @@ frontend and set ``AGENT_URL``, ``APP_URL``, and ``AUTH_SECRET`` for the tests.
 
 CI builds both images before this check. Tests call readiness, invoke, stream,
 history, and clear-history endpoints. They check the frontend health endpoint
-and HTML response. They do not control a browser or test Streamlit interaction.
+and HTML response. These pytest tests do not control the Streamlit page.
 An unavailable requested container causes failure.
+
+CI also runs ``docker_ui_smoke.py`` inside the running app container. It uses
+Streamlit ``AppTest`` to run the installed page with the real API client.
+It sends chat messages through SSE, JSON Lines, and invoke requests. It checks
+saved history, restores the conversation in a new UI session, and starts a new
+chat. The script removes its saved conversation when the check finishes.
+It needs no pytest installation in the image. It does not test browser rendering
+or WebSockets. To run it against a disposable API with the fake model and SQLite:
+
+.. code-block:: bash
+
+   docker cp tests/integration/docker_ui_smoke.py app-container:/tmp/docker_ui_smoke.py
+   docker exec app-container python /tmp/docker_ui_smoke.py
+
+Set ``AGENT_URL`` and ``AUTH_SECRET`` in the app container before it starts.
+``AGENT_URL`` must resolve to the API from inside that container.
 
 CI also checks final runtime contents with ``docker_image_smoke.py``.
 The check uses no test packages or external network. It verifies the non-root

@@ -55,6 +55,8 @@ def check_api() -> dict:
         "fastmcp",
         "langfuse",
         "langsmith",
+        "phoenix.client",
+        "openinference.instrumentation.langchain",
         "openai",
         "aiohttp",
         "httpx",

@@ -142,6 +142,15 @@ jobs:
             --python "$GITHUB_WORKSPACE/.venv-wheel/bin/python" python \
             "$GITHUB_WORKSPACE/scripts/ci/verify_ui_imports.py"
 
+      - name: Verify the source UI without service dependencies
+        run: |
+          uv sync --frozen --only-group client --python "${{ matrix.python-version }}"
+          uv run --no-sync python scripts/ci/verify_ui_imports.py
+        env:
+          UV_PROJECT_ENVIRONMENT: .venv-client
+          PYTHONPATH: ${{ github.workspace }}
+          PYTHON_DOTENV_DISABLED: "1"
+
   test-python:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -393,8 +402,9 @@ jobs:
 
       - name: Run app container
         run:
-          docker run -d --name app-container --network host -e
-          AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token
+          docker run -d --name app-container --network host --mount
+          "type=bind,source=$PWD/tests/integration/docker_ui_smoke.py,target=/tmp/docker_ui_smoke.py,readonly"
+          -e AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token
           agent-service-toolkit.app:${{ github.sha }}
 
       - name: Confirm app starts correctly
@@ -406,6 +416,9 @@ jobs:
               sleep 2
             done
           BASH
+
+      - name: Verify chat and history from the app container
+        run: docker exec app-container python /tmp/docker_ui_smoke.py
 
       - name: Set up Python
         uses: actions/setup-python@v7

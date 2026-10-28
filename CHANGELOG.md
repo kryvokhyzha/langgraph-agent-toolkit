@@ -49,6 +49,8 @@ format. The project uses
 
 ### Fixed
 
+- Keep tool selection settings independent of agent runtime imports. Restore
+  client and Streamlit startup in the minimal app image without LangChain.
 - Close each distinct agent observability backend during shutdown or failed
   startup. Include custom agent backends and close shared instances once.
 - Normalize Langfuse base URLs before SDK construction. Prevent duplicate
