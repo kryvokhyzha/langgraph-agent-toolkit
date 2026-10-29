@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.memory.threads &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/memory/threads.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=11e62b30"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.memory.threads</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.memory.threads</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;List saved conversations without loading checkpoint state.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">heapq</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.checkpoint.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">InMemorySaver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.checkpoint.postgres.aio</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncPostgresSaver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.checkpoint.sqlite.aio</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSqliteSaver</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.components.checkpoint.empty</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoOpSaver</span>
+
+
+<span class="n">SQLITE_THREAD_INDEX</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE INDEX IF NOT EXISTS lat_checkpoint_thread_heads_idx ON checkpoints (</span>
+<span class="s2">    COALESCE(json_extract(metadata, &#39;$.lat_user_id&#39;), json_extract(metadata, &#39;$.user_id&#39;)),</span>
+<span class="s2">    checkpoint_id DESC, thread_id DESC</span>
+<span class="s2">)</span>
+<span class="s2">WHERE checkpoint_ns = &#39;&#39; AND json_extract(metadata, &#39;$.step&#39;) = 0</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">POSTGRES_THREAD_INDEX</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE INDEX CONCURRENTLY IF NOT EXISTS lat_checkpoint_thread_heads_idx ON checkpoints (</span>
+<span class="s2">    (COALESCE(metadata-&gt;&gt;&#39;lat_user_id&#39;, metadata-&gt;&gt;&#39;user_id&#39;)),</span>
+<span class="s2">    checkpoint_id DESC, thread_id DESC</span>
+<span class="s2">)</span>
+<span class="s2">WHERE checkpoint_ns = &#39;&#39; AND metadata-&gt;&gt;&#39;step&#39; = &#39;0&#39;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="InvalidThreadCursor">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.threads.html#langgraph_agent_toolkit.core.memory.threads.InvalidThreadCursor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InvalidThreadCursor</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The cursor is invalid or belongs to another conversation scope.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ThreadListingUnsupported">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.threads.html#langgraph_agent_toolkit.core.memory.threads.ThreadListingUnsupported">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadListingUnsupported</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The checkpointer cannot list saved conversations.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ThreadSummary">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.threads.html#langgraph_agent_toolkit.core.memory.threads.ThreadSummary">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadSummary</span><span class="p">:</span>
+    <span class="n">thread_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="ThreadPage">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.threads.html#langgraph_agent_toolkit.core.memory.threads.ThreadPage">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadPage</span><span class="p">:</span>
+    <span class="n">threads</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ThreadSummary</span><span class="p">]</span>
+    <span class="n">next_cursor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span></div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Candidate</span><span class="p">:</span>
+    <span class="n">checkpoint_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">storage_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_scope</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">],</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_decode_cursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cursor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2048</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">cursor</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">),</span> <span class="n">altchars</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;-_&quot;</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span>
+            <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span>
+            <span class="ow">or</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span>
+            <span class="ow">or</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">scope</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="n">checkpoint_id</span><span class="p">,</span> <span class="n">storage_id</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">checkpoint_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">checkpoint_id</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">storage_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">storage_id</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">checkpoint_id</span> <span class="o">+</span> <span class="n">storage_id</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">return</span> <span class="n">checkpoint_id</span><span class="p">,</span> <span class="n">storage_id</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">UnicodeError</span><span class="p">,</span> <span class="n">binascii</span><span class="o">.</span><span class="n">Error</span><span class="p">,</span> <span class="ne">RecursionError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidThreadCursor</span><span class="p">(</span><span class="s2">&quot;Invalid thread cursor. Use a cursor from the same user and agent.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_encode_cursor</span><span class="p">(</span><span class="n">candidate</span><span class="p">:</span> <span class="n">_Candidate</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="o">*</span><span class="n">candidate</span><span class="o">.</span><span class="n">boundary</span><span class="p">],</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64encode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_matches_owner</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lat_user_id&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">))</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lat_agent_id&quot;</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">owner</span> <span class="o">==</span> <span class="n">user_id</span> <span class="ow">and</span> <span class="n">agent</span> <span class="o">==</span> <span class="n">agent_id</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_memory_candidates</span><span class="p">(</span>
+    <span class="n">saver</span><span class="p">:</span> <span class="n">InMemorySaver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Candidate</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">candidates</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">_Candidate</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">storage_id</span><span class="p">,</span> <span class="n">namespaces</span> <span class="ow">in</span> <span class="n">saver</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">checkpoints</span> <span class="o">=</span> <span class="n">namespaces</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="c1"># A new run writes step -1 and step 0. A history import starts at step 0.</span>
+            <span class="k">for</span> <span class="n">checkpoint_id</span> <span class="ow">in</span> <span class="n">heapq</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">checkpoints</span><span class="p">):</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">serde</span><span class="o">.</span><span class="n">loads_typed</span><span class="p">(</span><span class="n">checkpoints</span><span class="p">[</span><span class="n">checkpoint_id</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">candidate</span> <span class="o">=</span> <span class="n">_Candidate</span><span class="p">(</span><span class="n">checkpoint_id</span><span class="p">,</span> <span class="n">storage_id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">_matches_owner</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">before</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">candidate</span><span class="o">.</span><span class="n">boundary</span> <span class="o">&lt;</span> <span class="n">before</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">candidate</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">heapq</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">candidates</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">candidate</span><span class="p">:</span> <span class="n">candidate</span><span class="o">.</span><span class="n">boundary</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_sqlite_candidates</span><span class="p">(</span>
+    <span class="n">saver</span><span class="p">:</span> <span class="n">AsyncSqliteSaver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Candidate</span><span class="p">]:</span>
+    <span class="k">await</span> <span class="n">saver</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT c.checkpoint_id, c.thread_id, c.metadata FROM checkpoints AS c</span>
+<span class="s2">        WHERE c.checkpoint_ns = &#39;&#39; AND json_extract(c.metadata, &#39;$.step&#39;) = 0</span>
+<span class="s2">          AND COALESCE(json_extract(c.metadata, &#39;$.lat_user_id&#39;), json_extract(c.metadata, &#39;$.user_id&#39;)) = ?</span>
+<span class="s2">          AND NOT EXISTS (</span>
+<span class="s2">              SELECT 1 FROM checkpoints AS earlier</span>
+<span class="s2">              WHERE earlier.thread_id = c.thread_id AND earlier.checkpoint_ns = &#39;&#39;</span>
+<span class="s2">                AND json_extract(earlier.metadata, &#39;$.step&#39;) = 0 AND earlier.checkpoint_id &lt; c.checkpoint_id</span>
+<span class="s2">          )</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">before</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; AND (c.checkpoint_id, c.thread_id) &lt; (?, ?)&quot;</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; ORDER BY c.checkpoint_id DESC, c.thread_id DESC LIMIT ?&quot;</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">saver</span><span class="o">.</span><span class="n">lock</span><span class="p">,</span> <span class="n">saver</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_Candidate</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_postgres_candidates</span><span class="p">(</span>
+    <span class="n">saver</span><span class="p">:</span> <span class="n">AsyncPostgresSaver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">before</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Candidate</span><span class="p">]:</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT c.checkpoint_id, c.thread_id, c.metadata FROM checkpoints AS c</span>
+<span class="s2">        WHERE c.checkpoint_ns = &#39;&#39; AND c.metadata-&gt;&gt;&#39;step&#39; = &#39;0&#39;</span>
+<span class="s2">          AND COALESCE(c.metadata-&gt;&gt;&#39;lat_user_id&#39;, c.metadata-&gt;&gt;&#39;user_id&#39;) = </span><span class="si">%s</span>
+<span class="s2">          AND NOT EXISTS (</span>
+<span class="s2">              SELECT 1 FROM checkpoints AS earlier</span>
+<span class="s2">              WHERE earlier.thread_id = c.thread_id AND earlier.checkpoint_ns = &#39;&#39;</span>
+<span class="s2">                AND earlier.metadata-&gt;&gt;&#39;step&#39; = &#39;0&#39; AND earlier.checkpoint_id &lt; c.checkpoint_id</span>
+<span class="s2">          )</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">before</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; AND (c.checkpoint_id, c.thread_id) &lt; (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">+=</span> <span class="s2">&quot; ORDER BY c.checkpoint_id DESC, c.thread_id DESC LIMIT </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">saver</span><span class="o">.</span><span class="n">_cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_Candidate</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;checkpoint_id&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="list_threads">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.memory.threads.html#langgraph_agent_toolkit.core.memory.threads.list_threads">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_threads</span><span class="p">(</span>
+    <span class="n">saver</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">storage_key</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">cursor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThreadPage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a bounded page of conversation identities from root checkpoints.</span>
+
+<span class="sd">    The cursor orders conversations by their first step 0 checkpoint. It does</span>
+<span class="sd">    not order them by their latest activity. Other agents in the same user</span>
+<span class="sd">    scope can require extra pages. Continue until ``next_cursor`` is ``None``,</span>
+<span class="sd">    including after an empty page. ``storage_key`` must bind public IDs to the</span>
+<span class="sd">    authenticated owner and selected agent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">limit</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Thread page size must be between 1 and 100.&quot;</span><span class="p">)</span>
+    <span class="n">scope</span> <span class="o">=</span> <span class="n">_scope</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+    <span class="n">before</span> <span class="o">=</span> <span class="n">_decode_cursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+    <span class="n">scan_limit</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">limit</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">saver</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">saver</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">NoOpSaver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ThreadPage</span><span class="p">([],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">InMemorySaver</span><span class="p">):</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="n">_memory_candidates</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">before</span><span class="p">,</span> <span class="n">scan_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">AsyncSqliteSaver</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="s2">&quot;_lat_thread_listing_indexed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_sqlite_candidates</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">before</span><span class="p">,</span> <span class="n">scan_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">AsyncPostgresSaver</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="s2">&quot;_lat_thread_listing_indexed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_postgres_candidates</span><span class="p">(</span><span class="n">saver</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">before</span><span class="p">,</span> <span class="n">scan_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ThreadListingUnsupported</span><span class="p">(</span><span class="s2">&quot;This checkpointer does not support conversation listing.&quot;</span><span class="p">)</span>
+
+    <span class="n">threads</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">candidates</span><span class="p">[:</span><span class="n">scan_limit</span><span class="p">]):</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_matches_owner</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+            <span class="n">public_id</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lat_thread_id&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;langfuse_session_id&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">public_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">public_id</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">256</span>
+                <span class="ow">and</span> <span class="n">storage_key</span><span class="p">(</span><span class="n">public_id</span><span class="p">)</span> <span class="o">==</span> <span class="n">candidate</span><span class="o">.</span><span class="n">storage_id</span>
+            <span class="p">):</span>
+                <span class="n">threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ThreadSummary</span><span class="p">(</span><span class="n">public_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="o">==</span> <span class="n">limit</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">scan_limit</span><span class="p">:</span>
+            <span class="n">next_cursor</span> <span class="o">=</span> <span class="n">_encode_cursor</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span> <span class="k">if</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">ThreadPage</span><span class="p">(</span><span class="n">threads</span><span class="p">,</span> <span class="n">next_cursor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ThreadPage</span><span class="p">(</span><span class="n">threads</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optional tool selection &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/tool_selection.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=11e62b30"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deep Agents" href="deepagents.html" />
+    <link rel="prev" title="MCP tools" href="mcp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Optional tool selection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#select-a-mode">Select a mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-an-api-worker">Configure an API worker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-a-separate-selector-model">Use a separate selector model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-the-python-builders">Use the Python builders</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#keep-deep-agents-control-tools-available">Keep Deep Agents control tools available</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#handle-failures-and-permissions">Handle failures and permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluate-multi-turn-behavior-and-cost">Evaluate multi-turn behavior and cost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-offline-example">Run the offline example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-api-benchmark">Run the API benchmark</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Optional tool selection</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/tool_selection.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optional-tool-selection">
+<h1>Optional tool selection<a class="headerlink" href="#optional-tool-selection" title="Link to this heading"></a></h1>
+<p>Tool selection limits the tool definitions that a model sees for one call.
+Use it when an agent has a large catalog of tools. Keep it disabled for a small
+catalog unless a representative test shows a benefit.</p>
+<p>The toolkit reuses LangChain’s <code class="docutils literal notranslate"><span class="pre">LLMToolSelectorMiddleware</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ProviderToolSearchMiddleware</span></code>. It does not implement the complete
+<a class="reference external" href="https://arxiv.org/abs/2411.15399">Less-is-More research method</a>. That method
+also uses an ideal-tool recommendation call, embedding indexes, and offline
+tool clustering.</p>
+<section id="select-a-mode">
+<h2>Select a mode<a class="headerlink" href="#select-a-mode" title="Link to this heading"></a></h2>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Tool selection modes</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p>Behavior</p></th>
+<th class="head"><p>Use and limits</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p>Keep the existing tool catalog. This is the default.</p></td>
+<td><p>Use for small catalogs and as the benchmark baseline.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">llm</span></code></p></td>
+<td><p>Ask a model to select tools before the main model call.</p></td>
+<td><p>Works with a selector model that supports LangChain structured output.
+Adds model requests when the candidate count exceeds <code class="docutils literal notranslate"><span class="pre">max_tools</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">provider</span></code></p></td>
+<td><p>Mark candidate tools for the provider’s native tool search.</p></td>
+<td><p>Requires a supported provider, model, and API route. It does not make a
+separate toolkit selector-model call.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Provider mode currently uses the upstream Anthropic and OpenAI integrations.
+Provider detection alone does not prove that a deployed model or gateway
+supports tool search. Test the actual model and API route before deployment.
+An unsupported provider raises an error when searchable tools are present.
+For OpenAI, configure the model instance with <code class="docutils literal notranslate"><span class="pre">use_responses_api=True</span></code>.
+The route must support the Responses API and tool search. A gateway that only
+supports Chat Completions is not sufficient. Check the current <a class="reference external" href="https://developers.openai.com/api/docs/guides/tools-tool-search">OpenAI guide</a> for model
+support.
+See the <a class="reference external" href="https://reference.langchain.com/python/langchain/agents/middleware/provider_tool_search/ProviderToolSearchMiddleware">provider search reference</a>.</p>
+<p>Provider search controls model-context loading. The request can still contain
+the deferred tool definitions. Do not assume that it reduces HTTP payload
+bytes. MCP catalog discovery still occurs at worker startup.</p>
+</section>
+<section id="configure-an-api-worker">
+<h2>Configure an API worker<a class="headerlink" href="#configure-an-api-worker" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TOOL_SELECTION</span></code> is one JSON setting. No change to a REST request body is
+required. Set it before the service imports its agents:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">TOOL_SELECTION</span><span class="o">=</span><span class="s1">&#39;{&quot;mode&quot;:&quot;llm&quot;,&quot;max_tools&quot;:8}&#39;</span>
+</pre></div>
+</div>
+<p>The built-in <code class="docutils literal notranslate"><span class="pre">create_agent</span></code>, <code class="docutils literal notranslate"><span class="pre">create_agent_structured</span></code>, <code class="docutils literal notranslate"><span class="pre">hitl_agent</span></code>,
+and Deep Agents builders use this setting.
+The custom <code class="docutils literal notranslate"><span class="pre">create_react_agent</span></code> creator does not
+use this integration. Restart workers after a configuration change.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">ToolSelectionConfig</span></code> fields</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 18.0%" />
+<col style="width: 54.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mode</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p>Choose <code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">llm</span></code>, or <code class="docutils literal notranslate"><span class="pre">provider</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">max_tools</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">8</span></code></p></td>
+<td><p>Positive limit on normally selected tools in <code class="docutils literal notranslate"><span class="pre">llm</span></code> mode. Required
+tools and provider-specific tool dictionaries do not use this limit.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">always_include</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
+<td><p>Exact tool names to keep available. Names must be unique and present
+in the current model request.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">model_config_key</span></code></p></td>
+<td><p>Unset</p></td>
+<td><p>Name of a selector model in <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code>. Applies to <code class="docutils literal notranslate"><span class="pre">llm</span></code> mode.
+An unset key uses the main model.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_retries</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Additional selection attempts after a malformed structured response.
+Accepts values from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">3</span></code>. Applies to <code class="docutils literal notranslate"><span class="pre">llm</span></code> mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">on_parsing_failure</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">error</span></code></p></td>
+<td><p>Choose <code class="docutils literal notranslate"><span class="pre">error</span></code>, <code class="docutils literal notranslate"><span class="pre">none</span></code>, or <code class="docutils literal notranslate"><span class="pre">all</span></code> after malformed-response retries.
+Applies to <code class="docutils literal notranslate"><span class="pre">llm</span></code> mode.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The bridge skips LLM selection when there are no tools or when the eligible
+candidate count is at most <code class="docutils literal notranslate"><span class="pre">max_tools</span></code>. Required tools remain available.
+<code class="docutils literal notranslate"><span class="pre">max_tools</span></code> is not a limit on total tool schemas, model calls, or tool calls.
+It has no effect on provider mode.</p>
+<p>Use the final registered names for MCP tools. A server prefix can change a
+tool’s name. Inspect the configured catalog before setting <code class="docutils literal notranslate"><span class="pre">always_include</span></code>.
+An unknown required name produces an error. See <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a> for tool naming and
+server allowlists.</p>
+</section>
+<section id="use-a-separate-selector-model">
+<h2>Use a separate selector model<a class="headerlink" href="#use-a-separate-selector-model" title="Link to this heading"></a></h2>
+<p>The default LLM mode uses the main model for selection. A separate model can
+reduce selection cost, but it must select the tools required by the task.
+For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_CONFIGS</span><span class="o">=</span><span class="s1">&#39;{&quot;selector&quot;:{&quot;provider&quot;:&quot;openai&quot;,&quot;name&quot;:&quot;your-selector-model&quot;}}&#39;</span>
+<span class="nv">TOOL_SELECTION</span><span class="o">=</span><span class="s1">&#39;{&quot;mode&quot;:&quot;llm&quot;,&quot;max_tools&quot;:8,&quot;model_config_key&quot;:&quot;selector&quot;}&#39;</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">your-selector-model</span></code> with a model available to the deployment.
+Install its provider extra. Supply credentials through the process environment
+or the secret manager. Do not put credentials in committed configuration.</p>
+<p>The toolkit constructs this model through <code class="docutils literal notranslate"><span class="pre">CompletionModelFactory</span></code>.
+Managed HTTP connections, credentials, timeouts, and transport retries still
+apply. A missing <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code> key fails graph setup. Provider transport
+retries are separate from malformed-response retries.</p>
+</section>
+<section id="use-the-python-builders">
+<h2>Use the Python builders<a class="headerlink" href="#use-the-python-builders" title="Link to this heading"></a></h2>
+<p>Pass a configuration to one graph to override the worker setting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.blueprints.create_agent._shared</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">build_tool_graph</span><span class="p">,</span>
+    <span class="n">create_model</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.tool_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolSelectionConfig</span>
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">build_tool_graph</span><span class="p">(</span>
+    <span class="n">create_model</span><span class="p">(),</span>
+    <span class="n">tool_selection</span><span class="o">=</span><span class="n">ToolSelectionConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;llm&quot;</span><span class="p">,</span> <span class="n">max_tools</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Pass <code class="docutils literal notranslate"><span class="pre">selector_model=...</span></code> to use an application-owned <code class="docutils literal notranslate"><span class="pre">BaseChatModel</span></code>
+instance. Pass either that instance or <code class="docutils literal notranslate"><span class="pre">model_config_key</span></code>. Do not pass both.
+The caller owns the lifecycle of an injected model and its connections.</p>
+<p>The Deep Agents builder accepts the same selection arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.agents.blueprints.deep_agent.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_graph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.tool_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolSelectionConfig</span>
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">build_graph</span><span class="p">(</span>
+    <span class="n">tool_selection</span><span class="o">=</span><span class="n">ToolSelectionConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;llm&quot;</span><span class="p">,</span> <span class="n">max_tools</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Both builders accept <code class="docutils literal notranslate"><span class="pre">extra_middleware=()</span></code> for application middleware.
+The toolkit applies this middleware before selection. An access filter can
+remove tools before the selector sees them. In the native builder, the
+direct-answer budget can remove all tools before selection runs.
+Do not add another selector through <code class="docutils literal notranslate"><span class="pre">extra_middleware</span></code> when the configured
+selector is active unless the application deliberately composes both.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tool_selection=None</span></code> uses the worker setting. To disable selection for one
+graph even when that setting enables it, pass
+<code class="docutils literal notranslate"><span class="pre">ToolSelectionConfig(mode=&quot;off&quot;)</span></code> explicitly.</p>
+</section>
+<section id="keep-deep-agents-control-tools-available">
+<h2>Keep Deep Agents control tools available<a class="headerlink" href="#keep-deep-agents-control-tools-available" title="Link to this heading"></a></h2>
+<p>The integration keeps existing Deep Agents planning, delegation, file, and
+asynchronous task tools available. It protects only tools present in that
+request. These tools do not use <code class="docutils literal notranslate"><span class="pre">max_tools</span></code> and remain outside provider
+search. The resulting catalog can therefore be larger than <code class="docutils literal notranslate"><span class="pre">max_tools</span></code>.</p>
+<p>Selection applies to the main graph built by the toolkit. Do not assume that
+it also applies to a supplied subagent or to the upstream general-purpose
+subagent. Configure those agents’ own middleware when they need a selection
+policy. Compiled subagents keep their existing graph behavior.</p>
+<p>Selection does not change filesystem permissions, store namespaces, or the
+checkpoint backend. It changes the model’s view of tools for the current call.
+See <a class="reference internal" href="deepagents.html"><span class="doc">Deep Agents</span></a> for backend and subagent access rules.</p>
+</section>
+<section id="handle-failures-and-permissions">
+<h2>Handle failures and permissions<a class="headerlink" href="#handle-failures-and-permissions" title="Link to this heading"></a></h2>
+<p>The default parsing policy raises an error after the allowed attempts.
+<code class="docutils literal notranslate"><span class="pre">none</span></code> gives the main model no selected candidate tools. Required tools can
+remain available. This can cause an incomplete answer.
+<code class="docutils literal notranslate"><span class="pre">all</span></code> restores the candidate catalog for that call. This fallback bypasses
+<code class="docutils literal notranslate"><span class="pre">max_tools</span></code> and can increase prompt size.</p>
+<p>These policies handle returned values without the expected <code class="docutils literal notranslate"><span class="pre">tools</span></code> list.
+Exceptions from structured-output parsing, provider errors, timeouts, invalid
+tool names, and tool exceptions do not use this fallback policy.
+The integration does not retry an executed tool when selection fails.
+Keep approval and idempotency controls for external writes.
+Human approval in <code class="docutils literal notranslate"><span class="pre">hitl_agent</span></code> still applies to a selected write tool.</p>
+<p>Tool visibility is not authorization. Registered tools can still exist in the
+graph’s execution registry. Apply access checks in the tool or remote server.
+Select only from the authorized catalog. A fallback must not restore tools
+that an earlier access filter removed. <code class="docutils literal notranslate"><span class="pre">always_include</span></code> does not grant access.</p>
+<p>The bridge creates native selector middleware for each model request.
+Concurrent requests do not change a shared graph’s tool list or checkpoint
+history. MCP connections still use their normal worker lifecycle.</p>
+</section>
+<section id="evaluate-multi-turn-behavior-and-cost">
+<h2>Evaluate multi-turn behavior and cost<a class="headerlink" href="#evaluate-multi-turn-behavior-and-cost" title="Link to this heading"></a></h2>
+<p>The installed LangChain LLM selector bases its choice on the latest
+<code class="docutils literal notranslate"><span class="pre">HumanMessage</span></code>. It does not use all earlier messages or intermediate tool
+results to select the next tools. Test follow-ups such as <code class="docutils literal notranslate"><span class="pre">do</span> <span class="pre">that</span></code> and
+workflows whose next tool depends on a prior result. Keep required workflow
+tools available when that is appropriate. See the <a class="reference external" href="https://reference.langchain.com/python/langchain/agents/middleware/tool_selection/LLMToolSelectorMiddleware">LLM selector reference</a>.</p>
+<p>A selected catalog can reduce the main prompt while increasing total model
+requests. Selection can run again before a later main model call.
+Changing tool subsets can also reduce provider prompt-cache reuse.
+Measure selector calls, main calls, total tokens, cost, cache hits, task
+completion, and p50/p95 latency together. Use the configured observability
+backend to separate selector work from main-model work.</p>
+</section>
+<section id="run-the-offline-example">
+<h2>Run the offline example<a class="headerlink" href="#run-the-offline-example" title="Link to this heading"></a></h2>
+<p>The example uses fixed responses and real LangChain middleware. It does not
+read <code class="docutils literal notranslate"><span class="pre">.env</span></code>, contact a model provider, or enable remote tracing.
+Run these commands from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/python/11-tool-selection.py<span class="w"> </span>--mode<span class="o">=</span>off
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/python/11-tool-selection.py<span class="w"> </span>--mode<span class="o">=</span>llm
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/python/11-tool-selection.py<span class="w"> </span>--builder<span class="o">=</span>deep<span class="w"> </span>--mode<span class="o">=</span>llm
+</pre></div>
+</div>
+<p>Install the <code class="docutils literal notranslate"><span class="pre">deepagents</span></code> extra for the last command.
+The output reports actual main-model tool names and selector calls.
+The Deep Agents run also writes a virtual result file.
+The example checks middleware integration. It does not measure real-model
+tool-choice quality or provider latency.</p>
+<p>With its fixed task and twelve unrelated tools, the native run changes each
+main-model catalog from fifteen tools to one. It adds two selector calls.
+The Deep Agents run changes its catalog from twenty-two tools to nine. It adds
+three selector calls and keeps the control tools available.
+These counts describe this example, not a recommended production limit.</p>
+</section>
+<section id="run-the-api-benchmark">
+<h2>Run the API benchmark<a class="headerlink" href="#run-the-api-benchmark" title="Link to this heading"></a></h2>
+<p>The process tests compare <code class="docutils literal notranslate"><span class="pre">off</span></code> and <code class="docutils literal notranslate"><span class="pre">llm</span></code> with the same tasks and tool
+catalogs. They run real API processes, HTTP requests, SQLite checkpoints, and
+tools. Scripted models make the results repeatable.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/e2e/test_tool_selection_api.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--run-e2e<span class="w"> </span>-q<span class="w"> </span>--basetemp<span class="o">=</span>data/tool-selection-benchmark
+</pre></div>
+</div>
+<p>Each builder writes a <code class="docutils literal notranslate"><span class="pre">benchmark.json</span></code> report under its test directory.
+Set <code class="docutils literal notranslate"><span class="pre">LAT_TEST_TOOL_SELECTION_REPORT_DIR</span></code> to copy reports to one directory.
+Use a separate empty directory for each comparison run.
+The copied report names are <code class="docutils literal notranslate"><span class="pre">native.json</span></code> and <code class="docutils literal notranslate"><span class="pre">deepagents.json</span></code>.</p>
+<p>The report records serialized tool-schema UTF-8 bytes and tool counts.
+These are not provider token counts or HTTP request bytes.
+It also records selector and main-model calls, task success, side effects,
+and local API p50/p95 latency. The suite checks streaming, saved history,
+restart, concurrent requests, and bounded selection failures.</p>
+<p>The comparison has 8, 32, and 128 unrelated tools.
+Each variant uses one invoke request, one SSE request, and one JSONL
+request. Its latency summary combines those three protocols. Read the raw
+request samples before comparing protocols. Three samples do not establish
+production tail latency or capacity.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Deterministic comparison</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 25.0%" />
+<col style="width: 23.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Builder</p></th>
+<th class="head"><p>Main tools in <code class="docutils literal notranslate"><span class="pre">off</span></code> mode</p></th>
+<th class="head"><p>Main tools in <code class="docutils literal notranslate"><span class="pre">llm</span></code> mode</p></th>
+<th class="head"><p>Total model calls per task</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Native</p></td>
+<td><p>15 / 39 / 135</p></td>
+<td><p>3</p></td>
+<td><p>3 in <code class="docutils literal notranslate"><span class="pre">off</span></code>; 6 in <code class="docutils literal notranslate"><span class="pre">llm</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Deep Agents</p></td>
+<td><p>22 / 46 / 142</p></td>
+<td><p>11</p></td>
+<td><p>9 in <code class="docutils literal notranslate"><span class="pre">off</span></code>; 16 in <code class="docutils literal notranslate"><span class="pre">llm</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The tasks complete in both modes. Deep Agents call counts include its
+specialist. Main-model tool counts include tools kept available by policy.</p>
+<p>Synthetic model timings measure local framework overhead. They do not predict
+real-model speed, token cost, selection quality, or provider capacity.
+Provider mode needs a separate check against the actual provider and gateway.
+Before enabling selection in production, repeat the comparison with a
+representative task set and the deployed models. Keep selection disabled for
+agents where that comparison does not show a useful result.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mcp.html" class="btn btn-neutral float-left" title="MCP tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deepagents.html" class="btn btn-neutral float-right" title="Deep Agents" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

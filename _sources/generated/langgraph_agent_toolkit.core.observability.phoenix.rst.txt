@@ -1,0 +1,7 @@
+langgraph\_agent\_toolkit.core.observability.phoenix module
+===========================================================
+
+.. automodule:: langgraph_agent_toolkit.core.observability.phoenix
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Langfuse service upgrade &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/langfuse_server_upgrade.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=11e62b30"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Phoenix observability" href="phoenix.html" />
+    <link rel="prev" title="Langfuse compatibility" href="langfuse_compatibility.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Langfuse service upgrade</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#select-the-compose-server-version">Select the Compose server version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#infrastructure-and-existing-data">Infrastructure and existing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-a-disposable-service-test">Run a disposable service test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verification-record">Verification record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compare-synthetic-records-during-a-test-upgrade">Compare synthetic records during a test upgrade</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Langfuse service upgrade</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/langfuse_server_upgrade.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="langfuse-service-upgrade">
+<h1>Langfuse service upgrade<a class="headerlink" href="#langfuse-service-upgrade" title="Link to this heading"></a></h1>
+<p>Review date: 2026-10-28.</p>
+<p>The reviewed server versions are Langfuse 4.71.0 and the maintained v3 release
+3.225.15. The web and worker must use the same exact server version.
+SDK versions and server versions are separate. See <a class="reference internal" href="langfuse_compatibility.html"><span class="doc">Langfuse compatibility</span></a>
+before selecting a Python SDK extra.</p>
+<p>The <a class="reference external" href="https://github.com/langfuse/langfuse/releases/tag/v4.71.0">4.71.0 release</a> includes patched
+Node.js packages, authorization fixes, and improved stored message extraction.
+The <a class="reference external" href="https://github.com/langfuse/langfuse/releases/tag/v3.225.15">3.225.15 release</a> backports
+authorization and webhook-secret fixes. Upstream supports v3 security updates
+until the end of January 2027.</p>
+<p>The previous Compose example used floating <code class="docutils literal notranslate"><span class="pre">:3</span></code> tags. Its actual patch
+version depends on the last image pull. Record <code class="docutils literal notranslate"><span class="pre">/api/public/health</span></code> and the
+image digest before an existing deployment upgrade. Use the
+<a class="reference external" href="https://github.com/langfuse/langfuse/releases">official release list</a>
+to review changes from that recorded version.</p>
+<section id="select-the-compose-server-version">
+<h2>Select the Compose server version<a class="headerlink" href="#select-the-compose-server-version" title="Link to this heading"></a></h2>
+<p>The main Compose file requires <code class="docutils literal notranslate"><span class="pre">LANGFUSE_SERVER_VERSION</span></code> explicitly.
+The current <code class="docutils literal notranslate"><span class="pre">.env.example</span></code> selects 4.71.0 for a new deployment.
+It also selects <code class="docutils literal notranslate"><span class="pre">LANGFUSE_SDK_MAJOR=5</span></code> for the toolkit API image build.
+Compose reads this variable before it loads service <code class="docutils literal notranslate"><span class="pre">env_file</span></code> entries.
+Set it in the root <code class="docutils literal notranslate"><span class="pre">.env</span></code> or the shell. A value only in
+<code class="docutils literal notranslate"><span class="pre">configs/langfuse/.langfuse.env</span></code> does not select the image.
+Compose requires this value even for commands that select another service.</p>
+<p>For an existing v3 installation, first select:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>LANGFUSE_SERVER_VERSION=3.225.15
+LANGFUSE_SDK_MAJOR=4
+</pre></div>
+</div>
+<p>Complete the migration checks below before changing that value to 4.71.0.
+Do not point a test stack at existing deployment volumes.
+Use <code class="docutils literal notranslate"><span class="pre">LANGFUSE_SDK_MAJOR=3</span></code> when a client deployment must retain SDK v3.
+Rebuild the API image after changing this build option.</p>
+</section>
+<section id="infrastructure-and-existing-data">
+<h2>Infrastructure and existing data<a class="headerlink" href="#infrastructure-and-existing-data" title="Link to this heading"></a></h2>
+<p>Langfuse v4 needs ClickHouse 25.12 or later, PostgreSQL 15 or later, and Redis
+7.0 or later. The reviewed stack uses ClickHouse 26.4, PostgreSQL 16, and Redis
+7.2. Follow the <a class="reference external" href="https://langfuse.com/self-hosting/upgrade/upgrade-guides/upgrade-v3-to-v4">official v3-to-v4 guide</a>
+for ClickHouse grants, storage planning, and deployment-specific procedures.
+Historic backfill can need about three times the current ClickHouse data
+volume. Check disk capacity before enabling it.</p>
+<p>Use this sequence for existing data:</p>
+<ol class="arabic simple">
+<li><p>Back up PostgreSQL and ClickHouse. Retain the object-store data and secrets.
+Test the restore procedure.</p></li>
+<li><p>Update the v3 server and finish its required data migrations. Inspect each
+unfinished job and its prerequisites on the background migration page.</p></li>
+<li><p>Update ClickHouse while the server still uses v3. Verify ingestion and reads.</p></li>
+<li><p>Select the v4 images with a migration write mode. Review SDK producers,
+API consumers, evaluators, and exports before using <code class="docutils literal notranslate"><span class="pre">events_only</span></code>.</p></li>
+<li><p>Complete historic backfill or a retention-based rollover. Verify old and new
+records before removing the migration settings.</p></li>
+</ol>
+<p>The v4 schema update removes superseded tables. An image downgrade alone is
+not a rollback. Prefer a controlled restore or the upstream schema rollback
+procedure. Records written only in the new format are unavailable to a v3
+read path.</p>
+<p>Keep <code class="docutils literal notranslate"><span class="pre">SALT</span></code>, <code class="docutils literal notranslate"><span class="pre">ENCRYPTION_KEY</span></code>, <code class="docutils literal notranslate"><span class="pre">NEXTAUTH_SECRET</span></code>, and the database and
+object-store credentials. Do not generate replacement secrets during this
+server upgrade. Existing records and API keys depend on them.</p>
+<p>The fresh 3.225.15 test server has five pending <code class="docutils literal notranslate"><span class="pre">20260701_v4_step_*</span></code> jobs.
+They are gated v4 migration work. The fresh v4 server also keeps an optional
+scratch-table cleanup job pending. A raw count of unfinished rows does not
+distinguish these jobs from required v3 data migrations.
+Check each job’s name, gate, and error state. Finish required v3 data movement
+before the schema upgrade. Do not mark migration rows complete manually.</p>
+<p>For a first server upgrade that retains v3 ingestion and reads, put these
+values in the Langfuse service environment before starting v4:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>LANGFUSE_MIGRATION_V4_WRITE_MODE=legacy
+LANGFUSE_MIGRATION_V4_NATIVE_OTEL_BEHAVIOUR=dual_write
+LANGFUSE_MIGRATION_V4_ALLOW_PREVIEW_OPT_IN=false
+LANGFUSE_BACKGROUND_MIGRATION_V4_ENABLE_HISTORIC_BACKFILL=false
+</pre></div>
+</div>
+<p>These are temporary migration settings. Fresh v4 deployments use
+<code class="docutils literal notranslate"><span class="pre">events_only</span></code> and <code class="docutils literal notranslate"><span class="pre">direct</span></code>. The old trace and observation read endpoints
+are unavailable in that mode. Use Observations API v2 for trace records.
+Python SDK v2 ingestion is rejected. Python SDK v5 needs server 4.59.0 or later.</p>
+<p>The worker probe includes <code class="docutils literal notranslate"><span class="pre">failIfEventPropagationStuck=true</span></code>. This detects
+a stalled compatibility propagation job during a dual-write migration.
+The Langfuse images include <code class="docutils literal notranslate"><span class="pre">wget</span></code> and do not include <code class="docutils literal notranslate"><span class="pre">curl</span></code>.
+Their probes use the supplied executable. Toolkit API and UI images retain
+their <code class="docutils literal notranslate"><span class="pre">curl</span></code> probes.
+Docker health status alone does not restart a running container.
+Use an orchestrator liveness policy to replace an unhealthy service.</p>
+<p>Keep legacy SDK batching within the worker shutdown budget.
+The toolkit defaults are <code class="docutils literal notranslate"><span class="pre">LANGFUSE_FLUSH_INTERVAL=5</span></code> seconds and
+<code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_SHUTDOWN_TIMEOUT=10</span></code> seconds. SDK v2, v3, and v4 legacy queues
+can wait for their batch interval during a public flush. Leave time for export
+and network operations when changing either value.
+A graceful stop can flush pending records. A network failure, host failure,
+or <code class="docutils literal notranslate"><span class="pre">SIGKILL</span></code> can prevent delivery. Checkpoint durability has a separate policy.</p>
+<p>The worker now waits for web readiness before it starts. The web process
+applies schema migrations. This order avoids worker reads against incomplete
+tables during the first startup.</p>
+<p>Redis holds pending Langfuse jobs. The Compose configuration mounts a named
+<code class="docutils literal notranslate"><span class="pre">/data</span></code> volume and enables AOF with <code class="docutils literal notranslate"><span class="pre">appendfsync</span> <span class="pre">everysec</span></code>.
+Container recreation retains pending Redis data. A host crash can still lose
+about one second of recent writes. Keep Redis backups and monitor disk space.
+<code class="docutils literal notranslate"><span class="pre">noeviction</span></code> prevents Redis from deleting queue keys under memory pressure.
+New writes can fail when memory is exhausted. Size the service for its load.
+The example limits Redis data to 256 MiB inside its 512 MiB container limit.
+This leaves space for allocator and AOF overhead. It is a development-stack
+baseline. Measure peak memory, fragmentation, and AOF rewrites in production.
+Set <code class="docutils literal notranslate"><span class="pre">REDIS_AUTH</span></code> once in <code class="docutils literal notranslate"><span class="pre">configs/redis/.redis.env</span></code>. The server and its
+probe now read the same container environment value. No separate root <code class="docutils literal notranslate"><span class="pre">.env</span></code>
+copy of the password is required.
+Move any root-only <code class="docutils literal notranslate"><span class="pre">REDIS_AUTH</span></code> value into that service environment file.
+Keep its existing value during the migration.
+Before switching an existing deployment, copy its current effective password
+into this service file. Align LiteLLM and other Redis clients with that value.
+Do not replace a custom password with the example password.
+Drain pending jobs before the first Redis container replacement.
+An empty new volume does not copy the old container’s in-memory keys.
+Back up and restore Redis data when existing queue or cache keys must remain.</p>
+<p>Media URLs must be reachable by SDK clients and users. Replace the example’s
+<code class="docutils literal notranslate"><span class="pre">localhost:9090</span></code> endpoint with the appropriate address for container clients
+or a remote deployment. The v4 server uses the separate internal MinIO endpoint.
+The service tests below use text records. They do not verify browser media
+uploads or externally signed media URLs.</p>
+</section>
+<section id="run-a-disposable-service-test">
+<h2>Run a disposable service test<a class="headerlink" href="#run-a-disposable-service-test" title="Link to this heading"></a></h2>
+<p>The integration fixture creates a separate Compose project and named volumes.
+It exposes only the web port, bound to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. It does not load the
+application’s <code class="docutils literal notranslate"><span class="pre">.env</span></code> or the deployment’s service configuration.
+The helper generates synthetic credentials in the ignored <code class="docutils literal notranslate"><span class="pre">data/</span></code> directory.
+Its command output does not include those credentials.</p>
+<p>From the repository root, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/langfuse_stack.py<span class="w"> </span>prepare<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/langfuse-test-v4<span class="w"> </span>--server_version<span class="o">=</span><span class="m">4</span>.71.0
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/langfuse_stack.py<span class="w"> </span>start<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/langfuse-test-v4
+</pre></div>
+</div>
+<p>The first start downloads the server and database images. The fixture needs
+enough memory for six services. The local verification uses an 8 GiB Docker
+memory budget. Run v3 and v4 test stacks sequentially on a small computer.
+The main Compose web and worker limits match the tested 2 GiB and 1.5 GiB
+limits. Add <code class="docutils literal notranslate"><span class="pre">NODE_OPTIONS=--max-old-space-size=1024</span></code> to the Langfuse service
+environment when updating an older file. The current example includes it.
+The full application stack needs more memory than this isolated Langfuse stack.
+These are development baselines. Measure and tune production memory limits.</p>
+<p>Load only the generated test variables, then run the explicit live tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span>-a
+<span class="nb">source</span><span class="w"> </span>data/langfuse-test-v4/server.env
+<span class="nb">set</span><span class="w"> </span>+a
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/integration/test_langfuse_live.py<span class="w"> </span>--run-langfuse<span class="w"> </span>-q
+</pre></div>
+</div>
+<p>Use an environment with a compatible SDK. The test checks the reported server
+version and reads stored prompts, observations, tool results, and feedback.
+It uses synthetic model responses. It makes no paid model requests.</p>
+<p>To test persistence, keep the same project and restart only web and worker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/langfuse_stack.py<span class="w"> </span>restart<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/langfuse-test-v4
+</pre></div>
+</div>
+<p>Read the same record IDs after the restart. Do not delete the volumes between
+the write and read phases.</p>
+<p>Remove the generated test stack after verification:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/langfuse_stack.py<span class="w"> </span>stop<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/langfuse-test-v4
+</pre></div>
+</div>
+<p>The helper removes only its generated test project and volumes. It retains
+local logs and test credentials. Do not publish those files.
+Use a new directory for another independent project.
+To test the maintained v3 server, repeat the prepare command with
+<code class="docutils literal notranslate"><span class="pre">--server_version=3.225.15</span></code> and a separate directory.</p>
+<p>These tests use synthetic data. They do not prove that an existing production
+database completed its historic backfill. Verify that migration in staging
+with a restored backup before replacing a production server.</p>
+</section>
+<section id="verification-record">
+<h2>Verification record<a class="headerlink" href="#verification-record" title="Link to this heading"></a></h2>
+<p>The local verification used native arm64 images and synthetic model responses.
+SDK 5.0.4 and SDK 4.18.0 each passed four live tests against server 4.71.0.
+The tests read prompts, complete native and Deep Agents tool traces, feedback,
+and public user and session identities after toolkit API worker shutdown.</p>
+<p>After the v4 web and worker restarted, the same eight API process traces,
+172 observations, eight scores, and linked prompt revisions remained unchanged.
+The check read those existing IDs. It did not write replacement records.</p>
+<p>The Redis check used the actual main Compose command with a smaller 4 MiB
+test limit. It verified correct and incorrect authentication, a non-root
+server process, AOF recovery after container recreation, and explicit write
+errors under memory pressure. The earlier marker remained present.
+All Redis verification resources were disposable.</p>
+<p>SDK 2.60.10, 3.15.0, and 4.18.0 each passed four live tests against server
+3.225.15. That test project then upgraded to 4.71.0 in <code class="docutils literal notranslate"><span class="pre">legacy</span></code> mode with
+<code class="docutils literal notranslate"><span class="pre">dual_write</span></code> OTel behavior and historic backfill disabled.
+The upgrade retained its original keys and volumes. PostgreSQL and cold
+ClickHouse backups were taken before the schema update.
+All 12 API process traces, 254 observations, 12 scores, and linked prompt
+revisions remained unchanged through the legacy read APIs.
+This verifies the initial server schema step. It does not verify historic
+backfill or a cutover to <code class="docutils literal notranslate"><span class="pre">events_only</span></code>.</p>
+</section>
+<section id="compare-synthetic-records-during-a-test-upgrade">
+<h2>Compare synthetic records during a test upgrade<a class="headerlink" href="#compare-synthetic-records-during-a-test-upgrade" title="Link to this heading"></a></h2>
+<p>The read-only verifier accepts only a localhost test endpoint and paths in
+<code class="docutils literal notranslate"><span class="pre">data/</span></code>. It captures only the synthetic API process identities.
+Run the API tests for SDK v2, v3, and v4 against one disposable v3 project
+before taking its 12-trace snapshot.
+Prepare a migration fixture with <code class="docutils literal notranslate"><span class="pre">--write_mode=legacy</span></code> so later starts keep
+the legacy overlay. Retain its generated keys. Change only its server version
+after taking backups. The normal live test suite targets server defaults;
+this reader deliberately uses legacy APIs during the initial migration step:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/verify_langfuse_legacy_upgrade.py<span class="w"> </span>snapshot<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env_file<span class="o">=</span>data/langfuse-test-v3/server.env<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--manifest_path<span class="o">=</span>data/langfuse-test-v3/before-upgrade.json<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--expected_traces<span class="o">=</span><span class="m">12</span>
+</pre></div>
+</div>
+<p>Take backups and perform the controlled compatibility-mode upgrade described
+above. Keep the project keys and volumes. Then compare the original IDs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/verify_langfuse_legacy_upgrade.py<span class="w"> </span>verify<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env_file<span class="o">=</span>data/langfuse-test-v3/server.env<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--manifest_path<span class="o">=</span>data/langfuse-test-v3/before-upgrade.json<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--expected_server_version<span class="o">=</span><span class="m">4</span>.71.0
+</pre></div>
+</div>
+<p>The check compares trace identities and I/O, model and tool observation data,
+parent links, score identities and values, and both prompt revisions.
+It does not write records or perform a database migration.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langfuse_compatibility.html" class="btn btn-neutral float-left" title="Langfuse compatibility" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phoenix.html" class="btn btn-neutral float-right" title="Phoenix observability" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

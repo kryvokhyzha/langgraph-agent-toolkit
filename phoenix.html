@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phoenix observability &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/phoenix.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=11e62b30"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deployment and Recovery" href="deployment.html" />
+    <link rel="prev" title="Langfuse service upgrade" href="langfuse_server_upgrade.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Phoenix observability</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-and-select-the-backend">Install and select the backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trace-behavior">Trace behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prompt-management">Prompt management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feedback">Feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trace-content-and-access">Trace content and access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#self-hosted-storage">Self-hosted storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verification-and-limits">Verification and limits</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Phoenix observability</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/phoenix.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="phoenix-observability">
+<h1>Phoenix observability<a class="headerlink" href="#phoenix-observability" title="Link to this heading"></a></h1>
+<p>Use Phoenix to store OpenInference traces, prompt versions, and user feedback.
+Phoenix is an optional backend. It can replace Langfuse for these toolkit
+operations. It does not replace the checkpointer or long-term memory store.</p>
+<section id="install-and-select-the-backend">
+<h2>Install and select the backend<a class="headerlink" href="#install-and-select-the-backend" title="Link to this heading"></a></h2>
+<p>Add the optional dependencies to the application:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>add<span class="w"> </span><span class="s1">&#39;langgraph-agent-toolkit[phoenix]&#39;</span>
+</pre></div>
+</div>
+<p>For a source checkout, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>phoenix
+</pre></div>
+</div>
+<p>The extra installs the Phoenix client, OpenTelemetry SDK, and LangChain callback
+dependencies. It does not install or start the Phoenix server.
+Run the server separately or use an existing remote deployment.</p>
+<p>Set these values before the application starts:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">OBSERVABILITY_BACKEND</span><span class="o">=</span><span class="s">phoenix</span>
+<span class="na">PHOENIX_ENDPOINT</span><span class="o">=</span><span class="s">http://localhost:6006</span>
+<span class="na">PHOENIX_PROJECT_NAME</span><span class="o">=</span><span class="s">agent-service</span>
+<span class="na">PHOENIX_TIMEOUT</span><span class="o">=</span><span class="s">5</span>
+<span class="c1"># PHOENIX_API_KEY=&lt;system-api-key&gt;</span>
+</pre></div>
+</div>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Toolkit settings</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 31.0%" />
+<col style="width: 23.0%" />
+<col style="width: 46.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PHOENIX_ENDPOINT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://localhost:6006</span></code></p></td>
+<td><p>Base HTTP URL for the Phoenix API and trace collector.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PHOENIX_PROJECT_NAME</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">langgraph-agent-toolkit</span></code></p></td>
+<td><p>Project for traces from this service.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PHOENIX_API_KEY</span></code></p></td>
+<td><p>Unset</p></td>
+<td><p>API key for a Phoenix server that requires authentication.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PHOENIX_TIMEOUT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5</span></code> seconds</p></td>
+<td><p>Network timeout for REST and trace export clients.</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">PHOENIX_ENDPOINT</span></code> is a toolkit setting. Use the base URL, without
+<code class="docutils literal notranslate"><span class="pre">/v1/traces</span></code>. The adapter derives the trace path from this URL.
+For example, a base URL of <code class="docutils literal notranslate"><span class="pre">https://phoenix.example.com/monitoring</span></code> uses
+<code class="docutils literal notranslate"><span class="pre">https://phoenix.example.com/monitoring/v1/traces</span></code> for trace export.
+Configure the proxy to preserve that path.</p>
+<p>For Phoenix Cloud, copy the deployment base URL from its settings.
+Keep any space or proxy path in that URL. Set <code class="docutils literal notranslate"><span class="pre">PHOENIX_API_KEY</span></code> to a key for
+that deployment. For an authenticated self-hosted server, use a system API key.
+The adapter sends bearer authentication to the API and trace collector.
+Toolkit <code class="docutils literal notranslate"><span class="pre">AUTH_SECRET</span></code> authenticates callers of the agent API.
+It serves a different connection from <code class="docutils literal notranslate"><span class="pre">PHOENIX_API_KEY</span></code>.
+See the official <a class="reference external" href="https://arize.com/docs/phoenix/settings/api-keys">API key guide</a>.</p>
+<p>The toolkit exports OTLP over HTTP. Phoenix serves this collector on port
+<code class="docutils literal notranslate"><span class="pre">6006</span></code> by default. Port <code class="docutils literal notranslate"><span class="pre">4317</span></code> serves its separate gRPC collector.
+Use <code class="docutils literal notranslate"><span class="pre">https://</span></code> for a remote production endpoint. Keep certificate validation
+enabled. Configure the server, proxy, and certificate trust for the deployment.
+See the official <a class="reference external" href="https://arize.com/docs/phoenix/self-hosting/advanced/encryption">encryption guide</a>.</p>
+</section>
+<section id="trace-behavior">
+<h2>Trace behavior<a class="headerlink" href="#trace-behavior" title="Link to this heading"></a></h2>
+<p>The API attaches a separate callback handler to each run. It records the
+LangGraph execution tree, model calls, tools, and reported token usage.
+Native LangChain agents and Deep Agents use the same callback path.
+An agent must propagate the LangChain run configuration to custom nested
+runnables for those operations to appear in the trace.</p>
+<p>The response <code class="docutils literal notranslate"><span class="pre">run_id</span></code> identifies the Phoenix trace. The adapter converts the
+UUID to the 32-character hexadecimal trace ID that OpenTelemetry uses.
+The public <code class="docutils literal notranslate"><span class="pre">thread_id</span></code> becomes the trace session ID.
+The user identity becomes the trace user ID when it is available.
+These attributes group telemetry. They do not grant access to checkpoints or
+create long-term memory.</p>
+<p>The adapter owns a separate tracer provider. It does not register a global
+provider or enable process-wide LangChain instrumentation.
+Do not add <code class="docutils literal notranslate"><span class="pre">LangChainInstrumentor().instrument()</span></code> for the same agent runs.
+That can produce duplicate spans and change tracing in other components.</p>
+<p>Trace export uses a background batch processor with a one-second batch delay.
+It does not send an HTTP request for each model callback.
+<code class="docutils literal notranslate"><span class="pre">OTEL_BSP_SCHEDULE_DELAY</span></code> can override that delay.
+Prompt and feedback operations use the
+Phoenix REST client. The API runs blocking feedback operations outside its
+event loop. Use <code class="docutils literal notranslate"><span class="pre">apull_prompt</span></code> when custom async code reads a prompt.</p>
+<p>The service flushes telemetry during normal shutdown.
+<code class="docutils literal notranslate"><span class="pre">OBSERVABILITY_SHUTDOWN_TIMEOUT</span></code> limits this cleanup to 10 seconds by default.
+A service-owned tracer provider does not register a second exit hook.
+The service closes each distinct platform attached to its agents once.
+This includes an explicit <code class="docutils literal notranslate"><span class="pre">Agent(observability=...)</span></code> override.
+It also closes these platforms if later graph setup fails.
+A standalone script must call <code class="docutils literal notranslate"><span class="pre">before_shutdown</span></code> for the platform it creates.
+A forced process exit can lose spans that remain in memory.
+The batch queue is not a durable message queue. A long collector outage or a
+full queue can also cause trace loss. Keep checkpoint persistence independent
+from trace delivery.</p>
+<p>Use the native OpenTelemetry batch processor settings to tune export after a
+load test. <code class="docutils literal notranslate"><span class="pre">LANGFUSE_FLUSH_AT</span></code> and <code class="docutils literal notranslate"><span class="pre">LANGFUSE_FLUSH_INTERVAL</span></code> do not
+configure Phoenix export.
+<code class="docutils literal notranslate"><span class="pre">OTEL_BSP_MAX_QUEUE_SIZE</span></code> limits queued spans.
+<code class="docutils literal notranslate"><span class="pre">OTEL_BSP_MAX_EXPORT_BATCH_SIZE</span></code> limits spans in one export batch.
+<code class="docutils literal notranslate"><span class="pre">OTEL_BSP_SCHEDULE_DELAY</span></code> sets the batch delay in milliseconds.
+Queue capacity counts spans, rather than API requests. A delegated agent can
+create many spans for one request. A larger queue uses more memory and does
+not add durable storage. See the <a class="reference external" href="https://opentelemetry-python.readthedocs.io/en/latest/sdk/trace.export.html">OpenTelemetry batch processor reference</a>.
+See the <a class="reference external" href="https://arize.com/docs/phoenix/tracing/how-to-tracing/setup-tracing/setup-using-phoenix-otel">Phoenix tracing setup guide</a>
+for the SDK transport and batching model.</p>
+</section>
+<section id="prompt-management">
+<h2>Prompt management<a class="headerlink" href="#prompt-management" title="Link to this heading"></a></h2>
+<p>The toolkit supports Phoenix prompt creation, new versions, reads, and deletion.
+Phoenix requires model metadata when it creates a prompt version.
+This metadata describes the stored prompt. It does not change the model that
+the toolkit agent uses.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.observability.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObservabilityFactory</span>
+
+<span class="n">observability</span> <span class="o">=</span> <span class="n">ObservabilityFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;phoenix&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">observability</span><span class="o">.</span><span class="n">push_prompt</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;example-answer&quot;</span><span class="p">,</span>
+        <span class="n">prompt_template</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Give one short answer.&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Answer this question: </span><span class="si">{question}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="s2">&quot;example-model&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;model_provider&quot;</span><span class="p">:</span> <span class="s2">&quot;OPENAI&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;template_format&quot;</span><span class="p">:</span> <span class="s2">&quot;F_STRING&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;staging&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="n">force_create_new_version</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">prompt</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="n">observability</span><span class="o">.</span><span class="n">pull_prompt</span><span class="p">(</span>
+        <span class="s2">&quot;example-answer&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;staging&quot;</span><span class="p">,</span>
+        <span class="n">return_with_prompt_object</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="s2">&quot;What does this service do?&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">observability</span><span class="o">.</span><span class="n">before_shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This example stores and reads a prompt. It makes no model request.
+Replace <code class="docutils literal notranslate"><span class="pre">example-model</span></code> with the model name for the application.
+<code class="docutils literal notranslate"><span class="pre">model_provider</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">OPENAI</span></code>. Set it explicitly for another
+provider. <code class="docutils literal notranslate"><span class="pre">description</span></code> sets the prompt description.
+The adapter stores other metadata keys as Phoenix prompt metadata.
+<code class="docutils literal notranslate"><span class="pre">PHOENIX_PROJECT_NAME</span></code> groups traces. It does not create a separate prompt
+repository. Use distinct prompt names for each application and environment
+when they share one Phoenix server.</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">force_create_new_version=False</span></code> to keep an existing prompt.
+<code class="docutils literal notranslate"><span class="pre">remote_first=True</span></code> on the factory has the same effect for an existing
+remote prompt. Normal creation adds a new version.
+Only a missing prompt permits creation on these read-first paths.
+A connection or authorization failure must be resolved first.</p>
+<p>Use the same template format when you create and read a prompt.
+Phoenix supports <code class="docutils literal notranslate"><span class="pre">f-string</span></code> and <code class="docutils literal notranslate"><span class="pre">mustache</span></code> through this adapter.
+It does not support <code class="docutils literal notranslate"><span class="pre">jinja2</span></code>. Convert an existing Jinja template before you
+move it to Phoenix.
+Use <code class="docutils literal notranslate"><span class="pre">template_format=F_STRING</span></code> or <code class="docutils literal notranslate"><span class="pre">template_format=MUSTACHE</span></code> in creation
+metadata. <code class="docutils literal notranslate"><span class="pre">NONE</span></code> stores literal text without substitution.
+The adapter rejects a read whose requested format differs from the stored
+<code class="docutils literal notranslate"><span class="pre">F_STRING</span></code> or <code class="docutils literal notranslate"><span class="pre">MUSTACHE</span></code> format. A <code class="docutils literal notranslate"><span class="pre">NONE</span></code> prompt keeps literal braces.
+The toolkit converts text chat templates to <code class="docutils literal notranslate"><span class="pre">ChatPromptTemplate</span></code>.
+It rejects message placeholders and multimodal prompt templates.</p>
+<p>Phoenix prompt version IDs differ from Langfuse integer versions.
+Its prompt version tags can select a deployed revision.
+The creation <code class="docutils literal notranslate"><span class="pre">labels</span></code> list creates these tags.
+<code class="docutils literal notranslate"><span class="pre">pull_prompt(...,</span> <span class="pre">label=&quot;staging&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">pull_prompt(...,</span> <span class="pre">tag=&quot;staging&quot;)</span></code>
+select a tag. <code class="docutils literal notranslate"><span class="pre">version</span></code> and <code class="docutils literal notranslate"><span class="pre">prompt_version_id</span></code> select the native string
+version ID. Select a tag or a version ID in one call.
+<code class="docutils literal notranslate"><span class="pre">delete_prompt(name)</span></code> deletes the remote prompt and all its versions.
+Changing the observability backend does not copy prompt content or version
+labels from another service. Create and verify the target prompts first.
+See the official <a class="reference external" href="https://arize.com/docs/phoenix/prompt-engineering/quickstart-prompts/quickstart-prompts-ui">prompt client guide</a>.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">ObservabilityChatPromptTemplate</span></code> for a prompt in an agent graph.
+Pass the existing platform instance so that the application owns one set of
+connections and closes it at shutdown:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.prompts.chat_prompt_template</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ObservabilityChatPromptTemplate</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_runtime_prompt</span><span class="p">(</span><span class="n">observability</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ObservabilityChatPromptTemplate</span><span class="o">.</span><span class="n">from_observability_platform</span><span class="p">(</span>
+        <span class="n">prompt_name</span><span class="o">=</span><span class="s2">&quot;example-answer&quot;</span><span class="p">,</span>
+        <span class="n">observability_platform</span><span class="o">=</span><span class="n">observability</span><span class="p">,</span>
+        <span class="n">prompt_label</span><span class="o">=</span><span class="s2">&quot;staging&quot;</span><span class="p">,</span>
+        <span class="n">load_at_runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cache_ttl_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+        <span class="n">template_format</span><span class="o">=</span><span class="s2">&quot;f-string&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Call this function with the service’s platform instance.
+Use <code class="docutils literal notranslate"><span class="pre">ainvoke</span></code> in an async graph.
+Set <code class="docutils literal notranslate"><span class="pre">prompt_version</span></code> to a native string version ID when the deployment needs
+an immutable revision. Set <code class="docutils literal notranslate"><span class="pre">prompt_label</span></code> to follow a mutable version tag.</p>
+<p>Custom <code class="docutils literal notranslate"><span class="pre">PromptManager</span></code> subclasses can publish text prompt files to Phoenix.
+Set <code class="docutils literal notranslate"><span class="pre">template_format=&quot;f-string&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;mustache&quot;</span></code> on the manager.
+Pass <code class="docutils literal notranslate"><span class="pre">prompt_metadata</span></code> with <code class="docutils literal notranslate"><span class="pre">model_name</span></code> and the matching Phoenix
+<code class="docutils literal notranslate"><span class="pre">template_format</span></code> value. Use <code class="docutils literal notranslate"><span class="pre">has_messages_placeholder=False</span></code>.
+The manager’s default <code class="docutils literal notranslate"><span class="pre">jinja2</span></code> format does not work with Phoenix.
+Close <code class="docutils literal notranslate"><span class="pre">manager.observability</span></code> at shutdown when custom application code owns
+the manager. Existing local <code class="docutils literal notranslate"><span class="pre">ChatPromptTemplate</span></code> objects do not need these
+Phoenix prompt settings.</p>
+<p>To link a model call to the exact remote prompt revision, get the native
+prompt object and use its ID in OpenInference context:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openinference.instrumentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">using_attributes</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_with_prompt</span><span class="p">(</span><span class="n">observability</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">question</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">prompt</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="k">await</span> <span class="n">observability</span><span class="o">.</span><span class="n">apull_prompt</span><span class="p">(</span>
+        <span class="s2">&quot;example-answer&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;staging&quot;</span><span class="p">,</span>
+        <span class="n">return_with_prompt_object</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">with</span> <span class="n">using_attributes</span><span class="p">(</span>
+        <span class="n">prompt_template_version</span><span class="o">=</span><span class="n">version</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">prompt_template_variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">},</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="p">(</span><span class="n">prompt</span> <span class="o">|</span> <span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">ainvoke</span><span class="p">({</span><span class="s2">&quot;question&quot;</span><span class="p">:</span> <span class="n">question</span><span class="p">},</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Run this chain inside the agent’s callback context.
+Pass its <code class="docutils literal notranslate"><span class="pre">RunnableConfig</span></code> to nested calls in a custom graph node.
+Reading a remote prompt alone does not link it to later model spans.</p>
+</section>
+<section id="feedback">
+<h2>Feedback<a class="headerlink" href="#feedback" title="Link to this heading"></a></h2>
+<p>Use the existing <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/feedback</span></code> or <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/{agent_id}/feedback</span></code> endpoint.
+Send the <code class="docutils literal notranslate"><span class="pre">run_id</span></code> from the agent response. Token-bound authentication also
+requires the response <code class="docutils literal notranslate"><span class="pre">feedback_token</span></code>. Shared-token authentication retains
+the same request contract. See <a class="reference internal" href="environment_setup.html"><span class="doc">Environment Setup</span></a> and <a class="reference internal" href="migration.html"><span class="doc">Migrate to the current release</span></a>.</p>
+<p>The adapter records numeric feedback as a Phoenix trace annotation.
+The feedback key becomes the annotation name. The annotation uses
+<code class="docutils literal notranslate"><span class="pre">annotator_kind=HUMAN</span></code>. This is a trace-level result, so it does not require
+the client to locate an internal model span.</p>
+<p>The Phoenix adapter accepts these values in feedback <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>:</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Phoenix feedback options</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Use</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">comment</span></code> or <code class="docutils literal notranslate"><span class="pre">explanation</span></code></p></td>
+<td><p>Annotation explanation. <code class="docutils literal notranslate"><span class="pre">comment</span></code> has precedence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">label</span></code></p></td>
+<td><p>Optional text label for the annotation result.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code></p></td>
+<td><p>Additional annotation metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">feedback_id</span></code></p></td>
+<td><p>Optional annotation identifier.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The API adds the authorized user identity to annotation metadata.
+The adapter waits for normal background trace export.
+It retries a missing trace while Phoenix completes background ingestion.
+It does not flush the full telemetry queue for each feedback request.
+It does not retry authorization errors.
+It waits for the annotation request to finish. A successful agent response
+does not imply that a later feedback request will succeed.
+The retry window includes the configured batch delay and <code class="docutils literal notranslate"><span class="pre">PHOENIX_TIMEOUT</span></code>.
+Network timeouts apply to each attempt. <code class="docutils literal notranslate"><span class="pre">PHOENIX_TIMEOUT</span></code> is not a total
+deadline for the full feedback operation.</p>
+<p>The toolkit exposes feedback through the common observability interface.
+Phoenix evaluation jobs, dataset management, experiments, and session
+annotations use the native Phoenix client or UI.</p>
+</section>
+<section id="trace-content-and-access">
+<h2>Trace content and access<a class="headerlink" href="#trace-content-and-access" title="Link to this heading"></a></h2>
+<p>Traces can contain prompts, messages, tool inputs, tool results, and model
+outputs. Limit access to the Phoenix project and set an appropriate retention
+period. A telemetry project name does not enforce conversation ownership.</p>
+<p>Use OpenInference privacy settings before application startup when content
+must stay out of traces:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">OPENINFERENCE_HIDE_INPUTS</span><span class="o">=</span><span class="s">true</span>
+<span class="na">OPENINFERENCE_HIDE_OUTPUTS</span><span class="o">=</span><span class="s">true</span>
+<span class="na">OPENINFERENCE_HIDE_LLM_INVOCATION_PARAMETERS</span><span class="o">=</span><span class="s">true</span>
+</pre></div>
+</div>
+<p>These settings hide the selected trace attributes. They do not remove data
+from LangGraph state, checkpoints, application logs, or other integrations.
+Review the <a class="reference external" href="https://github.com/Arize-ai/openinference/blob/main/spec/configuration.md">OpenInference privacy configuration</a>
+for more specific controls.</p>
+<p>Never put API keys in ordinary prompt strings or tool results.
+Content hiding and secret masking cannot identify every sensitive plain string.
+The adapter masks typed Pydantic <code class="docutils literal notranslate"><span class="pre">SecretStr</span></code> and <code class="docutils literal notranslate"><span class="pre">SecretBytes</span></code> values
+before serialization. It handles nested models, dataclasses, and containers.
+This protection does not classify passwords or personal data in plain text.</p>
+</section>
+<section id="self-hosted-storage">
+<h2>Self-hosted storage<a class="headerlink" href="#self-hosted-storage" title="Link to this heading"></a></h2>
+<p>Phoenix stores its data in SQLite by default. Mount persistent storage at
+<code class="docutils literal notranslate"><span class="pre">PHOENIX_WORKING_DIR</span></code> for a local server whose data must survive replacement.
+For a shared production deployment, configure PostgreSQL with
+<code class="docutils literal notranslate"><span class="pre">PHOENIX_SQL_DATABASE_URL</span></code> on the Phoenix server.
+Back up that database and test restore before an upgrade.
+These are Phoenix server settings. They do not configure toolkit checkpoints.
+See the official <a class="reference external" href="https://arize.com/docs/phoenix/self-hosting/architecture">storage and deployment guide</a>.</p>
+<p>Enable authentication before exposing a self-hosted server to other networks.
+Provision a system key for the application. Keep the Phoenix server signing
+secret in the server’s secret store. Do not give it to the toolkit application.
+See the official <a class="reference external" href="https://arize.com/docs/phoenix/self-hosting/features/authentication">authentication guide</a>.</p>
+<p>The Phoenix server has separate web analytics settings.
+Set <code class="docutils literal notranslate"><span class="pre">PHOENIX_TELEMETRY_ENABLED=false</span></code> on that server to disable its UI analytics.
+Set <code class="docutils literal notranslate"><span class="pre">PHOENIX_ALLOW_EXTERNAL_RESOURCES=false</span></code> for the documented restricted
+network mode. These settings do not disable traces that your application
+explicitly exports. See the official <a class="reference external" href="https://arize.com/docs/phoenix/self-hosting/security/privacy">self-hosted privacy guide</a>.</p>
+</section>
+<section id="verification-and-limits">
+<h2>Verification and limits<a class="headerlink" href="#verification-and-limits" title="Link to this heading"></a></h2>
+<p>The tests use synthetic requests and a disposable Phoenix server.
+They do not require a paid model key.
+The server and SDK have independent versions.
+The baseline uses Phoenix server <code class="docutils literal notranslate"><span class="pre">20.26.1</span></code>, <code class="docutils literal notranslate"><span class="pre">arize-phoenix-client</span> <span class="pre">3.5.0</span></code>,
+<code class="docutils literal notranslate"><span class="pre">openinference-instrumentation-langchain</span> <span class="pre">0.1.80</span></code>, and OpenTelemetry <code class="docutils literal notranslate"><span class="pre">1.45.1</span></code>.
+The toolkit uses the OpenTelemetry HTTP exporter directly.
+It does not call <code class="docutils literal notranslate"><span class="pre">phoenix.otel.register</span></code>.
+It does not claim support for every
+historical Phoenix REST API or all Langfuse features.</p>
+<p>The callback uses the upstream OpenInference LangChain callback implementation.
+That dependency does not yet expose the callback through a public import.
+The package range and SDK integration tests guard this boundary.
+Test a dependency update before deploying it.</p>
+<p>To repeat the live checks from a source checkout, start Docker and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>sync<span class="w"> </span>--frozen<span class="w"> </span>--no-install-project<span class="w"> </span>--extra<span class="w"> </span>all
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/phoenix_stack.py<span class="w"> </span>prepare<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/phoenix-test
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/phoenix_stack.py<span class="w"> </span>start<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/phoenix-test
+<span class="nb">set</span><span class="w"> </span>-a
+<span class="nb">source</span><span class="w"> </span>data/phoenix-test/server.env
+<span class="nb">set</span><span class="w"> </span>+a
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/integration/test_phoenix_live.py<span class="w"> </span>tests/e2e/test_phoenix_api.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--run-phoenix<span class="w"> </span>--run-e2e<span class="w"> </span>--no-cov
+</pre></div>
+</div>
+<p>The helper starts the pinned server on a random loopback port.
+It creates a unique Compose project and a dedicated persistent SQLite volume.
+The generated test variables select only that disposable server.
+The process tests verify that the server matches the managed stack before
+they restart it. Do not substitute a normal deployment for this test stack.</p>
+<p>The live prompt checks cover <code class="docutils literal notranslate"><span class="pre">f-string</span></code> and <code class="docutils literal notranslate"><span class="pre">mustache</span></code> creation, reads,
+versions, tags, duplicate prevention, and deletion. They also test publication
+from a text file through <code class="docutils literal notranslate"><span class="pre">PromptManager</span></code>.
+The process checks call the real API with native LangChain and Deep Agents
+graphs. They use scripted model replies and real local tools.
+They check stored trace parents, model and tool spans, prompt version links,
+public session identity, feedback, and checkpoint history after API restart.
+They restart Phoenix and read the same stored records again.
+An additional process check uses a one-hour batch delay and sends no feedback.
+It requires an empty server trace before API shutdown.
+It then verifies the complete stored trace after normal shutdown.
+This checks that the service drains an explicit agent provider’s pending batch.
+These checks validate the integration. They do not measure model quality,
+external provider behavior, or maximum production throughput.
+The disposable server uses local HTTP without authentication.
+SDK wire tests check bearer headers and URL prefixes separately.
+Verify the actual certificate trust, proxy paths, and access keys in the target
+remote deployment before sending production traffic.</p>
+<p>Run cleanup after the checks, including when a test fails:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>scripts/ci/phoenix_stack.py<span class="w"> </span>stop<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--directory<span class="o">=</span>data/phoenix-test
+</pre></div>
+</div>
+<p>Cleanup saves logs and removes the containers and volume that the helper owns.
+For a manual persistence check, use <code class="docutils literal notranslate"><span class="pre">restart</span></code> before cleanup.
+It keeps the same volume. <code class="docutils literal notranslate"><span class="pre">stop</span></code> deletes that test data.</p>
+<p>Remote content stays in its original service when you change backends.
+Phoenix trace ingestion is separate from prompt and feedback REST APIs.
+A healthy agent response alone does not prove that all three paths work.
+Verify stored traces, prompt reads, and feedback after a deployment.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langfuse_server_upgrade.html" class="btn btn-neutral float-left" title="Langfuse service upgrade" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deployment.html" class="btn btn-neutral float-right" title="Deployment and Recovery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>October 2026 dependency releases &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/dependency_releases_2026_10.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=11e62b30"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Related projects and source review" href="related_projects.html" />
+    <link rel="prev" title="Dependency update review" href="dependency_updates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">October 2026 dependency releases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#deep-agents">Deep Agents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langchain">LangChain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langchain-core">LangChain Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#openai-integration">OpenAI integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anthropic-integration">Anthropic integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#aws-integration">AWS integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#google-integrations">Google integrations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langsmith-sdk">LangSmith SDK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fastmcp">FastMCP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mcp-sdk">MCP SDK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-decisions">Integration decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langgraph">LangGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checkpoint-packages">Checkpoint packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langgraph-sdk">LangGraph SDK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#langgraph-cli">LangGraph CLI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checkpoint-upgrade-operations">Checkpoint upgrade operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#legacy-chains-and-text-splitters">Legacy chains and text splitters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-studio-server-and-runtime">Optional Studio server and runtime</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">October 2026 dependency releases</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/dependency_releases_2026_10.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="october-2026-dependency-releases">
+<h1>October 2026 dependency releases<a class="headerlink" href="#october-2026-dependency-releases" title="Link to this heading"></a></h1>
+<p>Review date: 2026-10-27.</p>
+<p>This review starts from the previous 0.10.2 candidate lockfile.
+It lists stable releases up to the current baseline.
+It omits development-only changes from the summaries.
+Each version links to the full upstream release notes.
+See <a class="reference internal" href="dependency_updates.html"><span class="doc">Dependency update review</span></a> for the selected versions and deployment steps.</p>
+<section id="deep-agents">
+<h2>Deep Agents<a class="headerlink" href="#deep-agents" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.24">0.7.24</a>: Add fork mode for asynchronous subagents. Recover when summarization exceeds the context limit. Preserve the parent rubric during parallel calls.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.25">0.7.25</a>: Check requested and resolved paths against filesystem permissions and approval rules. Read skill-tool support from model profiles. Prefer ripgrep for sandbox searches and skip <code class="docutils literal notranslate"><span class="pre">.git</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.26">0.7.26</a>: Report subagents that wait for human input. Connect subagent traces to their parent. Expose the summarizer and preserve resolved tool-result paths.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.27">0.7.27</a>: Send asynchronous subagent status updates to the parent. Pass subagent names to their runs.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.28">0.7.28</a>: Apply the <code class="docutils literal notranslate"><span class="pre">path</span></code> argument in <code class="docutils literal notranslate"><span class="pre">ContextHubBackend.glob</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.29">0.7.29</a>: Accept composite routes without a final slash. Reject text edits to binary files. Skip binary files in in-memory <code class="docutils literal notranslate"><span class="pre">grep</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.30">0.7.30</a>: Queue subagent follow-up messages. Add <code class="docutils literal notranslate"><span class="pre">notify_parent</span></code> and <code class="docutils literal notranslate"><span class="pre">webhook</span></code>. Report remote cancellation and retry failed thread reads. Remove replaced reasoning blocks during summarization. Measure shell output limits in UTF-8 bytes.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.31">0.7.31</a>: Trace execution output retention. Omit asynchronous task IDs from replies by default. Preserve permissions in middleware overrides. Remove the <code class="docutils literal notranslate"><span class="pre">handoff</span></code> mode alias; use <code class="docutils literal notranslate"><span class="pre">isolated</span></code> or <code class="docutils literal notranslate"><span class="pre">fork</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.32">0.7.32</a>: Defer Anthropic and OpenAI imports until the SDK needs them. This reduces import work.</p></li>
+</ul>
+</section>
+<section id="langchain">
+<h2>LangChain<a class="headerlink" href="#langchain" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.4.5">1.4.5</a>: Accept a custom <code class="docutils literal notranslate"><span class="pre">summarizer</span></code> in <code class="docutils literal notranslate"><span class="pre">SummarizationMiddleware</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.4.6">1.4.6</a>: Add optional approval interrupts for each tool call in <code class="docutils literal notranslate"><span class="pre">HumanInTheLoopMiddleware</span></code>. The default interrupt format stays unchanged.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain%3D%3D1.4.7">1.4.7</a>: Read <code class="docutils literal notranslate"><span class="pre">tool-call-delta</span></code> events in stream consumers. Accept an agent address in <code class="docutils literal notranslate"><span class="pre">LangChainTracer</span></code>. Raise the Core and LangGraph minimum versions.</p></li>
+</ul>
+</section>
+<section id="langchain-core">
+<h2>LangChain Core<a class="headerlink" href="#langchain-core" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.10">1.6.10</a>: Declare support for mid-conversation changes in model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.11">1.6.11</a>: Accept an agent address in <code class="docutils literal notranslate"><span class="pre">LangChainTracer</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.12">1.6.12</a>: Preserve <code class="docutils literal notranslate"><span class="pre">extras</span></code> in content-block start events.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.6.13">1.6.13</a>: Read <code class="docutils literal notranslate"><span class="pre">tool-call-delta</span></code> events. Iteration over <code class="docutils literal notranslate"><span class="pre">ChatModelStream.tool_calls</span></code> now returns new argument slices.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-core%3D%3D1.7.0">1.7.0</a>: Emit <code class="docutils literal notranslate"><span class="pre">tool-call-delta</span></code> argument slices instead of accumulated <code class="docutils literal notranslate"><span class="pre">block-delta</span></code> arguments. The accumulated <code class="docutils literal notranslate"><span class="pre">.tool_calls.get()</span></code> and <code class="docutils literal notranslate"><span class="pre">.output</span></code> contracts stay unchanged.</p></li>
+</ul>
+</section>
+<section id="openai-integration">
+<h2>OpenAI integration<a class="headerlink" href="#openai-integration" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.6.3">1.6.3</a>: Expose inferred Responses API selection at model creation. Apply GPT-6 request constraints.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.6.4">1.6.4</a>: Refresh OpenAI model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.6.5">1.6.5</a>: Support mid-conversation tool changes on <code class="docutils literal notranslate"><span class="pre">SystemMessage</span></code>. Update model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.6.6">1.6.6</a>: Raise an error when a provider sends an error event in a stream.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.6.7">1.6.7</a>: Discover Azure workload identity. Refresh model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.7.0">1.7.0</a>: Add Decisions API support.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.7.1">1.7.1</a>: Declare mid-conversation support in model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.7.2">1.7.2</a>: Keep one content block when Responses API events change an item’s <code class="docutils literal notranslate"><span class="pre">output_index</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-openai%3D%3D1.7.3">1.7.3</a>: Refresh model profiles and dependency requirements. Require Core 1.7.0 or later.</p></li>
+</ul>
+</section>
+<section id="anthropic-integration">
+<h2>Anthropic integration<a class="headerlink" href="#anthropic-integration" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-anthropic%3D%3D1.7.6">1.7.6</a>: Refresh model profiles and declare mid-conversation support. Require Core 1.6.10 or later.</p></li>
+</ul>
+</section>
+<section id="aws-integration">
+<h2>AWS integration<a class="headerlink" href="#aws-integration" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.6.0">1.6.0</a>: Report cache-write usage by cache TTL. Preserve non-ASCII JSON and omit unsupported sampling parameters. When Bedrock returns <code class="docutils literal notranslate"><span class="pre">cacheDetails</span></code>, cache-write usage moves from <code class="docutils literal notranslate"><span class="pre">cache_creation</span></code> to TTL-specific keys.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.6.1">1.6.1</a>: Limit JSON Schema union variants. Preserve checkpoint namespaces for AgentCore code tools. Separate Nova reasoning from user text. Accept the <code class="docutils literal notranslate"><span class="pre">streaming</span></code> initialization argument.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.6.2">1.6.2</a>: Support Claude Fable and Sonnet 5. Allow thinking with forced tools where the model supports it.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.6.3">1.6.3</a>: Fix thinking and streaming for new Claude models. Support <code class="docutils literal notranslate"><span class="pre">search_result</span></code> blocks and managed knowledge bases. Improve model-provider detection.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.6.4">1.6.4</a>: Add Bedrock guardrails and per-request guardrail settings to <code class="docutils literal notranslate"><span class="pre">ChatAnthropicBedrock</span></code>. Fix Opus 5 thinking and streaming.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.0">1.7.0</a>: Add <code class="docutils literal notranslate"><span class="pre">ChatOpenAIMantle</span></code> through the optional <code class="docutils literal notranslate"><span class="pre">openai</span></code> extra. Support <code class="docutils literal notranslate"><span class="pre">reasoning_effort</span></code> and simpler Anthropic prompt caching in Converse. Include the model name in tracing parameters.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.1">1.7.1</a>: Add <code class="docutils literal notranslate"><span class="pre">DynamoDBVectorStore</span></code>. Support Kimi streaming in Converse.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.2">1.7.2</a>: Derive Mantle credentials from AWS credentials. Add <code class="docutils literal notranslate"><span class="pre">ChatAnthropicMantle</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.3">1.7.3</a>: Normalize assistant blocks from other providers before Converse serialization.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.4">1.7.4</a>: Reject unsupported Mantle guardrail headers. Fix Mantle authentication precedence and model-specific reasoning blocks.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.5">1.7.5</a>: Support Grok streaming and forced tools. Preserve zero temperature in traces. Add Mantle <code class="docutils literal notranslate"><span class="pre">auth_mode</span></code>. Reduce prompt-cache trace inputs. Update the optional Nova Sonic SDK.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.6">1.7.6</a>: Repair structured-output arguments and JSON Schema handling. Update model profiles, reasoning effort, and tool choice for new models.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.7">1.7.7</a>: Support <code class="docutils literal notranslate"><span class="pre">LANGSMITH_GATEWAY</span></code> in Converse. Preserve invalid tool calls for replay. Reject incomplete streams. Skip cache points after reasoning.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.8">1.7.8</a>: Add a readable <code class="docutils literal notranslate"><span class="pre">model</span></code> property to Bedrock chat models. Apply explicit regions to supplied AWS sessions in the AWS checkpoint package.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.7.9">1.7.9</a>: Handle redacted-only reasoning. Escape MemoryDB filter values. Add AgentCore web search and a Nova Sonic model property.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.8.0">1.8.0</a>: Update sampling, thinking, and routing for current models. Prefer Responses for supported Mantle models. Move unsupported tool-result images. Reject query syntax in MemoryDB field names.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.8.1">1.8.1</a>: Raise <code class="docutils literal notranslate"><span class="pre">ContextOverflowError</span></code> for context-limit failures. Filter reasoning blocks from other providers.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.8.2">1.8.2</a>: Preserve invalid streamed tool arguments for replay. Add Haiku 5.5 support and mid-conversation model profiles. Align AgentCore code tools with Deep Agents 0.7.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.9.0">1.9.0</a>: Accept plain-text MIME blocks. Correct reasoning and cache-token usage. Fix nested actor lookup in the AWS checkpoint package.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.9.1">1.9.1</a>: Support Z.ai models and <code class="docutils literal notranslate"><span class="pre">requestMetadata</span></code>. Use deterministic names for unnamed files. Correct model capability profiles. Fix AgentCore store round trips in the AWS checkpoint package.</p></li>
+</ul>
+</section>
+<section id="google-integrations">
+<h2>Google integrations<a class="headerlink" href="#google-integrations" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-google/releases/tag/libs%2Fgenai%2Fv4.4.1">langchain-google-genai 4.4.1</a>: Omit Bedrock cache points from Gemini prompts. Treat Gemini 4 and later as current model families.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-google/releases/tag/libs%2Fgenai%2Fv4.4.2">langchain-google-genai 4.4.2</a>: Normalize model names. Fix Gemini 3.5 cache paths and streaming usage. Refresh model profiles.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-google/releases/tag/libs%2Fvertexai%2Fv3.2.4">langchain-google-vertexai 3.2.4</a>: Reflect per-call model overrides in traces. Refresh model profiles and dependency requirements.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain-google/releases/tag/libs%2Fvertexai%2Fv3.2.5">langchain-google-vertexai 3.2.5</a>: Remove the unused PyArrow dependency. Preserve citations from metadata-only stream chunks. Convert file blocks to Anthropic documents. Correct Anthropic profiles, Gemini cache paths, streaming usage, and request labels.</p></li>
+</ul>
+</section>
+<section id="langsmith-sdk">
+<h2>LangSmith SDK<a class="headerlink" href="#langsmith-sdk" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-sdk/releases/tag/v0.14.8">0.14.8</a>: Send <code class="docutils literal notranslate"><span class="pre">session_id</span></code> with run patches. Reach the multipart-to-batch fallback after a 404 response. Update sandbox authentication and encrypted mounts.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-sdk/releases/tag/v0.14.9">0.14.9</a>: Send OTLP traces to an agent environment. Use <code class="docutils literal notranslate"><span class="pre">TypedDict</span></code> for <code class="docutils literal notranslate"><span class="pre">AgentAddress</span></code>. Correct comparative evaluator scores. Reduce sandbox command latency.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-python/releases/tag/v0.14.10">0.14.10</a>: Move Python SDK releases to <code class="docutils literal notranslate"><span class="pre">langchain-ai/langsmith-python</span></code>. The PyPI package and Python imports stay unchanged.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-python/releases/tag/v0.14.11">0.14.11</a>: Remove the temporary release-version pin. No toolkit API change is required.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-python/releases/tag/v0.14.12">0.14.12</a>: Preserve incomplete and failed Responses output in tracing. Add agent registry APIs and enforced feedback configuration. Correct example reference outputs.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-python/releases/tag/v0.14.13">0.14.13</a>: Wait for buffered run operations in <code class="docutils literal notranslate"><span class="pre">Client.flush()</span></code>. Stop failed experiment iteration from hanging. Add sandbox volumes and destination resolution. Sandbox schema changes require review for direct sandbox consumers.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langsmith-python/releases/tag/v0.14.14">0.14.14</a>: Stream v2 run, trace, and thread queries. Accept addresses in wrappers and integrations. Include subtree usage in run queries.</p></li>
+</ul>
+</section>
+<section id="fastmcp">
+<h2>FastMCP<a class="headerlink" href="#fastmcp" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.0">4.1.0</a>: Tighten filesystem paths, OpenAPI path parameters, regex search, and MultiAuth identities. Restore the SDK’s 30-minute HTTP session idle timeout. Fix elicitation validation, schema pagination, result status, and cancellation.</p></li>
+<li><p><a class="reference external" href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.1">4.1.1</a>: Bound regex search by pattern length and time. Restore linked skill-directory discovery. Fix JWKS refresh locking and proxy-setting handling.</p></li>
+<li><p><a class="reference external" href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.2">4.1.2</a>: Check authorization after component transforms. Prevent denied-resource fallback. Bind OAuth client credentials to a configured issuer. Fix stdio UTF-8 mode, timeouts, schemas, and shared dependency scopes. Add experimental Skills discovery.</p></li>
+<li><p><a class="reference external" href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.3">4.1.3</a>: Require current certifi bundles after the CA incident. Fix client-credential defaults, generator transforms, server timeouts, and timeout classification.</p></li>
+<li><p><a class="reference external" href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.4">4.1.4</a>: Prevent stale client contexts from closing new sessions. Forward <code class="docutils literal notranslate"><span class="pre">max_sse_event_size</span></code>. Fix proxy header precedence, mounted visibility, and generated commands. Support rotating task credentials and exclude Redis 8.1.0.</p></li>
+</ul>
+</section>
+<section id="mcp-sdk">
+<h2>MCP SDK<a class="headerlink" href="#mcp-sdk" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.3.0">2.3.0</a>:
+Require <code class="docutils literal notranslate"><span class="pre">httpx2&gt;=2.10.0</span></code>. Add <code class="docutils literal notranslate"><span class="pre">max_sse_event_size</span></code> for HTTP clients.
+Keep its 1 MiB default. Refresh schemas and retry once after a
+<code class="docutils literal notranslate"><span class="pre">HeaderMismatch</span></code> rejection. Omit empty legacy metadata and parameters.
+Validate header annotations at server registration. Look up tool schemas
+without an extra list request. Exclude interactive OAuth login from request
+deadlines. Validate explicit null structured results.</p></li>
+</ul>
+</section>
+<section id="integration-decisions">
+<h2>Integration decisions<a class="headerlink" href="#integration-decisions" title="Link to this heading"></a></h2>
+<p>The service keeps its current SSE and JSON Lines contracts.
+Its executor still consumes <code class="docutils literal notranslate"><span class="pre">AIMessageChunk</span></code> values from graph streams.
+The Core 1.7.0 change affects direct consumers of the v3 content-block protocol.
+Applications that use that protocol must concatenate <code class="docutils literal notranslate"><span class="pre">tool-call-delta</span></code> slices.
+Use <code class="docutils literal notranslate"><span class="pre">.tool_calls.get()</span></code> or <code class="docutils literal notranslate"><span class="pre">.output</span></code> for the complete result.</p>
+<p>The model factory passes provider configuration to the selected native model.
+For an OpenAI-compatible gateway that requires Chat Completions, set
+<code class="docutils literal notranslate"><span class="pre">use_responses_api=false</span></code> in its <code class="docutils literal notranslate"><span class="pre">MODEL_CONFIGS</span></code> entry.
+For document inputs that need Responses, set <code class="docutils literal notranslate"><span class="pre">use_responses_api=true</span></code>.
+The dependency update does not change these explicit settings.</p>
+<p>The blueprint supports native Deep Agents permissions, skills, memory sources,
+and asynchronous subagent definitions. Existing defaults stay unchanged.
+Asynchronous subagents need an external Agent Protocol service.
+The toolkit REST service does not provide that protocol.
+Review resolved filesystem paths when you use symlinks and permission rules.
+Treat configured skill and memory source paths as trusted input.</p>
+<p>FastMCP 4.1 changes server-side security checks and session ownership.
+Finish pending MultiAuth tasks before you upgrade a separate FastMCP server.
+For direct <code class="docutils literal notranslate"><span class="pre">ClientCredentialsOAuthProvider</span></code> or
+<code class="docutils literal notranslate"><span class="pre">PrivateKeyJWTOAuthProvider</span></code> use, configure <code class="docutils literal notranslate"><span class="pre">issuer</span></code> to enable issuer binding.
+The toolkit’s shared-header client configuration does not use these providers.
+The toolkit closes protocol sessions after calls and reuses only HTTP pools.
+It does not keep an idle protocol session for 30 minutes.
+Use the per-server <code class="docutils literal notranslate"><span class="pre">max_sse_event_size</span></code> setting for larger HTTP SSE results.
+Its default preserves the SDK’s 1 MiB limit. See <a class="reference internal" href="mcp.html"><span class="doc">MCP tools</span></a>.
+FastMCP 4.2.0a1 is a pre-release. This update excludes it.</p>
+<p>Rebuild images and update operating-system and custom certificate stores.
+Updating certifi does not update those stores.
+See the <a class="reference external" href="https://github.com/PrefectHQ/fastmcp/blob/main/SECURITY.md#certificate-authority-incident-october-2026">FastMCP CA security notice</a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">langchain-community==0.4.2</span></code> remains the latest stable release.
+The update does not replace the toolkit’s authentication or memory scopes.
+<code class="docutils literal notranslate"><span class="pre">user_id</span></code> remains the long-term user scope.
+<code class="docutils literal notranslate"><span class="pre">thread_id</span></code> remains the short-term conversation scope.</p>
+</section>
+<section id="langgraph">
+<h2>LangGraph<a class="headerlink" href="#langgraph" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.12">1.2.12</a>: Add <code class="docutils literal notranslate"><span class="pre">response_schema</span></code> to <code class="docutils literal notranslate"><span class="pre">interrupt()</span></code>. Detect subgraphs from bytecode when source is unavailable. Correct v3 stream projection types.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.13">1.2.13</a>: Remove answered interrupts from saved state responses. Isolate updates and replay on older checkpoint branches. Preserve delta counters and use the selected saver for subgraphs.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.14">1.2.14</a>: Publish the next patch version. The release notes list no additional behavior change.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.15">1.2.15</a>: Preserve control and interrupt events in v1/v2 streams. Save cached-node writes and state-update writes on the correct checkpoint. Correct delta replay order, message IDs, fork snapshots, and failed-write handling. Propagate invalid tool resume values.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.16">1.2.16</a>: Apply a resumed <code class="docutils literal notranslate"><span class="pre">Command.update</span></code> once. Keep completed subgraph tasks from running again. Save pending exit-mode writes once. Let other tasks finish when a resume value fails validation.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.17">1.2.17</a>: Apply an explicit recursion limit when it equals the default. Preserve the caller namespace in remote subgraph streams.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/1.2.18">1.2.18</a>: Run error handlers on all supported paths. Stream failed task results and the final checkpoint after a breakpoint or recursion limit. Prevent repeated subgraph tags. Change the default delta snapshot interval from 1,000 updates to 100 updates.</p></li>
+</ul>
+</section>
+<section id="checkpoint-packages">
+<h2>Checkpoint packages<a class="headerlink" href="#checkpoint-packages" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpoint%3D%3D4.3.0">langgraph-checkpoint 4.3.0</a>: Validate store namespaces before dispatch. Preserve serialized data when an object cannot be restored. Correct in-memory delta history and replay order. Accept mapping values in stores.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpoint%3D%3D4.3.1">langgraph-checkpoint 4.3.1</a>: Reject NUL bytes in store namespace labels.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointpostgres%3D%3D3.1.3">langgraph-checkpoint-postgres 3.1.3</a>: Start delta reads at the requested checkpoint. Treat an empty checkpoint ID as the latest checkpoint. Validate namespaces and correct delta replay order.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointpostgres%3D%3D3.2.0">langgraph-checkpoint-postgres 3.2.0</a>: Add native <code class="docutils literal notranslate"><span class="pre">prune</span></code> and <code class="docutils literal notranslate"><span class="pre">aprune</span></code> methods. Keep the latest checkpoint by default. Support explicit thread deletion.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointsqlite%3D%3D3.1.2">langgraph-checkpoint-sqlite 3.1.2</a>: Add task paths to saved writes. Follow parent pointers when reading delta history. Correct write order and empty checkpoint IDs. Validate store namespaces.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/prebuilt%3D%3D1.1.1">langgraph-prebuilt 1.1.1</a>: Propagate invalid resume values from <code class="docutils literal notranslate"><span class="pre">ToolNode</span></code>. Keep the graph available for a later valid answer.</p></li>
+</ul>
+</section>
+<section id="langgraph-sdk">
+<h2>LangGraph SDK<a class="headerlink" href="#langgraph-sdk" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.5">0.4.5</a>: Add typed interrupt response schemas to SDK data models. Update dependencies.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.6">0.4.6</a>: Encode thread and assistant IDs in stream request URLs.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.7">0.4.7</a>: End a thread stream only on a root run lifecycle event.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.8">0.4.8</a>: Report thread stream errors. Stop retries after a rejected stream request.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.9">0.4.9</a>: Add thread priority settings. Relax third-party upper bounds.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.10">0.4.10</a>: Retry <code class="docutils literal notranslate"><span class="pre">runs.wait</span></code> with a bodyless GET. Raise errors from synchronous wait calls. Correct multi-line SSE data, empty IDs, and a leading byte order mark. Accept durability, resumable streaming, and context in typed overloads.</p></li>
+</ul>
+</section>
+<section id="langgraph-cli">
+<h2>LangGraph CLI<a class="headerlink" href="#langgraph-cli" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.30">0.4.30</a>: Accept compatible API version ranges.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.31">0.4.31</a>: Permit API versions below 1.0.0. Deploy images from a previous build.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.32">0.4.32</a>: Select listeners and agent environments for deployments. Accept an image URI for self-hosted deployments. Clarify missing deployment configuration.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.33">0.4.33</a>: Deploy an image that is already in a registry. List deployment listeners. Reject Git dependency URLs that contain credentials.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.34">0.4.34</a>: Return listener lists as JSON with <code class="docutils literal notranslate"><span class="pre">--json</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.35">0.4.35</a>: Accept private registry image pull secrets. Use the returned registry username. Keep build logs after a deployment failure.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.36">0.4.36</a>: Accept deployment type aliases. Push images through the active Docker context.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.37">0.4.37</a>: Use serverless deployments by default. Exclude subprocess standard input from verbose logs.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.38">0.4.38</a>: Accept priority configuration in <code class="docutils literal notranslate"><span class="pre">langgraph.json</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.39">0.4.39</a>: Return deployment lists as JSON with <code class="docutils literal notranslate"><span class="pre">--json</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.40">0.4.40</a>: Send upload headers from the deployment control plane.</p></li>
+</ul>
+<p>The stable <code class="docutils literal notranslate"><span class="pre">langgraph-supervisor</span></code> version remains 0.0.31.
+This update keeps the existing supervisor interface.</p>
+</section>
+<section id="checkpoint-upgrade-operations">
+<h2>Checkpoint upgrade operations<a class="headerlink" href="#checkpoint-upgrade-operations" title="Link to this heading"></a></h2>
+<p>Back up the database before this update.
+Stop active requests before you update SQLite workers.
+SQLite saver setup adds <code class="docutils literal notranslate"><span class="pre">writes.task_path</span></code> to databases from version 3.1.1.
+The migration keeps existing rows.
+Do not mix old and new SQLite saver versions during this change.
+The regression fixture uses a database from the released 3.1.1 saver.
+It verifies a pending interrupt and a completed parallel branch after upgrade.</p>
+<p>The PostgreSQL saver migration list is unchanged from 3.1.2 to 3.2.0.
+The toolkit still runs saver setup under its schema lock.
+Run checkpoint migrations and resume checks before you replace all workers.</p>
+<p>Store namespace labels cannot contain periods, NUL bytes, or empty strings.
+Validation now also covers reads, searches, and direct batch operations.
+Encode user identifiers before you use them as namespace labels.
+The toolkit’s scoped checkpoint keys already use safe labels.
+Keep long-term user memory separate from conversation checkpoints.</p>
+<p>The new PostgreSQL <code class="docutils literal notranslate"><span class="pre">aprune</span></code> default is <code class="docutils literal notranslate"><span class="pre">strategy=&quot;keep_latest&quot;</span></code>.
+It keeps current state and pending interrupts for supported threads.
+It refuses <code class="docutils literal notranslate"><span class="pre">DeltaChannel</span></code> threads because they need older writes.
+Deep Agents uses these channels.
+The toolkit does not run this maintenance method automatically.
+Do not replace checkpoint deletion with pruning for Deep Agents threads.
+External media blobs still need their own retention policy.</p>
+<p>LangGraph 1.2.18 takes a delta snapshot after 100 updates by default.
+This can reduce restore time and increase database storage.
+Set <code class="docutils literal notranslate"><span class="pre">snapshot_frequency=1000</span></code> on a custom <code class="docutils literal notranslate"><span class="pre">DeltaChannel</span></code> to keep its old interval.
+An explicit interval on an upstream channel still takes precedence.</p>
+<p>Typed interrupts use native schema validation.
+The toolkit returns <code class="docutils literal notranslate"><span class="pre">response_schema</span></code> in live and recovered interrupt records.
+Send answers as <code class="docutils literal notranslate"><span class="pre">input.resume</span></code> values keyed by interrupt ID.
+The order of parallel interrupt records can differ between live and saved responses.
+Use IDs to match questions and answers.
+A Python response type enables native validation.
+A JSON Schema dictionary describes the response without enabling that validation.</p>
+</section>
+<section id="legacy-chains-and-text-splitters">
+<h2>Legacy chains and text splitters<a class="headerlink" href="#legacy-chains-and-text-splitters" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-classic%3D%3D1.0.8">langchain-classic 1.0.8</a>:
+Accept content-block tokens in streaming callbacks. Correct runnable type
+annotations. The toolkit does not need an interface change.</p></li>
+<li><p><a class="reference external" href="https://github.com/langchain-ai/langchain/releases/tag/langchain-text-splitters%3D%3D1.1.3">langchain-text-splitters 1.1.3</a>:
+Restore lazy imports for large optional dependencies. Reject invalid inputs
+to <code class="docutils literal notranslate"><span class="pre">RecursiveJsonSplitter</span></code> with <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>. Correct separators for
+Kotlin, Rust, Haskell, C#, and Elixir.</p></li>
+</ul>
+</section>
+<section id="optional-studio-server-and-runtime">
+<h2>Optional Studio server and runtime<a class="headerlink" href="#optional-studio-server-and-runtime" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">studio</span></code> extra installs <code class="docutils literal notranslate"><span class="pre">langgraph-cli[inmem]</span></code>.
+It now selects <code class="docutils literal notranslate"><span class="pre">langgraph-api==0.16.7</span></code> and
+<code class="docutils literal notranslate"><span class="pre">langgraph-runtime-inmem==0.36.7</span></code>.
+The previous versions were 0.10.3 and 0.30.3.
+These packages run the separate Studio development server.
+They do not replace the toolkit’s FastAPI server, checkpointer, or request queue.</p>
+<p>The <a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog">official Agent Server changelog</a> documents the
+API release families. The summaries below include fixes added to each family.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-11">0.11</a>:
+Add delta-aware pruning and Prometheus metrics. Correct durable interrupt
+resume and conditional-thread authorization. Metrics names and units change.</p></li>
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-12">0.12</a>:
+Add search cost limits and gRPC stores. Fix store authorization filters,
+resume races, subgraph events, and namespace matching.</p></li>
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-13">0.13</a>:
+Support Python 3.14 and A2A file output. Preserve cancellation across worker
+failures. Fix thread authorization and queue port conflicts.</p></li>
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-14">0.14</a>:
+Support custom encryption with gRPC checkpoints. Fix scheduler duplication,
+lock contention, delta restoration, auth checks, and cancellation.</p></li>
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-15">0.15</a>:
+Add A2UI and task-only A2A history. Fix false interrupt results, HTTPS
+webhooks, gRPC replay, startup failures, and tracing dependencies.</p></li>
+<li><p><a class="reference external" href="https://docs.langchain.com/langsmith/agent-server-changelog#v0-16">0.16</a>:
+Add typed interrupts, storage diagnostics, and dependency health details.
+Preserve pending questions and retry killed in-memory runs after restart.
+Correct delta history and transient-error streaming.
+Version 0.16.7 fixes factory-graph state operations with gRPC checkpoints.</p></li>
+</ul>
+<p>The API metadata selects the matching in-memory runtime family:</p>
+<table class="docutils align-default" id="id91">
+<caption><span class="caption-text">Studio API and runtime families</span><a class="headerlink" href="#id91" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>API family</p></th>
+<th class="head"><p>Runtime family</p></th>
+<th class="head"><p>Official metadata</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0.11.x</p></td>
+<td><p>0.31.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.11.0/">API 0.11.0</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>0.12.x</p></td>
+<td><p>0.32.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.12.0/">API 0.12.0</a></p></td>
+</tr>
+<tr class="row-even"><td><p>0.13.x</p></td>
+<td><p>0.33.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.13.0/">API 0.13.0</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>0.14.x</p></td>
+<td><p>0.34.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.14.0/">API 0.14.0</a></p></td>
+</tr>
+<tr class="row-even"><td><p>0.15.x</p></td>
+<td><p>0.35.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.15.0/">API 0.15.0</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>0.16.x</p></td>
+<td><p>0.36.x</p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/langgraph-api/0.16.7/">API 0.16.7</a></p></td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference external" href="https://pypi.org/project/langgraph-runtime-inmem/0.36.7/">runtime 0.36.7 metadata</a> has no separate
+patch changelog. Its review uses the API changelog and published requirements.
+It does not establish a patch-by-patch runtime change list.
+The selected API requires <code class="docutils literal notranslate"><span class="pre">grpcio-tools==1.81.1</span></code>, compatible gRPC 1.81
+packages, and <code class="docutils literal notranslate"><span class="pre">protobuf&gt;=6.32.1,&lt;7.0.0</span></code>.
+It also requires <code class="docutils literal notranslate"><span class="pre">anyio&gt;=4.14.2</span></code> and <code class="docutils literal notranslate"><span class="pre">starlette&gt;=1.3.1</span></code>.
+The lockfile resolves these requirements together.
+Do not independently pin the runtime to an incompatible API family.</p>
+<p>The verification covers dependency resolution, CLI help, and SDK contracts.
+It does not verify a running Studio server or a remote Agent Server deployment.
+Test graph loading, persisted local state, and pending questions in Studio
+before you replace an existing Studio environment.
+The 0.17 API family remains a release candidate at this review date.
+Its optional run-drain handoff is excluded from this stable update.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dependency_updates.html" class="btn btn-neutral float-left" title="Dependency update review" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="related_projects.html" class="btn btn-neutral float-right" title="Related projects and source review" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

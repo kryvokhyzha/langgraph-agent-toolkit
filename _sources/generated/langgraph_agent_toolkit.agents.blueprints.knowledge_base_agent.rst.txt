@@ -1,0 +1,15 @@
+langgraph\_agent\_toolkit.agents.blueprints.knowledge\_base\_agent package
+==========================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.knowledge_base_agent.agent
