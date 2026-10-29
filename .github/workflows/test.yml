@@ -54,7 +54,7 @@ jobs:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install the configured hook runner
         run: uv sync --frozen --only-group lint
       - name: Stage the pull request changes in this disposable checkout
@@ -91,7 +91,7 @@ jobs:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Verify the dependency lockfile
         run: uv lock --check
       - name: Install lint dependencies
@@ -117,7 +117,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Build and install the base wheel in a clean environment
         run: |
           uv build --wheel
@@ -142,6 +142,15 @@ jobs:
             --python "$GITHUB_WORKSPACE/.venv-wheel/bin/python" python \
             "$GITHUB_WORKSPACE/scripts/ci/verify_ui_imports.py"
 
+      - name: Verify the source UI without service dependencies
+        run: |
+          uv sync --frozen --only-group client --python "${{ matrix.python-version }}"
+          uv run --no-sync python scripts/ci/verify_ui_imports.py
+        env:
+          UV_PROJECT_ENVIRONMENT: .venv-client
+          PYTHONPATH: ${{ github.workspace }}
+          PYTHON_DOTENV_DISABLED: "1"
+
   test-python:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -162,13 +171,15 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install dependencies with uv
         run:
           uv sync --frozen --no-install-project --no-default-groups --extra all
           --group tests
 
       - name: Test the package and API process journeys with coverage
+        env:
+          LAT_TEST_TOOL_SELECTION_REPORT_DIR: data/tool-selection-ci/reports
         run: >-
           uv run --no-sync pytest --run-e2e --cov --cov-report=xml
           --junitxml=test-results.xml
@@ -181,6 +192,7 @@ jobs:
           path: |
             coverage.xml
             test-results.xml
+            data/tool-selection-ci/reports/*.json
           retention-days: 14
           if-no-files-found: warn
 
@@ -214,7 +226,9 @@ jobs:
           - extra: langfuse-v3
             version: "3.15.0"
           - extra: langfuse-v4
-            version: "4.15.2"
+            version: "4.18.0"
+          - extra: langfuse-v5
+            version: "5.0.4"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -224,7 +238,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Verify the extra selects its SDK major
         run: |
           uv venv .venv-langfuse
@@ -276,15 +290,17 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install test dependencies
-        run:
+        run: >-
           uv sync --frozen --no-install-project --no-default-groups --group
-          tests
-      - name: Verify locking, restart, cancellation, and checkpoint migration
+          tests --extra deepagents
+      - name: Verify locking, restart, cancellation, checkpoints, and media
         run: >-
           uv run --no-sync pytest tests/integration/test_postgres_reliability.py
           tests/integration/test_postgres_migration.py
+          tests/integration/test_deepagents_postgres.py
+          tests/integration/test_postgres_checkpoint_prune.py
           tests/core/test_concurrency.py tests/core/test_deadlocks.py
           --run-postgres -q
         env:
@@ -386,8 +402,9 @@ jobs:
 
       - name: Run app container
         run:
-          docker run -d --name app-container --network host -e
-          AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token
+          docker run -d --name app-container --network host --mount
+          "type=bind,source=$PWD/tests/integration/docker_ui_smoke.py,target=/tmp/docker_ui_smoke.py,readonly"
+          -e AGENT_URL=http://127.0.0.1:8080 -e AUTH_SECRET=ci-test-token
           agent-service-toolkit.app:${{ github.sha }}
 
       - name: Confirm app starts correctly
@@ -400,6 +417,9 @@ jobs:
             done
           BASH
 
+      - name: Verify chat and history from the app container
+        run: docker exec app-container python /tmp/docker_ui_smoke.py
+
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
@@ -407,7 +427,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.1.0
         with:
-          version: "0.12.1"
+          version: "0.13.6"
       - name: Install ONLY CLIENT dependencies with uv
         run: |
           uv sync --frozen --only-group client --only-group tests

@@ -3,7 +3,8 @@
 from collections.abc import Sequence
 
 from langchain.agents import AgentState, create_agent
-from langchain.agents.middleware import HumanInTheLoopMiddleware
+from langchain.agents.middleware import AgentMiddleware, HumanInTheLoopMiddleware
+from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool, tool
 from langgraph.pregel import Pregel
 
@@ -15,6 +16,7 @@ from langgraph_agent_toolkit.agents.components.middlewares import (
 from langgraph_agent_toolkit.core import settings
 from langgraph_agent_toolkit.core.mcp import merge_tools
 from langgraph_agent_toolkit.core.models.factory import CompletionModelFactory
+from langgraph_agent_toolkit.core.tool_selection import ToolSelectionConfig, create_tool_selection_middleware
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -32,7 +34,13 @@ model = CompletionModelFactory.create(
 )
 
 
-def build_graph(extra_tools: Sequence[BaseTool] = ()) -> Pregel:
+def build_graph(
+    extra_tools: Sequence[BaseTool] = (),
+    *,
+    tool_selection: ToolSelectionConfig | None = None,
+    selector_model: BaseChatModel | None = None,
+    extra_middleware: Sequence[AgentMiddleware] = (),
+) -> Pregel:
     """Build the graph with email approval and supplied tools."""
     return create_agent(
         model=model,
@@ -44,6 +52,8 @@ def build_graph(extra_tools: Sequence[BaseTool] = ()) -> Pregel:
             ),
             TrimMessagesMiddleware(),
             SanitizeHistoryMiddleware(),
+            *extra_middleware,
+            *create_tool_selection_middleware(tool_selection, selector_model=selector_model),
         ],
         system_prompt=(
             "You are a helpful assistant that can send emails on the user's behalf using the "

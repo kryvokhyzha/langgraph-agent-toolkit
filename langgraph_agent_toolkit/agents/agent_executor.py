@@ -29,7 +29,7 @@ from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.pregel import Pregel
-from langgraph.types import Command, Interrupt
+from langgraph.types import Command, Interrupt, StateSnapshot
 
 from langgraph_agent_toolkit.agents.agent import Agent
 from langgraph_agent_toolkit.core.memory.concurrency import ConversationCoordinator, serialize_execution
@@ -60,9 +60,11 @@ def _uses_functional_history(graph: Pregel) -> bool:
     return graph.input_channels == START and graph.output_channels == END and PREVIOUS in graph.channels
 
 
-async def _graph_history_values(graph: Pregel, config: RunnableConfig) -> dict[str, Any]:
+async def _graph_history_values(
+    graph: Pregel, config: RunnableConfig, state: StateSnapshot | None = None
+) -> dict[str, Any]:
     """Read saved conversation state without changing the graph output."""
-    state = await graph.aget_state(config)
+    state = state if state is not None else await graph.aget_state(config)
     if not _uses_functional_history(graph):
         return state.values
     checkpoint = await graph.checkpointer.aget_tuple(state.config)
@@ -78,6 +80,16 @@ async def get_graph_history(graph: Pregel, config: RunnableConfig) -> list[BaseM
     """Read messages from StateGraph state or Functional API saved state."""
     values = await _graph_history_values(graph, config)
     return convert_to_messages(values.get("messages", []))
+
+
+async def get_graph_conversation(
+    graph: Pregel, config: RunnableConfig
+) -> tuple[list[BaseMessage], list[dict[str, Any]]]:
+    """Read messages and pending interrupts from one saved state snapshot."""
+    state = await graph.aget_state(config)
+    values = await _graph_history_values(graph, config, state)
+    pending = [interrupt for task in state.tasks for interrupt in (getattr(task, "interrupts", None) or [])]
+    return convert_to_messages(values.get("messages", [])), _interrupt_records(pending)
 
 
 async def add_graph_history(graph: Pregel, config: RunnableConfig, messages: list[Any]) -> None:
@@ -134,16 +146,32 @@ def interrupts_to_chat_message(interrupts: list[Interrupt]) -> ChatMessage:
     return ChatMessage(
         type="ai",
         content=content,
-        custom_data={
-            "interrupts": [
-                {
-                    "id": interrupt.id if isinstance(getattr(interrupt, "id", None), str) else None,
-                    "value": interrupt.value,
-                }
-                for interrupt in interrupts
-            ]
-        },
+        custom_data={"interrupts": _interrupt_records(interrupts)},
     )
+
+
+def _interrupt_records(interrupts: list[Interrupt]) -> list[dict[str, Any]]:
+    """Use the same interrupt records for live responses and saved state."""
+    records = []
+    for interrupt in interrupts:
+        record = {
+            "id": interrupt.id if isinstance(getattr(interrupt, "id", None), str) else None,
+            "value": interrupt.value,
+        }
+        if (response_schema := getattr(interrupt, "response_schema", None)) is not None:
+            record["response_schema"] = response_schema
+        records.append(record)
+    return records
+
+
+def _resume_values_by_id(pending: list[Interrupt], value: Any) -> dict[str, Any]:
+    """Require one resume value for each pending interrupt ID."""
+    pending_ids = {getattr(interrupt, "id", None) for interrupt in pending}
+    if not all(isinstance(interrupt_id, str) and interrupt_id for interrupt_id in pending_ids):
+        raise InputValidationError("The pending interrupts do not have valid IDs.")
+    if not isinstance(value, dict) or set(value) != pending_ids:
+        raise InputValidationError("input.resume must contain one value for each pending interrupt ID.")
+    return value
 
 
 def _validate_mcp_resume(value: dict[str, Any], resume: Any) -> dict[str, Any]:
@@ -194,20 +222,16 @@ def build_resume_command(interrupted_tasks: list, user_input: Dict[str, Any]) ->
     ``HumanInTheLoopMiddleware`` expects ``{"decisions": [...]}``. Other
     ``interrupt()`` blueprints read the input dictionary. For a HITL tool
     approval request, translate the user's reply to a decision for each pending
-    tool call. Otherwise, return the input dictionary unchanged.
+    tool call. Typed interrupts accept ``input.resume`` values by interrupt
+    ID. Otherwise, return the input dictionary unchanged.
     """
     pending = [interrupt for task in interrupted_tasks for interrupt in (getattr(task, "interrupts", None) or [])]
     mcp_pending = [interrupt for interrupt in pending if _is_mcp_elicitation(interrupt.value)]
     if mcp_pending:
         if "resume" in user_input:
-            resume_map = user_input["resume"]
-            pending_ids = {getattr(interrupt, "id", None) for interrupt in pending}
             if "responses" in user_input:
                 raise InputValidationError("Send input.resume or input.responses, not both.")
-            if not all(isinstance(interrupt_id, str) and interrupt_id for interrupt_id in pending_ids):
-                raise InputValidationError("The pending interrupts do not have valid IDs.")
-            if not isinstance(resume_map, dict) or set(resume_map) != pending_ids:
-                raise InputValidationError("input.resume must contain one value for each pending interrupt ID.")
+            resume_map = _resume_values_by_id(pending, user_input["resume"])
             for interrupt in mcp_pending:
                 _validate_mcp_resume(interrupt.value, resume_map[interrupt.id])
             return Command(resume=resume_map)
@@ -230,6 +254,9 @@ def build_resume_command(interrupted_tasks: list, user_input: Dict[str, Any]) ->
         else:
             decision = {"type": "respond", "message": message}
         return Command(resume={"decisions": [decision] * count})
+
+    if "resume" in user_input and any(getattr(interrupt, "response_schema", None) is not None for interrupt in pending):
+        return Command(resume=_resume_values_by_id(pending, user_input["resume"]))
 
     return Command(resume=user_input)
 
@@ -400,6 +427,7 @@ class AgentExecutor:
         model_config_key: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
+        trace_session_id: Optional[str] = None,
     ) -> Tuple[Agent, Any, Any, UUID]:
         """Set up an agent run for `invoke` and `stream`.
 
@@ -413,6 +441,7 @@ class AgentExecutor:
             model_config_key: Optional replacement model configuration key.
             agent_config: Optional agent configuration.
             recursion_limit: Optional limit for graph recursion.
+            trace_session_id: Public session ID for observability. Default to `thread_id`.
 
         Returns:
             A tuple that contains:
@@ -427,6 +456,7 @@ class AgentExecutor:
 
         run_id = uuid4()
         thread_id = thread_id or str(uuid4())
+        session_id = trace_session_id if trace_session_id is not None else thread_id
 
         recursion_limit = recursion_limit or settings.DEFAULT_RECURSION_LIMIT
 
@@ -451,7 +481,15 @@ class AgentExecutor:
                 configurable["model_provider"] = model_provider
 
         if agent_config:
-            reserved = {"thread_id", "user_id", "checkpoint_id", "checkpoint_ns"}
+            reserved = {
+                "thread_id",
+                "user_id",
+                "checkpoint_id",
+                "checkpoint_ns",
+                "lat_user_id",
+                "lat_agent_id",
+                "lat_thread_id",
+            }
             if reserved.intersection(agent_config) or any(key.startswith("__") for key in agent_config):
                 raise ValueError("agent_config cannot override identity or checkpoint fields")
             configurable.update(agent_config)
@@ -459,7 +497,7 @@ class AgentExecutor:
         if agent.observability is None:
             agent.observability = EmptyObservability()
         callback = agent.observability.get_callback_handler(
-            run_id=str(run_id), user_id=user_id, session_id=thread_id, update_trace=True
+            run_id=str(run_id), user_id=user_id, session_id=session_id, update_trace=True
         )
 
         config = RunnableConfig(
@@ -468,7 +506,10 @@ class AgentExecutor:
             callbacks=[callback] if callback else None,
             recursion_limit=recursion_limit,
             metadata={
-                "langfuse_session_id": thread_id,
+                "lat_user_id": user_id,
+                "lat_agent_id": agent_id,
+                "lat_thread_id": session_id,
+                "langfuse_session_id": session_id,
                 "langfuse_user_id": user_id,
                 "langfuse_tags": [agent.name],
             },
@@ -506,6 +547,7 @@ class AgentExecutor:
         model_config_key: Optional[str] = None,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
+        trace_session_id: Optional[str] = None,
     ) -> ChatMessage:
         """Run an agent with a message and return its response.
 
@@ -519,6 +561,7 @@ class AgentExecutor:
             model_config_key: Optional replacement model configuration key.
             agent_config: Optional agent configuration.
             recursion_limit: Optional limit for graph recursion.
+            trace_session_id: Public session ID for observability. Default to `thread_id`.
 
         Returns:
             The agent response as a `ChatMessage`.
@@ -534,12 +577,13 @@ class AgentExecutor:
             model_config_key=model_config_key,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
+            trace_session_id=trace_session_id,
         )
 
         with agent.observability.trace_context(
             run_id=run_id,
             user_id=user_id,
-            session_id=thread_id,
+            session_id=config["metadata"]["langfuse_session_id"],
             input=input_data,
             agent_name=agent.name,
         ) as trace_span:
@@ -601,6 +645,7 @@ class AgentExecutor:
         stream_tokens: bool = True,
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
+        trace_session_id: Optional[str] = None,
     ) -> AsyncGenerator[str | ChatMessage, None]:
         """Stream an agent response as tokens or messages.
 
@@ -615,6 +660,7 @@ class AgentExecutor:
             stream_tokens: Stream individual tokens when true.
             agent_config: Optional agent configuration.
             recursion_limit: Optional limit for graph recursion.
+            trace_session_id: Public session ID for observability. Default to `thread_id`.
 
         Yields:
             Full `ChatMessage` objects or token strings.
@@ -630,16 +676,17 @@ class AgentExecutor:
             model_config_key=model_config_key,
             agent_config=agent_config,
             recursion_limit=recursion_limit,
+            trace_session_id=trace_session_id,
         )
 
         with agent.observability.trace_context(
             run_id=run_id,
             user_id=user_id,
-            session_id=thread_id,
+            session_id=config["metadata"]["langfuse_session_id"],
             input=input_data,
             agent_name=agent.name,
         ) as trace_span:
-            stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates"]
+            stream_mode = ["updates", "messages", "custom"] if stream_tokens else ["updates", "custom"]
             final_output: str | None = None
             pending_interrupts = []
             seen_interrupts = set()

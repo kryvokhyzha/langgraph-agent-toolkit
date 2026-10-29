@@ -13,10 +13,66 @@ import runpy
 import shutil
 import sqlite3
 import ssl
+import subprocess
 import sys
 import tempfile
 from contextlib import closing
 from pathlib import Path
+
+
+def check_trust_store(label: str, **kwargs) -> int:
+    """Reject the affected emSign root in a populated certificate store."""
+    certificates = ssl.create_default_context(**kwargs).get_ca_certs()
+    assert certificates, f"{label} requires certificate roots."
+    names = {
+        value
+        for certificate in certificates
+        for group in certificate["subject"]
+        for key, value in group
+        if key == "commonName"
+    }
+    assert "emSign ECC Root CA - G3" not in names, f"{label} still trusts the affected emSign root."
+    return len(certificates)
+
+
+def check_certificates() -> dict:
+    """Check application, system, pip, and ensurepip certificate bundles."""
+    import certifi
+
+    assert tuple(map(int, certifi.__version__.split("."))) >= (2026, 10, 19)
+    system_count = check_trust_store("System TLS")
+    certifi_count = check_trust_store("Application certifi", cafile=certifi.where())
+    # pip belongs to the base interpreter, outside the application environment.
+    script = """
+import ensurepip
+import json
+import runpy
+import sys
+from pathlib import Path
+from zipfile import ZipFile
+
+import pip
+from pip._vendor import certifi
+
+check = runpy.run_path(sys.argv[1])["check_trust_store"]
+assert tuple(map(int, pip.__version__.split("."))) >= (26, 2, 2)
+assert tuple(map(int, ensurepip.version().split("."))) >= (26, 2, 2)
+check("pip certifi", cafile=certifi.where())
+wheels = list(Path(ensurepip.__file__).with_name("_bundled").glob("pip-*.whl"))
+assert len(wheels) == 1, "Expected one bundled pip wheel."
+with ZipFile(wheels[0]) as wheel:
+    check("ensurepip certifi", cadata=wheel.read("pip/_vendor/certifi/cacert.pem").decode())
+print(json.dumps({"pip": pip.__version__, "ensurepip": ensurepip.version()}))
+"""
+    output = subprocess.check_output(
+        ["/usr/local/bin/python", "-c", script, str(Path(__file__).resolve())], text=True, timeout=15
+    )
+    return {
+        "trusted_certificates": system_count,
+        "certifi": certifi.__version__,
+        "certifi_roots": certifi_count,
+        **json.loads(output),
+    }
 
 
 def check_common() -> dict:
@@ -41,9 +97,7 @@ def check_common() -> dict:
     assert (source / "langgraph_agent_toolkit").is_dir()
     assert not list(source.rglob(".env*")), "The image must not contain a source environment file."
 
-    trust_store = ssl.create_default_context().get_ca_certs()
-    assert trust_store, "HTTPS requires a populated certificate trust store."
-    return {"uid": os.geteuid(), "python_prefix": sys.prefix, "trusted_certificates": len(trust_store)}
+    return {"uid": os.geteuid(), "python_prefix": sys.prefix, **check_certificates()}
 
 
 def check_api() -> dict:
@@ -55,6 +109,8 @@ def check_api() -> dict:
         "fastmcp",
         "langfuse",
         "langsmith",
+        "phoenix.client",
+        "openinference.instrumentation.langchain",
         "openai",
         "aiohttp",
         "httpx",

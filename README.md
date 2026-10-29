@@ -24,7 +24,8 @@ and [changelog](CHANGELOG.md) before upgrading.
 
 ## What the toolkit provides
 
-- FastAPI routes for invocation, SSE, JSON Lines, history, and feedback.
+- FastAPI routes for invocation, SSE, JSON Lines, conversation lists, history,
+  and feedback.
 - Sync and async `AgentClient` interfaces, including multimodal messages.
 - SQLite or PostgreSQL checkpoints with conversation ownership and ordered
   updates across workers.
@@ -32,11 +33,13 @@ and [changelog](CHANGELOG.md) before upgrading.
   optional aiohttp transport for OpenAI and Azure.
 - Native LangChain agents, custom LangGraph workflows, human approvals, and
   optional Deep Agents.
-- MCP tools, Langfuse SDK v2/v3/v4 integration, LangSmith, and local or managed
-  prompts.
+- Optional tool selection for native agents and Deep Agents. Keep the full
+  catalog by default. Use LLM selection or supported provider tool search.
+- MCP tools, Langfuse SDK v2/v3/v4/v5 integration, LangSmith, Phoenix, and local
+  or managed prompts.
 
-Install only the integrations that your service needs. LiteLLM, Langfuse, MCP,
-Deep Agents, and Streamlit are optional.
+Install only the integrations that your service needs. LiteLLM, Langfuse,
+Phoenix, MCP, Deep Agents, and Streamlit are optional.
 
 ## Quickstart
 
@@ -44,7 +47,7 @@ This local demo uses a deterministic fake model and SQLite. It needs no model
 key, Docker, or external service. It checks API behavior and persistence. Model
 quality requires separate evaluation.
 
-Install `uv`, then use a fresh checkout:
+Install `uv` 0.13.6 or later, then use a fresh checkout:
 
 ```sh
 git clone https://github.com/kryvokhyzha/langgraph-agent-toolkit.git
@@ -98,31 +101,33 @@ the Python client, the UI, and real-model configuration.
 
 ## Choose an integration
 
-| Need                                         | Start with                                          | Guide                                                     |
-| -------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
-| Chat without tools                           | `chatbot`                                           | [Agent patterns](docs/integrations.rst)                   |
-| A model that selects business tools          | Native `create_agent`                               | [Usage](docs/usage.rst)                                   |
-| Structured extraction                        | `create_agent_structured`                           | [Agent patterns](docs/integrations.rst)                   |
-| A fixed workflow or required approval        | Custom `StateGraph` or human-in-the-loop middleware | [Usage](docs/usage.rst)                                   |
-| Planning, intermediate files, and delegation | Optional Deep Agents                                | [Deep Agents](docs/deepagents.rst)                        |
-| Tools exposed by another service             | MCP, combined with a supported agent                | [MCP](docs/mcp.rst)                                       |
-| Traces, prompts, and feedback                | Langfuse or LangSmith                               | [Langfuse compatibility](docs/langfuse_compatibility.rst) |
+| Need                                         | Start with                                          | Guide                                                                       |
+| -------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| Chat without tools                           | `chatbot`                                           | [Agent patterns](docs/integrations.rst)                                     |
+| A model that selects business tools          | Native `create_agent`                               | [Usage](docs/usage.rst)                                                     |
+| Structured extraction                        | `create_agent_structured`                           | [Agent patterns](docs/integrations.rst)                                     |
+| A fixed workflow or required approval        | Custom `StateGraph` or human-in-the-loop middleware | [Usage](docs/usage.rst)                                                     |
+| Planning, intermediate files, and delegation | Optional Deep Agents                                | [Deep Agents](docs/deepagents.rst)                                          |
+| Tools exposed by another service             | MCP, combined with a supported agent                | [MCP](docs/mcp.rst)                                                         |
+| Large tool catalogs                          | Optional LangChain tool selection                   | [Tool selection](docs/tool_selection.rst)                                   |
+| Traces, prompts, and feedback                | Langfuse, LangSmith, or Phoenix                     | [Observability choices](docs/integrations.rst), [Phoenix](docs/phoenix.rst) |
 
 For an existing Python project, select provider and backend extras:
 
 ```sh
-uv add 'langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v4]'
+uv add 'langgraph-agent-toolkit[openai,uvicorn-backend,langfuse-v5]'
 ```
 
 Follow the [application onboarding guide](docs/onboarding.rst) to register
 agents, set identity and memory contracts, connect a client, and verify the
 deployment. It also gives the upgrade sequence for existing applications.
 
-`langfuse-v2`, `langfuse-v3`, and `langfuse-v4` select a Python SDK version
-range. Choose one. SDK and server versions are separate. Use the compatibility
-guide for supported combinations. `mcp`, `deepagents`, `ui`, and
-`openai-aiohttp` are separate extras. See [installation](docs/installation.rst)
-for all options.
+`langfuse-v2`, `langfuse-v3`, `langfuse-v4`, and `langfuse-v5` select a Python
+SDK version range. Choose one. SDK and server versions are separate. SDK v5
+requires server 4.59.0 or later. Keep `langfuse-v4` or `langfuse-v3` for server
+v3. Use the compatibility guide for supported combinations. `mcp`, `deepagents`,
+`ui`, and `openai-aiohttp` are separate extras. See
+[installation](docs/installation.rst) for all options.
 
 ## Memory and authentication
 
@@ -132,6 +137,12 @@ a store. SQLite supplies checkpoints but has no long-term store.
 
 The service separates conversation storage by authenticated user, agent, and
 public thread ID. Keep these values consistent when reading or updating history.
+
+Use `/threads` to list saved conversations for one user and agent. Use
+`/history` to read messages in one conversation. History returns at most 100
+messages by default. Follow `next_offset` for more messages and `next_cursor`
+for more conversations. See the [usage guide](docs/usage.rst) for examples and
+storage limits.
 
 For one deployment per client, keep one `AUTH_SECRET`. The default
 `AUTH_MODE=trusted` preserves 0.9.2 shared bearer-token authentication.
@@ -190,6 +201,7 @@ and `/openapi.json`.
 | Upgrade an existing deployment       | [Migration](docs/migration.rst), [dependency review](docs/dependency_updates.rst), [changelog](CHANGELOG.md)                                                     |
 | Deploy and operate the service       | [Deployment](docs/deployment.rst), [reliability](docs/reliability.rst)                                                                                           |
 | Configure Langfuse                   | [SDK and server compatibility](docs/langfuse_compatibility.rst)                                                                                                  |
+| Configure Phoenix                    | [Phoenix tracing, prompts, and feedback](docs/phoenix.rst)                                                                                                       |
 | Verify behavior and capacity         | [Testing](docs/testing.rst), [live model checks](docs/live_llm_testing.rst), [load tests](docs/load_testing.rst), [recorded results](docs/load_test_results.rst) |
 
 ## Development

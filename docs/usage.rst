@@ -246,6 +246,80 @@ closes its owned sync and async HTTP clients. If you inject ``http_client`` or
 The ``stream_timeout`` read limit measures idle time between reads. See
 :doc:`reliability` for timeout and connection settings.
 
+List saved conversations
+------------------------
+
+Use ``GET /{agent_id}/threads`` to find saved conversations for one user and
+agent. ``GET /threads`` uses the default agent. This endpoint returns
+conversation IDs. It does not return the messages in each conversation.
+Use ``/history`` with one returned ``thread_id`` to read those messages.
+
+.. code-block:: bash
+
+   curl --fail-with-body --get "$AGENT_API_URL/$AGENT_ID/threads" \
+     -H "Authorization: Bearer ${AUTH_SECRET}" \
+     --data-urlencode 'user_id=user-1' \
+     --data-urlencode 'limit=100'
+
+The response has this structure:
+
+.. code-block:: json
+
+   {
+     "threads": [
+       {"thread_id": "conversation-1", "agent_id": "chatbot-agent"}
+     ],
+     "next_cursor": null
+   }
+
+The default and maximum page size are 100 conversations. The minimum is 1.
+Send ``cursor=next_cursor`` to read the next page. Treat the cursor as an
+opaque value. Keep the same user and agent for each page. Continue until
+``next_cursor`` is null. A bounded scan can return a short or empty page with
+a non-null cursor. An empty ``threads`` list alone does not end pagination.
+The response does not include a total count.
+
+With an open ``AgentClient``, use:
+
+.. code-block:: python
+
+   cursor = None
+   while True:
+       page = client.list_threads(user_id="user-1", limit=100, cursor=cursor)
+       for thread in page.threads:
+           print(thread.thread_id, thread.agent_id)
+       if page.next_cursor is None:
+           break
+       cursor = page.next_cursor
+
+Use ``alist_threads()`` for asynchronous calls. Both methods return one page.
+The list orders conversations by creation, newest first. A new message does
+not move a conversation to the start. The endpoint reads checkpoint metadata.
+It does not load message content or generate titles.
+
+The authentication rules match history requests. ``user_id`` is optional.
+When you omit it, the service uses the identity selected by authentication.
+A user-bound token cannot list another user's conversations. A trusted backend
+must send the same end-user ID that it used to create the conversation.
+
+Toolkit-managed SQLite and PostgreSQL checkpointers support conversation lists.
+An in-memory saver lists only conversations in that process. Each list request
+scans its stored checkpoint keys. Use SQLite or PostgreSQL for large lists.
+``NoOpSaver``
+returns an empty list. An unsupported custom saver returns HTTP 501 for this
+endpoint. Its existing history operations remain available.
+
+The list needs the initial root checkpoint with ``step=0``. If checkpoint
+pruning removes that checkpoint, the conversation can disappear from the list.
+Its latest history can still be read with the known public ID. The service does
+not prune active conversations automatically.
+
+Existing scoped checkpoints can appear if they retain matching ``user_id``
+and ``langfuse_session_id`` metadata. Checkpoints without this metadata cannot
+be listed automatically. Keep their public IDs to read their history.
+See :doc:`migration` before changing an existing deployment's checkpoint
+identifiers.
+
 Read and change history
 -----------------------
 
@@ -267,6 +341,10 @@ The response contains ``messages``, ``total``, and ``next_offset``. Read the
 next page with ``offset=next_offset`` until that value is null. The default
 page has at most 100 messages. The requested limit must be from 1 to 1000.
 ``HISTORY_MAX_PAGE_SIZE`` can set a smaller server limit.
+Messages stay in conversation order, from oldest to newest. ``get_history()``
+and ``aget_history()`` return one page. They do not load later pages
+automatically. Pagination limits the response size. Each request still reads
+the latest saved conversation state from the checkpointer.
 
 With an open ``AgentClient``, use these methods:
 
@@ -438,3 +516,38 @@ and :doc:`deepagents` for Deep Agents. Use :doc:`deployment` for Uvicorn,
 Gunicorn, container settings, and worker recovery. Use :doc:`testing` for tests
 that need no external model and :doc:`live_llm_testing` for an explicit live
 provider check.
+
+Resume a typed interrupt
+------------------------
+
+A custom graph can call ``interrupt(question, response_schema=Decision)``.
+``Decision`` is a Pydantic model defined by the application.
+The response includes each question in ``custom_data.interrupts``.
+Each typed question has an ``id``, ``value``, and ``response_schema``.
+The history endpoint returns the same records in ``pending_interrupts``.
+Use history to recover after a lost response or worker restart.
+Reading history does not execute the graph.
+
+Render the JSON Schema in the application. Send one answer for each pending
+ID. The order of parallel questions can change. Match them by ``id``.
+For example, a quantity question can use this request:
+
+.. code-block:: bash
+
+   curl --fail-with-body "$AGENT_API_URL/$AGENT_ID/invoke" \
+     -H "Authorization: Bearer ${AUTH_SECRET}" \
+     -H 'Content-Type: application/json' \
+     -d '{"thread_id":"conversation-1","user_id":"user-1", "input":{"resume":{"<interrupt-id>":{"quantity":3}}}}'
+
+Replace ``<interrupt-id>`` with the saved question's ID.
+Use the same conversation and user identity as the interrupted run.
+LangGraph validates the answer when execution resumes.
+An invalid typed answer returns HTTP 400 in invoke mode. The question stays
+pending. Correct the answer and submit it again.
+A missing or unknown interrupt ID returns HTTP 422 before execution.
+For streaming requests, read error events as described above.
+
+This structured envelope is optional. Existing raw interrupt replies and
+human approval replies keep their format. MCP forms use their own response
+schema and ``responses`` envelope. See :doc:`mcp`.
+The Streamlit client does not generate generic typed forms automatically.

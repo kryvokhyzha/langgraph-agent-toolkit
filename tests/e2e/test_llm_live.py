@@ -14,7 +14,7 @@ from uuid import UUID, uuid4
 
 import httpx
 import pytest
-from conftest import ApiProcess
+from api_process import ApiProcess
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.llm]

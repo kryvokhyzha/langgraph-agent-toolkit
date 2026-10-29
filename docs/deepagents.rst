@@ -86,8 +86,9 @@ Set these values in the service environment or its ``.env`` file:
    USE_FAKE_MODEL=true
 
 Set ``AUTH_SECRET`` through your secret manager. The same shared secret can
-serve a deployment for one client. With ``AUTH_MODE=trusted``, that client must
-send the correct end-user identity in ``user_id``. See :doc:`migration`.
+serve a deployment for one client. With ``AUTH_MODE=trusted``, ``user_id`` is
+optional. A trusted client can send it to separate end-user conversations.
+Use the correct authenticated identity when you send it. See :doc:`migration`.
 
 Create the database directory, then start the service:
 
@@ -133,6 +134,21 @@ The existing invoke, streaming, history, clear, and interrupt-resume endpoints
 also apply to this agent. History contains messages. It is not a file-download
 API. The Python example uses ``graph.aget_state`` to inspect virtual files.
 
+Select tools for large catalogs
+-------------------------------
+
+Tool selection is disabled by default. Set ``TOOL_SELECTION`` or pass
+``build_graph(tool_selection=ToolSelectionConfig(...))`` to enable it for the
+main graph. The integration reuses LangChain's LLM selector or provider tool
+search. It keeps existing planning, delegation, filesystem, and asynchronous
+task tools available. Those tools do not use the selected-tool count limit.
+
+Supplied subagents and the upstream general-purpose subagent keep their own
+middleware. Configure their selection policy separately when needed.
+Selection does not change checkpoints, filesystem permissions, or tool access
+checks. See :doc:`tool_selection` for configuration, the offline example,
+provider limits, and the API benchmark.
+
 What it adds
 ------------
 
@@ -142,17 +158,188 @@ results into files for later access. Skills and memory files are optional
 sources of instructions. See the `upstream overview
 <https://docs.langchain.com/oss/python/deepagents/overview>`_.
 
-The toolkit selects Deep Agents 0.7.13. This version makes task planning
-optional. The built-in blueprint explicitly enables ``TodoListMiddleware``
+The toolkit selects Deep Agents 0.7.32. This version includes filesystem
+permission fixes, media recovery, and async subagent updates.
+See :doc:`dependency_releases_2026_10` for each intervening release.
+Task planning remains optional.
+The built-in blueprint explicitly enables ``TodoListMiddleware``
 to provide ``write_todos``. It uses ``StateBackend`` for virtual files and
 leaves the checkpointer for service startup to assign.
 
 The default main agent and ``general-purpose`` subagent expose ``ls``,
 ``read_file``, ``write_file``, ``edit_file``, ``glob``, and ``grep`` for virtual
 files. They also include ``add`` and ``multiply``. Their tool sets exclude
-``execute`` and ``delete_file``. The default blueprint does not mount a host
+``execute`` and ``delete``. The default blueprint does not mount a host
 directory or create a long-term memory store. Custom subagents follow the
 configuration rules in the next section.
+
+Read documents and media
+------------------------
+
+Use a model that supports each input format. Deep Agents checks the active
+model before sending media. Its ``read_file`` tool can pass DOCX, PPTX, XLSX,
+CSV, JSON, and Markdown files as native file inputs to OpenAI Responses.
+Support depends on the provider, selected model, API, and MIME type.
+See the `upstream multimodal guide
+<https://docs.langchain.com/oss/python/deepagents/multimodal>`_.
+
+The toolkit UI accepts these document extensions in addition to its existing
+image, PDF, audio, and video extensions. It preserves the upload's filename
+in the standard content block. The REST API uses the existing message format:
+
+.. code-block:: json
+
+   {
+     "thread_id": "document-1",
+     "input": {
+       "message": [
+         {"type": "text", "text": "Summarize this document."},
+         {
+           "type": "file",
+           "base64": "<base64-encoded-document>",
+           "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+           "extras": {"filename": "report.docx"}
+         }
+       ]
+     }
+   }
+
+Replace the base64 placeholder with the document content. A filename does not
+prove the content's format. Keep request-size limits and validate files at the
+application boundary.
+
+The blueprint passes a configured model instance to Deep Agents. Upstream's
+OpenAI model-string defaults do not change that instance. Enable Responses
+explicitly for a deployment that supports it:
+
+.. code-block:: text
+
+   MODEL_CONFIGS='{"deep_agent":{"provider":"openai","name":"gpt-4.1","use_responses_api":true}}'
+
+Use the actual model or deployment name. Supply credentials through the
+provider environment or secret mechanism. Restart the workers after changing
+the configuration. The example does not change the toolkit's global defaults.
+For a gateway that supports only Chat Completions, set
+``use_responses_api=false`` and use formats that it accepts.
+Test the actual gateway route before enabling native document inputs.
+See `OpenAI model configuration
+<https://docs.langchain.com/oss/python/deepagents/models#openai-and-the-responses-api>`_.
+
+If a newly read file causes an invalid model request, upstream retries that
+model call once with unsupported file content removed. This recovery does not
+add retries for remote tool writes. Model-switching middleware also uses the
+active model's content capabilities. Custom compiled subagents retain their
+own middleware and model settings.
+
+Offload binary content
+----------------------
+
+``build_graph`` accepts ``backend``, ``store``, and
+``offload_binary_content``. The default is ``False``.
+The default ``StateBackend`` stores files inside checkpoints.
+It cannot reduce checkpoint size through binary offloading.
+The helper rejects offloading when the blob route uses ``StateBackend``.
+
+Use a backend that stores blobs outside graph state. One option is
+``CompositeBackend`` with a ``/blobs/`` route to ``StoreBackend``.
+For this route, also pass the store through ``build_graph(store=...)``.
+This is required even if ``StoreBackend`` has an explicit store.
+Use one durable store that all API replicas can access.
+Keep its connections open for the full graph lifetime.
+An in-memory store or a worker-local directory cannot provide restart recovery
+across replicas.
+
+The following embedded example uses the toolkit's PostgreSQL store and saver.
+Configure the PostgreSQL settings first. Pass trusted identities and a model
+that supports the input content:
+
+.. code-block:: python
+
+   from deepagents.backends import CompositeBackend, StateBackend, StoreBackend
+   from langchain_core.language_models import BaseChatModel
+   from langgraph.runtime import Runtime
+
+   from langgraph_agent_toolkit.agents.blueprints.deep_agent.agent import build_graph
+   from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
+   from langgraph_agent_toolkit.core.memory.types import MemoryBackends
+   from langgraph_agent_toolkit.service.auth import storage_thread_id
+
+
+   def blob_namespace(runtime: Runtime) -> tuple[str, ...]:
+       thread_id = runtime.execution_info.thread_id
+       if not thread_id:
+           raise ValueError("A scoped thread_id is required")
+       return ("document-assistant", "blobs", thread_id)
+
+
+   async def read_document(
+       model: BaseChatModel,
+       content: list[dict],
+       user_id: str,
+       thread_id: str,
+   ):
+       memory = MemoryFactory.create(MemoryBackends.POSTGRES)
+       async with memory.get_memory_store() as store, memory.get_checkpoint_saver() as saver:
+           await store.setup()
+           await saver.setup()
+           backend = CompositeBackend(
+               default=StateBackend(),
+               routes={"/blobs/": StoreBackend(namespace=blob_namespace)},
+           )
+           graph = build_graph(
+               model=model,
+               backend=backend,
+               store=store,
+               offload_binary_content=True,
+           )
+           graph.checkpointer = saver
+           scoped_id = storage_thread_id(user_id, "document-assistant", thread_id)
+           return await graph.ainvoke(
+               {"messages": [{"role": "user", "content": content}]},
+               config={"configurable": {"thread_id": scoped_id, "user_id": user_id}},
+               durability="sync",
+           )
+
+The namespace uses the checkpoint key scoped by owner, agent, and public
+thread ID. It keeps blobs in short-term conversation storage.
+For HTTP runs, the service supplies that scoped key in
+``runtime.execution_info.thread_id``. Do not use an unscoped public thread ID
+as the only access boundary in a shared store.
+Keep long-term files in a separate namespace based on trusted ``user_id``.
+Use a separate store or schema for each client deployment.
+If deployments share a store, add a trusted deployment ID to the namespace.
+
+This example closes both database pools after the run. A service application
+must keep the store open through its lifespan. The default HTTP service opens
+its checkpointer only. ``MEMORY_BACKEND=postgres`` does not automatically
+attach a blob store. A custom service must initialize the store and provide
+it to ``build_graph(store=store, ...)`` through its graph factory.
+The caller owns the store's connections. Include this pool in the total
+database connection budget.
+
+The middleware stores content under ``/blobs/<sha256>`` and keeps a small
+reference in message history. It restores media before each model call.
+Content hashes identify blobs. They do not enforce access control.
+In this version, ``artifacts_root`` belongs to ``CompositeBackend``.
+It is not a ``FilesystemMiddleware`` argument.
+See `upstream binary offloading
+<https://docs.langchain.com/oss/python/deepagents/backends#offload-binary-content>`_.
+
+Keep these limits in the application design:
+
+* Earlier input checkpoints can still contain the original inline upload.
+  Offloading reduces later checkpoint payloads.
+* A failed upload keeps media inline. A missing or invalid blob becomes a text
+  notice, and the model call continues. Verify required media before treating
+  the answer as complete.
+* History returns saved references. It does not restore or download blobs.
+* Clearing checkpoints does not delete external blobs. Keep blobs while any
+  retained checkpoint can reference them. Add explicit retention and cleanup.
+* Restored media still goes to the model. Request-size, provider, token, and
+  traffic limits still apply.
+* The default ``general-purpose`` subagent inherits the file middleware.
+  A custom isolated subagent needs its own offloading configuration.
+  A compiled subagent retains its own implementation.
 
 Add tools and subagents
 -----------------------
@@ -176,7 +363,7 @@ and MCP injection in one service registration:
 
    from collections.abc import Sequence
 
-   from deepagents import CompiledSubAgent, SubAgent
+   from deepagents import AsyncSubAgent, CompiledSubAgent, SubAgent
    from langchain_core.language_models import BaseChatModel
    from langchain_core.tools import BaseTool
 
@@ -187,7 +374,7 @@ and MCP injection in one service registration:
    def make_assistant(
        model: BaseChatModel,
        tools: Sequence[BaseTool] = (),
-       subagents: Sequence[SubAgent | CompiledSubAgent] = (),
+       subagents: Sequence[SubAgent | CompiledSubAgent | AsyncSubAgent] = (),
    ) -> Agent:
        def create_graph(extra_tools: Sequence[BaseTool] = ()):
            return build_graph(
@@ -206,7 +393,8 @@ from an application module. Register that object through ``AGENT_PATHS``.
 Assign MCP servers to ``report-assistant`` when required. The service attaches
 its configured checkpointer after building the graph.
 
-``subagents`` accepts upstream ``SubAgent`` definitions or compiled graphs.
+``subagents`` accepts upstream ``SubAgent``, ``CompiledSubAgent``, and
+``AsyncSubAgent`` definitions.
 Give each specialist the tools it needs. The default ``general-purpose``
 subagent inherits the blueprint's file-tool selection. A custom isolated
 ``SubAgent`` uses upstream filesystem defaults unless its own ``middleware``
@@ -214,6 +402,152 @@ overrides ``FilesystemMiddleware``. An empty ``tools`` list only removes
 ordinary tools; middleware can still add file tools. Compiled subagents and
 custom tools retain the access that application code gives them. The offline
 example shows a reviewer subagent with a separate scripted model.
+
+Configure skills, memory, and file permissions
+----------------------------------------------
+
+``build_graph`` accepts ``skills``, ``memory``, and ``permissions``.
+All three default to ``None``. They add no sources or rules unless configured.
+Paths refer to the selected backend. ``StateBackend`` reads files from graph
+state. It does not read files from the host.
+
+Use ``FilesystemBackend`` when an application needs a directory on disk.
+Prepare these trusted files in that directory before building the graph:
+
+* ``AGENTS.md`` contains persistent context, such as the report currency.
+* ``skills/report-check/SKILL.md`` contains the report workflow.
+  Its YAML frontmatter must include ``name`` and ``description``.
+
+For example, use this content in ``skills/report-check/SKILL.md``:
+
+.. code-block:: markdown
+
+   ---
+   name: report-check
+   description: Check report totals before delivery.
+   ---
+   Read the report and check each total.
+
+This factory loads the configured context. It also denies built-in file tools
+access to ``/private/``:
+
+.. code-block:: python
+
+   from pathlib import Path
+
+   from deepagents import FilesystemPermission
+   from deepagents.backends import FilesystemBackend
+   from langchain_core.language_models import BaseChatModel
+
+   from langgraph_agent_toolkit.agents.blueprints.deep_agent.agent import build_graph
+
+
+   def make_report_graph(model: BaseChatModel, workspace: Path):
+       return build_graph(
+           model=model,
+           backend=FilesystemBackend(root_dir=workspace, virtual_mode=True),
+           skills=["/skills/"],
+           memory=["/AGENTS.md"],
+           permissions=[
+               FilesystemPermission(
+                   operations=["read", "write"],
+                   paths=["/private/**"],
+                   mode="deny",
+               )
+           ],
+       )
+
+
+   async def prepare_report(model: BaseChatModel, workspace: Path):
+       graph = make_report_graph(model, workspace)
+       return await graph.ainvoke(
+           {"messages": [{"role": "user", "content": "Prepare the report."}]}
+       )
+
+Supply a configured model and the prepared directory to ``prepare_report``.
+Attach a durable checkpointer when the graph must retain conversation state.
+The directory remains available to the process. ``virtual_mode=True`` gives
+file paths a virtual root; it does not isolate the process or custom tools.
+
+Skills and memory use direct backend reads. File-tool permissions do not
+restrict those reads. Configure only trusted source paths. A ``memory`` path
+loads instructions; it does not create a user-memory store. Use the namespace
+rules in `Memory boundaries`_ for per-user data. Give each client deployment
+its own directory or a backend that enforces its scope.
+
+Permissions apply to the blueprint's built-in file tools. The default
+``general-purpose`` subagent inherits them. A custom ``SubAgent`` inherits
+them unless it supplies its own ``permissions``. That field replaces the
+parent's rules. A ``CompiledSubAgent`` keeps its compiled behavior.
+Custom tools, MCP tools, and direct backend calls keep their own access rules.
+
+Run background subagents
+------------------------
+
+An ``AsyncSubAgent`` runs on a separate Agent Protocol server through the
+LangGraph SDK. The toolkit HTTP API is not an Agent Protocol server.
+Configure a compatible LangGraph deployment before using this option.
+Supply its URL and authentication headers from application configuration.
+
+.. code-block:: python
+
+   from deepagents import AsyncSubAgent
+   from langchain_core.language_models import BaseChatModel
+
+   from langgraph_agent_toolkit.agents.blueprints.deep_agent.agent import build_graph
+
+
+   def make_background_graph(
+       model: BaseChatModel,
+       agent_server_url: str,
+       headers: dict[str, str],
+   ):
+       reviewer: AsyncSubAgent = {
+           "name": "remote-review",
+           "description": "Review a report in the background.",
+           "graph_id": "report-review",
+           "url": agent_server_url,
+           "headers": headers,
+           "mode": "isolated",
+           "update_strategy": "enqueue",
+           "notify_parent": False,
+       }
+       return build_graph(model=model, subagents=[reviewer])
+
+Replace ``report-review`` with a graph or assistant ID on that server.
+Building this graph does not start remote work. The model can use
+``start_async_task``, ``check_async_task``, ``update_async_task``,
+``cancel_async_task``, and ``list_async_tasks`` during execution.
+The toolkit reserves these tool names.
+
+``update_strategy="enqueue"`` queues a follow-up behind active remote work.
+The upstream default is ``"interrupt"``, which replaces the active run.
+A queued follow-up can start after the earlier run asks for human input.
+In that case, the earlier request for input is dropped.
+Do not enqueue a follow-up that must preserve that pending decision.
+
+``notify_parent=False`` disables automatic parent wake-ups after completion.
+The running parent can still check task status. The application must arrange
+later checks or handle results itself. An optional ``webhook`` URL can receive
+remote completion notifications. The application must provide that endpoint;
+the toolkit does not install one.
+
+Upstream marks queueing and parent notifications as beta.
+A remote task with status ``waiting`` needs human input on its remote thread.
+Resume that thread on the Agent Protocol server. A reply to the toolkit
+conversation does not automatically resume it.
+
+``mode="isolated"`` sends the delegated task without parent history.
+The experimental ``mode="fork"`` also sends a parent-history snapshot.
+It does not copy the remote graph's model, tools, or prompt configuration.
+Matching those settings does not guarantee a provider prompt-cache hit.
+The old ``"handoff"`` alias was removed. Use ``"isolated"`` or ``"fork"``.
+See the `upstream async subagent guide
+<https://docs.langchain.com/oss/python/deepagents/async-subagents>`_.
+
+Offline tests verify graph registration without a remote connection.
+Test the actual Agent Protocol deployment, authentication, remote approvals,
+and result delivery before production use.
 
 Advantages and tradeoffs
 ------------------------
@@ -266,9 +600,9 @@ It does not delete files in an external backend or long-term user memory.
 Add long-term files in an embedded application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use the upstream API when an application needs a custom backend, skills,
-memory files, or filesystem permission rules. The toolkit's ``build_graph``
-exposes a smaller set of options.
+The toolkit's ``build_graph`` supports custom backends, skills, memory files,
+and filesystem permissions. Use the upstream API when an application also
+needs options such as ``context_schema`` or custom middleware.
 
 This separate Python factory routes ``/memories/`` to a store. Other files
 remain in thread state. The store namespace comes from trusted runtime context:
@@ -367,6 +701,13 @@ the tool service as well as in the agent configuration.
 See `upstream permissions
 <https://docs.langchain.com/oss/python/deepagents/permissions>`_.
 
+Permission checks include the requested path and its symlink-resolved target.
+This applies to deny rules and conditional approvals on ``FilesystemBackend``.
+``permissions=[FilesystemPermission(..., mode="interrupt")]`` pauses matching
+file operations for approval. Keep a durable checkpointer for these pauses.
+Explicit ``interrupt_on`` entries take priority for the same tool.
+Do not set an entry to ``False`` when its permission approval must remain active.
+
 Use ``build_graph(interrupt_on={"tool_name": True})`` to pause before a tool
 that requires human approval. Replace ``tool_name`` with the actual tool name.
 Keep ``CHECK_INTERRUPTS=True`` and configure a durable checkpointer. Place the
@@ -395,7 +736,7 @@ HTTP client.
 Record task completion, latency, model usage, tool failures, and checkpoint
 size. Validate the final output on representative tasks. Offline examples
 verify execution contracts; they do not estimate real-model quality or cost.
-Version 0.7.13 uses LangGraph's ``DeltaChannel`` message storage. Its upstream
-checkpoint format is still marked beta. Keep database backups and verify old
+The selected version uses LangGraph's ``DeltaChannel`` message storage.
+Its upstream checkpoint format is still marked beta. Keep database backups and verify old
 checkpoints and pending approvals before upgrading either library.
 See :doc:`testing`, :doc:`deployment`, and :doc:`langfuse_compatibility`.

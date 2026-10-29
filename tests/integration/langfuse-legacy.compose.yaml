@@ -1,0 +1,10 @@
+# Use with the disposable fixture for the first v3-to-v4 server migration step.
+services:
+  web:
+    environment: &legacy-environment
+      LANGFUSE_MIGRATION_V4_WRITE_MODE: legacy
+      LANGFUSE_MIGRATION_V4_NATIVE_OTEL_BEHAVIOUR: dual_write
+      LANGFUSE_MIGRATION_V4_ALLOW_PREVIEW_OPT_IN: "false"
+      LANGFUSE_BACKGROUND_MIGRATION_V4_ENABLE_HISTORIC_BACKFILL: "false"
+  worker:
+    environment: *legacy-environment

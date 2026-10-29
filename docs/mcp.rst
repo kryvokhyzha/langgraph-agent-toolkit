@@ -27,7 +27,7 @@ No MCP connections start when the package or a blueprint is imported.
 
 LangChain added its built-in MCP integration in version 1.4.0.
 This namespace is in beta.
-The toolkit limits LangChain to ``<1.5`` and FastMCP to ``<4.1``.
+The toolkit limits LangChain to ``<1.5`` and FastMCP to ``<4.2``.
 See the `LangChain announcement
 <https://www.langchain.com/blog/mcp-in-langchain-stateless-protocol-elicitation-and-more>`_.
 
@@ -131,6 +131,10 @@ Unknown agents, unknown servers, and duplicate assignments stop startup.
    * - ``timeout``
      - Positive timeout in seconds for each client's requests and initialization.
        The default is 30.
+   * - ``max_sse_event_size``
+     - Positive integer limit in bytes for one incoming HTTP SSE event.
+       Omit this field or use ``null`` to keep the SDK's 1 MiB default.
+       This field does not apply to stdio or ordinary JSON responses.
    * - ``tool_allowlist``
      - Original tool names to expose. The default permits every discovered tool.
 
@@ -149,9 +153,25 @@ A connection error or timeout stops startup before readiness succeeds.
 
 Tools retain their discovered schemas for the worker's lifetime.
 Restart workers after a server changes its tool names or schemas.
-Tool calls do not refresh the complete catalog on each request.
-Each call manages its connection context.
-Calls that need no user input do not retain a connection between agent runs.
+Each new protocol connection loads the tool schemas before its first call.
+This lets the MCP SDK send arguments marked with ``x-mcp-header`` as headers.
+The FastMCP cache uses the server's cache policy and expiry time.
+A server without a usable cache policy can still require catalog requests.
+The toolkit does not force a cache expiry time on the server.
+
+Each worker owns a separate HTTP connection pool for each configured server.
+Tool calls close their protocol sessions after the last overlapping call exits.
+The pool can reuse TCP connections between these sessions.
+Worker shutdown and failed startup close the pools.
+The pools use HTTPX2 defaults.
+``LLM_HTTP_*`` settings apply to model-provider clients, not these MCP pools.
+
+For HTTP tools with larger SSE responses, set ``max_sse_event_size`` on that
+server. For example, ``"max_sse_event_size":2097152`` allows a 2 MiB event.
+This limit includes the event's JSON data. A large text result can need more
+space after JSON encoding. Keep the limit bounded to control per-call memory.
+An oversized response fails the call. The toolkit does not repeat the operation.
+The result can already be committed on the remote server.
 
 The built-in retry middleware retries local tools only.
 It does not retry a failed MCP write automatically.
@@ -174,6 +194,60 @@ For MCP elicitation, ``value.type`` is ``mcp_elicitation``.
 ``value.requests`` contains the question keys and form schemas or URLs.
 The ``content`` field also contains text for display.
 SSE and JSON Lines message events preserve the same ``custom_data`` object.
+
+Recover questions after a lost response
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Read ``/history`` or ``/{agent_id}/history`` with the paused conversation's
+identity. The response includes ``pending_interrupts``:
+
+.. code-block:: bash
+
+   curl --get http://localhost:8080/create-agent/history \
+     -H "Authorization: Bearer ${AUTH_SECRET}" \
+     --data-urlencode 'thread_id=conversation-1' \
+     --data-urlencode 'user_id=user-1'
+
+.. code-block:: json
+
+   {
+     "messages": [],
+     "next_offset": null,
+     "total": 0,
+     "pending_interrupts": [
+       {
+         "id": "actual-interrupt-id",
+         "value": {
+           "type": "mcp_elicitation",
+           "tool_name": "save_report",
+           "requests": [
+             {
+               "key": "destination",
+               "mode": "form",
+               "message": "Select a folder.",
+               "requested_schema": {
+                 "type": "object",
+                 "properties": {"folder": {"type": "string"}},
+                 "required": ["folder"]
+               }
+             }
+           ]
+         }
+       }
+     ]
+   }
+
+The example shows an empty message page with a pending question.
+Every page includes all current pending interrupts.
+Message pagination does not limit this field.
+History reads use the saved state and do not call the remote tool.
+Use the saved IDs to resume after a worker restart or a lost invoke response.
+An empty list means that the saved conversation has no pending interrupts.
+Recovery requires a saved checkpoint.
+``NoOpSaver`` does not save pending questions.
+
+Send structured answers
+~~~~~~~~~~~~~~~~~~~~~~~
 
 For one pending interrupt, put the answers in ``input.responses``:
 
@@ -245,6 +319,49 @@ Legacy MCP tool calls are supported.
 Legacy server-pushed elicitation is not supported by this integration.
 Use the modern input-required protocol for interrupt and resume.
 
+Use the Streamlit UI
+~~~~~~~~~~~~~~~~~~~~
+
+The included UI shows forms for MCP questions.
+It reads pending questions from history when a conversation opens.
+It also reads them from invoke, SSE, and JSON Lines responses.
+Forms support basic strings, enums, booleans, numbers, and arrays of strings.
+For advanced schemas, enter a JSON object and follow the displayed schema.
+The API checks answer keys, actions, and MCP wire types before resume.
+The MCP server must check the requested form schema and its constraints.
+
+For a URL request, complete the linked operation before you select ``accept``.
+Use ``decline`` or ``cancel`` when you do not want to supply the requested input.
+The UI sends all answers with their request keys.
+It uses actual interrupt IDs for parallel questions.
+Ordinary chat input is unavailable while an MCP question needs an answer.
+After a failed resume request, the UI reads history before it sends more input.
+
+Read tool-result metadata
+-------------------------
+
+Tool messages include ``tool_status`` with ``success`` or ``error``.
+MCP results with structured content also include ``tool_artifact``:
+
+.. code-block:: json
+
+   {
+     "type": "tool",
+     "content": "Report saved.",
+     "tool_call_id": "call-1",
+     "tool_status": "success",
+     "tool_artifact": {
+       "structured_content": {"report_id": "report-1"}
+     }
+   }
+
+SSE, JSON Lines, and history preserve these fields.
+The artifact contains only JSON-safe MCP ``structured_content`` objects.
+Other Python artifacts remain outside the HTTP response.
+Messages without a supported artifact use ``tool_artifact=null``.
+An MCP tool error can use ``tool_status=error`` without failing the HTTP request.
+Check this field when application code handles tool results directly.
+
 Add MCP tools to a custom agent
 -------------------------------
 
@@ -306,6 +423,28 @@ For direct Python use, discover tools explicitly:
 Call the resulting graph with ``ainvoke`` or ``astream``.
 MCP tools use asynchronous operations.
 Direct Python callers must supply a checkpointer for elicitation.
+
+The example closes HTTP resources after each discovery or tool call.
+Use ``MCPTransportManager`` to reuse HTTP connections across calls:
+
+.. code-block:: python
+
+   from langchain.agents import create_agent
+
+   from langgraph_agent_toolkit.core.mcp import MCPTransportManager, load_mcp_tools
+
+
+   async def run_agent(servers, model):
+       async with MCPTransportManager() as manager:
+           tools_by_server = await load_mcp_tools(servers, manager=manager)
+           tools = [tool for group in tools_by_server.values() for tool in group]
+           graph = create_agent(model=model, tools=tools)
+           return await graph.ainvoke({"messages": [("user", "Find the report.")]})
+
+Keep the manager open until all graph calls finish.
+Use one manager in one event loop.
+Do not call its tools after the manager closes.
+The API service supplies this manager through its worker lifespan.
 
 The service configuration does not start an interactive OAuth flow.
 Use a custom ``fastmcp.Client`` and ``MCPAdapter`` in application code for advanced

@@ -11,6 +11,7 @@ from psycopg_pool import AsyncConnectionPool
 
 from langgraph_agent_toolkit.core.memory.concurrency import ConversationLockLostError, postgres_lock_session
 from langgraph_agent_toolkit.core.memory.schema_lock import schema_setup_lock
+from langgraph_agent_toolkit.core.memory.threads import POSTGRES_THREAD_INDEX
 
 
 class CoordinatedPostgresSaver(AsyncPostgresSaver):
@@ -20,6 +21,8 @@ class CoordinatedPostgresSaver(AsyncPostgresSaver):
     same session. A disconnected session cannot write through a replacement
     connection after another worker acquires the conversation lock.
     """
+
+    _lat_thread_listing_indexed = True
 
     def __init__(self, conn, pipe=None, serde=None):
         super().__init__(conn, pipe=pipe, serde=serde)
@@ -31,6 +34,14 @@ class CoordinatedPostgresSaver(AsyncPostgresSaver):
             async with schema_setup_lock(cursor, "langgraph-agent-toolkit:checkpoint-setup"):
                 scoped = AsyncPostgresSaver(cursor.connection, pipe=self.pipe, serde=self.serde)
                 await scoped.setup()
+                await cursor.execute(
+                    "SELECT indisvalid FROM pg_index WHERE indexrelid = to_regclass('lat_checkpoint_thread_heads_idx')"
+                )
+                index = await cursor.fetchone()
+                if index is not None and not index["indisvalid"]:
+                    # A failed concurrent build can leave an unusable index.
+                    await cursor.execute("DROP INDEX CONCURRENTLY IF EXISTS lat_checkpoint_thread_heads_idx")
+                await cursor.execute(POSTGRES_THREAD_INDEX)
 
     async def alist(
         self,

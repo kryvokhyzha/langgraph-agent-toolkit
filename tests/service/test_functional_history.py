@@ -10,7 +10,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.func import entrypoint
 from langgraph.graph import END, START, MessagesState, StateGraph
@@ -36,7 +36,7 @@ async def reply(messages):
     return await FakeListChatModel(responses=[f"answer {count}"]).ainvoke(messages)
 
 
-@pytest.fixture(params=["functional", "stategraph"])
+@pytest.fixture(params=["functional", "stategraph", "subgraph"])
 def history_service(request, monkeypatch, tmp_path):
     if request.param == "functional":
 
@@ -52,8 +52,17 @@ def history_service(request, monkeypatch, tmp_path):
 
         graph = workflow
     else:
+        child = None
+        if request.param == "subgraph":
+            child_builder = StateGraph(MessagesState)
+            child_builder.add_node("private_reply", lambda state: {"messages": [AIMessage("Private child reply.")]})
+            child_builder.add_edge(START, "private_reply")
+            child_builder.add_edge("private_reply", END)
+            child = child_builder.compile(checkpointer=True)
 
         async def node(state):
+            if child is not None:
+                await child.ainvoke({"messages": [HumanMessage("Private child input.")]})
             return {"messages": [await reply(state["messages"])]}
 
         builder = StateGraph(MessagesState)
@@ -157,6 +166,69 @@ def test_existing_checkpoint_append_stream_and_clear_keep_the_history_contract(h
         assert response.status_code == 200, response.text
         assert response.json()["content"] == "answer 1"
         assert read_history(client) == ["fresh", "answer 1"]
+
+
+def test_history_pages_read_only_the_root_snapshot_without_scanning_checkpoints(history_service, monkeypatch):
+    """Keep checkpoint reads bounded as turns and subgraph checkpoints increase."""
+
+    async def seed_conversations():
+        async with AsyncSqliteSaver.from_conn_string(str(history_service.database)) as saver:
+            graph = copy(history_service.graph)
+            graph.checkpointer = saver
+            for thread, turns in (("short", 1), ("long", 30)):
+                config = {"configurable": {"thread_id": storage_thread_id("owner", "history-agent", thread)}}
+                for turn in range(turns):
+                    await graph.ainvoke({"messages": [HumanMessage(f"question {turn + 1}")]}, config)
+            if history_service.kind == "subgraph":
+                assert any([bool(row.config["configurable"]["checkpoint_ns"]) async for row in saver.alist(config)])
+
+    asyncio.run(seed_conversations())
+    monkeypatch.setattr(settings, "HISTORY_MAX_PAGE_SIZE", 2)
+    with TestClient(history_service.app) as client:
+        saver = client.app.state.agent_executor.get_agent("history-agent").graph.checkpointer
+        reads = []
+        scans = []
+        original_get = saver.aget_tuple
+        original_list = saver.alist
+
+        async def recorded_get(config):
+            reads.append(config)
+            return await original_get(config)
+
+        async def recorded_list(*args, **kwargs):
+            scans.append((args, kwargs))
+            async for row in original_list(*args, **kwargs):
+                yield row
+
+        monkeypatch.setattr(saver, "aget_tuple", recorded_get)
+        monkeypatch.setattr(saver, "alist", recorded_list)
+        read_counts = []
+        for thread, offset, expected, total, next_offset in (
+            ("short", 0, ["question 1", "answer 1"], 2, None),
+            ("long", 0, ["question 1", "answer 1"], 60, 2),
+            ("long", 58, ["question 30", "answer 30"], 60, None),
+            ("long", 61, [], 60, None),
+        ):
+            reads.clear()
+            response = client.get(
+                "/history", headers=HEADERS, params={"thread_id": thread, "offset": offset, "limit": 1000}
+            )
+            assert response.status_code == 200, response.text
+            body = response.json()
+            assert [message["content"] for message in body["messages"]] == expected
+            assert body["total"] == total
+            assert body["next_offset"] == next_offset
+            assert not scans
+            assert all(not config["configurable"].get("checkpoint_ns") for config in reads)
+            read_counts.append(len(reads))
+        assert len(set(read_counts)) == 1
+        assert 1 <= read_counts[0] <= 2
+
+        reads.clear()
+        response = client.get("/history", headers=HEADERS, params={"thread_id": "long", "limit": 999999})
+        assert response.status_code == 422
+        assert not reads
+        assert not scans
 
 
 async def test_functional_append_preserves_other_saved_fields_and_message_ids(tmp_path):

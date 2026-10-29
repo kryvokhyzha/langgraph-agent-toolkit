@@ -5,6 +5,7 @@ from typing import Annotated, Any, Dict, Literal, Mapping, Optional
 
 from dotenv import find_dotenv
 from pydantic import (
+    AfterValidator,
     BeforeValidator,
     Field,
     HttpUrl,
@@ -15,11 +16,16 @@ from pydantic import (
 )
 from pydantic_settings import BaseSettings, EnvSettingsSource, SettingsConfigDict
 
+from langgraph_agent_toolkit.core.config_secrets import protect_config_secrets
 from langgraph_agent_toolkit.core.mcp import MCPServerConfig, ServerName
 from langgraph_agent_toolkit.core.memory.types import MemoryBackends
 from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
+from langgraph_agent_toolkit.core.tool_selection_config import ToolSelectionConfig
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.helper.types import EnvironmentMode
+
+
+ProviderConfigs = Annotated[Dict[str, Dict[str, Any]], AfterValidator(protect_config_secrets)]
 
 
 def check_str_is_http(x: str) -> str:
@@ -33,6 +39,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_ignore_empty=True,
         extra="ignore",
+        hide_input_in_errors=True,
         validate_default=False,
     )
     ENV_MODE: EnvironmentMode = EnvironmentMode.PRODUCTION
@@ -118,6 +125,8 @@ class Settings(BaseSettings):
     MCP_AGENT_SERVERS: dict[str, list[ServerName]] = Field(default_factory=dict)
     MCP_DISCOVERY_TIMEOUT: float = Field(default=30.0, gt=0, allow_inf_nan=False)
 
+    TOOL_SELECTION: ToolSelectionConfig = Field(default_factory=ToolSelectionConfig)
+
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"
     LANGCHAIN_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "https://api.smith.langchain.com"
@@ -133,6 +142,11 @@ class Settings(BaseSettings):
     LANGFUSE_TIMEOUT: int = 5
     LANGFUSE_DEBUG: bool = False
     LANGFUSE_SAMPLE_RATE: float = 1.0
+
+    PHOENIX_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "http://localhost:6006"
+    PHOENIX_PROJECT_NAME: str = Field(default="langgraph-agent-toolkit", min_length=1)
+    PHOENIX_API_KEY: SecretStr | None = None
+    PHOENIX_TIMEOUT: float = Field(default=5.0, gt=0, allow_inf_nan=False)
 
     # Database configuration.
     MEMORY_BACKEND: MemoryBackends | None = None
@@ -193,13 +207,13 @@ class Settings(BaseSettings):
     )
 
     # Model configuration dictionary.
-    MODEL_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
-    MODEL_CONFIGS_BASE64: str | None = None
+    MODEL_CONFIGS: ProviderConfigs = Field(default_factory=dict)
+    MODEL_CONFIGS_BASE64: SecretStr | None = None
     MODEL_CONFIGS_PATH: str | None = None
 
     # Database configuration dictionary.
-    DB_CONFIGS: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
-    DB_CONFIGS_BASE64: str | None = None
+    DB_CONFIGS: ProviderConfigs = Field(default_factory=dict)
+    DB_CONFIGS_BASE64: SecretStr | None = None
     DB_CONFIGS_PATH: str | None = None
 
     # Agent configuration.
@@ -308,11 +322,16 @@ class Settings(BaseSettings):
         for name, value in overrides.items():
             adapter = TypeAdapter(fields[name].rebuild_annotation())
             try:
-                validated[name] = adapter.validate_python(value)
-            except ValidationError:
-                if not isinstance(value, str):
-                    raise
-                validated[name] = adapter.validate_json(value)
+                try:
+                    validated[name] = adapter.validate_python(value)
+                except ValidationError:
+                    if not isinstance(value, str):
+                        raise
+                    validated[name] = adapter.validate_json(value)
+            except ValidationError as error:
+                raise ValidationError.from_exception_data(
+                    error.title, error.errors(include_url=False), hide_input=True
+                ) from None
         for name, value in validated.items():
             setattr(self, name, value)
             logger.debug(f"Applied environment override for {name}")
@@ -332,14 +351,14 @@ class Settings(BaseSettings):
         path = getattr(self, f"{field_name}_PATH")
         try:
             if encoded:
-                raw = base64.b64decode(encoded, validate=True).decode("utf-8")
+                raw = base64.b64decode(encoded.get_secret_value(), validate=True).decode("utf-8")
                 parsed = json.loads(raw)
             elif path:
                 with open(path, "r", encoding="utf-8") as config_file:
                     parsed = json.load(config_file)
             else:
                 return configs
-            return TypeAdapter(Dict[str, Dict[str, Any]]).validate_python(parsed)
+            return TypeAdapter(ProviderConfigs, config={"hide_input_in_errors": True}).validate_python(parsed)
         except (OSError, ValueError) as error:
             raise ValueError(f"Invalid {field_name} configuration source") from error
 

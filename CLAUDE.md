@@ -11,8 +11,8 @@ library, not a monorepo. It has one installable package
 (`langgraph_agent_toolkit/`) and Docker/CI infrastructure.
 
 Key components include a **LiteLLM** proxy for multi-provider LLMs, PostgreSQL /
-SQLite checkpointers for memory, and **Langfuse / LangSmith** for observability
-and prompt management. Almost all subsystems use a **factory +
+SQLite checkpointers for memory, and **Langfuse / LangSmith / Phoenix** for
+observability and prompt management. Almost all subsystems use a **factory +
 Pydantic-settings** pattern. See
 [Architecture & core patterns](#architecture--core-patterns).
 
@@ -148,6 +148,17 @@ Also follow these conventions:
 - Use `pydantic` for data models and configuration validation.
 - Add type hints to new code. Tests can use fewer type hints.
 
+## Public content boundaries
+
+Keep all toolkit files and public artifacts client-neutral. Never include
+customer names, client repository paths, private deployment URLs, or
+client-specific migration instructions in code or public documentation. This
+rule also applies to comments, docstrings, tests, examples, release notes, and
+repository guidance. Use generic identities and example domains. Keep
+client-specific notes in private, ignored working files or in the client's
+repository. Do not link to those notes from toolkit documentation. Check source
+files and built documentation before sharing release artifacts.
+
 ## Configuration & settings
 
 Use one global settings singleton:
@@ -193,9 +204,10 @@ This pattern applies to **models** (`CompletionModelFactory`/
 `EmbeddingModelFactory`; OpenAI uses `ChatOpenAIPatched`; other models use
 LangChain `init_chat_model`; `FAKE` uses `FakeToolModel`). It also applies to
 **memory** (`POSTGRES`/`SQLITE`; SQLite has no store), **observability**
-(`LANGFUSE`/`LANGSMITH`/`EMPTY`; lazy imports keep optional dependencies
-optional), and **prompts** (`PromptManager` + `ObservabilityChatPromptTemplate`;
-files are the source of truth and Jinja2 renders them).
+(`LANGFUSE`/`LANGSMITH`/`PHOENIX`/`EMPTY`; lazy imports keep optional
+dependencies optional), and **prompts** (`PromptManager` +
+`ObservabilityChatPromptTemplate`; files are the source of truth and Jinja2
+renders them).
 
 **Register agents with import strings, not filesystem scans.** `AgentExecutor`
 reads `"module.path:object"` strings from `settings.AGENT_PATHS` and imports
@@ -275,11 +287,11 @@ resume answers. Keep `CHECK_INTERRUPTS=True` for this feature.
   requests. Normal tests skip them. See `docs/live_llm_testing.rst`.
 - **Docker checks** require `--run-docker`. They check API behavior, frontend
   health, and HTML. They do not test browser interaction.
-- **Langfuse SDK tests** run SDK 2.60.10, 3.15.0, and 4.15.2 on Python
-  3.11–3.14. Select the matching `langfuse-v2`, `langfuse-v3`, or `langfuse-v4`
-  extra and pin the exact SDK baseline in each test environment. Live server
-  tests require `--run-langfuse` and a dedicated project configured through
-  `LAT_TEST_LANGFUSE_*`. Missing explicit configuration causes failure.
+- **Langfuse SDK tests** run SDK 2.60.10, 3.15.0, 4.18.0, and 5.0.4 on Python
+  3.11–3.14. Select the matching `langfuse-v2`, `langfuse-v3`, `langfuse-v4`, or
+  `langfuse-v5` extra and pin the exact SDK baseline in each test environment.
+  Live server tests require `--run-langfuse` and a dedicated project configured
+  through `LAT_TEST_LANGFUSE_*`. Missing explicit configuration causes failure.
 - **Coverage** includes the whole package, including blueprints, UI, and legacy
   creators. `.coveragerc` enables branches and subprocess collection. The 77%
   floor measures combined line and branch coverage. It is not a pure branch
@@ -295,19 +307,20 @@ resume answers. Keep `CHECK_INTERRUPTS=True` for this feature.
   providers are `openai`, `anthropic`, `google-vertexai`, `google-genai`, `aws`,
   and `all-llms`. Service backends are `uvicorn-backend`, `gunicorn-backend`,
   `aws-backend`, and `azure-backend`. Observability extras are `langfuse`,
-  `langfuse-v2`, `langfuse-v3`, `langfuse-v4`, `langsmith`, and
-  `all-observability`. The selectors require SDK `>=2.60.10,<3`, `>=3.15.0,<4`,
-  and `>=4.15.2,<5`, respectively. Use only one selector. Generic `langfuse`
-  permits `>=2.60.10,<5` and can combine with any one selector. These extras
-  select the SDK, not the server version. Their canonical names use hyphens;
-  package tools normalize underscore spellings such as `langfuse_v2`.
+  `langfuse-v2`, `langfuse-v3`, `langfuse-v4`, `langfuse-v5`, `langsmith`,
+  `phoenix`, and `all-observability`. The selectors require SDK `>=2.60.10,<3`,
+  `>=3.15.0,<4`, `>=4.18.0,<5`, and `>=5.0.4,<6`, respectively. Use only one
+  selector. Generic `langfuse` permits `>=2.60.10,<6` and can combine with any
+  one selector. These extras select the SDK, not the server version. Their
+  canonical names use hyphens; package tools normalize underscore spellings such
+  as `langfuse_v2`.
 - **All features**: Replace `--all-extras` with `--extra all`. The old flag
-  selects all three incompatible SDK selectors. The `all` extra includes every
+  selects all four incompatible SDK selectors. The `all` extra includes every
   feature through the existing umbrella extras and does not force a selector.
-  The default lockfile selection uses SDK v4. Use
-  `--extra all --extra langfuse-v2` for the same features with SDK v2 when all
-  requirements are compatible. `all-observability` still includes generic
-  `langfuse` and `langsmith`.
+  The default lockfile selection uses SDK v5. SDK v5 requires server >=4.59.0;
+  use `langfuse-v4` for server v3. Use `--extra all --extra langfuse-v2` for the
+  same features with SDK v2 when all requirements are compatible.
+  `all-observability` includes generic `langfuse`, `langsmith`, and `phoenix`.
 - **Dev / lint / test / docs**: Use the matching `[dependency-groups]` group.
   Groups are local source-checkout tools, not published wheel extras. The
   `client` group is the minimal Streamlit-only set.
@@ -340,7 +353,7 @@ Langfuse stack. The Langfuse stack contains postgres, redis, clickhouse, minio,
 langfuse-web :3000, and langfuse-worker. Postgres creates three DBs (`agents`,
 `litellm`, `langfuse`) and a `checkpoints` schema through
 `scripts/postgres-init/`. Both application images use multi-stage
-`python:3.13-slim` builds. The builder uses `uv`; the runtime contains its
+`python:3.13.18-slim` builds. The builder uses `uv`; the runtime contains its
 virtual environment and application source. Both runtime images install `curl`
 for health probes. Use `make rebuild_api` / `make rebuild_app` to rebuild one
 service.

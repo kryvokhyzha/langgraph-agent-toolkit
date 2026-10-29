@@ -31,6 +31,8 @@ updates:
       timezone: "Europe/Kyiv"
     cooldown:
       default-days: 7
+      exclude:
+        - "certifi"
     groups:
       # Keep security fixes separate from routine updates.
       python-security:
@@ -58,6 +60,8 @@ updates:
         patterns:
           - "langfuse"
           - "langsmith"
+          - "arize-phoenix*"
+          - "openinference*"
           - "opentelemetry*"
         update-types:
           - "minor"

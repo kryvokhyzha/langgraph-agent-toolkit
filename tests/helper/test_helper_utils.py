@@ -8,7 +8,7 @@ from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
 from langgraph.prebuilt.chat_agent_executor import _validate_chat_history
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message, sanitize_chat_history
 from langgraph_agent_toolkit.schema import ChatMessage
@@ -88,6 +88,62 @@ class TestLangchainToChatMessage:
         assert result.type == "tool"
         assert result.content == "Weather is sunny, 25°C"
         assert result.tool_call_id == "call_123"
+        assert result.tool_status == "success"
+
+    def test_tool_metadata_keeps_only_mcp_structured_content(self):
+        structured = {"items": [1, None, True, {"answer": "value"}]}
+        source = ToolMessage(
+            content="result",
+            tool_call_id="call_123",
+            status="error",
+            artifact={"structured_content": structured, "private_state": object()},
+        )
+        result = langchain_to_chat_message(source)
+        assert result.tool_status == "error"
+        assert result.tool_artifact == {"structured_content": structured}
+        assert result.tool_artifact["structured_content"] is not structured
+        assert ChatMessage.model_validate_json(result.model_dump_json()) == result
+
+    @pytest.mark.parametrize(
+        "artifact",
+        [
+            object(),
+            {"private_state": "hidden"},
+            {"structured_content": object()},
+            {"structured_content": {"nested": object()}},
+            {"structured_content": {1: "invalid key"}},
+            {"structured_content": {"nested": {"value"}}},
+            {"structured_content": {"nested": ("tuple",)}},
+            {"structured_content": {"nested": float("nan")}},
+            {"structured_content": {"nested": float("inf")}},
+        ],
+    )
+    def test_unsupported_tool_artifact_does_not_break_message_conversion(self, artifact):
+        source = ToolMessage(content="result", tool_call_id="call_123", artifact=artifact)
+        result = langchain_to_chat_message(source)
+        assert result.content == "result"
+        assert result.tool_status == "success"
+        assert result.tool_artifact is None
+
+    def test_circular_tool_artifact_is_not_exposed(self):
+        structured = {}
+        structured["self"] = structured
+        result = langchain_to_chat_message(
+            ToolMessage(content="result", tool_call_id="call_123", artifact={"structured_content": structured})
+        )
+        assert result.tool_artifact is None
+
+    @pytest.mark.parametrize("role", ["human", "ai", "custom"])
+    def test_tool_metadata_requires_a_tool_message(self, role):
+        with pytest.raises(ValidationError, match="require a tool message"):
+            ChatMessage(type=role, content="message", tool_status="success")
+
+    @pytest.mark.parametrize(
+        "artifact", [{"private": "hidden"}, {"structured_content": []}, {"structured_content": {"bad": float("nan")}}]
+    )
+    def test_message_contract_rejects_unsupported_tool_artifacts(self, artifact):
+        with pytest.raises(ValidationError):
+            ChatMessage(type="tool", content="message", tool_artifact=artifact)
 
     def test_tool_message_with_list_content(self):
         """Test converting ToolMessage with list content."""

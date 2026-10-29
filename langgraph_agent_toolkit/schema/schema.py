@@ -1,6 +1,7 @@
+import json
 from typing import Any, Dict, List, Literal, NotRequired
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, JsonValue, field_validator, model_validator
 from typing_extensions import TypedDict
 
 from langgraph_agent_toolkit.core.settings import settings
@@ -214,6 +215,12 @@ class ChatMessage(BaseModel):
         default=None,
         examples=["call_Jja7J89XsjrOLA5r!MEOW!SL"],
     )
+    tool_status: Literal["success", "error"] | None = Field(
+        default=None, description="Tool execution status. Available only for tool messages."
+    )
+    tool_artifact: dict[str, JsonValue] | None = Field(
+        default=None, description="JSON-safe MCP structured_content. Available only for tool messages."
+    )
     run_id: str | None = Field(
         description="Run ID of the message.",
         default=None,
@@ -238,6 +245,19 @@ class ChatMessage(BaseModel):
         description="Custom message data.",
         default={},
     )
+
+    @model_validator(mode="after")
+    def _validate_tool_metadata(self):
+        """Keep tool metadata on tool messages."""
+        if self.type != "tool" and (self.tool_status is not None or self.tool_artifact is not None):
+            raise ValueError("tool_status and tool_artifact require a tool message.")
+        if self.tool_artifact is not None:
+            if set(self.tool_artifact) != {"structured_content"} or not isinstance(
+                self.tool_artifact["structured_content"], dict
+            ):
+                raise ValueError("tool_artifact must contain only an MCP structured_content object.")
+            json.dumps(self.tool_artifact, allow_nan=False)
+        return self
 
     def pretty_repr(self) -> str:
         """Get a readable message representation."""
@@ -299,7 +319,7 @@ class Feedback(BaseModel):
         examples=["521c0a60-ea75-43fa-a793-a4cf11e013ae"],
     )
     kwargs: dict[str, Any] = Field(
-        description="Additional feedback kwargs, passed to LangSmith.",
+        description="Additional feedback kwargs for the selected observability backend.",
         default={},
         examples=[{"comment": "In-line human feedback"}],
     )
@@ -456,6 +476,37 @@ class ChatHistory(BaseModel):
     messages: list[ChatMessage]
     next_offset: int | None = None
     total: int | None = None
+    pending_interrupts: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="All pending interrupt IDs and values. Message pagination does not limit them.",
+    )
+
+
+class ThreadListInput(BaseModel):
+    """Select one page of conversations for one owner and agent."""
+
+    user_id: str | None = Field(default=None, min_length=1, max_length=256)
+    limit: int = Field(default=100, ge=1, le=100, description="Maximum number of conversations to return.")
+    cursor: str | None = Field(
+        default=None, min_length=1, max_length=2048, description="Use next_cursor from the previous page."
+    )
+
+
+class ThreadSummary(BaseModel):
+    """Identify one saved conversation without loading its messages."""
+
+    thread_id: str
+    agent_id: str
+
+
+class ThreadList(BaseModel):
+    """Return conversations in creation order, with the newest first."""
+
+    threads: list[ThreadSummary]
+    next_cursor: str | None = Field(
+        default=None,
+        description="Continue with this cursor, even when this page is empty. None marks the end.",
+    )
 
 
 class HealthCheck(BaseModel):

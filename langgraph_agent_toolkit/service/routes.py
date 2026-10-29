@@ -8,7 +8,12 @@ from langchain_core.messages import ChatMessage as LangchainChatMessage
 from langchain_core.runnables import RunnableConfig
 
 from langgraph_agent_toolkit import __version__
-from langgraph_agent_toolkit.agents.agent_executor import add_graph_history, get_graph_history
+from langgraph_agent_toolkit.agents.agent_executor import add_graph_history, get_graph_conversation
+from langgraph_agent_toolkit.core.memory.threads import (
+    InvalidThreadCursor,
+    ThreadListingUnsupported,
+    list_threads,
+)
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.constants import get_default_agent
 from langgraph_agent_toolkit.helper.utils import langchain_to_chat_message
@@ -31,9 +36,17 @@ from langgraph_agent_toolkit.schema import (
     StartupResponse,
     StreamChunk,
     StreamInput,
+    ThreadList,
+    ThreadListInput,
+    ThreadSummary,
     UserInput,
 )
-from langgraph_agent_toolkit.service.auth import conversation_identity, execution_input
+from langgraph_agent_toolkit.service.auth import (
+    authenticated_user_id,
+    conversation_identity,
+    execution_input,
+    storage_thread_id,
+)
 from langgraph_agent_toolkit.service.feedback import authorize_feedback, sign_feedback_message
 from langgraph_agent_toolkit.service.responses import ClosingStreamingResponse as StreamingResponse
 from langgraph_agent_toolkit.service.utils import (
@@ -118,6 +131,7 @@ async def invoke(user_input: UserInput, agent_id: str = None, request: Request =
         model_config_key=user_input.model_config_key,
         agent_config=user_input.agent_config,
         recursion_limit=user_input.recursion_limit,
+        trace_session_id=public_id,
     )
     response.thread_id = public_id
     return sign_feedback_message(request, agent_id, response)
@@ -285,13 +299,13 @@ async def history(
     agent_id: str | None = None,
     request: Request = None,
 ) -> ChatHistory:
-    """Get short-term chat history for one thread."""
+    """Get saved messages and all pending interrupts for one thread."""
     agent_id = agent_id or get_default_agent()
     _, owner, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
     executor = get_agent_executor(request)
     agent = get_agent(request, agent_id)
     async with executor.concurrency.lock(key):
-        messages = await get_graph_history(
+        messages, pending_interrupts = await get_graph_conversation(
             agent.graph, RunnableConfig(configurable={"thread_id": key, "user_id": owner})
         )
         limit = min(input.limit, settings.HISTORY_MAX_PAGE_SIZE)
@@ -301,7 +315,51 @@ async def history(
             messages=[langchain_to_chat_message(m) for m in page],
             total=len(messages),
             next_offset=next_offset if next_offset < len(messages) else None,
+            pending_interrupts=pending_interrupts,
         )
+
+
+@private_router.get(
+    "/threads",
+    tags=["history"],
+    summary="List saved conversations for the default agent",
+    responses={501: {"model": ErrorResponse, "description": "The checkpointer does not support thread listing"}},
+)
+@private_router.get(
+    "/{agent_id}/threads",
+    operation_id="threads_with_agent_id",
+    tags=["history"],
+    summary="List saved conversations for a specific agent",
+    responses={501: {"model": ErrorResponse, "description": "The checkpointer does not support thread listing"}},
+)
+async def threads(
+    input: ThreadListInput = Depends(),
+    agent_id: str | None = None,
+    request: Request = None,
+) -> ThreadList:
+    """List one owner's conversations without loading checkpoint messages."""
+    agent_id = agent_id or get_default_agent()
+    if "\x00" in agent_id:
+        raise HTTPException(422, "Conversation identifiers must not contain NUL characters")
+    owner = authenticated_user_id(request, input.user_id)
+    agent = get_agent(request, agent_id)
+    try:
+        page = await list_threads(
+            agent.graph.checkpointer,
+            user_id=owner,
+            agent_id=agent_id,
+            storage_key=lambda public_id: storage_thread_id(owner, agent_id, public_id),
+            limit=input.limit,
+            cursor=input.cursor,
+        )
+    except InvalidThreadCursor as exc:
+        raise HTTPException(422, "Invalid conversation cursor for this owner and agent") from exc
+    except ThreadListingUnsupported as exc:
+        raise HTTPException(501, "This checkpointer does not support thread listing") from exc
+    return ThreadList(
+        threads=[ThreadSummary(thread_id=item.thread_id, agent_id=item.agent_id) for item in page.threads],
+        next_cursor=page.next_cursor,
+    )
 
 
 @private_router.delete(
@@ -384,7 +442,10 @@ async def add_messages(
                 messages.append(message.model_dump(exclude_none=True, exclude={"custom_data"}))
         await add_graph_history(
             agent.graph,
-            config=RunnableConfig(configurable={"thread_id": key, "user_id": owner}),
+            config=RunnableConfig(
+                configurable={"thread_id": key, "user_id": owner},
+                metadata={"lat_user_id": owner, "lat_agent_id": agent_id, "lat_thread_id": public_id},
+            ),
             messages=messages,
         )
     return AddMessagesResponse(

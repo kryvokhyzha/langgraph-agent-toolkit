@@ -1,7 +1,7 @@
 import asyncio
 import threading
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.core.observability.types import ChatMessageDict, MessageRole, ObservabilityBackend
@@ -20,6 +20,7 @@ class PromptManager:
         force_create_new_version: bool = False,
         template_format: str = "jinja2",
         load_at_runtime: bool = False,
+        prompt_metadata: dict[str, Any] | None = None,
     ):
         """Initialize `PromptManager` with configurable parameters.
 
@@ -29,6 +30,7 @@ class PromptManager:
             force_create_new_version: Force new prompt versions.
             template_format: Prompt template format. The default is "jinja2".
             load_at_runtime: Load prompts at runtime. The default is `False`.
+            prompt_metadata: Metadata for prompt creation in the selected backend.
 
         """
         self._prompt_cache: Dict[str, ObservabilityChatPromptTemplate] = {}
@@ -42,6 +44,7 @@ class PromptManager:
         self._force_create_new_version = force_create_new_version
         self._template_format = template_format
         self._load_at_runtime = load_at_runtime
+        self._prompt_metadata = dict(prompt_metadata) if prompt_metadata is not None else None
 
     @property
     def observability(self):
@@ -108,6 +111,7 @@ class PromptManager:
             name=prompt_name,
             prompt_template=prompt_template,
             force_create_new_version=self._force_create_new_version,
+            **({"metadata": dict(self._prompt_metadata)} if self._prompt_metadata is not None else {}),
         )
 
         return self._cache_prompt(prompt_name, input_variables, partial_variables)

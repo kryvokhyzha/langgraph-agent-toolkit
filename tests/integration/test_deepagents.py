@@ -1,5 +1,7 @@
 """Run DeepAgents tools through real graphs and the toolkit service."""
 
+import base64
+import hashlib
 import importlib
 import sys
 from types import ModuleType
@@ -9,6 +11,8 @@ import pytest
 from fastapi.testclient import TestClient
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from langgraph.store.memory import InMemoryStore
 from pydantic import Field, SecretStr
 
 from langgraph_agent_toolkit.agents.agent import Agent
@@ -23,6 +27,8 @@ from langgraph_agent_toolkit.service.handler import create_app
 
 pytest.importorskip("deepagents")
 blueprint = importlib.import_module("langgraph_agent_toolkit.agents.blueprints.deep_agent.agent")
+backends = importlib.import_module("deepagents.backends")
+filesystem_middleware = importlib.import_module("deepagents.middleware.filesystem").FilesystemMiddleware
 HEADERS = {"Authorization": "Bearer deepagents-test-credential"}
 
 
@@ -227,3 +233,183 @@ async def test_mcp_tool_runs_once_and_closes_its_connection(monkeypatch, fail_af
     if not fail_after_write:
         assert messages[0].artifact == {"structured_content": {"saved": "one"}}
     assert not adapter.client.is_connected()
+
+
+def binary_message(payload: bytes):
+    return HumanMessage(
+        content=[
+            {"type": "text", "text": "Describe this image."},
+            {"type": "image", "base64": base64.b64encode(payload).decode("ascii"), "mime_type": "image/png"},
+        ]
+    )
+
+
+def binary_backend(directory):
+    return backends.CompositeBackend(
+        default=backends.StateBackend(),
+        routes={"/blobs/": backends.FilesystemBackend(root_dir=directory, virtual_mode=True)},
+    )
+
+
+async def test_binary_content_stays_inline_by_default():
+    payload = b"synthetic image bytes"
+    model = ScriptedModel(responses=[AIMessage("Image received.")])
+    result = await blueprint.build_graph(model=model).ainvoke({"messages": [binary_message(payload)]})
+    assert result["messages"][0].content[1]["base64"] == base64.b64encode(payload).decode("ascii")
+    assert "deepagents_blob" not in result["messages"][0].content[1]
+
+
+@pytest.mark.parametrize("blob_state", ["present", "missing", "corrupt"])
+async def test_binary_references_survive_restart_and_handle_unavailable_blobs(tmp_path, blob_state):
+    payload = b"synthetic image bytes" * 200
+    encoded = base64.b64encode(payload).decode("ascii")
+    digest = hashlib.sha256(payload).hexdigest()
+    config = {"configurable": {"thread_id": "binary-restart"}}
+    directory = tmp_path / "blobs"
+    directory.mkdir()
+    database = str(tmp_path / "checkpoints.sqlite")
+    model = ScriptedModel(responses=[AIMessage("Image received.")])
+    graph = blueprint.build_graph(model=model, backend=binary_backend(directory), offload_binary_content=True)
+    async with AsyncSqliteSaver.from_conn_string(database) as saver:
+        graph.checkpointer = saver
+        await graph.ainvoke({"messages": [binary_message(payload)]}, config, durability="sync")
+        checkpoint = await saver.aget_tuple(config)
+        state = await graph.aget_state(config)
+        saved_image = state.values["messages"][0].content[1]
+        assert saved_image == {"type": "image", "mime_type": "image/png", "deepagents_blob": digest}
+        assert encoded not in str(checkpoint.checkpoint)
+        assert encoded not in str(state.values)
+        assert "_blob_payloads" not in checkpoint.checkpoint["channel_values"]
+        history = [state async for state in graph.aget_state_history(config)]
+        assert any(encoded in str(state.values.get("messages")) for state in history)
+        assert model.seen[-1][1].content[1]["base64"] == encoded
+    assert (directory / digest).read_bytes() == payload
+
+    if blob_state == "missing":
+        (directory / digest).unlink()
+    elif blob_state == "corrupt":
+        (directory / digest).write_bytes(b"wrong content")
+
+    restored_model = ScriptedModel(responses=[AIMessage("Conversation restored.")])
+    restored = blueprint.build_graph(
+        model=restored_model, backend=binary_backend(directory), offload_binary_content=True
+    )
+    async with AsyncSqliteSaver.from_conn_string(database) as saver:
+        restored.checkpointer = saver
+        result = await restored.ainvoke({"messages": [HumanMessage("Continue.")]}, config, durability="sync")
+        assert result["messages"][-1].content == "Conversation restored."
+        image = next(message for message in restored_model.seen[-1] if isinstance(message, HumanMessage)).content[1]
+        if blob_state == "present":
+            assert image["base64"] == encoded
+            assert "deepagents_blob" not in image
+        else:
+            assert image["type"] == "text"
+            assert "no longer available" in image["text"]
+            assert encoded not in str(restored_model.seen[-1])
+        saved = await restored.aget_state(config)
+        assert saved.values["messages"][0].content[1]["deepagents_blob"] == digest
+        await saver.adelete_thread(config["configurable"]["thread_id"])
+        assert await saver.aget_tuple(config) is None
+    if blob_state == "present":
+        assert (directory / digest).read_bytes() == payload
+
+
+def test_service_binary_storage_is_scoped_to_user_and_thread(monkeypatch, tmp_path):
+    store = InMemoryStore()
+    namespace = lambda runtime: ("binary", runtime.execution_info.thread_id)
+    backend = backends.CompositeBackend(
+        default=backends.StateBackend(), routes={"/blobs/": backends.StoreBackend(namespace=namespace)}
+    )
+    model = ScriptedModel(responses=[AIMessage("Image saved.")])
+    graph = blueprint.build_graph(model=model, backend=backend, store=store, offload_binary_content=True)
+    configure_service(monkeypatch, tmp_path, graph)
+    payload = b"private synthetic image"
+    encoded = base64.b64encode(payload).decode("ascii")
+    digest = hashlib.sha256(payload).hexdigest()
+    message = binary_message(payload).content
+    with TestClient(create_app()) as client:
+        for thread, user in [("first-thread", "user-1"), ("second-thread", "user-1"), ("first-thread", "user-2")]:
+            invoke(client, message, thread=thread, user=user)
+            key = storage_thread_id(user, "deep-agent", thread)
+            assert store.get(("binary", key), "/" + digest) is not None
+        assert len(store.list_namespaces()) == 3
+        model.responses = [call("read_file", file_path="/blobs/" + digest), AIMessage("Read attempt complete.")]
+        model.i = 0
+        for thread, user in [("third-thread", "user-1"), ("first-thread", "user-3")]:
+            invoke(client, "Read that blob.", thread=thread, user=user)
+            assert tool_results(model.seen[-1], "read_file")[0].status == "error"
+            assert all(encoded not in item.model_dump_json() for item in model.seen[-1])
+        response = client.request(
+            "DELETE",
+            "/deep-agent/history/clear",
+            headers=HEADERS,
+            json={"thread_id": "first-thread", "user_id": "user-1"},
+        )
+        assert response.status_code == 200, response.text
+        key = storage_thread_id("user-1", "deep-agent", "first-thread")
+        assert store.get(("binary", key), "/" + digest) is not None
+        model.responses = [AIMessage("The cleared conversation is empty.")]
+        model.i = 0
+        invoke(client, "The checkpoints were cleared.")
+        assert all(digest not in item.model_dump_json() for item in model.seen[-1])
+        assert all(encoded not in item.model_dump_json() for item in model.seen[-1])
+
+
+async def test_binary_read_results_are_offloaded_and_restored_for_the_model(tmp_path):
+    payload = b"synthetic image read result"
+    encoded = base64.b64encode(payload).decode("ascii")
+    backend = backends.FilesystemBackend(root_dir=tmp_path, virtual_mode=True)
+    uploaded = await backend.aupload_files([("/image.png", payload)])
+    assert uploaded[0].error is None
+    model = ScriptedModel(responses=[call("read_file", file_path="/image.png"), AIMessage("Image read.")])
+    graph = blueprint.build_graph(model=model, backend=backend, offload_binary_content=True)
+    result = await graph.ainvoke({"messages": [HumanMessage("Read /image.png.")]})
+    read = tool_results(result["messages"], "read_file")[0]
+    assert read.content[0]["deepagents_blob"] == hashlib.sha256(payload).hexdigest()
+    assert "base64" not in read.content[0]
+    seen = tool_results(model.seen[-1], "read_file")[0]
+    assert seen.content[0]["base64"] == encoded
+
+
+async def test_failed_blob_upload_keeps_the_original_media(monkeypatch, tmp_path):
+    backend = backends.FilesystemBackend(root_dir=tmp_path, virtual_mode=True)
+
+    async def unavailable(files):
+        raise OSError("The blob store is unavailable.")
+
+    monkeypatch.setattr(backend, "aupload_files", unavailable)
+    payload = b"media that must stay available"
+    encoded = base64.b64encode(payload).decode("ascii")
+    model = ScriptedModel(responses=[AIMessage("Image received.")])
+    graph = blueprint.build_graph(model=model, backend=backend, offload_binary_content=True)
+    result = await graph.ainvoke({"messages": [binary_message(payload)]})
+    assert result["messages"][0].content[1]["base64"] == encoded
+    assert model.seen[-1][1].content[1]["base64"] == encoded
+
+
+@pytest.mark.parametrize("offload_subagent", [False, True])
+async def test_named_subagents_control_their_own_binary_offloading(tmp_path, offload_subagent):
+    payload = b"synthetic specialist image"
+    backend = backends.FilesystemBackend(root_dir=tmp_path, virtual_mode=True)
+    await backend.aupload_files([("/image.png", payload)])
+    specialist = ScriptedModel(responses=[call("read_file", file_path="/image.png"), AIMessage("Image inspected.")])
+    parent = ScriptedModel(
+        responses=[
+            call("task", subagent_type="image-specialist", description="Read /image.png."),
+            AIMessage("Task complete."),
+        ]
+    )
+    subagent = {"name": "image-specialist", "description": "Inspect an image.", "model": specialist}
+    if offload_subagent:
+        subagent["middleware"] = [
+            filesystem_middleware(backend=backend, tools=["read_file"], offload_binary_content=True)
+        ]
+    graph = blueprint.build_graph(model=parent, backend=backend, offload_binary_content=True, subagents=[subagent])
+    result = await graph.ainvoke({"messages": [HumanMessage("Delegate the image task.")]})
+    assert result["messages"][-1].content == "Task complete."
+    assert tool_results(specialist.seen[-1], "read_file")[0].content[0]["base64"] == base64.b64encode(payload).decode(
+        "ascii"
+    )
+    blob = tmp_path / "blobs" / hashlib.sha256(payload).hexdigest()
+    assert blob.exists() is offload_subagent
+    assert not tool_results(result["messages"], "read_file")

@@ -1,0 +1,182 @@
+# Use only with generated test credentials and a separate Compose project.
+# This stack does not read the application's .env or service configuration.
+x-langfuse-dependencies: &dependencies
+  postgres:
+    condition: service_healthy
+  clickhouse:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  minio:
+    condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: langfuse
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD:
+        ${LAT_TEST_LANGFUSE_DB_PASSWORD:?Generate test credentials first}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.4
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD:
+        ${LAT_TEST_LANGFUSE_CLICKHOUSE_PASSWORD:?Generate test credentials
+        first}
+    volumes:
+      - clickhouse:/var/lib/clickhouse
+    healthcheck:
+      test:
+        ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8123/ping"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    mem_limit: 2g
+
+  redis:
+    image: redis:7.2
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--appendfsync",
+        "everysec",
+        "--maxmemory",
+        "256mb",
+        "--maxmemory-policy",
+        "noeviction",
+      ]
+    volumes:
+      - redis:/data
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    image: cgr.dev/chainguard/minio
+    entrypoint: sh
+    command:
+      -c 'mkdir -p /data/langfuse && minio server --address ":9000" /data'
+    environment:
+      MINIO_ROOT_USER: langfuse
+      MINIO_ROOT_PASSWORD:
+        ${LAT_TEST_LANGFUSE_S3_PASSWORD:?Generate test credentials first}
+    volumes:
+      - minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    image:
+      docker.langfuse.com/langfuse/langfuse-worker:${LAT_TEST_LANGFUSE_SERVER_VERSION:?Select
+      a server version}
+    depends_on:
+      <<: *dependencies
+      web:
+        condition: service_healthy
+    environment: &langfuse-environment
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: postgresql://langfuse:${LAT_TEST_LANGFUSE_DB_PASSWORD}@postgres:5432/langfuse
+      SALT: ${LAT_TEST_LANGFUSE_SALT:?Generate test credentials first}
+      ENCRYPTION_KEY:
+        ${LAT_TEST_LANGFUSE_ENCRYPTION_KEY:?Generate test credentials first}
+      TELEMETRY_ENABLED: "false"
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD: ${LAT_TEST_LANGFUSE_CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LAT_TEST_LANGFUSE_S3_PASSWORD}
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LAT_TEST_LANGFUSE_S3_PASSWORD}
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_S3_BATCH_EXPORT_ENABLED: "false"
+      NODE_OPTIONS: --max-old-space-size=1024
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:3030/api/health?failIfEventPropagationStuck=true",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 120s
+    mem_limit: 1536m
+
+  web:
+    image: docker.langfuse.com/langfuse/langfuse:${LAT_TEST_LANGFUSE_SERVER_VERSION}
+    depends_on: *dependencies
+    ports:
+      - "127.0.0.1:${LAT_TEST_LANGFUSE_PORT}:3000"
+    environment:
+      <<: *langfuse-environment
+      HOSTNAME: 0.0.0.0
+      NEXTAUTH_URL: ${LAT_TEST_LANGFUSE_BASE_URL}
+      NEXTAUTH_SECRET:
+        ${LAT_TEST_LANGFUSE_NEXTAUTH_SECRET:?Generate test credentials first}
+      LANGFUSE_INIT_ORG_ID: ${LAT_TEST_LANGFUSE_ORG_ID}
+      LANGFUSE_INIT_ORG_NAME: Toolkit integration tests
+      LANGFUSE_INIT_PROJECT_ID: ${LAT_TEST_LANGFUSE_PROJECT_ID}
+      LANGFUSE_INIT_PROJECT_NAME: Disposable toolkit tests
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LAT_TEST_LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LAT_TEST_LANGFUSE_SECRET_KEY}
+      LANGFUSE_INIT_USER_EMAIL: toolkit-test@example.invalid
+      LANGFUSE_INIT_USER_NAME: Toolkit integration tests
+      LANGFUSE_INIT_USER_PASSWORD: ${LAT_TEST_LANGFUSE_USER_PASSWORD}
+    healthcheck:
+      # The upstream Langfuse image includes wget. It does not include curl.
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:3000/api/public/health",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 120s
+    mem_limit: 2g
+
+volumes:
+  postgres:
+  clickhouse:
+  minio:
+  redis:

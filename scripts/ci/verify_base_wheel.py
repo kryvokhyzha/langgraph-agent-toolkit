@@ -5,10 +5,11 @@ from importlib.util import find_spec
 
 from langgraph_agent_toolkit.agents.blueprints.create_agent.agent import react_agent
 from langgraph_agent_toolkit.client import AgentClient
+from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
 from langgraph_agent_toolkit.service.handler import create_app
 
 
-OPTIONAL_MODULES = ("langchain_openai", "streamlit", "fastmcp", "deepagents")
+OPTIONAL_MODULES = ("langchain_openai", "streamlit", "fastmcp", "deepagents", "phoenix")
 EXPECTED_APP_TITLE = "LangGraph Agent API"
 EXPECTED_FAKE_RESPONSE = "This is a test response from the fake model."
 
@@ -48,10 +49,22 @@ def verify_base_features() -> None:
         raise AssertionError(f"The fake model returned {response!r}. Expected {EXPECTED_FAKE_RESPONSE!r}.")
 
 
+def verify_phoenix_error() -> None:
+    """Require the Phoenix extra only when a caller selects its backend."""
+    try:
+        ObservabilityFactory.create("phoenix")
+    except ImportError as error:
+        if "[phoenix]" not in str(error):
+            raise AssertionError("The Phoenix import error must name the [phoenix] extra.") from error
+    else:
+        raise AssertionError("The Phoenix backend started without the phoenix dependencies.")
+
+
 def main() -> None:
     """Run the base wheel checks."""
     verify_optional_dependencies_are_absent()
     verify_deep_agents_error()
+    verify_phoenix_error()
     verify_base_features()
 
 

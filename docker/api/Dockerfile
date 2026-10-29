@@ -1,17 +1,22 @@
 # syntax=docker/dockerfile:1
 
+# Use a patched interpreter and pip certificate bundle in both stages.
+FROM python:3.13.18-slim AS base
+RUN --mount=from=ghcr.io/astral-sh/uv:0.13.6,source=/uv,target=/uv \
+    /uv pip install --system --no-cache "pip>=26.2.2"
+
 # ---------------------------------------------------------------------------
 # Builder: install dependencies in an isolated virtual environment.
 # The final image does not contain the `uv` binary or build cache.
 # ---------------------------------------------------------------------------
-FROM python:3.13-slim AS builder
+FROM base AS builder
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=0 \
     UV_PROJECT_ENVIRONMENT=/opt/venv
 
-COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13.6 /uv /bin/uv
 
 WORKDIR /app
 
@@ -21,19 +26,25 @@ WORKDIR /app
 # Include both OpenAI transports. The runtime selects aiohttp by default.
 COPY pyproject.toml uv.lock ./
 ARG INSTALL_DEEPAGENTS=false
+ARG LANGFUSE_SDK_MAJOR=5
 RUN --mount=type=cache,target=/root/.cache/uv \
     case "$INSTALL_DEEPAGENTS" in \
       true) set -- --extra deepagents ;; \
       false) set -- ;; \
       *) echo "INSTALL_DEEPAGENTS must be true or false" >&2; exit 1 ;; \
     esac && \
+    case "$LANGFUSE_SDK_MAJOR" in \
+      2|3|4|5) ;; \
+      *) echo "LANGFUSE_SDK_MAJOR must be 2, 3, 4, or 5" >&2; exit 1 ;; \
+    esac && \
     uv sync --frozen --no-install-project --no-dev \
-    --extra gunicorn-backend --extra all-observability --extra openai-aiohttp --extra mcp "$@"
+    --extra gunicorn-backend --extra all-observability --extra openai-aiohttp --extra mcp \
+    --extra "langfuse-v${LANGFUSE_SDK_MAJOR}" "$@"
 
 # ---------------------------------------------------------------------------
 # Runtime: include only the virtual environment and application source.
 # ---------------------------------------------------------------------------
-FROM python:3.13-slim AS runtime
+FROM base AS runtime
 
 ENV PYTHONPATH=/app \
     PYTHONUNBUFFERED=1 \
@@ -41,7 +52,7 @@ ENV PYTHONPATH=/app \
     PATH=/opt/venv/bin:$PATH
 
 # Install curl for the container health check.
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Create the writable application directory before copying source files.

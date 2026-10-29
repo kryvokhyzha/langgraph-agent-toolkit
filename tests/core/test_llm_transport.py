@@ -173,6 +173,43 @@ def model(server, provider="openai", **kwargs):
     return CompletionModelFactory.create(provider, "local-model", model_parameter_values=(), **params)
 
 
+@pytest.mark.parametrize("embedding", [False, True])
+async def test_typed_configuration_credentials_reach_sdk(model_server, embedding):
+    """Unwrap keys and headers for SDK requests without changing stored settings."""
+    parameters = {
+        "provider": "openai",
+        "name": "local-model",
+        "api_key": "synthetic-primary-secret",
+        "default_headers": {"api-key": "synthetic-header-secret"},
+        "base_url": model_server.url + "/v1",
+        "max_retries": 0,
+    }
+    if embedding:
+        parameters["check_embedding_ctx_length"] = False
+        model_server.behavior = lambda handler, body: handler.send_json(
+            {"data": [{"index": 0, "object": "embedding", "embedding": [0.25, 0.75]}], "model": "local-model"}
+        )
+    else:
+        parameters.update(streaming=False, use_responses_api=False)
+    selected = Settings(_env_file=None, MODEL_CONFIGS={"test": parameters})
+    configuration = selected.get_model_config("test")
+    assert isinstance(configuration["api_key"], SecretStr)
+    async with LLMTransportManager() as manager:
+        with manager.bind():
+            factory = EmbeddingModelFactory if embedding else CompletionModelFactory
+            configured = factory.get_model_from_config(configuration)
+            if embedding:
+                assert await configured.aembed_query("A local embedding request.") == [0.25, 0.75]
+            else:
+                assert (await configured.ainvoke("A local chat request.")).content == "local answer"
+    assert len(model_server.records) == 1
+    assert model_server.records[0]["authorization"] == "Bearer synthetic-primary-secret"
+    assert model_server.records[0]["api_key"] == "synthetic-header-secret"
+    assert isinstance(configuration["api_key"], SecretStr)
+    assert isinstance(configuration["default_headers"]["api-key"], SecretStr)
+    assert "synthetic-" not in selected.model_dump_json()
+
+
 @pytest.mark.parametrize("transport", ["httpx", "aiohttp"])
 @pytest.mark.parametrize("provider", ["openai", "azure_openai"])
 async def test_managed_defaults_match_openai_sdk(model_server, monkeypatch, transport, provider):

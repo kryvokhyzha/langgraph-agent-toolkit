@@ -1,4 +1,5 @@
 import inspect
+import json
 from pathlib import Path
 from typing import Any
 
@@ -11,10 +12,25 @@ from langchain_core.messages import (
 from langchain_core.messages import (
     ChatMessage as LangchainChatMessage,
 )
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue, TypeAdapter, ValidationError
 
 from langgraph_agent_toolkit.helper.exceptions import UnsupportedMessageTypeError
 from langgraph_agent_toolkit.schema import ChatMessage
+
+
+_JSON_OBJECT = TypeAdapter(dict[str, JsonValue])
+
+
+def _mcp_tool_artifact(artifact: Any) -> dict[str, Any] | None:
+    """Copy supported MCP structured content without converting Python objects."""
+    if not isinstance(artifact, dict) or not isinstance(artifact.get("structured_content"), dict):
+        return None
+    try:
+        structured = _JSON_OBJECT.validate_python(artifact["structured_content"], strict=True)
+        json.dumps(structured, allow_nan=False)
+        return {"structured_content": structured}
+    except (ValidationError, ValueError, TypeError, RecursionError):
+        return None
 
 
 def convert_message_content_to_string(content: str | list[str | dict]) -> str:
@@ -69,6 +85,8 @@ def langchain_to_chat_message(message: BaseMessage | dict | BaseModel | list) ->
                 type="tool",
                 content=message.content,
                 tool_call_id=message.tool_call_id,
+                tool_status=message.status,
+                tool_artifact=_mcp_tool_artifact(message.artifact),
             )
             return tool_message
         case LangchainChatMessage():

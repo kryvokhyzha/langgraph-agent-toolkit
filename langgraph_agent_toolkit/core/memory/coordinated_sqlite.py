@@ -8,6 +8,8 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.base import CheckpointTuple
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
+from langgraph_agent_toolkit.core.memory.threads import SQLITE_THREAD_INDEX
+
 
 class _TransactionLock(asyncio.Lock):
     """Roll back a failed operation before another task can use the connection."""
@@ -46,9 +48,21 @@ class _TransactionLock(asyncio.Lock):
 class CoordinatedSqliteSaver(AsyncSqliteSaver):
     """Keep failed writes out of the next operation's transaction."""
 
+    _lat_thread_listing_indexed = True
+
     def __init__(self, conn, *, serde=None):
         super().__init__(conn, serde=serde)
         self.lock = _TransactionLock(conn)
+        self._thread_index_ready = False
+
+    async def setup(self) -> None:
+        """Create checkpoint tables and the conversation listing index."""
+        await super().setup()
+        async with self.lock:
+            if not self._thread_index_ready:
+                await self.conn.execute(SQLITE_THREAD_INDEX)
+                await self.conn.commit()
+                self._thread_index_ready = True
 
     async def alist(
         self,

@@ -222,3 +222,33 @@ def test_invalid_reliability_override_does_not_partially_change_settings(invalid
     with pytest.raises(ValidationError):
         configuration.apply_overrides({"REQUEST_MAX_CONCURRENT": before + 1, **invalid})
     assert configuration.REQUEST_MAX_CONCURRENT == before
+
+
+def test_phoenix_overrides_preserve_secret_types_and_proxy_paths(mock_env):
+    configuration = Settings(_env_file=None)
+    configuration.apply_overrides(
+        {
+            "OBSERVABILITY_BACKEND": "phoenix",
+            "PHOENIX_API_KEY": "synthetic-test-secret",
+            "PHOENIX_ENDPOINT": "https://telemetry.example.com/phoenix",
+            "PHOENIX_TIMEOUT": "2.5",
+        }
+    )
+    assert isinstance(configuration.PHOENIX_API_KEY, SecretStr)
+    assert "synthetic-test-secret" not in configuration.model_dump_json()
+    assert configuration.PHOENIX_ENDPOINT.rstrip("/") == "https://telemetry.example.com/phoenix"
+    assert configuration.PHOENIX_TIMEOUT == 2.5
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"PHOENIX_ENDPOINT": "grpc://localhost:4317"},
+        {"PHOENIX_TIMEOUT": "NaN"},
+        {"PHOENIX_TIMEOUT": 0},
+        {"PHOENIX_PROJECT_NAME": ""},
+    ],
+)
+def test_reject_invalid_phoenix_settings(overrides, mock_env):
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None).apply_overrides(overrides)

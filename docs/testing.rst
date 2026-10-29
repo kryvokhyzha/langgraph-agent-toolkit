@@ -24,7 +24,7 @@ interpreter and dependencies for installation and tests.
 
 Use ``--extra all`` instead of the earlier ``--all-extras`` flag. The ``all``
 extra includes the complete feature set. It avoids selecting the incompatible
-``langfuse-v2``, ``langfuse-v3``, and ``langfuse-v4`` alternatives together.
+``langfuse-v2``, ``langfuse-v3``, ``langfuse-v4``, and ``langfuse-v5`` alternatives together.
 To test all features with another SDK generation, add one selector, such as
 ``--extra all --extra langfuse-v2``. The dependencies must resolve together.
 
@@ -35,12 +35,28 @@ processes. Test setup disables loading credentials and database paths from
 Test setup also ignores exported ``LANGFUSE_*`` and
 ``LANGGRAPH_LANGFUSE_*`` project settings. Live Langfuse tests use only the
 explicit ``LAT_TEST_LANGFUSE_*`` configuration.
+The same setup removes ``PHOENIX_*``, ``LANGGRAPH_PHOENIX_*``, ``OTEL_*``,
+and ``OPENINFERENCE_*`` settings. Live Phoenix tests use the explicit
+``LAT_TEST_PHOENIX_*`` configuration.
 
 Test layers
 -----------
 
 Use :doc:`load_testing` for repeatable HTTP pressure tests, provider faults,
 database faults, worker replacement during traffic, and bounded soak tests.
+
+The current dependency contracts also cover typed interrupt recovery across
+HTTP and SQLite restart. The SQLite upgrade test reads a fixture produced by
+the released 3.1.1 saver. It verifies pending answers after the schema update
+and checks that a completed parallel branch does not run again.
+The optional PostgreSQL tests cover native pruning and its ``DeltaChannel``
+guard. They do not enable automatic pruning in the service.
+
+Model transport tests use real SDK serializers with local HTTP transports.
+They check fragmented tool arguments, response block indexes, and provider
+errors after partial text. MCP tests check default and configured SSE event
+limits. A limit failure must not repeat the tool operation.
+These tests do not verify a live provider's model quality or access rules.
 
 .. list-table::
    :header-rows: 1
@@ -61,13 +77,14 @@ database faults, worker replacement during traffic, and bounded soak tests.
      - A real service process, HTTP client, SQLite database, restart, and resume.
      - ``tests/e2e`` and ``tests/service/test_worker_recovery.py``
    * - Container checks
-     - Runtime contents, model transports, readiness, chat history, and HTML.
+     - Runtime contents, model transports, readiness, UI chat, saved history, and HTML.
      - ``tests/integration/docker_image_smoke.py``,
-       ``tests/integration/test_docker_e2e.py``, and
+       ``tests/integration/test_docker_e2e.py``,
+       ``tests/integration/docker_ui_smoke.py``, and
        ``tests/integration/docker_transport_smoke.py``
    * - External service integration
-     - PostgreSQL locking and recovery; Langfuse ingestion and stored results.
-     - PostgreSQL and Langfuse live tests in ``tests/integration``
+     - PostgreSQL locking and recovery; telemetry ingestion and stored results.
+     - PostgreSQL, Langfuse, and Phoenix live tests in ``tests/integration``
 
 The directories name the component under test. They do not always identify a
 test layer. For example, ``tests/service/test_stream_integration.py`` uses an in-process
@@ -88,10 +105,21 @@ after a forced API restart. Langfuse SDK tests export a real Deep Agent run
 through each supported SDK generation. Internal summarization must stay out
 of the user-facing stream.
 
+Multimodal tests check document filenames through HTTP, SQLite restart, and
+OpenAI Responses serialization. Binary tests check restoration, missing or
+invalid blobs, failed uploads, scoped file access, and checkpoint deletion.
+Media recovery tests check one model retry without repeated tool writes.
+Model-switch tests preserve checkpoint media while filtering the model view.
+
 MCP tests use real FastMCP and LangChain adapters. They cover tool discovery,
 HTTP credentials, stdio, cancellation, timeouts, connection closure, and
-elicitation. HTTP tests replace the network transport with an in-process
-server. They retain the actual protocol and client setup.
+elicitation. In-process HTTP tests retain the actual protocol and client setup.
+Local TCP tests check connection reuse and schema headers.
+Service tests recover parallel questions after SQLite closes and reopens.
+They check that history reads do not execute tools.
+They also preserve successful and failed tool metadata through streaming and
+saved history. Streamlit tests submit structured form answers and recover
+questions from history.
 
 Regression tests also check minimal-package imports, SSE comment and keepalive
 frames, and history queries with omitted optional values. These checks protect
@@ -100,6 +128,12 @@ SQLite service tests check both StateGraph and Functional API history. They
 read existing checkpoints, append messages, stream one new answer, reopen the
 database, and clear the conversation. Functional API history reads LangGraph's
 private saved-state channel. Keep these tests when upgrading LangGraph.
+
+Conversation-list tests use real graphs and SQLite checkpoints. They check
+user and agent isolation, cursor pagination, database restart, and deletion.
+They keep conversation lists separate from message-history pages. They also
+check that repeated runs and subgraph checkpoints do not add duplicate threads.
+Pagination tests follow non-null cursors even when a page is empty.
 
 API process journeys
 --------------------
@@ -113,6 +147,14 @@ authentication, separate user memory and thread history, SSE and JSON Lines,
 safe error responses, and concurrent updates. They restart the process and
 check durable history and a pending interrupt. The worker tests kill a worker
 and check replacement under Uvicorn and Gunicorn. They require POSIX signals.
+
+The MCP process journey starts a separate HTTP MCP server.
+It loses the initial API response, replaces the API process, and recovers two
+parallel questions through history.
+It resumes both tools through two input rounds and replaces the API process
+between rounds. Each tool writes its result once after the answers complete.
+The test uses the configured service transport and persistent SQLite.
+It does not claim exactly-once writes after an arbitrary transport failure.
 
 CI runs these journeys on Python 3.11, 3.12, 3.13, and 3.14. The model is deterministic.
 These tests do not measure model quality or simulate a production load.
@@ -129,13 +171,32 @@ frontend and set ``AGENT_URL``, ``APP_URL``, and ``AUTH_SECRET`` for the tests.
 
 CI builds both images before this check. Tests call readiness, invoke, stream,
 history, and clear-history endpoints. They check the frontend health endpoint
-and HTML response. They do not control a browser or test Streamlit interaction.
+and HTML response. These pytest tests do not control the Streamlit page.
 An unavailable requested container causes failure.
+
+CI also runs ``docker_ui_smoke.py`` inside the running app container. It uses
+Streamlit ``AppTest`` to run the installed page with the real API client.
+It sends chat messages through SSE, JSON Lines, and invoke requests. It checks
+saved history, restores the conversation in a new UI session, and starts a new
+chat. The script removes its saved conversation when the check finishes.
+It needs no pytest installation in the image. It does not test browser rendering
+or WebSockets. To run it against a disposable API with the fake model and SQLite:
+
+.. code-block:: bash
+
+   docker cp tests/integration/docker_ui_smoke.py app-container:/tmp/docker_ui_smoke.py
+   docker exec app-container python /tmp/docker_ui_smoke.py
+
+Set ``AGENT_URL`` and ``AUTH_SECRET`` in the app container before it starts.
+``AGENT_URL`` must resolve to the API from inside that container.
 
 CI also checks final runtime contents with ``docker_image_smoke.py``.
 The check uses no test packages or external network. It verifies the non-root
 user, copied virtual environment, and TLS certificate roots. It rejects build
-tools, development packages, and source environment files. The API check
+tools, development packages, and source environment files. It checks the
+application certifi version and the base interpreter's pip and ensurepip
+versions. It rejects the affected emSign root in all four certificate stores.
+The API check
 imports the selected features, loads the bundled PostgreSQL client, and writes
 and reopens a temporary SQLite database. The UI check reuses the client-only
 import check. After building both images, run:
@@ -176,23 +237,73 @@ PostgreSQL integration
 
 Set ``LAT_TEST_POSTGRES_DSN`` to a disposable test database. The tests create
 and remove test schemas and records.
+Install the ``deepagents`` extra to include the binary store contract.
 
 .. code-block:: bash
 
    uv run --no-sync pytest tests/integration/test_postgres_reliability.py \
      tests/integration/test_postgres_migration.py \
+     tests/integration/test_deepagents_postgres.py \
      tests/core/test_concurrency.py tests/core/test_deadlocks.py --run-postgres
 
 ``--run-postgres`` fails when the DSN is missing. Tests check migration,
 checkpoint recovery, lock release, cancellation, connection loss, and bounded
 connection pools. CI supplies a PostgreSQL 16 service for this job.
+The binary store test closes both PostgreSQL pools, opens new pools, and
+restores saved media. It also checks owner isolation and blob retention after
+checkpoint deletion.
+
+Tool selection and API benchmarks
+----------------------------------
+
+The normal suite checks the optional tool-selection bridge with native
+LangChain middleware and real graphs. SDK wire tests check deferred tool
+schemas through OpenAI Responses and Anthropic clients with local transports.
+They do not contact either provider.
+MCP protocol tests also call selected remote tools through a local FastMCP
+server. They check connection cleanup and forward failures without retries.
+
+Run the API benchmark with:
+
+.. code-block:: bash
+
+   LAT_TEST_TOOL_SELECTION_REPORT_DIR=data/tool-selection-reports \
+     uv run --no-sync pytest tests/e2e/test_tool_selection_api.py --run-e2e -q
+
+The tests compare native agents and Deep Agents with selection disabled and
+enabled. Catalogs include 8, 32, or 128 unrelated tools. Each report includes
+task completion, model and selector calls, schema bytes, and local latency.
+These tests use scripted models. Their latency is not a provider performance
+estimate. See :doc:`tool_selection` for the metric definitions and limits.
+CI saves the reports with each Python test artifact.
+
+Phoenix SDK and service checks
+-------------------------------
+
+The normal suite includes native OpenInference callback and Phoenix SDK
+contract tests. These tests need the ``phoenix`` extra. The ``all`` extra
+includes it. They use local export transports and do not contact a server.
+
+Live tests require ``--run-phoenix``. API process tests also require
+``--run-e2e``. They use a disposable Phoenix 20.26.1 server with an isolated
+SQLite volume. Tests read native stored traces, prompt versions, tags, and
+feedback. The API journeys cover native agents and Deep Agents, JSON Lines,
+checkpoint recovery, and retained telemetry after a Phoenix restart.
+These tests use the ``phoenix_live`` marker. The Phoenix client's ``phoenix``
+marker starts its separate experiment integration. Do not use it for the
+toolkit's service checks.
+
+Use the ``Phoenix E2E`` workflow for the same disposable check in CI.
+It runs on relevant pull requests and supports manual runs. It does not need
+model keys or production observability credentials. See :doc:`phoenix` for
+local commands and the limits of these tests.
 
 Langfuse SDK compatibility
 --------------------------
 
-CI installs SDK 2.60.10, 3.15.0, and 4.15.2 separately on Python 3.11, 3.12,
+CI installs SDK 2.60.10, 3.15.0, 4.18.0, and 5.0.4 separately on Python 3.11, 3.12,
 3.13, and 3.14. Each installation selects the matching ``langfuse-v2``, ``langfuse-v3``,
-or ``langfuse-v4`` extra and pins the exact SDK baseline. Each environment also
+``langfuse-v4``, or ``langfuse-v5`` extra and pins the exact SDK baseline. Each environment also
 resolves the MCP and Deep Agents extras. Compatibility tests check callbacks,
 prompts, feedback, configuration, and dependency contracts.
 
@@ -217,7 +328,8 @@ Use a separate environment to test another SDK without changing the main one:
 
 Change both the selector and the exact SDK pin for another matrix entry.
 Use ``langfuse-v3`` with ``langfuse==3.15.0`` or ``langfuse-v4`` with
-``langfuse==4.15.2``. The selectors are published package extras. The exact pin
+``langfuse==4.18.0``. Use ``langfuse-v5`` with ``langfuse==5.0.4``.
+The selectors are published package extras. The exact pin
 reproduces the CI baseline; it is optional for ordinary application installs.
 See :doc:`langfuse_compatibility` for SDK and server selection.
 
@@ -244,16 +356,101 @@ server. They wait for ingestion to finish. Trace and score records keep
 an incorrect server version, or missing records causes failure.
 
 The manual ``langfuse-live.yml`` workflow tests SDK v2 with server v2, all three
-SDK generations with server v3, and SDK v4 with server v4. Configure the repository
+SDK generations v2 through v4 with server v3, and SDK v4 and v5 with server v4. Configure the repository
 environments ``langfuse-v2``, ``langfuse-v3``, and ``langfuse-v4``. Each needs
 variables ``LANGFUSE_TEST_URL`` and ``LANGFUSE_TEST_VERSION``, plus secrets
 ``LANGFUSE_TEST_PUBLIC_KEY`` and ``LANGFUSE_TEST_SECRET_KEY``. Server v3 must be
-at least 3.63.0 for SDK v3 and v4. A passing SDK matrix does not replace this
+at least 3.63.0 for SDK v3 and v4. Server v4 must be at least 4.59.0 for SDK v5.
+A passing SDK matrix does not replace this
 live-server result.
 
 The manual workflow omits SDK v3 with server v4. Use the command above to test
 this supported but deprecated combination. Set ``LAT_TEST_LANGFUSE_TIMEOUT=1200``.
 This allows for the server's delayed processing of legacy SDK observations.
+
+Disposable server CI
+~~~~~~~~~~~~~~~~~~~~
+
+Run the manual ``langfuse-disposable.yml`` workflow to test fresh servers
+without external projects or repository secrets. Each job creates its own
+PostgreSQL, ClickHouse, Redis, and object-store services.
+The matrix tests SDK v4 and v5 with server 4.71.0. It tests SDK v2, v3, and v4
+with server 3.225.15. Each job checks direct SDK graphs and real API processes.
+The workflow removes only its generated Compose project and volumes.
+It uploads the test report. It does not upload generated credential files.
+
+The API process journeys verify public session IDs, remote prompt revisions,
+model and tool records, feedback, graceful flush, and history after restart.
+They use the default flush interval for SDK v2, v3, and v4.
+SDK v5 also passes with a 3,600-second interval, which requires an immediate
+flush during shutdown. The older SDK consumers cannot wake a long batching
+wait through their public flush API. Keep their batching interval below the
+service shutdown budget, with time for network delivery.
+No shutdown deadline can guarantee delivery during a network outage.
+
+These local and CI tests use scripted models. They do not call a paid model.
+See :doc:`langfuse_server_upgrade` for the local stack commands and migration
+limits. Fresh server tests do not prove an existing database backfill.
+
+Live verification on 2026-10-28
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The 0.10.2 candidate passed the following live matrix.
+Each row passed four tests: two direct SDK graph tests and two API process
+journeys. The processes used native and Deep Agents graphs, real local tools,
+remote prompt revisions, feedback, and SQLite restart recovery.
+The models returned scripted responses. No paid model request was made.
+Prompt-to-generation links are required for SDK v3, v4, and v5. SDK v2 verifies
+prompt creation, reads, and versions through its legacy adapter.
+
+.. list-table:: Current live server results
+   :header-rows: 1
+   :widths: 30 30 40
+
+   * - Server
+     - Python SDK
+     - Result
+   * - 4.71.0
+     - 5.0.4
+     - 4 passed
+   * - 4.71.0
+     - 4.18.0
+     - 4 passed
+   * - 3.225.15
+     - 4.18.0
+     - 4 passed
+   * - 3.225.15
+     - 3.15.0
+     - 4 passed
+   * - 3.225.15
+     - 2.60.10
+     - 4 passed
+
+The v4 service restart check retained eight API traces, 172 observations,
+eight scores, and their linked prompt revisions. It read the same IDs after
+restarting web and worker. It did not write replacement records.
+
+A controlled server upgrade also retained the original v3 test records.
+The stack moved from 3.225.15 to 4.71.0 with the same project keys and volumes.
+The compatibility write mode stayed ``legacy`` with ``dual_write`` native
+OpenTelemetry behavior. Historic backfill and preview opt-in stayed disabled.
+A read-only verifier compared the same 12 traces, 254 observations, 12 scores,
+and prompt revisions before and after the schema step.
+PostgreSQL and cold ClickHouse backups were taken before the upgrade.
+This does not prove a production restore, historic backfill, or a switch to
+``events_only``. Those steps still need a staging deployment.
+
+These tests found and fixed two production errors. Validated URL values could
+produce a duplicate-slash export path and a redirect without ingestion.
+API telemetry sessions also used scoped checkpoint keys instead of public
+conversation IDs. The new session tests preserve checkpoint owner isolation.
+
+The full local suite passed 1,147 tests with 53 expected skips.
+Combined line and branch coverage was 84.40 percent.
+The frozen SDK v2/v3/v4/v5 matrix passed on Python 3.11 and 3.14.
+API images with SDK v4 and v5 passed curl health checks, authenticated invoke,
+streaming, history, and clear. These image checks ran on native Linux arm64.
+The installed base wheel passed on Python 3.14 without provider extras.
 
 Live verification on 2026-09-12
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

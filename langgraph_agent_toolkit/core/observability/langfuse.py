@@ -18,12 +18,13 @@ from langgraph_agent_toolkit.core.observability.base import (
     PromptReturnType,
     PromptTemplateType,
 )
+from langgraph_agent_toolkit.core.observability.masking import mask_secret_values as _mask_secret_values
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
 
 _SDK_MAJOR = int(version("langfuse").split(".")[0])
-if _SDK_MAJOR not in (2, 3, 4):
+if _SDK_MAJOR not in (2, 3, 4, 5):
     raise ImportError(f"Unsupported Langfuse SDK major version: {_SDK_MAJOR}")
 
 _IS_NEW_LANGFUSE = _SDK_MAJOR >= 3
@@ -222,13 +223,14 @@ def _configuration() -> Dict[str, Any]:
     return {
         "public_key": credential("LANGFUSE_PUBLIC_KEY"),
         "secret_key": credential("LANGFUSE_SECRET_KEY"),
-        "host": os.environ.get("LANGFUSE_BASE_URL") or host,
+        "base_url" if _IS_NEW_LANGFUSE else "host": (os.environ.get("LANGFUSE_BASE_URL") or host).rstrip("/"),
         "environment": settings.LANGFUSE_TRACING_ENVIRONMENT,
         "flush_at": settings.LANGFUSE_FLUSH_AT,
         "flush_interval": settings.LANGFUSE_FLUSH_INTERVAL,
         "timeout": settings.LANGFUSE_TIMEOUT,
         "debug": settings.LANGFUSE_DEBUG,
         "sample_rate": settings.LANGFUSE_SAMPLE_RATE,
+        "mask": _mask_secret_values,
     }
 
 

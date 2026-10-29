@@ -30,9 +30,11 @@ def test_validated_credentials_are_passed_to_sdk(monkeypatch):
     obs._get_client()
     assert constructor.call_args.kwargs["public_key"] == "pk-from-settings"
     assert constructor.call_args.kwargs["secret_key"] == "sk-from-settings"
-    assert constructor.call_args.kwargs["host"] == "https://langfuse.invalid"
+    url_parameter = "base_url" if adapter._IS_NEW_LANGFUSE else "host"
+    assert constructor.call_args.kwargs[url_parameter] == "https://langfuse.invalid"
     assert constructor.call_args.kwargs["flush_at"] == 20
     assert constructor.call_args.kwargs["timeout"] == 3
+    assert constructor.call_args.kwargs["mask"] is adapter._mask_secret_values
     obs._get_client()
     constructor.assert_called_once()
 

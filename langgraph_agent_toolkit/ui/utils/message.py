@@ -1,12 +1,24 @@
 """Provide Streamlit message, feedback, and multimodal content helpers."""
 
 import base64
+from pathlib import Path
 
 import streamlit as st
 
 from langgraph_agent_toolkit.client import AgentClient, AgentClientError
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.schema import ChatMessage
+
+
+_DOCUMENT_MIME_TYPES = {
+    ".pdf": "application/pdf",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".csv": "text/csv",
+    ".json": "application/json",
+    ".md": "text/markdown",
+}
 
 
 def create_welcome_message(agent: str) -> ChatMessage:
@@ -25,7 +37,11 @@ def create_welcome_message(agent: str) -> ChatMessage:
 
 def file_to_content_block(file) -> dict:
     """Encode an uploaded Streamlit file as a base64 LangChain content block."""
-    mime = file.type or "application/octet-stream"
+    filename = getattr(file, "name", None)
+    mime = file.type
+    if not mime or mime == "application/octet-stream":
+        suffix = Path(filename).suffix.lower() if filename else ""
+        mime = _DOCUMENT_MIME_TYPES.get(suffix, "application/octet-stream")
     data = base64.b64encode(file.getvalue()).decode("utf-8")
     if mime.startswith("image/"):
         block_type = "image"
@@ -34,8 +50,11 @@ def file_to_content_block(file) -> dict:
     elif mime.startswith("video/"):
         block_type = "video"
     else:
-        block_type = "file"  # e.g. application/pdf
-    return {"type": block_type, "base64": data, "mime_type": mime}
+        block_type = "file"
+    block = {"type": block_type, "base64": data, "mime_type": mime}
+    if block_type == "file" and filename:
+        block["extras"] = {"filename": filename}
+    return block
 
 
 def build_chat_message(text: str, files: list) -> str | list[dict]:
@@ -67,7 +86,9 @@ def render_human_message(content: str | list) -> None:
             except Exception:
                 st.caption(f"📎 {block.get('mime_type') or btype} attachment (invalid base64)")
         else:
-            st.caption(f"📎 {block.get('mime_type') or btype} attachment")
+            extras = block.get("extras")
+            filename = block.get("filename") or (extras.get("filename") if isinstance(extras, dict) else None)
+            st.caption(f"📎 {filename or block.get('mime_type') or btype} attachment")
 
 
 async def handle_feedback() -> None:

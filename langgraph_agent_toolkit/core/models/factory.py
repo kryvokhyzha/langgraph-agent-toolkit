@@ -17,6 +17,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.runnables import Runnable, RunnableConfig
 from typing_extensions import TypeAlias
 
+from langgraph_agent_toolkit.core.config_secrets import reveal_config_secrets
 from langgraph_agent_toolkit.core.models.fake import FakeToolModel
 from langgraph_agent_toolkit.core.models.transport import configure_model_transport
 from langgraph_agent_toolkit.helper.constants import (
@@ -67,7 +68,7 @@ class CompletionModelFactory:
 
     @staticmethod
     def _init_chat_model_helper(model: str, *, model_provider: Optional[str] = None, **kwargs: Any) -> BaseChatModel:
-        kwargs = configure_model_transport(model_provider, kwargs)
+        kwargs = configure_model_transport(model_provider, reveal_config_secrets(kwargs))
         if model_provider in {"openai", "azure_openai"}:
             from langgraph_agent_toolkit.core.models.chat_openai import AzureChatOpenAIPatched, ChatOpenAIPatched
 
@@ -253,7 +254,9 @@ class EmbeddingModelFactory:
 
         # Get the provider string from the enum when required.
         provider_str = model_provider.value if isinstance(model_provider, ModelProvider) else str(model_provider)
-        _model_parameter_values = configure_model_transport(provider_str, _model_parameter_values, chat=False)
+        _model_parameter_values = configure_model_transport(
+            provider_str, reveal_config_secrets(_model_parameter_values), chat=False
+        )
 
         return init_embeddings(
             model=model_name,

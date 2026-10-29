@@ -123,6 +123,13 @@ MCP is a tool transport. It does not add task planning, document retrieval, or
 authorization by itself. The remote server must enforce access. Toolkit API
 credentials and MCP credentials serve different connections.
 
+For a large assigned catalog, optional tool selection can reduce the tool
+definitions visible to each model call. Native agents and Deep Agents can use
+an LLM selector or supported provider tool search. Keep the default ``off``
+mode for small catalogs unless a benchmark shows a benefit. Static MCP
+allowlists and server access checks still apply. See :doc:`tool_selection`
+for the shared configuration and API benchmark.
+
 Memory and persistence
 ----------------------
 
@@ -144,13 +151,52 @@ Clearing conversation history removes checkpoints for that conversation.
 Long-term memory and external files need their own retention and deletion
 rules. See :doc:`migration` and :doc:`deployment` for the service contract.
 
+Choose an observability backend
+--------------------------------
+
+Set ``OBSERVABILITY_BACKEND`` to select one backend for the service.
+Install its package extra in the application environment.
+This choice does not change the agent builder, tools, or checkpointer.
+
+.. list-table:: Observability choices
+   :header-rows: 1
+   :widths: 16 32 52
+
+   * - Backend
+     - Choose it for
+     - Toolkit contract and limits
+   * - ``langfuse``
+     - Existing Langfuse projects, prompt versions, and user feedback.
+     - Per-run callbacks, remote prompts, and scores. Select an SDK for the
+       server version. SDK v2 cannot delete prompts through the toolkit.
+       See :doc:`langfuse_compatibility`.
+   * - ``phoenix``
+     - OpenInference traces in Phoenix, with self-hosted or remote storage.
+     - Per-run callbacks, remote prompt versions, and trace annotations.
+       Prompt creation needs model metadata. Prompt formats and version
+       selectors differ from Langfuse. See :doc:`phoenix`.
+   * - ``langsmith``
+     - LangSmith tracing and its prompt repository.
+     - SDK tracing configured through ``LANGSMITH_*``, prompt operations,
+       and feedback. The adapter uses the LangSmith SDK tracing lifecycle.
+   * - ``empty`` or unset
+     - Local development that needs no remote trace service.
+     - In-process prompts. No remote traces or feedback storage.
+
+The common interface does not provide every feature of each platform.
+For example, Phoenix datasets and experiments use its native client.
+Switching ``OBSERVABILITY_BACKEND`` does not move existing traces, prompts,
+or feedback to another service. Create prompts in the selected service and
+check their formats before changing a deployment.
+
 Observe and test the selected combination
 -----------------------------------------
 
 Record tool failures, model-call counts, elapsed time, and successful task
 outcomes. Check whether delegated runs preserve the parent trace and user
-scope. Use the configured Langfuse or LangSmith backend. See
-:doc:`langfuse_compatibility` for the tested Langfuse SDK and server boundaries.
+scope. Use the configured observability backend. See
+:doc:`langfuse_compatibility` and :doc:`phoenix` for their tested SDK and server
+boundaries.
 
 Test the whole combination that you deploy: agent builder, model, tools,
 database, and observability SDK. The deterministic examples verify execution
