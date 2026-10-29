@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Use a patched interpreter and pip certificate bundle in both stages.
-FROM python:3.13.18-slim AS base
+FROM python:3.15.0-slim AS base
 RUN --mount=from=ghcr.io/astral-sh/uv:0.13.6,source=/uv,target=/uv \
     /uv pip install --system --no-cache "pip>=26.2.2"
 
