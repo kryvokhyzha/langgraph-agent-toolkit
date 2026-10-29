@@ -266,6 +266,10 @@ resume answers. Keep `CHECK_INTERRUPTS=True` for this feature.
 
 ## Testing
 
+Task-specific coding guidance is in [skills/README.md](skills/README.md). Use
+the relevant skill for agent development, client integration, reliability, or
+package maintenance. Keep shared project rules in this file.
+
 - Framework: `pytest` + `pytest-asyncio` + `pytest-cov` + `pytest-env` in
   `[dependency-groups] tests`.
 - `pyproject.toml` sets `pythonpath = ["langgraph_agent_toolkit", "."]`.

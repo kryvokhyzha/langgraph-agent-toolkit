@@ -22,6 +22,9 @@ and [changelog](CHANGELOG.md) before upgrading.
 [Deployment](#deployment) · [Documentation](#documentation) ·
 [Development](#development)
 
+For coding-agent workflows, use the [repository skills](skills/README.md). They
+cover application agents, API clients, reliability, and package maintenance.
+
 ## What the toolkit provides
 
 - FastAPI routes for invocation, SSE, JSON Lines, conversation lists, history,
@@ -205,6 +208,11 @@ and `/openapi.json`.
 | Verify behavior and capacity         | [Testing](docs/testing.rst), [live model checks](docs/live_llm_testing.rst), [load tests](docs/load_testing.rst), [recorded results](docs/load_test_results.rst) |
 
 ## Development
+
+The [coding-agent skills](skills/README.md) include repository discovery links
+for Codex and Claude Code. You can also install selected skills in another
+application project. These skills guide development; they do not change the
+running API's agent configuration.
 
 Install the locked dependencies and run the local tests. The pre-commit hook
 environments require Python 3.13.

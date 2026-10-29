@@ -2,6 +2,12 @@
 
 Follow [CLAUDE.md](CLAUDE.md) for the repository's project guidance.
 
+## Coding-agent skills
+
+Task-specific guides are in [skills/README.md](skills/README.md). Read only the
+skill that applies to the task. The source files are under `skills/`.
+`.agents/skills/` and `.claude/skills/` contain discovery links to those files.
+
 ## Technical writing
 
 Write comments, docstrings, and documentation in ASD-STE100 Simplified Technical
