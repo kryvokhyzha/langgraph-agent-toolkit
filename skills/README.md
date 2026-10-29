@@ -95,9 +95,9 @@ task that should select the skill. Put the main workflow in `SKILL.md`. Link
 conditional detail from it. Add scripts or templates only when they remove
 repeated work that instructions cannot handle well.
 
-Keep project-wide rules in `AGENTS.md` and `CLAUDE.md`. Keep full product
-documentation in `docs/`. Skills should contain the package contracts and
-procedures that change a coding agent's implementation decisions.
+Keep project-wide rules in `CLAUDE.md`. `AGENTS.md` points to that file. Keep
+full product documentation in `docs/`. Skills should contain the package
+contracts and procedures that change a coding agent's implementation decisions.
 
 When a package contract changes, update the relevant skill and its examples.
 Check the frontmatter, local reference links, and discovery links. Run any
