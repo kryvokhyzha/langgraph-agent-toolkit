@@ -19,7 +19,6 @@ async def test_cancelled_callers_do_not_release_running_thread_capacity():
     executor = BoundedBlockingExecutor(capacity=2)
     loop = asyncio.get_running_loop()
     entered = [asyncio.Event(), asyncio.Event()]
-    finished = [asyncio.Event(), asyncio.Event()]
     release = [threading.Event(), threading.Event()]
     identity = ContextVar("feedback_test_identity")
     observed = []
@@ -28,7 +27,6 @@ async def test_cancelled_callers_do_not_release_running_thread_capacity():
         observed.append((index, identity.get(), threading.current_thread().daemon))
         loop.call_soon_threadsafe(entered[index].set)
         release[index].wait()
-        loop.call_soon_threadsafe(finished[index].set)
 
     async def call(index):
         identity.set(f"owner-{index}")
@@ -47,11 +45,15 @@ async def test_cancelled_callers_do_not_release_running_thread_capacity():
                     await executor.run(feedback, 0)
             assert sorted(observed) == [(0, "owner-0", True), (1, "owner-1", True)]
 
+            # The callback can return before the executor releases its slot.
+            pending_calls = tuple(executor._pending)
+            assert len(pending_calls) == 2
             release[0].set()
-            await finished[0].wait()
-            await asyncio.sleep(0)
+            done, pending = await asyncio.wait(pending_calls, timeout=1, return_when=asyncio.FIRST_COMPLETED)
+            assert len(done) == 1
+            assert len(pending) == 1
             assert await executor.run(lambda left, *, right: left + right, 6, right=7) == 13
-            assert not finished[1].is_set()
+            assert not any(call.done() for call in pending)
     finally:
         for event in release:
             event.set()
@@ -107,13 +109,10 @@ async def test_feedback_api_rejects_work_while_a_timed_out_call_still_runs(monke
     monkeypatch.setattr(settings, "AUTH_MODE", "trusted")
     entered = threading.Event()
     release = threading.Event()
-    finished = asyncio.Event()
-    loop = asyncio.get_running_loop()
 
     def feedback(**kwargs):
         entered.set()
         release.wait()
-        loop.call_soon_threadsafe(finished.set)
 
     app = create_app()
     app.state.agent_executor = SimpleNamespace(
@@ -131,7 +130,6 @@ async def test_feedback_api_rejects_work_while_a_timed_out_call_still_runs(monke
             assert (await client.post("/local/feedback", json=payload)).status_code == 201
             release.clear()
             entered.clear()
-            finished.clear()
             monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 0.05)
             timed_out = await client.post("/local/feedback", json=payload)
             assert timed_out.status_code == 504
@@ -142,9 +140,12 @@ async def test_feedback_api_rejects_work_while_a_timed_out_call_still_runs(monke
             assert rejected.headers["retry-after"] == "1"
             assert (await client.get("/health/live")).status_code == 200
 
+            # Wait for capacity release, not a signal from inside the callback.
+            pending_calls = tuple(app.state.blocking_executor._pending)
+            assert len(pending_calls) == 1
             release.set()
-            await asyncio.wait_for(finished.wait(), timeout=1)
-            await asyncio.sleep(0)
+            _, pending = await asyncio.wait(pending_calls, timeout=1)
+            assert not pending
             monkeypatch.setattr(settings, "REQUEST_TIMEOUT", 1)
             assert (await client.post("/local/feedback", json=payload)).status_code == 201
     finally:
