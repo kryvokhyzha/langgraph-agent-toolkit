@@ -101,9 +101,9 @@ docs\make.bat html
 
 ## Code and documentation style
 
-Use the conventions in [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md). Write
-comments, docstrings, and documentation in ASD-STE100 Simplified Technical
-English. Use short, direct sentences. Preserve technical identifiers.
+Use the conventions in [CLAUDE.md](CLAUDE.md). Write comments, docstrings, and
+documentation in ASD-STE100 Simplified Technical English. Use short, direct
+sentences. Preserve technical identifiers.
 
 Pre-commit runs Ruff, codespell, Prettier, format checks, Gitleaks, credential
 checks, and lockfile validation. Fix the reported cause before committing. Keep
