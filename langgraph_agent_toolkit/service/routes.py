@@ -384,10 +384,18 @@ async def clear_history(
 ) -> ClearHistoryResponse:
     """Delete one thread's checkpoints. Keep long-term memory."""
     agent_id = agent_id or get_default_agent()
-    public_id, _, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
+    public_id, owner_id, key = conversation_identity(request, agent_id, input.thread_id, input.user_id)
     executor = get_agent_executor(request)
     agent = get_agent(request, agent_id)
     async with executor.concurrency.lock(key):
+        queue = getattr(request.app.state, "background_jobs", None)
+        if queue is not None:
+            from langgraph_agent_toolkit.service.jobs import _job_errors
+
+            with _job_errors():
+                active = await queue.has_active_jobs(agent_id=agent_id, owner_id=owner_id, thread_id=public_id)
+            if active:
+                raise HTTPException(409, "Cannot clear history while this conversation has active background jobs")
         if not agent.graph.checkpointer:
             raise HTTPException(503, "This agent has no checkpointer")
         await agent.graph.checkpointer.adelete_thread(key)
@@ -544,8 +552,10 @@ async def readiness_probe(request: Request):
     if is_ready:
         try:
             async with asyncio.timeout(2):
-                for name in ("db_pool", "lock_pool"):
-                    pool = getattr(request.app.state, name, None)
+                queue = getattr(request.app.state, "background_jobs", None)
+                pools = [getattr(request.app.state, name, None) for name in ("db_pool", "lock_pool")]
+                pools.append(getattr(queue, "pool", None))
+                for pool in pools:
                     if pool is not None:
                         async with pool.connection(timeout=1) as connection:
                             await connection.execute("SELECT 1")

@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
-from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
+from collections.abc import AsyncGenerator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
 from functools import wraps
 from typing import TYPE_CHECKING, Annotated, Any, Literal
@@ -185,7 +185,7 @@ class _ToolConnection:
         self._primed_session: Any = None
 
     @asynccontextmanager
-    async def connect(self) -> AsyncIterator[None]:
+    async def connect(self) -> AsyncGenerator[None, None]:
         if self.manager is not None:
             self.manager._check_owner()
         async with self.client:

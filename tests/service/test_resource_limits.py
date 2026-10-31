@@ -163,7 +163,7 @@ def probe_app():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("pool_name", ["db_pool", "lock_pool"])
+@pytest.mark.parametrize("pool_name", ["db_pool", "lock_pool", "background_jobs"])
 async def test_readiness_tracks_database_outage_and_recovery(pool_name):
     app = probe_app()
     state = {"outage": False, "open": 0}
@@ -179,7 +179,8 @@ async def test_readiness_tracks_database_outage_and_recovery(pool_name):
         finally:
             state["open"] -= 1
 
-    setattr(app.state, pool_name, SimpleNamespace(connection=connection))
+    pool = SimpleNamespace(connection=connection)
+    setattr(app.state, pool_name, SimpleNamespace(pool=pool) if pool_name == "background_jobs" else pool)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app), base_url="http://test") as client:
         assert (await client.get("/health/ready")).status_code == 200
         state["outage"] = True

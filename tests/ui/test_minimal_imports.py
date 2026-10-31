@@ -19,10 +19,12 @@ import sys
 import dotenv
 
 dotenv.find_dotenv = lambda *args, **kwargs: ""
-for name in ("langchain", "langchain_core", "langgraph", "deepagents", "fastapi"):
+for name in ("langchain", "langchain_core", "langgraph", "deepagents", "fastapi", "procrastinate", "psycopg"):
     sys.modules[name] = None
 runpy.run_path(sys.argv[1], run_name="__main__")
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.schema import BackgroundJob, ExecutionRequest
+assert ExecutionRequest(thread_id="minimal", input={"value": 1}).input == {"value": 1}
 assert settings.TOOL_SELECTION.mode == sys.argv[2]
 """
     result = subprocess.run(

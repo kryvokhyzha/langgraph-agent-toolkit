@@ -4,14 +4,18 @@ from collections.abc import AsyncGenerator, Callable
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from typing import TypeVar
 
-from psycopg.conninfo import conninfo_to_dict, make_conninfo
-from psycopg.rows import dict_row
+from psycopg.conninfo import conninfo_to_dict
 from psycopg_pool import PoolTimeout
 
 from langgraph_agent_toolkit.core.memory.base import BaseMemoryBackend
 from langgraph_agent_toolkit.core.memory.coordinated_saver import CoordinatedPostgresSaver as AsyncPostgresSaver
 from langgraph_agent_toolkit.core.memory.coordinated_store import CoordinatedPostgresStore as AsyncPostgresStore
 from langgraph_agent_toolkit.core.memory.pool import CheckedAsyncConnectionPool as AsyncConnectionPool
+from langgraph_agent_toolkit.core.postgres import (
+    postgres_connection_string,
+    postgres_pool_options,
+    validate_postgres_credentials,
+)
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 
@@ -24,20 +28,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
 
     def validate_config(self) -> bool:
         """Validate that all required PostgreSQL configuration is present."""
-        required_vars = [
-            "POSTGRES_USER",
-            "POSTGRES_PASSWORD",
-            "POSTGRES_HOST",
-            "POSTGRES_PORT",
-            "POSTGRES_DB",
-        ]
-
-        missing = [var for var in required_vars if not getattr(settings, var, None)]
-        if missing:
-            raise ValueError(
-                f"Missing required PostgreSQL configuration: {', '.join(missing)}. "
-                "These environment variables must be set to use PostgreSQL persistence."
-            )
+        validate_postgres_credentials(settings)
 
         if settings.POSTGRES_MIN_SIZE > settings.POSTGRES_POOL_SIZE:
             raise ValueError(
@@ -50,19 +41,7 @@ class PostgresMemoryBackend(BaseMemoryBackend):
     @staticmethod
     def get_connection_string() -> str:
         """Build the PostgreSQL connection string from settings."""
-        return make_conninfo(
-            user=settings.POSTGRES_USER,
-            password=settings.POSTGRES_PASSWORD.get_secret_value(),
-            host=settings.POSTGRES_HOST,
-            port=settings.POSTGRES_PORT,
-            dbname=settings.POSTGRES_DB,
-            connect_timeout=settings.POSTGRES_CONNECT_TIMEOUT,
-            keepalives=1,
-            keepalives_idle=settings.POSTGRES_KEEPALIVES_IDLE,
-            keepalives_interval=settings.POSTGRES_KEEPALIVES_INTERVAL,
-            keepalives_count=settings.POSTGRES_KEEPALIVES_COUNT,
-            tcp_user_timeout=settings.POSTGRES_TCP_USER_TIMEOUT,
-        )
+        return postgres_connection_string(settings)
 
     @asynccontextmanager
     async def _get_connection_context(
@@ -95,66 +74,20 @@ class PostgresMemoryBackend(BaseMemoryBackend):
             f"schema={settings.POSTGRES_SCHEMA}, application_name={application_name}"
         )
 
-        # Prepare connection arguments with the schema setting.
-        connection_kwargs = {
-            "autocommit": True,
-            "prepare_threshold": 0,
-            "row_factory": dict_row,
-            "application_name": application_name,
-        }
-
-        # Build PostgreSQL options for timeouts and schema.
-        pg_options = []
-
-        # Set `search_path` for a non-default schema.
-        if settings.POSTGRES_SCHEMA and settings.POSTGRES_SCHEMA != "public":
-            pg_options.append(f"-c search_path={settings.POSTGRES_SCHEMA}")
-
-        # Send zero explicitly to disable an inherited database or role timeout.
-        pg_options.extend(
-            [
-                f"-c statement_timeout={settings.POSTGRES_STATEMENT_TIMEOUT}",
-                f"-c lock_timeout={settings.POSTGRES_LOCK_TIMEOUT}",
-                f"-c idle_in_transaction_session_timeout={settings.POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT}",
-            ]
-        )
-        connection_kwargs["options"] = " ".join(pg_options)
-
-        # Log failed reconnection attempts.
-        def on_reconnect_failed(pool: AsyncConnectionPool) -> None:
-            logger.error(
-                f"Failed to reconnect to PostgreSQL. Pool stats: "
-                f"pool_size={pool.get_stats().get('pool_size', 'N/A')}, "
-                f"pool_available={pool.get_stats().get('pool_available', 'N/A')}"
-            )
-
-        # Use `AsyncConnectionPool` as an asynchronous context manager.
-        # Each gunicorn or uvicorn worker has its own pool.
-        # Size `POSTGRES_POOL_SIZE` with worker count below server `max_connections`.
         conninfo = self.get_connection_string()
         scope = hashlib.sha256(
             json.dumps([conninfo_to_dict(conninfo), settings.POSTGRES_SCHEMA], sort_keys=True).encode()
         ).hexdigest()
         async with AsyncConnectionPool(
             conninfo,
-            min_size=min_size,
-            max_size=max_size,
-            max_waiting=settings.POSTGRES_POOL_MAX_WAITING,
-            max_idle=settings.POSTGRES_MAX_IDLE,
-            timeout=settings.POSTGRES_POOL_TIMEOUT,
-            reconnect_timeout=settings.POSTGRES_RECONNECT_TIMEOUT,
-            # Recycle connections after this time.
-            max_lifetime=settings.POSTGRES_MAX_LIFETIME,
-            # Use this number of background workers for connection maintenance.
-            num_workers=settings.POSTGRES_NUM_WORKERS,
-            # Check connection health before returning it from the pool.
-            health_check_timeout=settings.POSTGRES_HEALTH_CHECK_TIMEOUT,
-            # Handle reconnection failure.
-            reconnect_failed=on_reconnect_failed,
-            # Set connection configuration.
-            kwargs=connection_kwargs,
-            # Open the pool manually after setup.
-            open=False,
+            **postgres_pool_options(
+                settings,
+                min_size=min_size,
+                max_size=max_size,
+                schema=settings.POSTGRES_SCHEMA,
+                app_prefix=app_prefix,
+                conninfo=conninfo,
+            ),
         ) as pool:
             pool._lat_checkpoint_scope = scope
             # Open the pool and wait for `min_size` connections.

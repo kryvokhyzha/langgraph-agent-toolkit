@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langgraph-agent-toolkit"
-version = "0.10.2"
+version = "0.11.0"
 description = "Full toolkit for running an AI agent service built with LangGraph, FastAPI and Streamlit"
 readme = "README.md"
 authors = [
@@ -108,7 +108,12 @@ studio = [
 ]
 
 all = [
-    "langgraph-agent-toolkit[ui,studio,mcp,deepagents,all-backends,all-llms,all-observability]",
+    "langgraph-agent-toolkit[ui,studio,mcp,deepagents,background,all-backends,all-llms,all-observability]",
+]
+
+# Durable background jobs use PostgreSQL without a separate message broker.
+background = [
+    "procrastinate >= 3.10, < 4",
 ]
 
 # MCP tools for LangChain agents

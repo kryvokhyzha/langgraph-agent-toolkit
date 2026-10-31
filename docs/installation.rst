@@ -89,6 +89,11 @@ Deep Agent blueprint. A real model still needs its provider extra and
 configuration. See :doc:`mcp`, :doc:`deepagents`, and :doc:`integrations` for
 their use cases and limits.
 
+Install ``background`` in API and worker environments to enable durable jobs.
+It adds Procrastinate and uses PostgreSQL. The feature stays disabled until
+``BACKGROUND_ENABLED=true``. Embedded ``agent_runtime()`` use does not need
+this extra. See :doc:`background` for setup and recovery limits.
+
 UI and Development Server
 -------------------------
 
@@ -160,6 +165,7 @@ container, database, and live-provider tests.
 The API Docker image includes OpenAI, both HTTP transports, MCP, Gunicorn, and
 observability dependencies. Deep Agents requires the ``INSTALL_DEEPAGENTS=true``
 build argument. Other model providers require a custom image with their extras.
+Use ``INSTALL_BACKGROUND=true`` to include the optional job worker dependencies.
 
 See :doc:`deployment` for worker recovery, database sizing, and concurrent
 conversation limits.

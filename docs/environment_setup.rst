@@ -222,6 +222,58 @@ Use ``POSTGRES_HOST=postgres`` for the repository's Compose network. Set
 and conversation-lock pools for the total worker count. See :doc:`deployment`
 for database setup, pool sizing, and worker recovery.
 
+Background jobs
+---------------
+
+Background execution is optional and does not change existing chat routes.
+Install the ``background`` extra, initialize its dedicated PostgreSQL schema,
+and start a separate worker. See :doc:`background` for the full procedure.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Setting
+     - Default
+     - Purpose
+   * - ``BACKGROUND_ENABLED``
+     - ``false``
+     - Enable job API routes and permit worker startup.
+   * - ``BACKGROUND_POSTGRES_DSN``
+     - Unset
+     - Optional secret connection override. Otherwise use ``POSTGRES_*``.
+   * - ``BACKGROUND_POSTGRES_SCHEMA``
+     - ``lat_background``
+     - Dedicated queue and job-record schema.
+   * - ``BACKGROUND_POSTGRES_POOL_SIZE``
+     - ``5``
+     - Queue pool limit per process. Minimum: 2.
+   * - ``BACKGROUND_WORKER_CONCURRENCY``
+     - ``4``
+     - Worker execution slots.
+   * - ``BACKGROUND_EXECUTION_TIMEOUT``
+     - ``300`` seconds
+     - Maximum execution time after a worker starts the job.
+   * - ``BACKGROUND_MAX_ATTEMPTS``
+     - ``3``
+     - Maximum execution attempts after worker loss.
+
+The queue reuses ``POSTGRES_USER``, ``POSTGRES_PASSWORD``, ``POSTGRES_HOST``,
+``POSTGRES_PORT``, and ``POSTGRES_DB`` unless its DSN override is set. Its pool
+uses the shared ``POSTGRES_*`` checkout, health-check, reconnect, connection
+lifetime, and SQL timeout settings. Queue connections use the application name
+``POSTGRES_APPLICATION_NAME`` with the ``-background`` suffix. The queue opens
+one initial connection and has its own maximum pool size.
+
+The queue pool and schema remain separate from checkpoint and conversation-lock
+resources. A queue DSN does not configure the checkpointer. Explicit connection
+parameters in that DSN take precedence over network defaults. Toolkit schema and
+SQL timeout settings take precedence over DSN ``options`` for those same values.
+The earlier names ``BACKGROUND_SCHEMA`` and ``BACKGROUND_POOL_MAX_SIZE`` remain
+accepted aliases. Use the new names in deployment configuration.
+
+The API and worker must use matching agent and persistence settings. Job requests
+can select a shorter timeout but cannot raise the service limit.
+
 Observability
 -------------
 

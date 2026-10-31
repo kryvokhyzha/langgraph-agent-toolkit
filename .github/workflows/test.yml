@@ -294,15 +294,17 @@ jobs:
       - name: Install test dependencies
         run: >-
           uv sync --frozen --no-install-project --no-default-groups --group
-          tests --extra deepagents
+          tests --extra deepagents --extra background
       - name: Verify locking, restart, cancellation, checkpoints, and media
         run: >-
           uv run --no-sync pytest tests/integration/test_postgres_reliability.py
           tests/integration/test_postgres_migration.py
           tests/integration/test_deepagents_postgres.py
           tests/integration/test_postgres_checkpoint_prune.py
-          tests/core/test_concurrency.py tests/core/test_deadlocks.py
-          --run-postgres -q
+          tests/integration/test_background*.py
+          tests/integration/test_postgres_shared_config.py
+          tests/e2e/test_background_jobs.py tests/core/test_concurrency.py
+          tests/core/test_deadlocks.py --run-postgres --run-e2e -q
         env:
           LAT_TEST_POSTGRES_DSN: postgresql://lat_test@127.0.0.1:5432/lat_test
 

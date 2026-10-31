@@ -6,6 +6,54 @@ This file uses the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 format. The project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0]
+
+### Added
+
+- Add optional durable background execution with PostgreSQL and Procrastinate.
+  Submit jobs with idempotency keys, read saved results, and request
+  cancellation. Run workers separately from the API. Keep background execution
+  disabled by default.
+- Add `agent_runtime()` and explicit graph input, resume, recovery, and
+  inspection for applications that own their execution lifecycle. Preserve the
+  existing invoke and streaming contracts.
+- Add synchronous and asynchronous job methods to `AgentClient`, an approval
+  blueprint, a worker CLI, and an optional Docker Compose worker service.
+- Add real PostgreSQL and process tests for submission, ownership, restart,
+  cancellation, approval, recovery, and immediate and queued model execution.
+
+### Changed
+
+- Reuse memory's `POSTGRES_*` connection, timeout, health-check, and pool
+  controls for background storage. Keep a separate queue pool and schema. Allow
+  `BACKGROUND_POSTGRES_DSN` to override the database connection.
+- Name queue settings `BACKGROUND_POSTGRES_SCHEMA` and
+  `BACKGROUND_POSTGRES_POOL_SIZE`. Accept the earlier `BACKGROUND_SCHEMA` and
+  `BACKGROUND_POOL_MAX_SIZE` names as configuration aliases.
+- Run recovery outside job execution slots. Stop the worker after queue
+  bookkeeping failures so its supervisor can replace it. Recovery no longer
+  creates periodic maintenance jobs.
+
+### Fixed
+
+- Preserve pending task writes during explicit recovery. Do not report
+  unfinished execution as complete after a required graph node is removed or
+  renamed.
+- Reject history clearing while a conversation has active background jobs.
+  Preserve the checkpoints needed to recover an uncertain attempt.
+- Use indexed, bounded recovery queries and skip locked job rows. Add an
+  explicit schema upgrade that preserves existing job and idempotency records.
+- Use `Generator` and `AsyncGenerator` annotations for context manager
+  functions.
+
+### Documentation
+
+- Add background execution setup, PostgreSQL naming and connection budgets,
+  schema upgrades, recovery limits, graph deployment rules, and capacity
+  guidance.
+- Explain that applications own event polling, business schedules, external
+  delivery, retention, and idempotency for tool side effects.
+
 ## [0.10.2]
 
 ### Added

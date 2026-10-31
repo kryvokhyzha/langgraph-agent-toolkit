@@ -39,6 +39,7 @@ The generated reference below describes the Python package.
    :caption: Agents and integrations
 
    integrations
+   background
    mcp
    tool_selection
    deepagents

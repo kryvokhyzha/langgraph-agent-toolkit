@@ -31,7 +31,7 @@ def test_lifespan_marks_ready_after_initializing_agents():
     mock_executor.get_all_agent_info.return_value = [agent_info]
     mock_executor.get_agent.return_value = mock_agent
 
-    with patch("langgraph_agent_toolkit.service.handler.AgentExecutor", return_value=mock_executor):
+    with patch("langgraph_agent_toolkit.core.runtime.AgentExecutor", return_value=mock_executor):
         with patch.object(settings, "MEMORY_BACKEND", None):
             app = create_app()
 
@@ -63,7 +63,7 @@ def test_lifespan_marks_ready_after_initializing_agents():
 
 def test_lifespan_failure_stops_worker_startup():
     """A supervisor must see startup failure and replace an unusable worker."""
-    with patch("langgraph_agent_toolkit.service.handler.AgentExecutor", side_effect=RuntimeError("boom")):
+    with patch("langgraph_agent_toolkit.core.runtime.AgentExecutor", side_effect=RuntimeError("boom")):
         with patch.object(settings, "MEMORY_BACKEND", None):
             app = create_app()
             with pytest.raises(RuntimeError, match="boom"), TestClient(app):

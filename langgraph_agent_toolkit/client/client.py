@@ -26,6 +26,8 @@ from langgraph_agent_toolkit.schema import (
     UserComplexInput,
     UserInput,
 )
+from langgraph_agent_toolkit.schema.execution import ExecutionRequest
+from langgraph_agent_toolkit.schema.jobs import BackgroundJob
 from langgraph_agent_toolkit.schema.models import ModelProvider
 
 
@@ -188,6 +190,92 @@ class AgentClient:
         if self._http_client is None:
             self._http_client = httpx.Client()
         return self._http_client
+
+    def submit_job(self, request: ExecutionRequest, *, idempotency_key: str) -> BackgroundJob:
+        """Submit durable work. Reuse the key only for the same operation."""
+        path = f"/{self.agent}/jobs" if self.agent else "/jobs"
+        try:
+            response = self._get_http_client().post(
+                self.base_url + path,
+                json=request.model_dump(mode="json", exclude_unset=True),
+                headers={**self._headers, "Idempotency-Key": idempotency_key},
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
+
+    async def asubmit_job(self, request: ExecutionRequest, *, idempotency_key: str) -> BackgroundJob:
+        """Submit durable work without waiting for the agent result."""
+        path = f"/{self.agent}/jobs" if self.agent else "/jobs"
+        try:
+            response = await self._get_async_http_client().post(
+                self.base_url + path,
+                json=request.model_dump(mode="json", exclude_unset=True),
+                headers={**self._headers, "Idempotency-Key": idempotency_key},
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
+
+    def get_job(self, job_id: str, *, user_id: str | None = None) -> BackgroundJob:
+        """Read the current job status and its saved result."""
+        try:
+            response = self._get_http_client().get(
+                f"{self.base_url}/jobs/{job_id}",
+                params={"user_id": user_id} if user_id is not None else {},
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
+
+    async def aget_job(self, job_id: str, *, user_id: str | None = None) -> BackgroundJob:
+        """Read one job without waiting for completion."""
+        try:
+            response = await self._get_async_http_client().get(
+                f"{self.base_url}/jobs/{job_id}",
+                params={"user_id": user_id} if user_id is not None else {},
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
+
+    def cancel_job(self, job_id: str, *, user_id: str | None = None) -> BackgroundJob:
+        """Request job cancellation and return its current status."""
+        try:
+            response = self._get_http_client().post(
+                f"{self.base_url}/jobs/{job_id}/cancel",
+                params={"user_id": user_id} if user_id is not None else {},
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
+
+    async def acancel_job(self, job_id: str, *, user_id: str | None = None) -> BackgroundJob:
+        """Request cancellation without reversing completed external actions."""
+        try:
+            response = await self._get_async_http_client().post(
+                f"{self.base_url}/jobs/{job_id}/cancel",
+                params={"user_id": user_id} if user_id is not None else {},
+                headers=self._headers,
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            return BackgroundJob.model_validate(response.json())
+        except httpx.HTTPError as exc:
+            raise _http_error(exc) from exc
 
     def _get_async_http_client(self) -> httpx.AsyncClient:
         loop = asyncio.get_running_loop()
