@@ -5,6 +5,11 @@ Start the service with :doc:`quickstart`. Use :doc:`installation` to select
 optional dependencies. Use :doc:`environment_setup` for model and database
 configuration. This guide covers the toolkit HTTP API and ``AgentClient``.
 
+Use ``/invoke`` for one complete answer, ``/stream`` for live messages and
+tokens, or optional ``/jobs`` for durable work in a separate worker. Read
+:ref:`choose-execution-path` for their request formats, response behavior,
+and recovery guarantees.
+
 Connect to a running service
 ----------------------------
 

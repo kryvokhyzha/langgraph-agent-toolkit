@@ -13,30 +13,103 @@ history, authentication, and UI behavior stay unchanged. The new job routes
 exist only when background execution is enabled. Ordinary ``/invoke`` calls
 do not become queued jobs. Redis and RabbitMQ are not required.
 
+.. _choose-execution-path:
+
 Choose the execution path
 -------------------------
 
 .. list-table::
    :header-rows: 1
-   :widths: 25 38 37
+   :widths: 20 35 45
 
    * - Path
      - Use it for
-     - Lifetime
-   * - Existing invoke and streaming API
-     - Interactive chat and token streaming
-     - The HTTP worker owns the request.
+     - Response and execution lifetime
+   * - ``POST /invoke``
+     - Interactive requests that need one complete answer
+     - The API executes the graph and returns one ``ChatMessage``. The client
+       waits for the response.
+   * - ``POST /stream``
+     - Interactive chat that displays messages and tokens as they arrive
+     - The API executes the graph while the HTTP connection carries SSE
+       events. Token output depends on the agent and model.
+   * - ``POST /jobs``
+     - Work that must survive API restarts, run in separate workers, or wait
+       for later approval
+     - The API commits the job before returning HTTP 202. A separate worker
+       executes it. Read status and saved results with ``GET /jobs/{job_id}``.
    * - ``agent_runtime()`` and ``executor.execute()``
      - Embedded applications and an existing application worker
      - The caller owns execution and recovery.
-   * - Optional ``/jobs`` API and toolkit worker
-     - Durable submission, separate worker capacity, and saved results
-     - The queue owns the job after submission commits.
+
+The three HTTP submission paths use the default agent. Add ``/{agent_id}``
+before the path to select another agent. Use :doc:`usage` for invoke and
+streaming examples. ``/stream/jsonl`` provides the same execution path with
+JSON Lines instead of SSE.
+
+Choose ``/invoke`` or ``/stream`` when the caller can keep the request open.
+Both run in the API process. Waiting for an HTTP response does not mean that
+the server uses blocking model or database calls. The asynchronous client method
+``ainvoke()`` still waits for this HTTP result; it does not submit a background
+job. A checkpoint can preserve completed steps, but it does not schedule
+automatic recovery after an API process crash. A lost connection is
+not proof that no tool action occurred. Do not blindly repeat the input.
+
+Choose ``/jobs`` when execution must continue independently of the submitting
+connection. It requires the ``background`` extra, PostgreSQL, an enabled jobs
+API, and a separate worker. Use shared durable checkpoints for recovery of
+unfinished graph execution. HTTP 202 confirms that the job was stored; it does
+not confirm completion or worker availability. Jobs return saved status and
+results, not a live token stream. ``/stream`` starts a new request; it does not
+attach to a submitted job.
+
+The request contracts differ. Invoke and streaming use the chat envelope, such
+as ``{"input":{"message":"Hello"}}``. Jobs require an explicit ``thread_id``
+and an ``Idempotency-Key`` header. Their ``input`` contains native graph input,
+such as ``{"messages":[{"role":"user","content":"Hello"}]}`` for a chat
+graph. See the submission example below before changing an existing client.
 
 The application still owns event polling, schedules, approval policy, external
 message delivery, and account mapping. Submit a stable operation key for each
 source event. Keep source cursors and outbound delivery records in the
 application database. A graph checkpoint is not an outbound message receipt.
+
+Why use a durable queue
+-----------------------
+
+FastAPI's `BackgroundTasks
+<https://fastapi.tiangolo.com/tutorial/background-tasks/>`_ runs functions
+after sending an HTTP response. The functions run inside the API process.
+It is useful for short, best-effort work, such as refreshing a disposable
+cache when a missed update is acceptable.
+
+``BackgroundTasks`` provides no persistent queue, automatic crash recovery,
+submission deduplication, or job status API. An abrupt process termination can
+lose pending work or interrupt work already in progress. Graceful shutdown
+can wait for tasks, but it does not make them durable. Tasks attached to one
+response run in order; an unhandled exception prevents later tasks from
+running. See the `Starlette background task documentation
+<https://starlette.dev/background/>`_.
+
+Background tasks also share API capacity. Asynchronous functions use the API
+event loop. Synchronous functions use its shared thread pool. Moving a slow
+operation into ``BackgroundTasks`` does not isolate it from HTTP handling.
+See the `Starlette thread pool documentation
+<https://starlette.dev/threadpool/>`_.
+
+The toolkit uses PostgreSQL and Procrastinate to store accepted jobs and run
+them in separate workers with bounded execution concurrency. Submission saves
+the job record and queue entry in one transaction before HTTP 202. Keep this
+database write in the request handler. Deferring it with ``BackgroundTasks``
+would allow the API to acknowledge a job before storage succeeds. A storage
+failure after the response could no longer produce HTTP 503 for that request.
+
+The durable queue supports duplicate-submission checks, saved results,
+cancellation requests, and recovery after worker loss. Checkpoints preserve
+graph progress; the queue schedules execution. These are separate roles.
+Neither guarantees that an external tool action occurs exactly once. Give
+external writes their own idempotency keys. The reliability limits below
+describe recovery and cancellation boundaries.
 
 Install and configure
 ---------------------

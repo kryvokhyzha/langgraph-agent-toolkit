@@ -104,6 +104,12 @@ the Python client, the UI, and real-model configuration.
 
 ## Choose an integration
 
+Use `/invoke` for one complete answer, `/stream` for live messages and tokens,
+or optional `/jobs` for durable work in a separate worker. The
+[execution guide](docs/background.rst#choose-the-execution-path) compares their
+contracts and explains why jobs use a durable queue instead of FastAPI
+`BackgroundTasks`.
+
 | Need                                         | Start with                                          | Guide                                                                       |
 | -------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
 | Chat without tools                           | `chatbot`                                           | [Agent patterns](docs/integrations.rst)                                     |
