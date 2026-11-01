@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.postgres &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/postgres.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../background.html">Background Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.postgres</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.postgres</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Share PostgreSQL connection and pool controls across toolkit backends.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgrammingError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.conninfo</span><span class="w"> </span><span class="kn">import</span> <span class="n">conninfo_to_dict</span><span class="p">,</span> <span class="n">make_conninfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.rows</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_row</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core._base_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">Settings</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.memory.pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckedAsyncConnectionPool</span>
+
+
+<div class="viewcode-block" id="validate_postgres_credentials">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.postgres.html#langgraph_agent_toolkit.core.postgres.validate_postgres_credentials">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_postgres_credentials</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="s2">&quot;Settings&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require the shared connection fields without including their values.&quot;&quot;&quot;</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;POSTGRES_USER&quot;</span><span class="p">,</span> <span class="s2">&quot;POSTGRES_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;POSTGRES_HOST&quot;</span><span class="p">,</span> <span class="s2">&quot;POSTGRES_PORT&quot;</span><span class="p">,</span> <span class="s2">&quot;POSTGRES_DB&quot;</span><span class="p">)</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">required</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required PostgreSQL configuration: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="postgres_connection_string">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.postgres.html#langgraph_agent_toolkit.core.postgres.postgres_connection_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">postgres_connection_string</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="s2">&quot;Settings&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dsn</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use an explicit DSN or the shared credentials and network defaults.</span>
+
+<span class="sd">    Explicit DSN parameters take precedence over network defaults. TLS and</span>
+<span class="sd">    other libpq parameters remain in the DSN. Managed session options are</span>
+<span class="sd">    applied separately by ``postgres_connection_kwargs``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;connect_timeout&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_CONNECT_TIMEOUT</span><span class="p">,</span>
+        <span class="s2">&quot;keepalives&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;keepalives_idle&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_KEEPALIVES_IDLE</span><span class="p">,</span>
+        <span class="s2">&quot;keepalives_interval&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_KEEPALIVES_INTERVAL</span><span class="p">,</span>
+        <span class="s2">&quot;keepalives_count&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_KEEPALIVES_COUNT</span><span class="p">,</span>
+        <span class="s2">&quot;tcp_user_timeout&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_TCP_USER_TIMEOUT</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">dsn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">validate_postgres_credentials</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_USER</span><span class="p">,</span>
+            <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_PASSWORD</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
+            <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_HOST</span><span class="p">,</span>
+            <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_PORT</span><span class="p">,</span>
+            <span class="s2">&quot;dbname&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_DB</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dsn</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid PostgreSQL connection string&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">conninfo_to_dict</span><span class="p">(</span><span class="n">dsn</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ProgrammingError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid PostgreSQL connection string&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">return</span> <span class="n">make_conninfo</span><span class="p">(</span><span class="o">**</span><span class="p">(</span><span class="n">defaults</span> <span class="o">|</span> <span class="n">parameters</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="postgres_connection_kwargs">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.postgres.html#langgraph_agent_toolkit.core.postgres.postgres_connection_kwargs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">postgres_connection_kwargs</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;Settings&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">app_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">conninfo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">force_schema</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply the same session controls to each PostgreSQL backend.</span>
+
+<span class="sd">    Keep extra DSN options. Append managed schema and timeout options so that</span>
+<span class="sd">    they take precedence. For memory&#39;s default public schema, preserve the</span>
+<span class="sd">    existing role search path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">inherited</span> <span class="o">=</span> <span class="n">conninfo_to_dict</span><span class="p">(</span><span class="n">conninfo</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inherited</span><span class="p">:</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inherited</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="ow">and</span> <span class="p">(</span><span class="n">schema</span> <span class="o">!=</span> <span class="s2">&quot;public&quot;</span> <span class="ow">or</span> <span class="n">force_schema</span><span class="p">):</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-c search_path=</span><span class="si">{</span><span class="n">schema</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;-c statement_timeout=</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_STATEMENT_TIMEOUT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;-c lock_timeout=</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_LOCK_TIMEOUT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;-c idle_in_transaction_session_timeout=</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;autocommit&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;prepare_threshold&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;row_factory&quot;</span><span class="p">:</span> <span class="n">dict_row</span><span class="p">,</span>
+        <span class="s2">&quot;application_name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_APPLICATION_NAME</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">app_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_reconnect_failed</span><span class="p">(</span><span class="n">pool</span><span class="p">:</span> <span class="s2">&quot;CheckedAsyncConnectionPool&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+        <span class="s2">&quot;Failed to reconnect to PostgreSQL. Pool stats: pool_size=</span><span class="si">{}</span><span class="s2">, pool_available=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pool_size&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">),</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pool_available&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="postgres_pool_options">
+<a class="viewcode-back" href="../../../generated/langgraph_agent_toolkit.core.postgres.html#langgraph_agent_toolkit.core.postgres.postgres_pool_options">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">postgres_pool_options</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;Settings&quot;</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">app_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">conninfo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">force_schema</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build options for ``CheckedAsyncConnectionPool`` without opening it.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">min_size</span> <span class="o">&lt;=</span> <span class="n">max_size</span> <span class="ow">or</span> <span class="n">max_size</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;PostgreSQL pool minimum must be between zero and its positive maximum&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;min_size&quot;</span><span class="p">:</span> <span class="n">min_size</span><span class="p">,</span>
+        <span class="s2">&quot;max_size&quot;</span><span class="p">:</span> <span class="n">max_size</span><span class="p">,</span>
+        <span class="s2">&quot;max_waiting&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_POOL_MAX_WAITING</span><span class="p">,</span>
+        <span class="s2">&quot;max_idle&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_MAX_IDLE</span><span class="p">,</span>
+        <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_POOL_TIMEOUT</span><span class="p">,</span>
+        <span class="s2">&quot;reconnect_timeout&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_RECONNECT_TIMEOUT</span><span class="p">,</span>
+        <span class="s2">&quot;max_lifetime&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_MAX_LIFETIME</span><span class="p">,</span>
+        <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_NUM_WORKERS</span><span class="p">,</span>
+        <span class="s2">&quot;health_check_timeout&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">POSTGRES_HEALTH_CHECK_TIMEOUT</span><span class="p">,</span>
+        <span class="s2">&quot;reconnect_failed&quot;</span><span class="p">:</span> <span class="n">_reconnect_failed</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="n">postgres_connection_kwargs</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">app_prefix</span><span class="o">=</span><span class="n">app_prefix</span><span class="p">,</span> <span class="n">conninfo</span><span class="o">=</span><span class="n">conninfo</span><span class="p">,</span> <span class="n">force_schema</span><span class="o">=</span><span class="n">force_schema</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;open&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

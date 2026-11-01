@@ -1,0 +1,15 @@
+langgraph\_agent\_toolkit.agents.blueprints.background\_example package
+=======================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.background_example
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.background_example.agent

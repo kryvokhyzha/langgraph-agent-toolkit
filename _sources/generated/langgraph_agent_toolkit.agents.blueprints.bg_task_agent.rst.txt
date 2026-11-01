@@ -1,0 +1,17 @@
+langgraph\_agent\_toolkit.agents.blueprints.bg\_task\_agent package
+===================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.bg_task_agent
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.agents.blueprints.bg_task_agent.agent
+   langgraph_agent_toolkit.agents.blueprints.bg_task_agent.task
+   langgraph_agent_toolkit.agents.blueprints.bg_task_agent.utils

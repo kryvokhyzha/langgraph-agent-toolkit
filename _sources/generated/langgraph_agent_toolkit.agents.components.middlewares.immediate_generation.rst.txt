@@ -1,0 +1,7 @@
+langgraph\_agent\_toolkit.agents.components.middlewares.immediate\_generation module
+====================================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.components.middlewares.immediate_generation
+   :members:
+   :show-inheritance:
+   :undoc-members:

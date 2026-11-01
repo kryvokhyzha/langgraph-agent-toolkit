@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.background.postgres module &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/generated/langgraph_agent_toolkit.core.background.postgres.html" />
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="langgraph_agent_toolkit.core.memory package" href="langgraph_agent_toolkit.core.memory.html" />
+    <link rel="prev" title="langgraph_agent_toolkit.core.background package" href="langgraph_agent_toolkit.core.background.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Background Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="langgraph_agent_toolkit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.agents.html">langgraph_agent_toolkit.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.client.html">langgraph_agent_toolkit.client package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.helper.html">langgraph_agent_toolkit.helper package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.schema.html">langgraph_agent_toolkit.schema package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.service.html">langgraph_agent_toolkit.service package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="langgraph_agent_toolkit.ui.html">langgraph_agent_toolkit.ui package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="langgraph_agent_toolkit.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.html">langgraph_agent_toolkit package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.html">langgraph_agent_toolkit.core package</a></li>
+          <li class="breadcrumb-item"><a href="langgraph_agent_toolkit.core.background.html">langgraph_agent_toolkit.core.background package</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.background.postgres module</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/generated/langgraph_agent_toolkit.core.background.postgres.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-langgraph_agent_toolkit.core.background.postgres">
+<span id="langgraph-agent-toolkit-core-background-postgres-module"></span><h1>langgraph_agent_toolkit.core.background.postgres module<a class="headerlink" href="#module-langgraph_agent_toolkit.core.background.postgres" title="Link to this heading"></a></h1>
+<p>Persist job records and enqueue them in one PostgreSQL transaction.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.JobConflict">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.background.postgres.</span></span><span class="sig-name descname"><span class="pre">JobConflict</span></span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#JobConflict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L81-L82"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.JobConflict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>The operation conflicts with an existing durable job.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.BackgroundUnavailable">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.background.postgres.</span></span><span class="sig-name descname"><span class="pre">BackgroundUnavailable</span></span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#BackgroundUnavailable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L85-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.BackgroundUnavailable" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>The optional queue has not been configured or initialized.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.background.postgres.</span></span><span class="sig-name descname"><span class="pre">PostgresJobQueue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsn</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat_background'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L120-L510"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Own a bounded pool shared by job records and the optional task queue.</p>
+<p>Opening the queue checks its schema. It never creates or migrates tables.
+Use <code class="docutils literal notranslate"><span class="pre">initialize_background</span></code> once with a deployment migration identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dsn</strong> (<em>str</em>)</p></li>
+<li><p><strong>schema</strong> (<em>str</em>)</p></li>
+<li><p><strong>pool_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>pool_max_size</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_attempts</strong> (<em>int</em>)</p></li>
+<li><p><strong>execution_timeout</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsn</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat_background'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L127-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dsn</strong> (<em>str</em>)</p></li>
+<li><p><strong>schema</strong> (<em>str</em>)</p></li>
+<li><p><strong>pool_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>pool_max_size</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_attempts</strong> (<em>int</em>)</p></li>
+<li><p><strong>execution_timeout</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.submit">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">submit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idempotency_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.submit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L207-L243"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.submit" title="Link to this definition"></a></dt>
+<dd><p>Atomically save a request and enqueue it, or return its prior job.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>owner_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>request</strong> (<a class="reference internal" href="langgraph_agent_toolkit.schema.execution.html#langgraph_agent_toolkit.schema.execution.ExecutionRequest" title="langgraph_agent_toolkit.schema.execution.ExecutionRequest"><em>ExecutionRequest</em></a>)</p></li>
+<li><p><strong>idempotency_key</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="langgraph_agent_toolkit.schema.jobs.html#langgraph_agent_toolkit.schema.jobs.BackgroundJob" title="langgraph_agent_toolkit.schema.jobs.BackgroundJob"><em>BackgroundJob</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.get">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L245-L253"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.get" title="Link to this definition"></a></dt>
+<dd><p>Read only a job owned by the authenticated identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>owner_id</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="langgraph_agent_toolkit.schema.jobs.html#langgraph_agent_toolkit.schema.jobs.BackgroundJob" title="langgraph_agent_toolkit.schema.jobs.BackgroundJob"><em>BackgroundJob</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.has_active_jobs">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">has_active_jobs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.has_active_jobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L255-L273"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.has_active_jobs" title="Link to this definition"></a></dt>
+<dd><p>Check for recoverable work before deleting a conversation’s checkpoints.</p>
+<p>The caller holds the conversation lock. This read does not acquire job
+row locks. A newly submitted job cannot start until that lock is released.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>owner_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>thread_id</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.cancel">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L275-L296"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.cancel" title="Link to this definition"></a></dt>
+<dd><p>Persist cancellation and notify the worker in the same transaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_id</strong> (<em>str</em>)</p></li>
+<li><p><strong>owner_id</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="langgraph_agent_toolkit.schema.jobs.html#langgraph_agent_toolkit.schema.jobs.BackgroundJob" title="langgraph_agent_toolkit.schema.jobs.BackgroundJob"><em>BackgroundJob</em></a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.recover_stalled">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">recover_stalled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stalled_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.recover_stalled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L366-L438"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.recover_stalled" title="Link to this definition"></a></dt>
+<dd><p>Recover lost workers and failed result persistence without replaying input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stalled_after</strong> (<em>float</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.run_worker">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">run_worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">concurrency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recovery_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stalled_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_signal_handlers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#PostgresJobQueue.run_worker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L440-L510"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.run_worker" title="Link to this definition"></a></dt>
+<dd><p>Supervise the library worker and recovery outside execution slots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>runtime</strong> (<a class="reference internal" href="langgraph_agent_toolkit.core.runtime.html#langgraph_agent_toolkit.core.runtime.AgentRuntime" title="langgraph_agent_toolkit.core.runtime.AgentRuntime"><em>AgentRuntime</em></a>)</p></li>
+<li><p><strong>concurrency</strong> (<em>int</em>)</p></li>
+<li><p><strong>recovery_interval</strong> (<em>int</em>)</p></li>
+<li><p><strong>stalled_after</strong> (<em>float</em>)</p></li>
+<li><p><strong>install_signal_handlers</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.initialize_background">
+<span class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.background.postgres.</span></span><span class="sig-name descname"><span class="pre">initialize_background</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsn</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat_background'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#initialize_background"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L513-L561"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.initialize_background" title="Link to this definition"></a></dt>
+<dd><p>Create the dedicated schema or apply a supported toolkit schema upgrade.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dsn</strong> (<em>str</em>)</p></li>
+<li><p><strong>schema</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="langgraph_agent_toolkit.core.background.postgres.queue_from_settings">
+<span class="sig-prename descclassname"><span class="pre">langgraph_agent_toolkit.core.background.postgres.</span></span><span class="sig-name descname"><span class="pre">queue_from_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/langgraph_agent_toolkit/core/background/postgres.html#queue_from_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="reference external" href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/langgraph_agent_toolkit/core/background/postgres.py#L564-L575"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#langgraph_agent_toolkit.core.background.postgres.queue_from_settings" title="Link to this definition"></a></dt>
+<dd><p>Build the optional queue without exposing its connection credentials.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue" title="langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue"><em>PostgresJobQueue</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="langgraph_agent_toolkit.core.background.html" class="btn btn-neutral float-left" title="langgraph_agent_toolkit.core.background package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="langgraph_agent_toolkit.core.memory.html" class="btn btn-neutral float-right" title="langgraph_agent_toolkit.core.memory package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

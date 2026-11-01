@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>langgraph_agent_toolkit.core.background.postgres &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/_modules/langgraph_agent_toolkit/core/background/postgres.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="../../../../index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../background.html">Background Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">langgraph_agent_toolkit.core.background.postgres</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for langgraph_agent_toolkit.core.background.postgres</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Persist job records and enqueue them in one PostgreSQL transaction.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncExitStack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncConnection</span><span class="p">,</span> <span class="n">sql</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psycopg.types.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">Jsonb</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.identity</span><span class="w"> </span><span class="kn">import</span> <span class="n">storage_thread_id</span><span class="p">,</span> <span class="n">validate_conversation_identifiers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.memory.pool</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckedAsyncConnectionPool</span> <span class="k">as</span> <span class="n">AsyncConnectionPool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.postgres</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">postgres_connection_kwargs</span><span class="p">,</span>
+    <span class="n">postgres_connection_string</span><span class="p">,</span>
+    <span class="n">postgres_pool_options</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.helper.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema.execution</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackgroundJob</span>
+
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">procrastinate.job_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobContext</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">procrastinate.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncCallNext</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">procrastinate.worker</span><span class="w"> </span><span class="kn">import</span> <span class="n">Worker</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRuntime</span>
+
+
+<span class="n">_TERMINAL</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="s2">&quot;interrupted&quot;</span><span class="p">,</span> <span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="s2">&quot;cancelled&quot;</span><span class="p">}</span>
+<span class="n">_QUEUE</span> <span class="o">=</span> <span class="s2">&quot;lat-runs&quot;</span>
+<span class="n">_TASK</span> <span class="o">=</span> <span class="s2">&quot;lat.execute&quot;</span>
+<span class="n">_SCHEMA_VERSION</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">_HISTORY_GUARD_INDEX</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE INDEX lat_jobs_active_thread ON lat_jobs(owner_id,agent_id,md5(thread_id))</span>
+<span class="s2">    WHERE status IN (&#39;queued&#39;,&#39;running&#39;,&#39;cancelling&#39;);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">_RECOVERY_INDEXES</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE INDEX lat_jobs_recovery_active ON lat_jobs(queue_job_id)</span>
+<span class="s2">    WHERE status IN (&#39;queued&#39;,&#39;running&#39;,&#39;cancelling&#39;);</span>
+<span class="s2">CREATE INDEX lat_queue_recovery_doing ON procrastinate_jobs(id)</span>
+<span class="s2">    WHERE status = &#39;doing&#39;;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">_DDL</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">CREATE TABLE lat_background_version (</span>
+<span class="s2">    singleton boolean PRIMARY KEY DEFAULT true CHECK (singleton),</span>
+<span class="s2">    version integer NOT NULL,</span>
+<span class="s2">    queue_version text NOT NULL</span>
+<span class="s2">);</span>
+<span class="s2">CREATE TABLE lat_jobs (</span>
+<span class="s2">    job_id uuid PRIMARY KEY,</span>
+<span class="s2">    queue_job_id bigint UNIQUE REFERENCES procrastinate_jobs(id),</span>
+<span class="s2">    owner_id text NOT NULL,</span>
+<span class="s2">    agent_id text NOT NULL,</span>
+<span class="s2">    thread_id text NOT NULL,</span>
+<span class="s2">    idempotency_key text NOT NULL,</span>
+<span class="s2">    fingerprint text NOT NULL,</span>
+<span class="s2">    request jsonb NOT NULL,</span>
+<span class="s2">    status text NOT NULL DEFAULT &#39;queued&#39;</span>
+<span class="s2">        CHECK (status IN (&#39;queued&#39;,&#39;running&#39;,&#39;cancelling&#39;,&#39;cancelled&#39;,&#39;completed&#39;,&#39;interrupted&#39;,&#39;failed&#39;)),</span>
+<span class="s2">    started boolean NOT NULL DEFAULT false,</span>
+<span class="s2">    baseline_checkpoint_id text,</span>
+<span class="s2">    attempts integer NOT NULL DEFAULT 0,</span>
+<span class="s2">    result jsonb,</span>
+<span class="s2">    error text,</span>
+<span class="s2">    created_at timestamptz NOT NULL DEFAULT now(),</span>
+<span class="s2">    updated_at timestamptz NOT NULL DEFAULT now(),</span>
+<span class="s2">    UNIQUE (owner_id, agent_id, idempotency_key)</span>
+<span class="s2">);</span>
+<span class="s2">CREATE INDEX lat_jobs_owner_created ON lat_jobs(owner_id, created_at DESC);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="JobConflict">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.JobConflict">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobConflict</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The operation conflicts with an existing durable job.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="BackgroundUnavailable">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.BackgroundUnavailable">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BackgroundUnavailable</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The optional queue has not been configured or initialized.&quot;&quot;&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_procrastinate</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">procrastinate</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;Install langgraph-agent-toolkit[background] to use durable jobs&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+    <span class="k">return</span> <span class="n">procrastinate</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_schema_name</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z_][a-z0-9_]{0,62}&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Background schema must be a lowercase PostgreSQL identifier&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_job</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">BackgroundJob</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">BackgroundJob</span><span class="o">.</span><span class="n">model_validate</span><span class="p">({</span><span class="o">**</span><span class="n">row</span><span class="p">,</span> <span class="s2">&quot;job_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;job_id&quot;</span><span class="p">])})</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_valid_job_id</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">UUID</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_configure_connection</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">AsyncConnection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Procrastinate sets autocommit itself on its separate LISTEN connection.</span>
+    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">set_autocommit</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PostgresJobQueue">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostgresJobQueue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Own a bounded pool shared by job records and the optional task queue.</span>
+
+<span class="sd">    Opening the queue checks its schema. It never creates or migrates tables.</span>
+<span class="sd">    Use ``initialize_background`` once with a deployment migration identity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PostgresJobQueue.__init__">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dsn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lat_background&quot;</span><span class="p">,</span>
+        <span class="n">pool_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">pool_max_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">execution_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">procrastinate</span> <span class="o">=</span> <span class="n">_procrastinate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">_schema_name</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pool_max_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pool_size</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">pool_size</span> <span class="o">!=</span> <span class="n">pool_max_size</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Use only one background pool size&quot;</span><span class="p">)</span>
+            <span class="n">pool_size</span> <span class="o">=</span> <span class="n">pool_max_size</span>
+        <span class="k">if</span> <span class="n">pool_size</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">max_attempts</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">execution_timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Background pool size must be at least 2; attempts and timeout must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">=</span> <span class="n">max_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">execution_timeout</span> <span class="o">=</span> <span class="n">execution_timeout</span>
+        <span class="n">conninfo</span> <span class="o">=</span> <span class="n">postgres_connection_string</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">dsn</span><span class="o">=</span><span class="n">dsn</span><span class="p">)</span>
+        <span class="n">pool_options</span> <span class="o">=</span> <span class="n">postgres_pool_options</span><span class="p">(</span>
+            <span class="n">settings</span><span class="p">,</span>
+            <span class="n">min_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">max_size</span><span class="o">=</span><span class="n">pool_size</span><span class="p">,</span>
+            <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+            <span class="n">app_prefix</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span>
+            <span class="n">conninfo</span><span class="o">=</span><span class="n">conninfo</span><span class="p">,</span>
+            <span class="n">force_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Procrastinate sets this keyword on its separate LISTEN connection.</span>
+        <span class="c1"># The configure callback enables it for pooled connections as well.</span>
+        <span class="n">pool_options</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;autocommit&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">AsyncConnectionPool</span><span class="p">(</span>
+            <span class="n">conninfo</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">pool_options</span><span class="p">,</span>
+            <span class="n">configure</span><span class="o">=</span><span class="n">_configure_connection</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">procrastinate</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">connector</span><span class="o">=</span><span class="n">procrastinate</span><span class="o">.</span><span class="n">PsycopgConnector</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">task</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">_TASK</span><span class="p">,</span>
+            <span class="n">queue</span><span class="o">=</span><span class="n">_QUEUE</span><span class="p">,</span>
+            <span class="n">pass_context</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">retry</span><span class="o">=</span><span class="n">procrastinate</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="n">max_attempts</span><span class="o">=</span><span class="n">max_attempts</span><span class="p">,</span> <span class="n">exponential_wait</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_job</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span><span class="p">:</span> <span class="n">AgentRuntime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span><span class="p">:</span> <span class="n">AsyncExitStack</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PostgresJobQueue&quot;</span><span class="p">:</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">AsyncExitStack</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">resources</span><span class="o">.</span><span class="n">enter_async_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">POSTGRES_POOL_TIMEOUT</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">resources</span><span class="o">.</span><span class="n">enter_async_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">open_async</span><span class="p">(</span><span class="n">pool</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">))</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                <span class="n">exists</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span><span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT to_regclass(&#39;lat_background_version&#39;) AS name&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">exists</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;Initialize the background database schema before starting the service&quot;</span><span class="p">)</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT version, queue_version FROM lat_background_version&quot;</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="n">version</span>
+                    <span class="ow">or</span> <span class="n">version</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SCHEMA_VERSION</span>
+                    <span class="ow">or</span> <span class="n">version</span><span class="p">[</span><span class="s2">&quot;queue_version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;procrastinate&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span>
+                        <span class="s2">&quot;Background schema version differs; apply a reviewed database migration&quot;</span>
+                    <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="n">resources</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">resources</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+            <span class="k">raise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span><span class="o">.</span><span class="fm">__aexit__</span><span class="p">(</span><span class="o">*</span><span class="n">exc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="PostgresJobQueue.submit">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.submit">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ExecutionRequest</span><span class="p">,</span> <span class="n">idempotency_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BackgroundJob</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Atomically save a request and enqueue it, or return its prior job.&quot;&quot;&quot;</span>
+        <span class="n">validate_conversation_identifiers</span><span class="p">(</span><span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">thread_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user_id</span> <span class="o">!=</span> <span class="n">owner_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;user_id must match the execution owner&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">idempotency_key</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">idempotency_key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">128</span> <span class="ow">or</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">idempotency_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Idempotency key must contain 1 to 128 characters without NUL&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">timeout_seconds</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Execution timeout exceeds the configured background limit&quot;</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+        <span class="n">fingerprint</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+            <span class="n">inserted</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;INSERT INTO lat_jobs(job_id,owner_id,agent_id,thread_id,idempotency_key,fingerprint,request) &quot;</span>
+                    <span class="s2">&quot;VALUES (</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">) ON CONFLICT (owner_id,agent_id,idempotency_key) DO NOTHING &quot;</span>
+                    <span class="s2">&quot;RETURNING job_id&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">idempotency_key</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">,</span> <span class="n">Jsonb</span><span class="p">(</span><span class="n">payload</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">inserted</span><span class="p">:</span>
+                <span class="n">queue_id</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span>
+                    <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="n">storage_thread_id</span><span class="p">(</span><span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">thread_id</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">defer_async</span><span class="p">(</span><span class="n">job_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">job_id</span><span class="p">))</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;UPDATE lat_jobs SET queue_job_id=</span><span class="si">%s</span><span class="s2"> WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">queue_id</span><span class="p">,</span> <span class="n">job_id</span><span class="p">))</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;SELECT * FROM lat_jobs WHERE owner_id=</span><span class="si">%s</span><span class="s2"> AND agent_id=</span><span class="si">%s</span><span class="s2"> AND idempotency_key=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">idempotency_key</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;fingerprint&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">fingerprint</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">JobConflict</span><span class="p">(</span><span class="s2">&quot;Idempotency key was already used for a different request&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_job</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PostgresJobQueue.get">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.get">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BackgroundJob</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read only a job owned by the authenticated identity.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_valid_job_id</span><span class="p">(</span><span class="n">job_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM lat_jobs WHERE job_id=</span><span class="si">%s</span><span class="s2"> AND owner_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">))</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_job</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">if</span> <span class="n">row</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="PostgresJobQueue.has_active_jobs">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.has_active_jobs">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">has_active_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for recoverable work before deleting a conversation&#39;s checkpoints.</span>
+
+<span class="sd">        The caller holds the conversation lock. This read does not acquire job</span>
+<span class="sd">        row locks. A newly submitted job cannot start until that lock is released.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validate_conversation_identifiers</span><span class="p">(</span><span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;SELECT EXISTS (SELECT 1 FROM lat_jobs WHERE owner_id=</span><span class="si">%s</span><span class="s2"> AND agent_id=</span><span class="si">%s</span><span class="s2"> AND thread_id=</span><span class="si">%s</span><span class="s2"> &quot;</span>
+                    <span class="s2">&quot;AND md5(thread_id)=md5(</span><span class="si">%s</span><span class="s2">) &quot;</span>
+                    <span class="s2">&quot;AND status IN (&#39;queued&#39;,&#39;running&#39;,&#39;cancelling&#39;)) AS active&quot;</span><span class="p">,</span>
+                    <span class="c1"># Hash the index key to bound its UTF-8 size. The original</span>
+                    <span class="c1"># thread comparison prevents hash collisions from matching.</span>
+                    <span class="p">(</span><span class="n">owner_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PostgresJobQueue.cancel">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.cancel">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BackgroundJob</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Persist cancellation and notify the worker in the same transaction.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_valid_job_id</span><span class="p">(</span><span class="n">job_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;SELECT * FROM lat_jobs WHERE job_id=</span><span class="si">%s</span><span class="s2"> AND owner_id=</span><span class="si">%s</span><span class="s2"> FOR UPDATE&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">row</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TERMINAL</span><span class="p">:</span>
+                <span class="n">queue_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">job_manager</span><span class="o">.</span><span class="n">get_job_status_async</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;queue_job_id&quot;</span><span class="p">],</span> <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;cancelling&quot;</span> <span class="k">if</span> <span class="n">queue_status</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;doing&quot;</span> <span class="k">else</span> <span class="s2">&quot;cancelled&quot;</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">job_manager</span><span class="o">.</span><span class="n">cancel_job_by_id_async</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;queue_job_id&quot;</span><span class="p">],</span> <span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;UPDATE lat_jobs SET status=</span><span class="si">%s</span><span class="s2">,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2"> RETURNING *&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">job_id</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">_job</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s2">&quot;JobContext&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;A worker runtime is required to execute background jobs&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span><span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM lat_jobs WHERE job_id=</span><span class="si">%s</span><span class="s2"> FOR UPDATE&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,)))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">_TERMINAL</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cancelling&quot;</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;UPDATE lat_jobs SET status=&#39;cancelled&#39;,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,))</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;attempts&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;UPDATE lat_jobs SET status=&#39;failed&#39;,error=&#39;Worker recovery attempts exhausted&#39;,updated_at=now() &quot;</span>
+                    <span class="s2">&quot;WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">job_id</span><span class="p">,),</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="s2">&quot;UPDATE lat_jobs SET status=&#39;running&#39;,attempts=attempts+1,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,)</span>
+            <span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">record_start</span><span class="p">(</span><span class="n">checkpoint_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT status FROM lat_jobs WHERE job_id=</span><span class="si">%s</span><span class="s2"> FOR UPDATE&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job_id</span><span class="p">,))</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">current</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;running&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;UPDATE lat_jobs SET started=true,baseline_checkpoint_id=</span><span class="si">%s</span><span class="s2">,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">checkpoint_id</span><span class="p">,</span> <span class="n">job_id</span><span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;agent_id&quot;</span><span class="p">],</span>
+                <span class="n">ExecutionRequest</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]),</span>
+                <span class="n">owner_id</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;owner_id&quot;</span><span class="p">],</span>
+                <span class="n">operation_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
+                <span class="n">retry</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">],</span>
+                <span class="n">baseline_checkpoint_id</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;baseline_checkpoint_id&quot;</span><span class="p">],</span>
+                <span class="n">on_start</span><span class="o">=</span><span class="n">record_start</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;UPDATE lat_jobs SET status=CASE WHEN status=&#39;cancelling&#39; THEN &#39;cancelled&#39; ELSE &#39;running&#39; END, &quot;</span>
+                    <span class="s2">&quot;updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2"> AND status IN (&#39;running&#39;,&#39;cancelling&#39;)&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">job_id</span><span class="p">,),</span>
+                <span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># Exception messages can contain model input or provider credentials.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Background operation </span><span class="si">{}</span><span class="s2"> failed (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;UPDATE lat_jobs SET status=CASE WHEN status=&#39;cancelling&#39; THEN &#39;cancelled&#39; ELSE &#39;failed&#39; END, &quot;</span>
+                    <span class="s2">&quot;error=</span><span class="si">%s</span><span class="s2">,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2"> AND status IN (&#39;running&#39;,&#39;cancelling&#39;)&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution failed (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">job_id</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="s2">&quot;UPDATE lat_jobs SET status=</span><span class="si">%s</span><span class="s2">,result=</span><span class="si">%s</span><span class="s2">,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;AND status IN (&#39;running&#39;,&#39;cancelling&#39;)&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">Jsonb</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)),</span> <span class="n">job_id</span><span class="p">),</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="PostgresJobQueue.recover_stalled">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.recover_stalled">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover_stalled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stalled_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recover lost workers and failed result persistence without replaying input.&quot;&quot;&quot;</span>
+        <span class="n">procrastinate</span> <span class="o">=</span> <span class="n">_procrastinate</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;SELECT candidates.job_id FROM (&quot;</span>
+                    <span class="s2">&quot;SELECT j.job_id,q.id FROM procrastinate_jobs q JOIN lat_jobs j ON j.queue_job_id=q.id &quot;</span>
+                    <span class="s2">&quot;WHERE q.status=&#39;doing&#39; AND (q.worker_id IS NULL OR EXISTS (&quot;</span>
+                    <span class="s2">&quot;SELECT 1 FROM procrastinate_workers w WHERE w.id=q.worker_id &quot;</span>
+                    <span class="s2">&quot;AND w.last_heartbeat &lt; now() - </span><span class="si">%s</span><span class="s2"> * interval &#39;1 second&#39;)) &quot;</span>
+                    <span class="s2">&quot;UNION ALL &quot;</span>
+                    <span class="s2">&quot;SELECT j.job_id,q.id FROM lat_jobs j JOIN procrastinate_jobs q ON q.id=j.queue_job_id &quot;</span>
+                    <span class="s2">&quot;WHERE j.status IN (&#39;queued&#39;,&#39;running&#39;,&#39;cancelling&#39;) AND q.status IN (&#39;failed&#39;,&#39;aborted&#39;)&quot;</span>
+                    <span class="s2">&quot;) candidates ORDER BY candidates.id LIMIT 100&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">stalled_after</span><span class="p">,),</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">,</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+                <span class="c1"># Match cancellation&#39;s ledger-before-queue lock order. Recheck the</span>
+                <span class="c1"># queue after locking; another worker can already have recovered it.</span>
+                <span class="n">job</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;SELECT * FROM lat_jobs WHERE job_id=</span><span class="si">%s</span><span class="s2"> FOR UPDATE SKIP LOCKED&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;job_id&quot;</span><span class="p">],)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">job</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">candidate</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;SELECT q.status,q.attempts,q.abort_requested FROM procrastinate_jobs q WHERE q.id=</span><span class="si">%s</span><span class="s2"> AND (&quot;</span>
+                        <span class="s2">&quot;q.status IN (&#39;failed&#39;,&#39;aborted&#39;) OR (q.status=&#39;doing&#39; AND (q.worker_id IS NULL OR EXISTS (&quot;</span>
+                        <span class="s2">&quot;SELECT 1 FROM procrastinate_workers w WHERE w.id=q.worker_id &quot;</span>
+                        <span class="s2">&quot;AND w.last_heartbeat &lt; now() - </span><span class="si">%s</span><span class="s2"> * interval &#39;1 second&#39;)))) &quot;</span>
+                        <span class="s2">&quot;FOR UPDATE OF q SKIP LOCKED&quot;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s2">&quot;queue_job_id&quot;</span><span class="p">],</span> <span class="n">stalled_after</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">candidate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;aborted&quot;</span> <span class="ow">or</span> <span class="p">(</span>
+                    <span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;attempts&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="ow">or</span> <span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;abort_requested&quot;</span><span class="p">])</span>
+                <span class="p">):</span>
+                    <span class="k">if</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TERMINAL</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                            <span class="s2">&quot;UPDATE lat_jobs SET status=&quot;</span>
+                            <span class="s2">&quot;CASE WHEN status=&#39;cancelling&#39; THEN &#39;cancelled&#39; ELSE &#39;failed&#39; END, &quot;</span>
+                            <span class="s2">&quot;error=&#39;Worker recovery attempts exhausted&#39;,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s2">&quot;job_id&quot;</span><span class="p">],),</span>
+                        <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span> <span class="ow">and</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">_TERMINAL</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cancelling&quot;</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                        <span class="s2">&quot;UPDATE lat_jobs SET status=&#39;cancelled&#39;,updated_at=now() WHERE job_id=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s2">&quot;job_id&quot;</span><span class="p">],)</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">candidate</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">job_manager</span><span class="o">.</span><span class="n">cancel_job_by_id_async</span><span class="p">(</span><span class="n">job</span><span class="p">[</span><span class="s2">&quot;queue_job_id&quot;</span><span class="p">],</span> <span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">)</span>
+                <span class="c1"># Reuse the library&#39;s transition in this transaction. Its public</span>
+                <span class="c1"># retry helper does not accept an external connection.</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">execute_query_one_async_with_connection</span><span class="p">(</span>
+                    <span class="n">conn</span><span class="p">,</span>
+                    <span class="n">query</span><span class="o">=</span><span class="n">procrastinate</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">queries</span><span class="p">[</span><span class="s2">&quot;retry_job&quot;</span><span class="p">],</span>
+                    <span class="n">job_id</span><span class="o">=</span><span class="n">job</span><span class="p">[</span><span class="s2">&quot;queue_job_id&quot;</span><span class="p">],</span>
+                    <span class="n">retry_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">),</span>
+                    <span class="n">new_priority</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">new_queue_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">new_lock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PostgresJobQueue.run_worker">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.PostgresJobQueue.run_worker">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_worker</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">runtime</span><span class="p">:</span> <span class="s2">&quot;AgentRuntime&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">recovery_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">stalled_after</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">install_signal_handlers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Supervise the library worker and recovery outside execution slots.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">recovery_interval</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">stalled_after</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">concurrency</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Recovery interval, stalled timeout, and concurrency must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;Use a separate queue instance for each worker runtime&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="n">runtime</span>
+        <span class="n">bookkeeping_failure</span><span class="p">:</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">supervise_job</span><span class="p">(</span><span class="n">call_next</span><span class="p">:</span> <span class="s2">&quot;AsyncCallNext&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s2">&quot;JobContext&quot;</span><span class="p">,</span> <span class="n">worker</span><span class="p">:</span> <span class="s2">&quot;Worker&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+            <span class="c1"># Middleware runs inside the library&#39;s delivery task. Its completion</span>
+            <span class="c1"># includes the final queue acknowledgement, after middleware returns.</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">completed</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">nonlocal</span> <span class="n">bookkeeping_failure</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">cancelled</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">error</span> <span class="o">:=</span> <span class="n">task</span><span class="o">.</span><span class="n">exception</span><span class="p">())</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">bookkeeping_failure</span> <span class="o">=</span> <span class="n">bookkeeping_failure</span> <span class="ow">or</span> <span class="n">error</span>
+                    <span class="n">worker</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+            <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="n">completed</span><span class="p">)</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">()</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># A queued recovery task can strand its own lock after a worker dies.</span>
+            <span class="c1"># This loop has no queue lock and consumes no execution slot or row.</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">recovery_interval</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">recover_stalled</span><span class="p">(</span><span class="n">stalled_after</span><span class="o">=</span><span class="n">stalled_after</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">recover_stalled</span><span class="p">(</span><span class="n">stalled_after</span><span class="o">=</span><span class="n">stalled_after</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">runtime</span><span class="o">.</span><span class="n">llm_transport_manager</span><span class="o">.</span><span class="n">bind</span><span class="p">():</span>
+                <span class="n">worker_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">run_worker_async</span><span class="p">(</span>
+                        <span class="n">queues</span><span class="o">=</span><span class="p">[</span><span class="n">_QUEUE</span><span class="p">],</span>
+                        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+                        <span class="n">install_signal_handlers</span><span class="o">=</span><span class="n">install_signal_handlers</span><span class="p">,</span>
+                        <span class="n">shutdown_graceful_timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">update_heartbeat_interval</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">stalled_after</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
+                        <span class="n">stalled_worker_timeout</span><span class="o">=</span><span class="n">stalled_after</span><span class="p">,</span>
+                        <span class="n">fetch_job_polling_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">abort_job_polling_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">worker_middleware</span><span class="o">=</span><span class="p">[</span><span class="n">supervise_job</span><span class="p">],</span>
+                    <span class="p">),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;background-worker&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">recovery_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">recover</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;background-recovery&quot;</span><span class="p">)</span>
+                <span class="n">tasks</span> <span class="o">=</span> <span class="p">(</span><span class="n">worker_task</span><span class="p">,</span> <span class="n">recovery_task</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_when</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">FIRST_COMPLETED</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                            <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                    <span class="c1"># The library drains running jobs before its task exits.</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bookkeeping_failure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;Background job acknowledgement failed&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">bookkeeping_failure</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="initialize_background">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.initialize_background">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialize_background</span><span class="p">(</span><span class="n">dsn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lat_background&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create the dedicated schema or apply a supported toolkit schema upgrade.&quot;&quot;&quot;</span>
+    <span class="n">procrastinate</span> <span class="o">=</span> <span class="n">_procrastinate</span><span class="p">()</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">_schema_name</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+    <span class="n">conninfo</span> <span class="o">=</span> <span class="n">postgres_connection_string</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">dsn</span><span class="o">=</span><span class="n">dsn</span><span class="p">)</span>
+    <span class="n">connection_kwargs</span> <span class="o">=</span> <span class="n">postgres_connection_kwargs</span><span class="p">(</span>
+        <span class="n">settings</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">app_prefix</span><span class="o">=</span><span class="s2">&quot;background-initialize&quot;</span><span class="p">,</span> <span class="n">conninfo</span><span class="o">=</span><span class="n">conninfo</span><span class="p">,</span> <span class="n">force_schema</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="c1"># Schema migrations contain multiple statements. Do not prepare them.</span>
+    <span class="n">connection_kwargs</span><span class="p">[</span><span class="s2">&quot;prepare_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="k">await</span> <span class="n">AsyncConnection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+        <span class="n">conninfo</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">connection_kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">conn</span><span class="o">.</span><span class="n">transaction</span><span class="p">():</span>
+            <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT pg_advisory_xact_lock(hashtextextended(</span><span class="si">%s</span><span class="s2">,0))&quot;</span><span class="p">,</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lat-background:</span><span class="si">{</span><span class="n">schema</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,))</span>
+            <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;CREATE SCHEMA IF NOT EXISTS </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">schema</span><span class="p">)))</span>
+            <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">SQL</span><span class="p">(</span><span class="s2">&quot;SET LOCAL search_path TO </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">schema</span><span class="p">)))</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span><span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT to_regclass(&#39;lat_background_version&#39;) AS name&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">found</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">queue_table</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span><span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT to_regclass(&#39;procrastinate_jobs&#39;) AS name&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">queue_table</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span><span class="s2">&quot;Use a fresh dedicated schema; an unrelated queue already exists&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">procrastinate</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">SchemaManager</span><span class="o">.</span><span class="n">get_schema</span><span class="p">())</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_DDL</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_RECOVERY_INDEXES</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_HISTORY_GUARD_INDEX</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                    <span class="s2">&quot;INSERT INTO lat_background_version(version,queue_version) VALUES (</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">_SCHEMA_VERSION</span><span class="p">,</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;procrastinate&quot;</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="k">await</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT version,queue_version FROM lat_background_version&quot;</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="n">queue_version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;procrastinate&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">version</span> <span class="ow">and</span> <span class="n">version</span><span class="p">[</span><span class="s2">&quot;queue_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">queue_version</span> <span class="ow">and</span> <span class="n">version</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">}:</span>
+                    <span class="c1"># Only the explicit initializer applies this additive migration.</span>
+                    <span class="k">if</span> <span class="n">version</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_RECOVERY_INDEXES</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_HISTORY_GUARD_INDEX</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;UPDATE lat_background_version SET version=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">_SCHEMA_VERSION</span><span class="p">,))</span>
+                <span class="k">elif</span> <span class="n">version</span> <span class="o">!=</span> <span class="p">{</span>
+                    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">_SCHEMA_VERSION</span><span class="p">,</span>
+                    <span class="s2">&quot;queue_version&quot;</span><span class="p">:</span> <span class="n">queue_version</span><span class="p">,</span>
+                <span class="p">}:</span>
+                    <span class="k">raise</span> <span class="n">BackgroundUnavailable</span><span class="p">(</span>
+                        <span class="s2">&quot;Background schema version differs; apply a reviewed database migration&quot;</span>
+                    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="queue_from_settings">
+<a class="viewcode-back" href="../../../../generated/langgraph_agent_toolkit.core.background.postgres.html#langgraph_agent_toolkit.core.background.postgres.queue_from_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">queue_from_settings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PostgresJobQueue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the optional queue without exposing its connection credentials.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PostgresJobQueue</span><span class="p">(</span>
+        <span class="n">postgres_connection_string</span><span class="p">(</span>
+            <span class="n">settings</span><span class="p">,</span>
+            <span class="n">dsn</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_POSTGRES_DSN</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_POSTGRES_DSN</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">schema</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_POSTGRES_SCHEMA</span><span class="p">,</span>
+        <span class="n">pool_size</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_POSTGRES_POOL_SIZE</span><span class="p">,</span>
+        <span class="n">max_attempts</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_MAX_ATTEMPTS</span><span class="p">,</span>
+        <span class="n">execution_timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">BACKGROUND_EXECUTION_TIMEOUT</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

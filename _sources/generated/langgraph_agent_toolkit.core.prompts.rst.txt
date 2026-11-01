@@ -1,0 +1,16 @@
+langgraph\_agent\_toolkit.core.prompts package
+==============================================
+
+.. automodule:: langgraph_agent_toolkit.core.prompts
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   langgraph_agent_toolkit.core.prompts.chat_prompt_template
+   langgraph_agent_toolkit.core.prompts.prompt_manager

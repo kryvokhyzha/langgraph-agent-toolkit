@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Background Execution &mdash; langgraph-agent-toolkit</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="canonical" href="https://kryvokhyzha.github.io/langgraph-agent-toolkit/background.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f3b36f1a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="MCP tools" href="mcp.html" />
+    <link rel="prev" title="Choose an agent integration" href="integrations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    <a href="index.html">
+        <p class="project-name">langgraph-agent-toolkit</p>
+        
+    </a>
+
+    
+
+    <div class="project-description"></div>
+
+    
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start and configure</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Run your first agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="onboarding.html">Application Onboarding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment_setup.html">Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Agents and integrations</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="integrations.html">Choose an agent integration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Background Execution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#choose-the-execution-path">Choose the execution path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-and-configure">Install and configure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-worker-service">Docker worker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submit-read-and-cancel">Submit, read, and cancel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explicit-resume-and-recovery">Explicit resume and recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-without-http-or-a-queue">Run without HTTP or a queue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recovery-guarantees-and-limits">Recovery guarantees and limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#capacity-and-tuning">Capacity and tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#locks-and-database-growth">Locks and database growth</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tool_selection.html">Optional tool selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deepagents.html">Deep Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_compatibility.html">Langfuse compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="langfuse_server_upgrade.html">Langfuse service upgrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="phoenix.html">Phoenix observability</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deploy and upgrade</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment and Recovery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reliability.html">Connections and High Traffic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate to the current release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_updates.html">Dependency update review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dependency_releases_2026_10.html">October 2026 dependency releases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_projects.html">Related projects and source review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/modules.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Develop and verify</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_testing.html">API load tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load_test_results.html">Local pressure-test results: 2026-09-12</a></li>
+<li class="toctree-l1"><a class="reference internal" href="live_llm_testing.html">Real LLM verification</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">langgraph-agent-toolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Background Execution</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/kryvokhyzha/langgraph-agent-toolkit/blob/main/docs/background.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="background-execution">
+<h1>Background Execution<a class="headerlink" href="#background-execution" title="Link to this heading"></a></h1>
+<p>Use optional background jobs when work must outlive its HTTP request. The API
+stores a job and returns HTTP 202. A separate worker executes the graph and
+saves its result. PostgreSQL stores the queue and job records. The toolkit
+uses <a class="reference external" href="https://procrastinate.readthedocs.io/">Procrastinate</a> for worker
+coordination, heartbeats, cancellation, and queue state transitions. A supervised
+toolkit task recovers jobs from lost workers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">BACKGROUND_ENABLED</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>. Existing invoke, streaming,
+history, authentication, and UI behavior stay unchanged. The new job routes
+exist only when background execution is enabled. Ordinary <code class="docutils literal notranslate"><span class="pre">/invoke</span></code> calls
+do not become queued jobs. Redis and RabbitMQ are not required.</p>
+<section id="choose-the-execution-path">
+<h2>Choose the execution path<a class="headerlink" href="#choose-the-execution-path" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 38.0%" />
+<col style="width: 37.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Path</p></th>
+<th class="head"><p>Use it for</p></th>
+<th class="head"><p>Lifetime</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Existing invoke and streaming API</p></td>
+<td><p>Interactive chat and token streaming</p></td>
+<td><p>The HTTP worker owns the request.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">agent_runtime()</span></code> and <code class="docutils literal notranslate"><span class="pre">executor.execute()</span></code></p></td>
+<td><p>Embedded applications and an existing application worker</p></td>
+<td><p>The caller owns execution and recovery.</p></td>
+</tr>
+<tr class="row-even"><td><p>Optional <code class="docutils literal notranslate"><span class="pre">/jobs</span></code> API and toolkit worker</p></td>
+<td><p>Durable submission, separate worker capacity, and saved results</p></td>
+<td><p>The queue owns the job after submission commits.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The application still owns event polling, schedules, approval policy, external
+message delivery, and account mapping. Submit a stable operation key for each
+source event. Keep source cursors and outbound delivery records in the
+application database. A graph checkpoint is not an outbound message receipt.</p>
+</section>
+<section id="install-and-configure">
+<h2>Install and configure<a class="headerlink" href="#install-and-configure" title="Link to this heading"></a></h2>
+<p>Install the <code class="docutils literal notranslate"><span class="pre">background</span></code> extra in both API and worker environments:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;langgraph-agent-toolkit[background]&quot;</span>
+</pre></div>
+</div>
+<p>For a source checkout, use <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span> <span class="pre">--frozen</span> <span class="pre">--no-install-project</span> <span class="pre">--extra</span>
+<span class="pre">background</span></code>. Add the model and observability extras that the application uses.
+The <code class="docutils literal notranslate"><span class="pre">all</span></code> extra includes background support.</p>
+<p>Set the same agent paths, checkpoint database, and queue schema in every API
+and background worker. This example uses the generic approval blueprint and
+does not call a model:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">BACKGROUND_ENABLED</span><span class="o">=</span><span class="s">true</span>
+<span class="na">BACKGROUND_POSTGRES_SCHEMA</span><span class="o">=</span><span class="s">lat_background</span>
+<span class="na">BACKGROUND_POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="s">5</span>
+<span class="na">MEMORY_BACKEND</span><span class="o">=</span><span class="s">postgres</span>
+<span class="na">POSTGRES_HOST</span><span class="o">=</span><span class="s">127.0.0.1</span>
+<span class="na">POSTGRES_PORT</span><span class="o">=</span><span class="s">5432</span>
+<span class="na">POSTGRES_DB</span><span class="o">=</span><span class="s">agents</span>
+<span class="na">POSTGRES_USER</span><span class="o">=</span><span class="s">app_user</span>
+<span class="na">POSTGRES_PASSWORD</span><span class="o">=</span><span class="s">replace-me</span>
+<span class="na">POSTGRES_SCHEMA</span><span class="o">=</span><span class="s">checkpoints</span>
+<span class="na">CHECKPOINT_DURABILITY</span><span class="o">=</span><span class="s">sync</span>
+<span class="na">AGENT_PATHS</span><span class="o">=</span><span class="s">[&quot;langgraph_agent_toolkit.agents.blueprints.background_example.agent:agent&quot;]</span>
+<span class="na">DEFAULT_AGENT</span><span class="o">=</span><span class="s">background-example</span>
+<span class="na">AUTH_SECRET</span><span class="o">=</span><span class="s">replace-with-a-private-shared-secret</span>
+</pre></div>
+</div>
+<p>Memory and jobs use the same <code class="docutils literal notranslate"><span class="pre">POSTGRES_*</span></code> connection settings by default.
+They retain separate schemas and pools. Set <code class="docutils literal notranslate"><span class="pre">BACKGROUND_POSTGRES_DSN</span></code> only
+when jobs need another database or connection identity. The queue uses the
+shared PostgreSQL timeout, connection health, and reconnect controls. See
+<a class="reference internal" href="environment_setup.html"><span class="doc">Environment Setup</span></a> for precedence and configuration aliases.</p>
+<p>Create the checkpoint schema through the normal database setup. Initialize the
+dedicated queue schema once with deployment credentials that can create tables:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>langgraph_agent_toolkit.run_worker<span class="w"> </span>initialize
+</pre></div>
+</div>
+<p>Run the API and worker as separate processes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>langgraph_agent_toolkit.run_api
+<span class="c1"># In a separate terminal or supervised service:</span>
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>langgraph_agent_toolkit.run_worker<span class="w"> </span>run
+</pre></div>
+</div>
+<p>The initializer is idempotent for the current schema and Procrastinate version.
+It also supports additive toolkit schema upgrades from versions 1 and 2 to 3.
+These upgrades add recovery and active-conversation indexes. They preserve jobs and duplicate-submission
+keys. Stop API and worker writers, back up the queue, then run <code class="docutils literal notranslate"><span class="pre">initialize</span></code>
+before restarting them. Index creation has bounded statement and lock waits.
+For large databases, plan an explicit maintenance window.</p>
+<p>Normal startup only checks the queue schema. It does not run queue migrations.
+An unsupported version mismatch fails startup. Before upgrading Procrastinate,
+review its schema migration instructions separately. Do not remove the version
+record or recreate a queue that contains unfinished work.</p>
+</section>
+<section id="docker-worker-service">
+<h2>Docker worker service<a class="headerlink" href="#docker-worker-service" title="Link to this heading"></a></h2>
+<p>The API Dockerfile accepts <code class="docutils literal notranslate"><span class="pre">--build-arg</span> <span class="pre">INSTALL_BACKGROUND=true</span></code>. Its default
+is <code class="docutils literal notranslate"><span class="pre">false</span></code>. The same image can run the API or the worker. The optional Compose
+overlay installs the extra and adds a worker service:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yaml<span class="w"> </span>-f<span class="w"> </span>docker-compose.background.yaml<span class="w"> </span>build
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yaml<span class="w"> </span>-f<span class="w"> </span>docker-compose.background.yaml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--wait<span class="w"> </span>postgres
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yaml<span class="w"> </span>-f<span class="w"> </span>docker-compose.background.yaml<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--no-deps<span class="w"> </span>lat-background-worker<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>langgraph_agent_toolkit.run_worker<span class="w"> </span>initialize
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>docker-compose.yaml<span class="w"> </span>-f<span class="w"> </span>docker-compose.background.yaml<span class="w"> </span>up<span class="w"> </span>-d
+</pre></div>
+</div>
+<p>Set the queue DSN host and <code class="docutils literal notranslate"><span class="pre">POSTGRES_HOST</span></code> to <code class="docutils literal notranslate"><span class="pre">postgres</span></code> inside this network.
+The overlay uses the root <code class="docutils literal notranslate"><span class="pre">.env</span></code> and the existing optional Compose services.
+Custom agents must be available in the image or through a mounted package.
+The worker exposes no HTTP port. The API keeps its existing curl health probe.
+When jobs are enabled, API readiness also checks the queue database connection.
+The worker uses process supervision and queue heartbeats; it does not inherit
+the API HTTP probe. Monitor pending job age and stalled-worker counts separately.</p>
+</section>
+<section id="submit-read-and-cancel">
+<h2>Submit, read, and cancel<a class="headerlink" href="#submit-read-and-cancel" title="Link to this heading"></a></h2>
+<p>Use native graph input in <code class="docutils literal notranslate"><span class="pre">input</span></code>. For a chat graph, this usually means
+<code class="docutils literal notranslate"><span class="pre">{&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Hello&quot;}]}</span></code>. The existing
+<code class="docutils literal notranslate"><span class="pre">/invoke</span></code> message envelope still works on the existing chat endpoints.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span>http://localhost:8080/background-example/jobs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$AUTH_SECRET</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Idempotency-Key: example-prepare-1&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;thread_id&quot;:&quot;example-1&quot;,&quot;input&quot;:{&quot;value&quot;:21}}&#39;</span>
+</pre></div>
+</div>
+<p>The response includes <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">thread_id</span></code>, <code class="docutils literal notranslate"><span class="pre">status</span></code>, attempt count,
+timestamps, and a <code class="docutils literal notranslate"><span class="pre">Location</span></code> header. Submission and queue insertion commit in
+one transaction. HTTP 202 confirms storage, not execution success or worker
+availability. <code class="docutils literal notranslate"><span class="pre">/jobs</span></code> is the default-agent submission alias.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>--fail-with-body<span class="w"> </span><span class="s2">&quot;http://localhost:8080/jobs/</span><span class="nv">$JOB_ID</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$AUTH_SECRET</span><span class="s2">&quot;</span>
+curl<span class="w"> </span>--fail-with-body<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://localhost:8080/jobs/</span><span class="nv">$JOB_ID</span><span class="s2">/cancel&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$AUTH_SECRET</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">user_id</span></code> remains optional. A shared trusted token uses the service identity
+when it is absent. If a trusted caller submits a different <code class="docutils literal notranslate"><span class="pre">user_id</span></code>, it must
+send that same value as a query parameter when reading or cancelling the job.
+Token-bound users cannot select another owner. Another owner’s job returns 404.
+See <a class="reference internal" href="environment_setup.html"><span class="doc">Environment Setup</span></a> for authentication modes.</p>
+<p>Reuse an <code class="docutils literal notranslate"><span class="pre">Idempotency-Key</span></code> only for an identical request to the same agent
+and owner. A duplicate returns the existing job. A different request with that
+key returns 409. A new key represents a new operation, even on the same thread.
+Keep the key when retrying a submission whose HTTP response was lost.
+Keys must contain 1–128 ASCII letters, digits, dots, underscores, colons, or
+hyphens. Stored records retain keys until the operator removes those records.</p>
+<p>Job statuses are <code class="docutils literal notranslate"><span class="pre">queued</span></code>, <code class="docutils literal notranslate"><span class="pre">running</span></code>, <code class="docutils literal notranslate"><span class="pre">cancelling</span></code>, <code class="docutils literal notranslate"><span class="pre">cancelled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">interrupted</span></code>, and <code class="docutils literal notranslate"><span class="pre">failed</span></code>. An interrupted job has finished
+its execution attempt and releases the worker slot. It waits for a new resume
+job, not a worker held open until a person replies. Cancellation is cooperative.
+A completed result can win a race with cancellation. Cancellation does not undo
+external writes or checkpoints that already committed.
+Synchronous tools can continue after cancellation or timeout. Give those tools
+their own timeouts and idempotency controls. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a>.</p>
+</section>
+<section id="explicit-resume-and-recovery">
+<h2>Explicit resume and recovery<a class="headerlink" href="#explicit-resume-and-recovery" title="Link to this heading"></a></h2>
+<p>An interrupted result contains <code class="docutils literal notranslate"><span class="pre">checkpoint_id</span></code> and <code class="docutils literal notranslate"><span class="pre">interrupts</span></code>. Resume
+requires that checkpoint and answers keyed by the pending interrupt IDs. Use
+a new idempotency key for the answer:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;operation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;resume&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;thread_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example-1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;expected_checkpoint_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;checkpoint-from-job-result&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;resume&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;interrupt-id-from-job-result&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The generic example completes with <code class="docutils literal notranslate"><span class="pre">result:</span> <span class="pre">42</span></code> after approval. It returns
+<code class="docutils literal notranslate"><span class="pre">result:</span> <span class="pre">null</span></code> after rejection. A stale checkpoint or an incorrect set of
+interrupt IDs fails the job without resuming the graph. The API acknowledges
+storage before these graph-state checks run. A new input job cannot implicitly
+approve a paused graph. These rules apply to the new execution contract; the
+existing chat API retains its current resume behavior.</p>
+<p><code class="docutils literal notranslate"><span class="pre">operation=&quot;recover&quot;</span></code> with <code class="docutils literal notranslate"><span class="pre">expected_checkpoint_id</span></code> continues unfinished
+work using LangGraph’s <code class="docutils literal notranslate"><span class="pre">input=None</span></code>. It does not append another input or answer
+an approval. Inspect the saved state first. A completed state has nothing to
+recover, and a pending interrupt requires <code class="docutils literal notranslate"><span class="pre">resume</span></code> instead.</p>
+<p>Use the client without a polling thread or a long HTTP request:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionRequest</span>
+
+<span class="k">async</span> <span class="k">with</span> <span class="n">AgentClient</span><span class="p">(</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8080&quot;</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;background-example&quot;</span><span class="p">,</span> <span class="n">get_info</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">asubmit_job</span><span class="p">(</span>
+        <span class="n">ExecutionRequest</span><span class="p">(</span><span class="n">thread_id</span><span class="o">=</span><span class="s2">&quot;example-1&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">}),</span>
+        <span class="n">idempotency_key</span><span class="o">=</span><span class="s2">&quot;example-prepare-1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">aget_job</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">job_id</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The client also provides synchronous <code class="docutils literal notranslate"><span class="pre">submit_job</span></code>, <code class="docutils literal notranslate"><span class="pre">get_job</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">cancel_job</span></code> methods. It does not automatically retry or poll submissions.
+An application can poll with a bounded interval and its own overall deadline.</p>
+</section>
+<section id="run-without-http-or-a-queue">
+<h2>Run without HTTP or a queue<a class="headerlink" href="#run-without-http-or-a-queue" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">agent_runtime()</span></code> owns the same model transports, MCP sessions, observability,
+checkpointer, and conversation coordinator as the API. Keep it open for the
+worker lifetime and await all work before closing it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">agent_runtime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionRequest</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_example</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">agent_runtime</span><span class="p">(</span>
+        <span class="s2">&quot;langgraph_agent_toolkit.agents.blueprints.background_example.agent:agent&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">runtime</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">runtime</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;background-example&quot;</span><span class="p">,</span>
+            <span class="n">ExecutionRequest</span><span class="p">(</span><span class="n">thread_id</span><span class="o">=</span><span class="s2">&quot;embedded-1&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">}),</span>
+            <span class="n">owner_id</span><span class="o">=</span><span class="s2">&quot;application-service&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="k">await</span> <span class="n">runtime</span><span class="o">.</span><span class="n">executor</span><span class="o">.</span><span class="n">inspect_execution</span><span class="p">(</span>
+            <span class="s2">&quot;background-example&quot;</span><span class="p">,</span> <span class="s2">&quot;embedded-1&quot;</span><span class="p">,</span> <span class="n">owner_id</span><span class="o">=</span><span class="s2">&quot;application-service&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">snapshot</span>
+</pre></div>
+</div>
+<p>This path does not require the <code class="docutils literal notranslate"><span class="pre">background</span></code> extra. The calling application
+authenticates users and chooses the trusted <code class="docutils literal notranslate"><span class="pre">owner_id</span></code>. Never accept an
+arbitrary external owner without checking access. Explicit execution returns
+JSON-compatible graph output rather than requiring a chat message.</p>
+</section>
+<section id="recovery-guarantees-and-limits">
+<h2>Recovery guarantees and limits<a class="headerlink" href="#recovery-guarantees-and-limits" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>The queue recovers work from lost workers. The default worker heartbeat is
+10 seconds, the stalled threshold is 60 seconds, and recovery is scheduled
+every 10 seconds. Recovery runs outside execution slots and creates no queue
+maintenance records. Database pressure can still delay it. Recovery or final
+queue-acknowledgement failures stop the worker. Run it under a supervisor that
+replaces failed processes.</p></li>
+<li><p>Execution records its operation ID in checkpoint metadata. A recovered job
+continues its own unfinished checkpoint or returns its saved result. It does
+not add the original input again after finding that operation’s checkpoint.
+If another operation changed the thread, recovery fails instead of guessing.
+Saved task writes can exist before their enclosing checkpoint commits.
+Recovery completes that step before it reports success, and reuses the saved
+writes instead of repeating completed nodes.</p></li>
+<li><p>Keep required node names and compatible state while unfinished work exists.
+Recovery rejects a missing pending node instead of reporting false completion.
+This check cannot detect changes to tool behavior or application semantics.
+Drain unfinished work with its original graph before an incompatible upgrade.
+Prerelease Functional API checkpoints can lack the scheduling metadata needed
+for this check. Keep their original entrypoint until unfinished work is drained.</p></li>
+<li><p>History clearing returns HTTP 409 while that conversation has queued, running,
+or cancelling background jobs. Wait for completion or cancellation before
+clearing. Do not delete checkpoints directly while recovery is possible.
+External pruning and database restores can remove operation markers and make
+duplicate detection unreliable.</p></li>
+<li><p>Configure shared durable checkpoints for cross-process recovery. The queue
+database alone does not make graph state durable. Explicit <code class="docutils literal notranslate"><span class="pre">NoOpSaver</span></code> and
+volatile savers remain valid for stateless work. A lost worker cannot safely
+recover their unsaved progress; an uncertain retry fails.</p></li>
+<li><p>Queued execution forces <code class="docutils literal notranslate"><span class="pre">sync</span></code> checkpoint durability. It awaits asynchronous
+checkpoint writes before the next step; it does not perform blocking database
+I/O. This makes the operation marker available before the first graph step.
+Ordinary HTTP and direct execution without an <code class="docutils literal notranslate"><span class="pre">operation_id</span></code> retain
+<code class="docutils literal notranslate"><span class="pre">CHECKPOINT_DURABILITY</span></code> behavior.</p></li>
+<li><p>Delivery and tool execution are not exactly once. A tool can commit an
+external action before its checkpoint commits. Give such actions their own
+idempotency keys. Do not put an irreversible action before <code class="docutils literal notranslate"><span class="pre">interrupt()</span></code>
+in the same node, because LangGraph reruns that node on resume.</p></li>
+<li><p>Normal execution errors become failed jobs. They are not automatically
+replayed. <code class="docutils literal notranslate"><span class="pre">BACKGROUND_MAX_ATTEMPTS</span></code> bounds worker-loss recovery attempts.
+Inspect a failure and its checkpoints before submitting recovery work.</p></li>
+<li><p>Queued jobs for the same owner, agent, and thread serialize. The runtime also
+uses the existing conversation coordinator with ordinary API calls. This is
+not a global FIFO guarantee or a per-user rate limiter.</p></li>
+<li><p>There is no automatic retention policy, job-list endpoint, recurring business
+scheduler, or outbound delivery guarantee. Job payloads and results contain
+application data. Control database access, backups, and retention. Removing
+a record also removes its duplicate-submission protection. Do not independently
+prune queue rows while their toolkit job records still reference them.</p></li>
+</ul>
+</section>
+<section id="capacity-and-tuning">
+<h2>Capacity and tuning<a class="headerlink" href="#capacity-and-tuning" title="Link to this heading"></a></h2>
+<p>The defaults allow four simultaneous executions per worker process and a
+300-second execution deadline. The deadline includes waiting for the runtime’s
+conversation lock. It starts when a worker executes the job, not at submission.
+Queue waiting can therefore exceed it. The API accepts a shorter
+<code class="docutils literal notranslate"><span class="pre">timeout_seconds</span></code> but rejects a value above the configured limit.</p>
+<p><code class="docutils literal notranslate"><span class="pre">BACKGROUND_POSTGRES_POOL_SIZE=5</span></code> adds at most five queue connections per API or
+worker process. The queue listener can need an additional connection. Existing
+checkpoint, conversation-lock, long-term store, and model pools are separate.
+Budget all processes together before increasing concurrency. Do not hold a
+database transaction open while a model or tool runs.</p>
+<p>There is no queue-length admission cap. Monitor queue depth, oldest pending
+job age, failed jobs, worker heartbeats, and database capacity. Apply ingress
+rate limits and scale workers within model-provider and database budgets.
+API request admission still applies to submission requests. It does not count
+background executions. See <a class="reference internal" href="reliability.html"><span class="doc">Connections and High Traffic</span></a> for shared connection limits.</p>
+<p>Four execution slots provide approximately 8 to 20 jobs per minute when jobs
+take 12 to 30 seconds, before overhead. Sustained higher arrival rates grow the
+backlog. Set ingress limits and alert on queue age. Execution deadlines do not
+expire queued jobs. Choose an application retention policy before production.</p>
+<p>Generated results have no toolkit size limit. Status reads include the saved
+result. Return small graph outputs or artifact references for large documents.
+Avoid frequent polling of large results. A synchronous tool can continue after
+its awaiting task is cancelled; use tool-native deadlines for external calls.</p>
+</section>
+<section id="locks-and-database-growth">
+<h2>Locks and database growth<a class="headerlink" href="#locks-and-database-growth" title="Link to this heading"></a></h2>
+<p>Procrastinate claims jobs with PostgreSQL row locks. Toolkit recovery also uses
+<code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">...</span> <span class="pre">FOR</span> <span class="pre">UPDATE</span> <span class="pre">SKIP</span> <span class="pre">LOCKED</span></code>. It locks the job record before the queue
+record and rechecks eligibility inside that transaction. A busy row does not
+hold up other recovery candidates. Lock and statement timeouts remain enabled.
+These controls do not remove all possible database contention.</p>
+<p>Recovery uses partial indexes for active job records and running queue records.
+Completed history does not require a full-table scan on each recovery pass.
+The candidate query remains sensitive to active backlog size. Each pass handles
+at most 100 candidates. Keep autovacuum enabled and monitor table and index size.</p>
+<p>Application records still need a retention policy. Recovery creates no new
+maintenance rows. If a prerelease deployment used queued recovery tasks, its
+old <code class="docutils literal notranslate"><span class="pre">lat-maintenance</span></code> rows no longer block recovery. After stopping old workers,
+use the library’s cleanup method for finished historical maintenance jobs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langgraph_agent_toolkit.core.background</span><span class="w"> </span><span class="kn">import</span> <span class="n">queue_from_settings</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">clean_maintenance_history</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">queue_from_settings</span><span class="p">()</span> <span class="k">as</span> <span class="n">queue</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">queue</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">job_manager</span><span class="o">.</span><span class="n">delete_old_jobs</span><span class="p">(</span>
+            <span class="n">nb_hours</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+            <span class="n">queue</span><span class="o">=</span><span class="s2">&quot;lat-maintenance&quot;</span><span class="p">,</span>
+            <span class="n">include_failed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">include_cancelled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">include_aborted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>Schedule this operation through the deployment’s maintenance system. It removes
+old maintenance jobs and their events. It does not remove application results
+or idempotency records. See Procrastinate’s
+<a class="reference external" href="https://procrastinate.readthedocs.io/en/stable/howto/production/delete_finished_jobs.html">finished-job cleanup guide</a>.</p>
+<p>Choose application-job retention separately. It defines how long clients can
+read results and safely retry their original submission keys. Archive required
+results before deletion. Remove expired terminal toolkit records and their
+terminal queue records in small transactions, in ledger-before-queue lock order.
+Keep queued, running, cancelling, and approval-waiting records. Do not enable
+automatic deletion on all queue jobs: toolkit records reference those rows.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="integrations.html" class="btn btn-neutral float-left" title="Choose an agent integration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mcp.html" class="btn btn-neutral float-right" title="MCP tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-2026, Roman Kryvokhyzha.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <div class="footer">
+        <p>
+            <a href="" target="_blank">GitHub Repository</a> |
+            <a href="" target="_blank">Documentation</a>
+        </p>
+    </div>
+
+
+</body>
+</html>

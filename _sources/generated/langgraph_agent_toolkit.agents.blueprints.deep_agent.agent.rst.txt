@@ -1,0 +1,7 @@
+langgraph\_agent\_toolkit.agents.blueprints.deep\_agent.agent module
+====================================================================
+
+.. automodule:: langgraph_agent_toolkit.agents.blueprints.deep_agent.agent
+   :members:
+   :show-inheritance:
+   :undoc-members:
