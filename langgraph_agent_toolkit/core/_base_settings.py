@@ -6,6 +6,7 @@ from typing import Annotated, Any, Dict, Literal, Mapping, Optional
 from dotenv import find_dotenv
 from pydantic import (
     AfterValidator,
+    AliasChoices,
     BeforeValidator,
     Field,
     HttpUrl,
@@ -26,6 +27,10 @@ from langgraph_agent_toolkit.helper.types import EnvironmentMode
 
 
 ProviderConfigs = Annotated[Dict[str, Dict[str, Any]], AfterValidator(protect_config_secrets)]
+_BACKGROUND_SETTING_ALIASES = {
+    "BACKGROUND_SCHEMA": "BACKGROUND_POSTGRES_SCHEMA",
+    "BACKGROUND_POOL_MAX_SIZE": "BACKGROUND_POSTGRES_POOL_SIZE",
+}
 
 
 def check_str_is_http(x: str) -> str:
@@ -110,6 +115,23 @@ class Settings(BaseSettings):
     # Observability platform.
     OBSERVABILITY_BACKEND: ObservabilityBackend | None = None
     OBSERVABILITY_SHUTDOWN_TIMEOUT: float = Field(default=10.0, gt=0)
+
+    # Optional durable jobs. API processes submit work; separate workers execute it.
+    BACKGROUND_ENABLED: bool = False
+    BACKGROUND_POSTGRES_DSN: SecretStr | None = None
+    BACKGROUND_POSTGRES_SCHEMA: str = Field(
+        default="lat_background",
+        pattern=r"^[a-z_][a-z0-9_]{0,62}$",
+        validation_alias=AliasChoices("BACKGROUND_POSTGRES_SCHEMA", "BACKGROUND_SCHEMA"),
+    )
+    BACKGROUND_POSTGRES_POOL_SIZE: int = Field(
+        default=5,
+        ge=2,
+        validation_alias=AliasChoices("BACKGROUND_POSTGRES_POOL_SIZE", "BACKGROUND_POOL_MAX_SIZE"),
+    )
+    BACKGROUND_WORKER_CONCURRENCY: int = Field(default=4, ge=1)
+    BACKGROUND_EXECUTION_TIMEOUT: float = Field(default=300.0, gt=0, allow_inf_nan=False)
+    BACKGROUND_MAX_ATTEMPTS: int = Field(default=3, ge=1)
 
     # Agent configuration.
     AGENT_PATHS: list[str] = [
@@ -307,13 +329,29 @@ class Settings(BaseSettings):
     def _apply_langgraph_env_overrides(self) -> None:
         """Validate `LANGGRAPH_` overrides before applying them."""
         source = EnvSettingsSource(type(self), env_prefix="LANGGRAPH_", case_sensitive=True, env_parse_none_str="null")
-        self.apply_overrides(source())
+        overrides = source()
+        # Explicit aliases bypass EnvSettingsSource's prefix. Read these fields
+        # with the same prefix as all other overrides.
+        for legacy, canonical in _BACKGROUND_SETTING_ALIASES.items():
+            overrides.pop(legacy, None)
+            overrides.pop(canonical, None)
+            for name in (canonical, legacy):
+                value = os.environ.get(f"LANGGRAPH_{name}")
+                if value:
+                    overrides[canonical] = None if value == "null" else value
+                    break
+        self.apply_overrides(overrides)
 
     def apply_overrides(self, overrides: Mapping[str, Any]) -> None:
         """Validate all overrides before changing any setting.
 
         JSON strings are accepted for collection fields. Unknown fields fail.
         """
+        overrides = dict(overrides)
+        for legacy, canonical in _BACKGROUND_SETTING_ALIASES.items():
+            if legacy in overrides:
+                value = overrides.pop(legacy)
+                overrides.setdefault(canonical, value)
         fields = type(self).model_fields
         unknown = set(overrides) - set(fields)
         if unknown:

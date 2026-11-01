@@ -1,12 +1,15 @@
+import asyncio
 import functools
+import hashlib
 import importlib
 import inspect
+import json
 import os
 import traceback
 from contextlib import aclosing
 from copy import copy
 from pathlib import Path
-from typing import Any, AsyncGenerator, Callable, Dict, List, Optional, Tuple, TypeVar
+from typing import Any, AsyncGenerator, Awaitable, Callable, Dict, List, Optional, Tuple, TypeVar
 from uuid import UUID, uuid4
 
 import joblib
@@ -22,16 +25,22 @@ from langchain_core.messages import (
     convert_to_messages,
 )
 from langchain_core.runnables import RunnableConfig
-from langgraph._internal._constants import PREVIOUS
+from langgraph._internal._constants import PREVIOUS, TASKS
 from langgraph.channels import LastValue
+from langgraph.checkpoint.base import CheckpointTuple
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.constants import END, START
 from langgraph.errors import GraphRecursionError
 from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.pregel import Pregel
-from langgraph.types import Command, Interrupt, StateSnapshot
+from langgraph.types import Command, Interrupt, Send, StateSnapshot
+from pydantic_core import to_jsonable_python
 
 from langgraph_agent_toolkit.agents.agent import Agent
+from langgraph_agent_toolkit.agents.components.checkpoint.empty import NoOpSaver
+from langgraph_agent_toolkit.core.execution import ExecutionConflictError
+from langgraph_agent_toolkit.core.identity import storage_thread_id, validate_conversation_identifiers
 from langgraph_agent_toolkit.core.memory.concurrency import ConversationCoordinator, serialize_execution
 from langgraph_agent_toolkit.core.observability.empty import EmptyObservability
 from langgraph_agent_toolkit.core.settings import settings
@@ -45,10 +54,50 @@ from langgraph_agent_toolkit.helper.utils import (
     remove_tool_calls,
 )
 from langgraph_agent_toolkit.schema import AgentInfo, ChatMessage
+from langgraph_agent_toolkit.schema.execution import (
+    ExecutionRequest,
+    ExecutionResult,
+    ExecutionSnapshot,
+    validate_agent_config,
+)
 
 
 _HITL_APPROVE = {"approve", "yes", "y", "ok", "accept", "approved"}
 _HITL_REJECT = {"reject", "no", "n", "deny", "rejected"}
+
+
+def _validate_checkpoint_graph(graph: Pregel, saved: CheckpointTuple) -> None:
+    """Reject pending work that the current graph would silently discard.
+
+    LangGraph omits missing nodes from its state snapshot. Inspect its stored
+    scheduling channels too. Keep these channel contracts covered by real graph
+    tests when updating LangGraph.
+    """
+    values = saved.checkpoint["channel_values"]
+    writes = saved.pending_writes or []
+    channel_names = set(values) | {channel for _, channel, _ in writes}
+    incompatible = any(name.startswith("branch:to:") and name not in graph.channels for name in channel_names)
+    sends = values.get(TASKS, [])
+    if isinstance(sends, tuple):
+        sends = sends[1]  # Older Topic checkpoints store (seen, values).
+    sends = [*sends, *(value for _, channel, value in writes if channel == TASKS)]
+    incompatible |= any(isinstance(send, Send) and send.node not in graph.nodes for send in sends)
+    versions = saved.checkpoint["channel_versions"]
+    seen = saved.checkpoint["versions_seen"]
+    recorded = json.loads(saved.metadata.get("lat_execution_triggers", "{}"))
+    for name, triggers in recorded.items():
+        node = graph.nodes.get(name)
+        if node is not None and set(node.triggers) == set(triggers):
+            continue
+        consumed = seen.get(name, {})
+        incompatible |= any(
+            channel in values
+            and channel in versions
+            and (channel not in consumed or versions[channel] > consumed[channel])
+            for channel in triggers
+        )
+    if incompatible:
+        raise ExecutionConflictError("The checkpoint contains pending work that is incompatible with this graph")
 
 
 def _uses_functional_history(graph: Pregel) -> bool:
@@ -428,6 +477,7 @@ class AgentExecutor:
         agent_config: Optional[Dict[str, Any]] = None,
         recursion_limit: Optional[int] = None,
         trace_session_id: Optional[str] = None,
+        _implicit_resume: bool = True,
     ) -> Tuple[Agent, Any, Any, UUID]:
         """Set up an agent run for `invoke` and `stream`.
 
@@ -481,17 +531,7 @@ class AgentExecutor:
                 configurable["model_provider"] = model_provider
 
         if agent_config:
-            reserved = {
-                "thread_id",
-                "user_id",
-                "checkpoint_id",
-                "checkpoint_ns",
-                "lat_user_id",
-                "lat_agent_id",
-                "lat_thread_id",
-            }
-            if reserved.intersection(agent_config) or any(key.startswith("__") for key in agent_config):
-                raise ValueError("agent_config cannot override identity or checkpoint fields")
+            validate_agent_config(agent_config)
             configurable.update(agent_config)
 
         if agent.observability is None:
@@ -519,20 +559,202 @@ class AgentExecutor:
         input_data: Command | dict[str, Any]
 
         interrupted_tasks = []
-        if settings.CHECK_INTERRUPTS and agent_graph.checkpointer is not None:
+        if _implicit_resume and settings.CHECK_INTERRUPTS and agent_graph.checkpointer:
             state = await agent_graph.aget_state(config=config)
             interrupted_tasks = [task for task in state.tasks if hasattr(task, "interrupts") and task.interrupts]
 
         if interrupted_tasks:
             input_data = build_resume_command(interrupted_tasks, _input)
         else:
-            if "message" in _input:
+            if _implicit_resume and "message" in _input:
                 message = _input.pop("message", "") or ""
                 input_data = {"messages": [HumanMessage(content=message)], **_input}
             else:
                 input_data = _input
 
         return agent, input_data, config, run_id
+
+    async def _execution_snapshot(self, agent: Agent, config: RunnableConfig, thread_id: str) -> ExecutionSnapshot:
+        """Read one checkpoint and preserve the graph's output channel shape."""
+        if not agent.graph.checkpointer:
+            return ExecutionSnapshot(status="empty", thread_id=thread_id)
+        state = await agent.graph.aget_state(config)
+        checkpoint_id = state.config.get("configurable", {}).get("checkpoint_id")
+        if checkpoint_id is None:
+            return ExecutionSnapshot(status="empty", thread_id=thread_id)
+        pending = [item for task in state.tasks for item in (getattr(task, "interrupts", None) or [])]
+        checkpoint = await agent.graph.checkpointer.aget_tuple(state.config)
+        if checkpoint is not None:
+            _validate_checkpoint_graph(agent.graph, checkpoint)
+        values = checkpoint.checkpoint["channel_values"] if checkpoint else {}
+        channels = agent.graph.output_channels
+        output = (
+            values.get(channels)
+            if isinstance(channels, str)
+            else {key: values[key] for key in channels if key in values}
+        )
+        metadata = state.metadata or {}
+        return ExecutionSnapshot(
+            # Completed task writes still need a checkpoint before recovery can finish.
+            status="interrupted" if pending else "unfinished" if state.next or state.tasks else "completed",
+            output=to_jsonable_python(output),
+            thread_id=thread_id,
+            checkpoint_id=checkpoint_id,
+            operation_id=metadata.get("lat_operation_id"),
+            run_id=metadata.get("lat_execution_run_id"),
+            interrupts=to_jsonable_python(_interrupt_records(pending)),
+        )
+
+    async def inspect_execution(self, agent_id: str, thread_id: str, *, owner_id: str) -> ExecutionSnapshot:
+        """Inspect the same scoped checkpoints used by the HTTP service."""
+        validate_conversation_identifiers(owner_id, agent_id, thread_id)
+        key = storage_thread_id(owner_id, agent_id, thread_id)
+        async with self.concurrency.lock(key):
+            return await self._execution_snapshot(
+                self.get_agent(agent_id), {"configurable": {"thread_id": key}}, thread_id
+            )
+
+    async def execute(
+        self,
+        agent_id: str,
+        request: ExecutionRequest,
+        *,
+        owner_id: str,
+        operation_id: str | None = None,
+        retry: bool = False,
+        baseline_checkpoint_id: str | None = None,
+        on_start: Callable[[str | None], Awaitable[None]] | None = None,
+    ) -> ExecutionResult:
+        """Execute explicit input or recovery with a worker-owned deadline.
+
+        ``on_start`` persists the initial checkpoint reference while the
+        conversation lock is held. A queue retry must supply that reference.
+        Operation markers prevent a retry from appending the same input again.
+        These runs wait for checkpoint writes before the next graph step.
+        Operation markers do not make external tool writes exactly once.
+        """
+        validate_conversation_identifiers(owner_id, agent_id, request.thread_id)
+        if request.user_id is not None and request.user_id != owner_id:
+            raise InputValidationError("user_id must match the execution owner")
+        if operation_id is not None and (not operation_id or len(operation_id) > 256 or "\x00" in operation_id):
+            raise InputValidationError("operation_id must be nonempty, NUL-free, and at most 256 characters")
+        if retry and operation_id is None:
+            raise InputValidationError("A retry requires operation_id")
+        if request.recursion_limit is not None and request.recursion_limit > settings.DEFAULT_RECURSION_LIMIT:
+            raise InputValidationError("recursion_limit exceeds the configured limit")
+        fingerprint = hashlib.sha256(
+            json.dumps(request.model_dump(mode="json"), sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+        ).hexdigest()
+        key = storage_thread_id(owner_id, agent_id, request.thread_id)
+        async with asyncio.timeout(request.timeout_seconds), self.concurrency.lock(key):
+            agent, input_data, config, run_id = await self._setup_agent_execution(
+                agent_id=agent_id,
+                input=request.input,
+                thread_id=key,
+                user_id=owner_id,
+                model_name=request.model_name,
+                model_provider=request.model_provider,
+                model_config_key=request.model_config_key,
+                agent_config=request.agent_config,
+                recursion_limit=request.recursion_limit,
+                trace_session_id=request.thread_id,
+                _implicit_resume=False,
+            )
+            snapshot = await self._execution_snapshot(agent, config, request.thread_id)
+            matching_operation = operation_id is not None and snapshot.operation_id == operation_id
+            if matching_operation:
+                state = await agent.graph.aget_state(config)
+                if (state.metadata or {}).get("lat_operation_fingerprint") != fingerprint:
+                    raise ExecutionConflictError("The operation ID already belongs to different input")
+                if snapshot.status in {"completed", "interrupted"}:
+                    return ExecutionResult(
+                        status=snapshot.status,
+                        output=snapshot.output,
+                        run_id=snapshot.run_id or str(run_id),
+                        thread_id=request.thread_id,
+                        checkpoint_id=snapshot.checkpoint_id,
+                        interrupts=snapshot.interrupts,
+                    )
+                input_data = None
+            else:
+                if retry and snapshot.checkpoint_id != baseline_checkpoint_id:
+                    raise ExecutionConflictError("Another operation changed the thread before recovery")
+                if retry and (
+                    not agent.graph.checkpointer or isinstance(agent.graph.checkpointer, (NoOpSaver, InMemorySaver))
+                ):
+                    raise ExecutionConflictError("The saver cannot prove whether the previous attempt started")
+                if (
+                    request.expected_checkpoint_id is not None
+                    and snapshot.checkpoint_id != request.expected_checkpoint_id
+                ):
+                    raise ExecutionConflictError("The expected checkpoint is no longer current")
+                if request.operation == "input":
+                    if snapshot.status in {"interrupted", "unfinished"}:
+                        raise ExecutionConflictError("The thread requires an explicit resume or recover operation")
+                elif request.operation == "recover":
+                    if snapshot.status != "unfinished":
+                        raise ExecutionConflictError("The thread has no unfinished execution to recover")
+                    input_data = None
+                else:
+                    if snapshot.status != "interrupted":
+                        raise ExecutionConflictError("The thread has no pending interrupts to resume")
+                    state = await agent.graph.aget_state(config)
+                    pending = [item for task in state.tasks for item in (getattr(task, "interrupts", None) or [])]
+                    answers = _resume_values_by_id(pending, request.resume)
+                    for item in pending:
+                        if _is_mcp_elicitation(item.value):
+                            _validate_mcp_resume(item.value, answers[item.id])
+                    input_data = Command(resume=answers)
+                if on_start is not None:
+                    await on_start(snapshot.checkpoint_id)
+
+            config["metadata"]["lat_execution_run_id"] = str(run_id)
+            # LangGraph persists scalar metadata. Store only scheduling names.
+            config["metadata"]["lat_execution_triggers"] = json.dumps(
+                {name: list(node.triggers) for name, node in agent.graph.nodes.items()}, separators=(",", ":")
+            )
+            if operation_id is not None:
+                config["metadata"].update(
+                    lat_operation_id=operation_id,
+                    lat_operation_fingerprint=fingerprint,
+                )
+            with agent.observability.trace_context(
+                run_id=run_id,
+                user_id=owner_id,
+                session_id=request.thread_id,
+                input=input_data,
+                agent_name=agent.name,
+            ) as trace_span:
+                output = None
+                pending = []
+                async with aclosing(
+                    agent.graph.astream(
+                        input=input_data,
+                        config=config,
+                        stream_mode="values",
+                        output_keys=agent.graph.output_channels,
+                        durability=("sync" if operation_id is not None else settings.CHECKPOINT_DURABILITY)
+                        if agent.graph.checkpointer
+                        else None,
+                    )
+                ) as events:
+                    async for value in events:
+                        if isinstance(value, dict) and "__interrupt__" in value:
+                            pending.extend(value["__interrupt__"])
+                            value = {name: data for name, data in value.items() if name != "__interrupt__"}
+                        output = value
+                snapshot = await self._execution_snapshot(agent, config, request.thread_id)
+                records = snapshot.interrupts or to_jsonable_python(_interrupt_records(pending))
+                result = ExecutionResult(
+                    status="interrupted" if records else "completed",
+                    output=to_jsonable_python(output),
+                    run_id=str(run_id),
+                    thread_id=request.thread_id,
+                    checkpoint_id=snapshot.checkpoint_id,
+                    interrupts=records,
+                )
+                agent.observability.update_trace(trace_span, output=result.output)
+                return result
 
     @handle_agent_errors
     @serialize_execution

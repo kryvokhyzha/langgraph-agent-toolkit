@@ -1,0 +1,41 @@
+# Optional overlay: docker compose -f docker-compose.yaml -f docker-compose.background.yaml ...
+# Initialize the dedicated queue schema before starting the API and worker.
+x-background-image: &background-image
+  image: langgraph-agent-toolkit.background:local
+  build:
+    context: .
+    dockerfile: docker/api/Dockerfile
+    args:
+      INSTALL_BACKGROUND: "true"
+      LANGFUSE_SDK_MAJOR: ${LANGFUSE_SDK_MAJOR:-5}
+
+services:
+  lat-agent-backend:
+    <<: *background-image
+    environment:
+      BACKGROUND_ENABLED: "true"
+
+  lat-background-worker:
+    <<: *background-image
+    platform: linux/amd64
+    restart: always
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      BACKGROUND_ENABLED: "true"
+    command: ["python", "-m", "langgraph_agent_toolkit.run_worker", "run"]
+    # This worker has no HTTP server. Monitor queue age and worker heartbeats.
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stop_grace_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G

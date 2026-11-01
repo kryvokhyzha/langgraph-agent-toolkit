@@ -1,14 +1,14 @@
 """Bind conversation storage to authenticated callers."""
 
-import hashlib
-import json
 import secrets
 from dataclasses import dataclass
 from uuid import uuid4
 
 from fastapi import HTTPException, Request
 
+from langgraph_agent_toolkit.core.identity import storage_thread_id as storage_thread_id
 from langgraph_agent_toolkit.core.settings import settings
+from langgraph_agent_toolkit.schema.execution import validate_agent_config
 
 
 @dataclass(frozen=True)
@@ -57,15 +57,6 @@ def authenticate(token: str | None) -> Principal:
     raise HTTPException(401, "Missing or invalid bearer token", headers={"WWW-Authenticate": "Bearer"})
 
 
-def storage_thread_id(user_id: str, agent_id: str, thread_id: str) -> str:
-    """Scope short-term checkpoints to their owner, agent, and public thread.
-
-    This key does not replace the user ID used by long-term memory stores.
-    """
-    identity = json.dumps([user_id, agent_id, thread_id], ensure_ascii=True, separators=(",", ":"))
-    return "lat:v1:" + hashlib.sha256(identity.encode()).hexdigest()
-
-
 def authenticated_user_id(request: Request, user_id: str | None) -> str:
     """Resolve the stable user identity for memory access and observability."""
     principal: Principal = request.state.principal
@@ -100,17 +91,10 @@ def conversation_identity(
 def execution_input(request: Request, agent_id: str, value):
     """Create execution input with authenticated storage identifiers."""
     public_id, owner, key = conversation_identity(request, agent_id, value.thread_id, value.user_id, create=True)
-    forbidden = {
-        "thread_id",
-        "user_id",
-        "checkpoint_id",
-        "checkpoint_ns",
-        "lat_user_id",
-        "lat_agent_id",
-        "lat_thread_id",
-    }
-    if forbidden.intersection(value.agent_config) or any(k.startswith("__") for k in value.agent_config):
-        raise HTTPException(422, "agent_config cannot override identity or checkpoint fields")
+    try:
+        validate_agent_config(value.agent_config)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
     if value.recursion_limit is not None and not 1 <= value.recursion_limit <= settings.DEFAULT_RECURSION_LIMIT:
         raise HTTPException(422, f"recursion_limit must be between 1 and {settings.DEFAULT_RECURSION_LIMIT}")
     return public_id, value.model_copy(update={"thread_id": key, "user_id": owner})

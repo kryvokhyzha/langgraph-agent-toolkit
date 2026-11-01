@@ -113,6 +113,7 @@ the Python client, the UI, and real-model configuration.
 | Planning, intermediate files, and delegation | Optional Deep Agents                                | [Deep Agents](docs/deepagents.rst)                                          |
 | Tools exposed by another service             | MCP, combined with a supported agent                | [MCP](docs/mcp.rst)                                                         |
 | Large tool catalogs                          | Optional LangChain tool selection                   | [Tool selection](docs/tool_selection.rst)                                   |
+| Durable work outside an HTTP request         | Optional PostgreSQL jobs and separate workers       | [Background execution](docs/background.rst)                                 |
 | Traces, prompts, and feedback                | Langfuse, LangSmith, or Phoenix                     | [Observability choices](docs/integrations.rst), [Phoenix](docs/phoenix.rst) |
 
 For an existing Python project, select provider and backend extras:
@@ -129,7 +130,7 @@ deployment. It also gives the upgrade sequence for existing applications.
 SDK version range. Choose one. SDK and server versions are separate. SDK v5
 requires server 4.59.0 or later. Keep `langfuse-v4` or `langfuse-v3` for server
 v3. Use the compatibility guide for supported combinations. `mcp`, `deepagents`,
-`ui`, and `openai-aiohttp` are separate extras. See
+`background`, `ui`, and `openai-aiohttp` are separate extras. See
 [installation](docs/installation.rst) for all options.
 
 ## Memory and authentication
@@ -181,7 +182,9 @@ stack through the [environment guide](docs/environment_setup.rst).
 - Use PostgreSQL for replicas across hosts. SQLite workers must share a file on
   a local filesystem. Configure persistence; the default backend is unset.
 - Supervisors replace failed workers. Requests running in a failed worker can
-  fail. The toolkit does not provide durable jobs or exactly-once tool writes.
+  fail. Use the optional [background jobs](docs/background.rst) path to submit
+  durable work to separate PostgreSQL-backed workers. Tool writes still need
+  their own idempotency keys.
 
 Read [deployment](docs/deployment.rst) for health probes and worker recovery,
 and [reliability](docs/reliability.rst) for database pools, connection limits,
@@ -200,6 +203,7 @@ and `/openapi.json`.
 | Add the toolkit to an application    | [Onboarding](docs/onboarding.rst)                                                                                                                                |
 | Select extras and configure services | [Installation](docs/installation.rst), [environment](docs/environment_setup.rst)                                                                                 |
 | Call the API or register an agent    | [Usage](docs/usage.rst)                                                                                                                                          |
+| Run durable work or embed a runtime  | [Background execution](docs/background.rst)                                                                                                                      |
 | Choose agents and tools              | [Integrations](docs/integrations.rst), [MCP](docs/mcp.rst), [Deep Agents](docs/deepagents.rst)                                                                   |
 | Upgrade an existing deployment       | [Migration](docs/migration.rst), [dependency review](docs/dependency_updates.rst), [changelog](CHANGELOG.md)                                                     |
 | Deploy and operate the service       | [Deployment](docs/deployment.rst), [reliability](docs/reliability.rst)                                                                                           |

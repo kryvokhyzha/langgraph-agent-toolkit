@@ -26,12 +26,18 @@ WORKDIR /app
 # Include both OpenAI transports. The runtime selects aiohttp by default.
 COPY pyproject.toml uv.lock ./
 ARG INSTALL_DEEPAGENTS=false
+ARG INSTALL_BACKGROUND=false
 ARG LANGFUSE_SDK_MAJOR=5
 RUN --mount=type=cache,target=/root/.cache/uv \
     case "$INSTALL_DEEPAGENTS" in \
       true) set -- --extra deepagents ;; \
       false) set -- ;; \
       *) echo "INSTALL_DEEPAGENTS must be true or false" >&2; exit 1 ;; \
+    esac && \
+    case "$INSTALL_BACKGROUND" in \
+      true) set -- "$@" --extra background ;; \
+      false) ;; \
+      *) echo "INSTALL_BACKGROUND must be true or false" >&2; exit 1 ;; \
     esac && \
     case "$LANGFUSE_SDK_MAJOR" in \
       2|3|4|5) ;; \

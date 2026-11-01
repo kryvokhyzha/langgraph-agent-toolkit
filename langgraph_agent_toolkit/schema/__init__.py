@@ -31,6 +31,10 @@ __all__ = [
     "AddMessagesInput",
     "AddMessagesResponse",
     "AgentInfo",
+    "BackgroundJob",
+    "ExecutionRequest",
+    "ExecutionResult",
+    "ExecutionSnapshot",
     "UserComplexInput",
     "UserInput",
     "ChatMessage",
@@ -54,3 +58,5 @@ __all__ = [
     "ThreadListInput",
     "ThreadSummary",
 ]
+from langgraph_agent_toolkit.schema.execution import ExecutionRequest, ExecutionResult, ExecutionSnapshot
+from langgraph_agent_toolkit.schema.jobs import BackgroundJob

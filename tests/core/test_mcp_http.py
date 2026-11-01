@@ -420,6 +420,7 @@ async def test_tcp_servers_keep_separate_pools_credentials_and_caches(tcp_mcp_se
 
 
 async def test_service_failed_graph_startup_closes_mcp_pool(tcp_mcp_server, monkeypatch):
+    from langgraph_agent_toolkit.core import runtime
     from langgraph_agent_toolkit.core.settings import settings
     from langgraph_agent_toolkit.service import handler
 
@@ -427,7 +428,7 @@ async def test_service_failed_graph_startup_closes_mcp_pool(tcp_mcp_server, monk
     executor = Mock()
     executor.get_all_agent_info.return_value = [SimpleNamespace(key="custom")]
     executor.get_agent.return_value = agent
-    monkeypatch.setattr(handler, "AgentExecutor", lambda *paths: executor)
+    monkeypatch.setattr(runtime, "AgentExecutor", lambda *paths: executor)
     monkeypatch.setattr(settings, "MCP_SERVERS", {"remote": MCPServerConfig(url=tcp_mcp_server.url)})
     monkeypatch.setattr(settings, "MCP_AGENT_SERVERS", {"custom": ["remote"]})
     monkeypatch.setattr(settings, "MEMORY_BACKEND", None)

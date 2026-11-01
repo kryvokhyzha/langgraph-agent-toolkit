@@ -1,5 +1,3 @@
-import asyncio
-import threading
 import warnings
 from collections.abc import AsyncGenerator
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -8,21 +6,10 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from langchain_core._api import LangChainBetaWarning
-from langgraph.checkpoint.memory import MemorySaver
 
 from langgraph_agent_toolkit import __version__
-from langgraph_agent_toolkit.agents.agent_executor import AgentExecutor
-from langgraph_agent_toolkit.core.mcp import MCPTransportManager, configure_mcp_agents
-from langgraph_agent_toolkit.core.memory.concurrency import (
-    ConversationCoordinator,
-    PostgresConversationCoordinator,
-    SQLiteConversationCoordinator,
-)
-from langgraph_agent_toolkit.core.memory.factory import MemoryFactory
-from langgraph_agent_toolkit.core.memory.types import MemoryBackends
-from langgraph_agent_toolkit.core.models.transport import LLMTransportManager
-from langgraph_agent_toolkit.core.observability.factory import ObservabilityFactory
-from langgraph_agent_toolkit.core.observability.types import ObservabilityBackend
+from langgraph_agent_toolkit.core.runtime import agent_runtime
+from langgraph_agent_toolkit.core.runtime import shutdown_observability as shutdown_observability
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.helper.logging import logger
 from langgraph_agent_toolkit.service.admission import RequestAdmissionMiddleware
@@ -37,40 +24,6 @@ from langgraph_agent_toolkit.service.utils import verify_bearer
 warnings.filterwarnings("ignore", category=LangChainBetaWarning)
 
 
-async def shutdown_observability(observability) -> None:
-    """Give synchronous telemetry flush a deadline without blocking worker exit."""
-    loop = asyncio.get_running_loop()
-    completed = loop.create_future()
-
-    def finish(error: Exception | None) -> None:
-        if completed.done():
-            return
-        if error is None:
-            completed.set_result(None)
-        else:
-            completed.set_exception(error)
-
-    def flush() -> None:
-        error = None
-        try:
-            observability.before_shutdown()
-        except Exception as exc:
-            error = exc
-        try:
-            loop.call_soon_threadsafe(finish, error)
-        except RuntimeError:
-            pass  # The worker event loop has already stopped.
-
-    # A stuck default-executor thread would also block asyncio.run() shutdown.
-    threading.Thread(target=flush, name="observability-shutdown", daemon=True).start()
-    try:
-        await asyncio.wait_for(completed, settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
-    except TimeoutError:
-        logger.warning("Observability flush exceeded its shutdown time limit; pending telemetry may be lost")
-    except Exception:
-        logger.opt(exception=True).warning("Observability flush failed during shutdown")
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Initialize all required resources or fail worker startup."""
@@ -82,71 +35,38 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.state.sqlite_connection = None
     app.state.llm_transport_manager = None
     app.state.mcp_transport_manager = None
+    app.state.agent_runtime = None
+    app.state.background_jobs = None
     try:
         validate_auth_configuration()
-        async with AsyncExitStack() as resources:
-            manager = await resources.enter_async_context(LLMTransportManager.from_settings(settings))
-            resources.enter_context(manager.bind())
-            app.state.llm_transport_manager = manager
-            mcp_manager = await resources.enter_async_context(MCPTransportManager())
-            app.state.mcp_transport_manager = mcp_manager
-            observability = ObservabilityFactory.create(settings.OBSERVABILITY_BACKEND or ObservabilityBackend.EMPTY)
-            telemetry_resources = await resources.enter_async_context(AsyncExitStack())
-            telemetry_resources.push_async_callback(shutdown_observability, observability)
-            telemetry_ids = {id(observability)}
-            app.state.blocking_executor = BoundedBlockingExecutor(settings.REQUEST_MAX_CONCURRENT)
-            resources.push_async_callback(app.state.blocking_executor.aclose, settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
-            saver = None
-            concurrency = ConversationCoordinator()
-            if settings.MEMORY_BACKEND:
-                backend = MemoryFactory.create(settings.MEMORY_BACKEND)
-                saver = await resources.enter_async_context(backend.get_checkpoint_saver())
-                await saver.setup()
-                if settings.MEMORY_BACKEND == MemoryBackends.POSTGRES:
-                    app.state.db_pool = saver.conn
-                    lock_pool = await resources.enter_async_context(backend.get_lock_pool())
-                    app.state.lock_pool = lock_pool
-                    concurrency = PostgresConversationCoordinator(lock_pool)
-                else:
-                    app.state.sqlite_connection = saver.conn
-                    if settings.SQLITE_DB_PATH != ":memory:":
-                        concurrency = SQLiteConversationCoordinator(settings.SQLITE_DB_PATH)
-                    else:
-                        logger.warning(
-                            "SQLite checkpoints use :memory: and are not durable. "
-                            "Workers do not share this database. Worker shutdown deletes its checkpoints."
-                        )
+        blocking = BoundedBlockingExecutor(settings.REQUEST_MAX_CONCURRENT)
+        app.state.blocking_executor = blocking
+        try:
+            async with agent_runtime() as runtime, AsyncExitStack() as resources:
+                app.state.agent_runtime = runtime
+                app.state.db_pool = runtime.db_pool
+                app.state.lock_pool = runtime.lock_pool
+                app.state.sqlite_connection = runtime.sqlite_connection
+                app.state.llm_transport_manager = runtime.llm_transport_manager
+                app.state.mcp_transport_manager = runtime.mcp_transport_manager
+                app.state.agent_executor = runtime.executor
+                app.state.initialized_agents = list(runtime.initialized_agents)
+                if settings.BACKGROUND_ENABLED:
+                    from langgraph_agent_toolkit.core.background import queue_from_settings
 
-            executor = AgentExecutor(*settings.AGENT_PATHS)
-            executor.concurrency = concurrency
-            agents = executor.get_all_agent_info()
-            if not agents:
-                raise RuntimeError("No agents were initialized")
-            # Register custom providers before graph setup can fail.
-            for info in agents:
-                agent = executor.get_agent(info.key)
-                if agent.observability is None:
-                    agent.observability = observability
-                if id(agent.observability) not in telemetry_ids:
-                    telemetry_ids.add(id(agent.observability))
-                    telemetry_resources.push_async_callback(shutdown_observability, agent.observability)
-            await configure_mcp_agents(executor, settings, rebuild_all=True, manager=mcp_manager)
-            for info in agents:
-                agent = executor.get_agent(info.key)
-                if agent.graph.checkpointer is None:
-                    agent.graph.checkpointer = saver if saver is not None else MemorySaver()
-                if isinstance(agent.graph.checkpointer, MemorySaver):
-                    logger.warning(
-                        f"Agent {info.key!r} uses MemorySaver. Checkpoints are not durable. "
-                        "Workers do not share these checkpoints. Worker shutdown deletes them."
-                    )
-                app.state.initialized_agents.append(info.key)
-
-            app.state.agent_executor = executor
-            app.state.startup_complete = True
-            app.state.ready = True
-            logger.info(f"Initialized {len(agents)} agents")
-            yield
+                    app.state.background_jobs = await resources.enter_async_context(queue_from_settings())
+                app.state.startup_complete = True
+                app.state.ready = True
+                logger.info(f"Initialized {len(runtime.initialized_agents)} agents")
+                try:
+                    yield
+                finally:
+                    # Feedback threads can still use the observability providers.
+                    await blocking.aclose(settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
+        finally:
+            # Runtime startup can fail before the service accepts any requests.
+            if not app.state.startup_complete:
+                await blocking.aclose(settings.OBSERVABILITY_SHUTDOWN_TIMEOUT)
     finally:
         app.state.ready = False
         app.state.db_pool = None
@@ -154,6 +74,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         app.state.sqlite_connection = None
         app.state.llm_transport_manager = None
         app.state.mcp_transport_manager = None
+        app.state.agent_runtime = None
+        app.state.background_jobs = None
         if hasattr(app.state, "agent_executor"):
             del app.state.agent_executor
 
@@ -216,5 +138,10 @@ def create_app() -> FastAPI:
 
     # Include the authenticated router with shared OpenAPI error responses.
     app.include_router(private_router, dependencies=[Depends(verify_bearer)], responses=COMMON_ERROR_RESPONSES)
+
+    if settings.BACKGROUND_ENABLED:
+        from langgraph_agent_toolkit.service.jobs import jobs_router
+
+        app.include_router(jobs_router, dependencies=[Depends(verify_bearer)], responses=COMMON_ERROR_RESPONSES)
 
     return app

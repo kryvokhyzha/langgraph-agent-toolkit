@@ -6,7 +6,7 @@ import asyncio
 import importlib
 import os
 import threading
-from collections.abc import Iterator, Mapping
+from collections.abc import Generator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any, Literal
@@ -170,7 +170,7 @@ class LLMTransportManager:
             raise RuntimeError("LLM transport manager belongs to another event loop")
 
     @contextmanager
-    def bind(self) -> Iterator[LLMTransportManager]:
+    def bind(self) -> Generator[LLMTransportManager, None, None]:
         self._check_owner()
         token = _manager.set(self)
         try:

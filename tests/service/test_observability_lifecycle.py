@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from fastapi import FastAPI
 
+from langgraph_agent_toolkit.core import runtime
 from langgraph_agent_toolkit.core.settings import settings
 from langgraph_agent_toolkit.service import handler
 
@@ -35,9 +36,9 @@ async def test_distinct_agent_providers_close_once_after_request_executor(monkey
     configure = AsyncMock(side_effect=RuntimeError("Graph startup failed") if fail_startup else None)
     monkeypatch.setattr(settings, "MEMORY_BACKEND", None)
     monkeypatch.setattr(handler, "validate_auth_configuration", lambda: None)
-    monkeypatch.setattr(handler, "AgentExecutor", lambda *args, **kwargs: executor)
-    monkeypatch.setattr(handler.ObservabilityFactory, "create", lambda *args, **kwargs: default)
-    monkeypatch.setattr(handler, "configure_mcp_agents", configure)
+    monkeypatch.setattr(runtime, "AgentExecutor", lambda *args, **kwargs: executor)
+    monkeypatch.setattr(runtime.ObservabilityFactory, "create", lambda *args, **kwargs: default)
+    monkeypatch.setattr(runtime, "configure_mcp_agents", configure)
     close_requests = handler.BoundedBlockingExecutor.aclose
 
     async def close_and_record(self, *args, **kwargs):
@@ -55,8 +56,12 @@ async def test_distinct_agent_providers_close_once_after_request_executor(monkey
             assert app.state.ready
             assert agents["implicit"].observability is default
             assert events == []
-    assert events[0] == "requests"
-    assert set(events[1:]) == set(providers)
+    if fail_startup:
+        assert events[-1] == "requests"
+        assert set(events[:-1]) == set(providers)
+    else:
+        assert events[0] == "requests"
+        assert set(events[1:]) == set(providers)
     for provider in providers.values():
         provider.before_shutdown.assert_called_once_with()
     assert not app.state.ready

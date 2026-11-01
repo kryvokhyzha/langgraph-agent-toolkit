@@ -11,6 +11,35 @@ The service binds each stored conversation to a user and an agent. The public
 Existing raw thread IDs need an explicit migration before the service can read
 them through the new API.
 
+Upgrade from 0.10.x to 0.11.0
+-----------------------------
+
+Existing invoke, streaming, authentication, and history request formats remain
+available. ``BACKGROUND_ENABLED=false`` remains the default. Installing 0.11.0
+does not start a queue or convert chat requests into background jobs.
+
+To enable jobs, install the ``background`` extra in API and worker environments.
+Use the existing ``POSTGRES_*`` connection settings with a separate
+``BACKGROUND_POSTGRES_SCHEMA=lat_background`` and
+``BACKGROUND_POSTGRES_POOL_SIZE=5``. An optional ``BACKGROUND_POSTGRES_DSN``
+selects another database. Both backends use the shared connection reliability
+settings. Include the added queue pools and worker runtimes in connection budgets.
+
+For a prerelease background deployment, replace ``BACKGROUND_SCHEMA`` with
+``BACKGROUND_POSTGRES_SCHEMA`` and ``BACKGROUND_POOL_MAX_SIZE`` with
+``BACKGROUND_POSTGRES_POOL_SIZE``. The old names remain accepted aliases.
+Stop API and queue workers, back up storage, and run
+``python -m langgraph_agent_toolkit.run_worker initialize`` before restarting.
+This applies supported toolkit schema upgrades from 1 or 2 to 3 without removing
+jobs. Queue dependency schema versions must still match.
+
+Recovery runs independently of execution slots and no longer creates maintenance
+jobs. Keep worker supervision enabled. Queue bookkeeping failures now stop the
+worker so a replacement can recover its jobs. Drain unfinished operations before
+removing or renaming their graph nodes. History clearing returns HTTP 409 while
+the conversation has active background jobs. See :doc:`background` for recovery,
+checkpoint deletion, tool side effects, and retention limits.
+
 Refresh installation tools and images
 -------------------------------------
 

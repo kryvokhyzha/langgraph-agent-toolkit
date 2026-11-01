@@ -253,6 +253,46 @@ The binary store test closes both PostgreSQL pools, opens new pools, and
 restores saved media. It also checks owner isolation and blob retention after
 checkpoint deletion.
 
+Background jobs use the same disposable PostgreSQL service. Install the
+``background`` extra and run both the database contracts and process journeys:
+
+.. code-block:: bash
+
+   uv run --no-sync pytest tests/integration/test_background*.py \
+     tests/e2e/test_background_jobs.py --run-postgres --run-e2e
+
+These tests run a real API and a separate queue worker. They check committed
+submission before execution, API restart, duplicate submissions, owner isolation,
+queued and running cancellation, explicit approval, stale answers, and worker
+termination during a multi-step graph. Recovery must not repeat a node whose
+checkpoint already committed. Additional regressions cover queue acknowledgement
+failure, abandoned maintenance locks, recovery while execution slots are full,
+shared PostgreSQL settings, incompatible graph changes, and history deletion
+while recovery remains possible. These are deterministic graph tests; they make
+no model-provider requests. CI runs them in the PostgreSQL job.
+
+For bounded real-model checks of both immediate and queued execution, use:
+
+.. code-block:: bash
+
+   uv run --no-sync pytest tests/e2e/test_background_live_execution.py \
+     --run-e2e --run-postgres --run-llm
+
+Set ``LAT_TEST_POSTGRES_DSN``, ``LAT_TEST_OPENAI_API_KEY``, and
+``LAT_TEST_OPENAI_MODEL`` explicitly. Tests do not read local environment files.
+The default provider is OpenAI; ``LAT_TEST_OPENAI_BASE_URL`` can select another
+compatible endpoint. For Azure, set ``LAT_TEST_OPENAI_PROVIDER=azure_openai`` and
+provide ``LAT_TEST_AZURE_OPENAI_ENDPOINT``, ``LAT_TEST_AZURE_OPENAI_API_VERSION``,
+and ``LAT_TEST_AZURE_OPENAI_DEPLOYMENT``. The test key variable remains
+``LAT_TEST_OPENAI_API_KEY`` for either provider. Keep credentials out of shell
+history and reports. Optional ``LAT_TEST_OPENAI_MODEL_KWARGS`` accepts only
+``reasoning_effort`` and ``temperature``.
+
+These two tests normally make two model requests. They disable SDK retries and
+cap each output at 512 tokens. They check response usage, history after API
+restart, approval before the queued model call, worker restart, and duplicate
+submission without another model call. Normal and CI runs skip these paid tests.
+
 Tool selection and API benchmarks
 ----------------------------------
 

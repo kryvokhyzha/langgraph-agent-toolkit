@@ -140,7 +140,8 @@ Cancellation preserves completed checkpoints when the backend remains
 available. A running node can remain unfinished. A hard worker termination can
 stop any in-flight operation. Checkpoints do not resume accepted HTTP requests
 automatically or provide exactly-once external tool actions. Use idempotency keys
-and a durable job system for work that must continue after the client disconnects.
+and the optional :doc:`background` path for work that must continue after the
+client disconnects.
 
 The history API returns messages, not a complete checkpoint backup. Other state
 channels, pending tasks, and external tool data require their own backup or
@@ -196,9 +197,10 @@ rejected request. Set a small positive ``REQUEST_QUEUE_MAX_WAITERS`` to absorb
 short bursts. Waiters use no model or database connection. A disconnected waiter
 can occupy its queue slot until admission or ``REQUEST_QUEUE_TIMEOUT``.
 
-The queue exists in one worker. It is not a persistent job queue. A worker loss
-does not transfer accepted work to another worker. Use a durable job system for
-work that must continue without the original HTTP client.
+This admission queue exists in one worker. It is not a persistent job queue.
+A worker loss does not transfer accepted HTTP requests to another worker.
+Use the separate :doc:`background` path for work that must continue without
+the original HTTP client.
 
 The conversation queue is a separate limit. Calls for the same thread can occupy
 active request slots while waiting for that thread. Keep
@@ -306,8 +308,9 @@ can still allow one request in each other worker to wait for the shared database
 lock; it is not a global immediate-rejection policy.
 
 For retries after an uncertain result, use an application operation ID and a
-durable record of its status and result. The toolkit has no built-in
-``Idempotency-Key`` contract. A returned ``run_id`` identifies a run; it does not
+durable record of its status and result. Ordinary invoke and streaming endpoints
+do not have an ``Idempotency-Key`` contract. The optional :doc:`background`
+submission API requires one. A returned ``run_id`` identifies a run; it does not
 deduplicate the next request. Check saved state before retrying a failed run.
 Tools that change external systems also need idempotency at those systems.
 Ordinary repeated message text creates another turn when no interrupt is pending.

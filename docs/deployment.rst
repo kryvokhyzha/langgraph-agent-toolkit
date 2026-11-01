@@ -259,9 +259,10 @@ After recovery, a caller can retry from the available checkpoint, but the
 service does not automatically replay incomplete HTTP requests. Review the
 application's recovery rules for interrupted runs and external side effects.
 
-No Redis queue or background job broker is added by this change. Requests still
-run in the worker that accepts them. Use a durable job system if work must
-survive the loss of that worker independently of a connected client.
+Ordinary HTTP requests run in the worker that accepts them. The optional
+:doc:`background` path adds PostgreSQL-backed jobs and a separate worker service.
+It does not require Redis. Enable it explicitly for work that must survive
+worker loss independently of a connected client.
 
 Nested Calls and Shutdown
 -------------------------
