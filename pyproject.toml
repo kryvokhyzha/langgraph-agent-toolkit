@@ -205,7 +205,7 @@ langsmith = [
 ]
 
 phoenix = [
-    "arize-phoenix-client >= 3.5.0, < 3.6",
+    "arize-phoenix-client>=3.5.0,<3.7",
     "openinference-instrumentation-langchain >= 0.1.80, < 0.2",
     "opentelemetry-sdk >= 1.45.1, < 2",
     "opentelemetry-exporter-otlp-proto-http >= 1.45.1, < 2",
