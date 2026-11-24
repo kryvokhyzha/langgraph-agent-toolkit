@@ -38,7 +38,7 @@ dependencies = [
     "fastapi >= 0.136.3, < 0.136.4",  # This range uses the tested native JSON Lines streaming API.
     "httpx ~= 0.28.1",
     "langchain >= 1.4.7, < 1.5",
-    "langchain-core >= 1.7.0, < 1.8",
+    "langchain-core>=1.7.0,<1.9",
     "langchain-community >= 0.4.2, < 0.4.3",
     "langgraph >= 1.2.18, < 1.3",
     "langgraph-checkpoint >= 4.3.1, < 4.4",
@@ -119,7 +119,7 @@ background = [
 # MCP tools for LangChain agents
 mcp = [
     "langchain[mcp] >= 1.4.7, < 1.5",
-    "fastmcp >= 4.1.4, < 4.2",
+    "fastmcp>=4.1.4,<4.3",
 ]
 
 # Deep Agents adds context management, virtual files, and delegated work.
@@ -159,7 +159,7 @@ anthropic = [
 ]
 
 google-vertexai = [
-    "langchain-google-vertexai >= 3.2.5, < 3.3",
+    "langchain-google-vertexai>=3.2.5,<3.4",
 ]
 
 google-genai = [
@@ -167,7 +167,7 @@ google-genai = [
 ]
 
 openai = [
-    "langchain-openai >= 1.7.3, < 1.8",
+    "langchain-openai>=1.7.3,<1.9",
 ]
 
 openai-aiohttp = [
